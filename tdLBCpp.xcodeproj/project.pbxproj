@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D698D759257D036600A3BFD2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D698D758257D036500A3BFD2 /* main.cpp */; };
+		D6E5C52425DBAD1B0067FDE1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C51F25DBAD1B0067FDE1 /* main.cpp */; };
+		D6E5C52525DBAD1B0067FDE1 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C52125DBAD1B0067FDE1 /* jsoncpp.cpp */; };
+		D6E5C52825DBAD5C0067FDE1 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C52725DBAD5C0067FDE1 /* test.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +26,19 @@
 
 /* Begin PBXFileReference section */
 		D698D755257D036500A3BFD2 /* tdLBCpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tdLBCpp; sourceTree = BUILT_PRODUCTS_DIR; };
-		D698D758257D036500A3BFD2 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D6E5C4F625DBACEA0067FDE1 /* RushtonTurbine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RushtonTurbine.hpp; sourceTree = "<group>"; };
+		D6E5C4F825DBACEA0067FDE1 /* GeomMidPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GeomMidPoint.hpp; sourceTree = "<group>"; };
+		D6E5C51A25DBAD1A0067FDE1 /* FlowParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FlowParams.hpp; path = src/FlowParams.hpp; sourceTree = SOURCE_ROOT; };
+		D6E5C51B25DBAD1A0067FDE1 /* ComputeUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ComputeUnit.h; path = src/ComputeUnit.h; sourceTree = SOURCE_ROOT; };
+		D6E5C51C25DBAD1B0067FDE1 /* BaseParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = BaseParams.hpp; path = src/BaseParams.hpp; sourceTree = SOURCE_ROOT; };
+		D6E5C51D25DBAD1B0067FDE1 /* GridParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GridParams.hpp; path = src/GridParams.hpp; sourceTree = SOURCE_ROOT; };
+		D6E5C51E25DBAD1B0067FDE1 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Header.h; path = src/Header.h; sourceTree = SOURCE_ROOT; };
+		D6E5C51F25DBAD1B0067FDE1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
+		D6E5C52025DBAD1B0067FDE1 /* QVec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = QVec.hpp; path = src/QVec.hpp; sourceTree = SOURCE_ROOT; };
+		D6E5C52125DBAD1B0067FDE1 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsoncpp.cpp; path = src/jsoncpp.cpp; sourceTree = SOURCE_ROOT; };
+		D6E5C52225DBAD1B0067FDE1 /* ComputeUnit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeUnit.hpp; path = src/ComputeUnit.hpp; sourceTree = SOURCE_ROOT; };
+		D6E5C52325DBAD1B0067FDE1 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json.h; path = src/json.h; sourceTree = SOURCE_ROOT; };
+		D6E5C52725DBAD5C0067FDE1 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,10 +52,39 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D6878A9B25DAC05A0033C514 /* tdLBGeometryRushtonTurbineLib */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C4F425DBACEA0067FDE1 /* Sources */,
+			);
+			name = tdLBGeometryRushtonTurbineLib;
+			path = tdLBCpp/tdLBGeometryRushtonTurbineLib;
+			sourceTree = "<group>";
+		};
+		D68F4A7B25DAC003009E77AE /* src */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C51C25DBAD1B0067FDE1 /* BaseParams.hpp */,
+				D6E5C52025DBAD1B0067FDE1 /* QVec.hpp */,
+				D6E5C51B25DBAD1A0067FDE1 /* ComputeUnit.h */,
+				D6E5C52225DBAD1B0067FDE1 /* ComputeUnit.hpp */,
+				D6E5C51A25DBAD1A0067FDE1 /* FlowParams.hpp */,
+				D6E5C51D25DBAD1B0067FDE1 /* GridParams.hpp */,
+				D6E5C51E25DBAD1B0067FDE1 /* Header.h */,
+				D6E5C52325DBAD1B0067FDE1 /* json.h */,
+				D6E5C52125DBAD1B0067FDE1 /* jsoncpp.cpp */,
+				D6E5C51F25DBAD1B0067FDE1 /* main.cpp */,
+			);
+			name = src;
+			path = tdLBCpp/src;
+			sourceTree = "<group>";
+		};
 		D698D74C257D036500A3BFD2 = {
 			isa = PBXGroup;
 			children = (
-				D698D757257D036500A3BFD2 /* tdLBCpp */,
+				D6E5C52A25DBAD610067FDE1 /* tests */,
+				D6878A9B25DAC05A0033C514 /* tdLBGeometryRushtonTurbineLib */,
+				D68F4A7B25DAC003009E77AE /* src */,
 				D698D756257D036500A3BFD2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,12 +97,30 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		D698D757257D036500A3BFD2 /* tdLBCpp */ = {
+		D6E5C4F425DBACEA0067FDE1 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				D698D758257D036500A3BFD2 /* main.cpp */,
+				D6E5C4F525DBACEA0067FDE1 /* tdLBGeometryRushtonTurbineLibCPP */,
 			);
-			path = tdLBCpp;
+			name = Sources;
+			path = tdLBGeometryRushtonTurbineLib/Sources;
+			sourceTree = SOURCE_ROOT;
+		};
+		D6E5C4F525DBACEA0067FDE1 /* tdLBGeometryRushtonTurbineLibCPP */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C4F625DBACEA0067FDE1 /* RushtonTurbine.hpp */,
+				D6E5C4F825DBACEA0067FDE1 /* GeomMidPoint.hpp */,
+			);
+			path = tdLBGeometryRushtonTurbineLibCPP;
+			sourceTree = "<group>";
+		};
+		D6E5C52A25DBAD610067FDE1 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C52725DBAD5C0067FDE1 /* test.cpp */,
+			);
+			path = tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -88,7 +149,7 @@
 		D698D74D257D036500A3BFD2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1220;
+				LastUpgradeCheck = 1240;
 				TargetAttributes = {
 					D698D754257D036500A3BFD2 = {
 						CreatedOnToolsVersion = 12.2;
@@ -118,7 +179,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D698D759257D036600A3BFD2 /* main.cpp in Sources */,
+				D6E5C52525DBAD1B0067FDE1 /* jsoncpp.cpp in Sources */,
+				D6E5C52425DBAD1B0067FDE1 /* main.cpp in Sources */,
+				D6E5C52825DBAD5C0067FDE1 /* test.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,6 +302,7 @@
 		D698D75D257D036600A3BFD2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = D77CH63CLG;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -249,6 +313,7 @@
 		D698D75E257D036600A3BFD2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = D77CH63CLG;
 				ENABLE_HARDENED_RUNTIME = YES;
