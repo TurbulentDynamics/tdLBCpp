@@ -1,4 +1,4 @@
-[submodule "tdLBCpp/tdLBGeometryRushtonTurbineLib"]
+[submodule "tdLBGeometryRushtonTurbineLib"]
 	path = tdLBGeometryRushtonTurbineLib
 	url = git@github.com:TurbulentDynamics/tdLBGeometryRushtonTurbineLib.git
 [submodule "tdLBCppApi"]
