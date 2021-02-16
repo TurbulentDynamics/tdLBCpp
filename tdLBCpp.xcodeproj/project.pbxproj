@@ -39,6 +39,7 @@
 		D6E5C52225DBAD1B0067FDE1 /* ComputeUnit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeUnit.hpp; path = src/ComputeUnit.hpp; sourceTree = SOURCE_ROOT; };
 		D6E5C52325DBAD1B0067FDE1 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json.h; path = src/json.h; sourceTree = SOURCE_ROOT; };
 		D6E5C52725DBAD5C0067FDE1 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
+		D6E5C56125DBE69E0067FDE1 /* GlobalStructures.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GlobalStructures.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +83,7 @@
 		D698D74C257D036500A3BFD2 = {
 			isa = PBXGroup;
 			children = (
+				D6E5C55F25DBE69E0067FDE1 /* tdLBCppApi */,
 				D6E5C52A25DBAD610067FDE1 /* tests */,
 				D6878A9B25DAC05A0033C514 /* tdLBGeometryRushtonTurbineLib */,
 				D68F4A7B25DAC003009E77AE /* src */,
@@ -121,6 +123,22 @@
 				D6E5C52725DBAD5C0067FDE1 /* test.cpp */,
 			);
 			path = tests;
+			sourceTree = "<group>";
+		};
+		D6E5C55F25DBE69E0067FDE1 /* tdLBCppApi */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C56025DBE69E0067FDE1 /* include */,
+			);
+			path = tdLBCppApi;
+			sourceTree = "<group>";
+		};
+		D6E5C56025DBE69E0067FDE1 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C56125DBE69E0067FDE1 /* GlobalStructures.hpp */,
+			);
+			path = include;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
