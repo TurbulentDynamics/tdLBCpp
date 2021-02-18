@@ -47,11 +47,13 @@ using let_tStep = const int;
 //Q0 unused, so not allocated in memory, and Q19, acually
 #define Q0 Unused_Error    // 0,  0,  0
 
+
+
 //Faces
 #define Q1 0           //+1,  0,  0
 #define Q2 1           //-1,  0,  0
-#define Q3 2           // 0, +1,  0
-#define Q4 3           // 0, -1,  0
+#define Q3 2           // 0, +1,  0  //UP VECTOR
+#define Q4 3           // 0, -1,  0  //DOWN VECTOR
 #define Q5 4           // 0,  0, +1
 #define Q6 5           // 0,  0, -1
 
@@ -150,7 +152,14 @@ using let_tStep = const int;
 #define O25 Q11
 #define O26 Q19
 
-
+#define nFACES 6
 #define FACES [O4, O10, O12, O14, O16, O22]
+
+#define nEDGES 12
 #define EDGES [O1, O3, O5, O7,   O9, O11, O15, O17,   O19, O21, O23, O25]
+
+#define nCORNERS 8
 #define CORNERS [O0, O2, O6, O8, O18, O20, O24, O26]
+
+#define nTOP 9
+#define TOP [O0, O1, O2, O9, O10, O11, O18, O19, O20]

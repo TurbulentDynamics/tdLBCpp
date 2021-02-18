@@ -12,6 +12,8 @@
 
 #include "Header.h"
 
+#include "../tdLBCppApi/include/GlobalStructures.hpp"
+
 
 
 template <typename T>
@@ -27,10 +29,6 @@ struct Velocity {
         return u;
     };
 };
-
-
-
-
 
 
 template <typename T>
@@ -53,8 +51,6 @@ struct Force {
         
     }
 };
-
-
 
 
 

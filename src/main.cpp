@@ -9,19 +9,13 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
-//#include <unistd.h>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 
-#include "../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomMidPoint.hpp"
-
-#include "ComputeUnit.h"
-
 //For the overflow error checking. (didnt work with pg compiler)
 #include <cfenv>
-
 
 
 #include "json.h"
@@ -29,6 +23,8 @@
 #include "Header.h"
 #include "GridParams.hpp"
 #include "FlowParams.hpp"
+#include "../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomMidPoint.hpp"
+#include "ComputeUnit.h"
 
 
 

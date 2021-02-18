@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D6E5C52425DBAD1B0067FDE1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C51F25DBAD1B0067FDE1 /* main.cpp */; };
-		D6E5C52525DBAD1B0067FDE1 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C52125DBAD1B0067FDE1 /* jsoncpp.cpp */; };
 		D6E5C52825DBAD5C0067FDE1 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C52725DBAD5C0067FDE1 /* test.cpp */; };
+		D6E5C5F025DBEC2E0067FDE1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C5ED25DBEC2E0067FDE1 /* main.cpp */; };
+		D6E5C5F125DBEC2E0067FDE1 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C5EE25DBEC2E0067FDE1 /* jsoncpp.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,20 +26,24 @@
 
 /* Begin PBXFileReference section */
 		D698D755257D036500A3BFD2 /* tdLBCpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tdLBCpp; sourceTree = BUILT_PRODUCTS_DIR; };
-		D6E5C4F625DBACEA0067FDE1 /* RushtonTurbine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RushtonTurbine.hpp; sourceTree = "<group>"; };
-		D6E5C4F825DBACEA0067FDE1 /* GeomMidPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GeomMidPoint.hpp; sourceTree = "<group>"; };
-		D6E5C51A25DBAD1A0067FDE1 /* FlowParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FlowParams.hpp; path = src/FlowParams.hpp; sourceTree = SOURCE_ROOT; };
-		D6E5C51B25DBAD1A0067FDE1 /* ComputeUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ComputeUnit.h; path = src/ComputeUnit.h; sourceTree = SOURCE_ROOT; };
-		D6E5C51C25DBAD1B0067FDE1 /* BaseParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = BaseParams.hpp; path = src/BaseParams.hpp; sourceTree = SOURCE_ROOT; };
-		D6E5C51D25DBAD1B0067FDE1 /* GridParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GridParams.hpp; path = src/GridParams.hpp; sourceTree = SOURCE_ROOT; };
-		D6E5C51E25DBAD1B0067FDE1 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Header.h; path = src/Header.h; sourceTree = SOURCE_ROOT; };
-		D6E5C51F25DBAD1B0067FDE1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
-		D6E5C52025DBAD1B0067FDE1 /* QVec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = QVec.hpp; path = src/QVec.hpp; sourceTree = SOURCE_ROOT; };
-		D6E5C52125DBAD1B0067FDE1 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsoncpp.cpp; path = src/jsoncpp.cpp; sourceTree = SOURCE_ROOT; };
-		D6E5C52225DBAD1B0067FDE1 /* ComputeUnit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeUnit.hpp; path = src/ComputeUnit.hpp; sourceTree = SOURCE_ROOT; };
-		D6E5C52325DBAD1B0067FDE1 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json.h; path = src/json.h; sourceTree = SOURCE_ROOT; };
 		D6E5C52725DBAD5C0067FDE1 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
-		D6E5C56125DBE69E0067FDE1 /* GlobalStructures.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GlobalStructures.hpp; sourceTree = "<group>"; };
+		D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RushtonTurbine.hpp; sourceTree = "<group>"; };
+		D6E5C5BD25DBEC0B0067FDE1 /* GeomMidPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GeomMidPoint.hpp; sourceTree = "<group>"; };
+		D6E5C5E625DBEC2E0067FDE1 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
+		D6E5C5E725DBEC2E0067FDE1 /* QVec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = QVec.hpp; sourceTree = "<group>"; };
+		D6E5C5E825DBEC2E0067FDE1 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
+		D6E5C5E925DBEC2E0067FDE1 /* ComputeUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComputeUnit.h; sourceTree = "<group>"; };
+		D6E5C5EA25DBEC2E0067FDE1 /* FlowParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FlowParams.hpp; sourceTree = "<group>"; };
+		D6E5C5EB25DBEC2E0067FDE1 /* BaseParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BaseParams.hpp; sourceTree = "<group>"; };
+		D6E5C5EC25DBEC2E0067FDE1 /* GridParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GridParams.hpp; sourceTree = "<group>"; };
+		D6E5C5ED25DBEC2E0067FDE1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D6E5C5EE25DBEC2E0067FDE1 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
+		D6E5C5EF25DBEC2E0067FDE1 /* ComputeUnit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnit.hpp; sourceTree = "<group>"; };
+		D6E5C61225DD56F50067FDE1 /* GlobalStructures.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GlobalStructures.hpp; path = tdLBCppApi/include/GlobalStructures.hpp; sourceTree = "<group>"; };
+		D6E5C61425DD580C0067FDE1 /* GlobalStructures.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GlobalStructures.hpp; path = tdLBCppApi/include/GlobalStructures.hpp; sourceTree = SOURCE_ROOT; };
+		D6E5C61625DE3C440067FDE1 /* Collision.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Collision.hpp; sourceTree = "<group>"; };
+		D6E5C61725DE3C510067FDE1 /* Streaming.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Streaming.hpp; sourceTree = "<group>"; };
+		D6E5C61825DE3CCA0067FDE1 /* Boundary.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Boundary.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,40 +57,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		D6878A9B25DAC05A0033C514 /* tdLBGeometryRushtonTurbineLib */ = {
-			isa = PBXGroup;
-			children = (
-				D6E5C4F425DBACEA0067FDE1 /* Sources */,
-			);
-			name = tdLBGeometryRushtonTurbineLib;
-			path = tdLBCpp/tdLBGeometryRushtonTurbineLib;
-			sourceTree = "<group>";
-		};
-		D68F4A7B25DAC003009E77AE /* src */ = {
-			isa = PBXGroup;
-			children = (
-				D6E5C51C25DBAD1B0067FDE1 /* BaseParams.hpp */,
-				D6E5C52025DBAD1B0067FDE1 /* QVec.hpp */,
-				D6E5C51B25DBAD1A0067FDE1 /* ComputeUnit.h */,
-				D6E5C52225DBAD1B0067FDE1 /* ComputeUnit.hpp */,
-				D6E5C51A25DBAD1A0067FDE1 /* FlowParams.hpp */,
-				D6E5C51D25DBAD1B0067FDE1 /* GridParams.hpp */,
-				D6E5C51E25DBAD1B0067FDE1 /* Header.h */,
-				D6E5C52325DBAD1B0067FDE1 /* json.h */,
-				D6E5C52125DBAD1B0067FDE1 /* jsoncpp.cpp */,
-				D6E5C51F25DBAD1B0067FDE1 /* main.cpp */,
-			);
-			name = src;
-			path = tdLBCpp/src;
-			sourceTree = "<group>";
-		};
 		D698D74C257D036500A3BFD2 = {
 			isa = PBXGroup;
 			children = (
-				D6E5C55F25DBE69E0067FDE1 /* tdLBCppApi */,
+				D6E5C5F325DBEC380067FDE1 /* tdLBCppApi */,
+				D6E5C5A925DBEC0A0067FDE1 /* tdLBGeometryRushtonTurbineLib */,
+				D6E5C5E525DBEC2E0067FDE1 /* src */,
 				D6E5C52A25DBAD610067FDE1 /* tests */,
-				D6878A9B25DAC05A0033C514 /* tdLBGeometryRushtonTurbineLib */,
-				D68F4A7B25DAC003009E77AE /* src */,
 				D698D756257D036500A3BFD2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -99,24 +76,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		D6E5C4F425DBACEA0067FDE1 /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				D6E5C4F525DBACEA0067FDE1 /* tdLBGeometryRushtonTurbineLibCPP */,
-			);
-			name = Sources;
-			path = tdLBGeometryRushtonTurbineLib/Sources;
-			sourceTree = SOURCE_ROOT;
-		};
-		D6E5C4F525DBACEA0067FDE1 /* tdLBGeometryRushtonTurbineLibCPP */ = {
-			isa = PBXGroup;
-			children = (
-				D6E5C4F625DBACEA0067FDE1 /* RushtonTurbine.hpp */,
-				D6E5C4F825DBACEA0067FDE1 /* GeomMidPoint.hpp */,
-			);
-			path = tdLBGeometryRushtonTurbineLibCPP;
-			sourceTree = "<group>";
-		};
 		D6E5C52A25DBAD610067FDE1 /* tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -125,18 +84,65 @@
 			path = tests;
 			sourceTree = "<group>";
 		};
-		D6E5C55F25DBE69E0067FDE1 /* tdLBCppApi */ = {
+		D6E5C5A925DBEC0A0067FDE1 /* tdLBGeometryRushtonTurbineLib */ = {
 			isa = PBXGroup;
 			children = (
-				D6E5C56025DBE69E0067FDE1 /* include */,
+				D6E5C61225DD56F50067FDE1 /* GlobalStructures.hpp */,
+				D6E5C5B925DBEC0B0067FDE1 /* Sources */,
 			);
-			path = tdLBCppApi;
+			path = tdLBGeometryRushtonTurbineLib;
 			sourceTree = "<group>";
 		};
-		D6E5C56025DBE69E0067FDE1 /* include */ = {
+		D6E5C5B925DBEC0B0067FDE1 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				D6E5C56125DBE69E0067FDE1 /* GlobalStructures.hpp */,
+				D6E5C5BA25DBEC0B0067FDE1 /* tdLBGeometryRushtonTurbineLibCPP */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		D6E5C5BA25DBEC0B0067FDE1 /* tdLBGeometryRushtonTurbineLibCPP */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */,
+				D6E5C5BD25DBEC0B0067FDE1 /* GeomMidPoint.hpp */,
+			);
+			path = tdLBGeometryRushtonTurbineLibCPP;
+			sourceTree = "<group>";
+		};
+		D6E5C5E525DBEC2E0067FDE1 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C5E825DBEC2E0067FDE1 /* json.h */,
+				D6E5C5EE25DBEC2E0067FDE1 /* jsoncpp.cpp */,
+				D6E5C5E625DBEC2E0067FDE1 /* Header.h */,
+				D6E5C5EB25DBEC2E0067FDE1 /* BaseParams.hpp */,
+				D6E5C5EC25DBEC2E0067FDE1 /* GridParams.hpp */,
+				D6E5C5EA25DBEC2E0067FDE1 /* FlowParams.hpp */,
+				D6E5C5E725DBEC2E0067FDE1 /* QVec.hpp */,
+				D6E5C5E925DBEC2E0067FDE1 /* ComputeUnit.h */,
+				D6E5C5EF25DBEC2E0067FDE1 /* ComputeUnit.hpp */,
+				D6E5C61625DE3C440067FDE1 /* Collision.hpp */,
+				D6E5C61725DE3C510067FDE1 /* Streaming.hpp */,
+				D6E5C61825DE3CCA0067FDE1 /* Boundary.hpp */,
+				D6E5C5ED25DBEC2E0067FDE1 /* main.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		D6E5C5F325DBEC380067FDE1 /* tdLBCppApi */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C5F425DBEC380067FDE1 /* include */,
+			);
+			name = tdLBCppApi;
+			path = src/tdLBCppApi;
+			sourceTree = "<group>";
+		};
+		D6E5C5F425DBEC380067FDE1 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C61425DD580C0067FDE1 /* GlobalStructures.hpp */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -197,8 +203,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D6E5C52525DBAD1B0067FDE1 /* jsoncpp.cpp in Sources */,
-				D6E5C52425DBAD1B0067FDE1 /* main.cpp in Sources */,
+				D6E5C5F125DBEC2E0067FDE1 /* jsoncpp.cpp in Sources */,
+				D6E5C5F025DBEC2E0067FDE1 /* main.cpp in Sources */,
 				D6E5C52825DBAD5C0067FDE1 /* test.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -212,7 +218,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -271,7 +277,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;

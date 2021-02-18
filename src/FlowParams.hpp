@@ -54,7 +54,7 @@ struct FlowParams {
 
             d.initial_rho = (T)param_json["initial_rho"].asDouble();
             d.re_m_nondimensional = (T)param_json["re_m_nondimensional"].asDouble();
-            d.uav = (tGeomShape)param_json["uav"].asDouble();
+            d.uav = (T)param_json["uav"].asDouble();
 
             d.cs0 = (T)param_json["cs0"].asDouble();
 
