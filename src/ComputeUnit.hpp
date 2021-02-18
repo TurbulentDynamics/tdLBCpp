@@ -101,17 +101,7 @@ ComputeUnit<T, QVecSize>::~ComputeUnit()
 }
 
 
-template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::index(tNi i, tNi j, tNi k)
-{
-#ifdef DEBUG
-    if ((i>=xg) || (j>=yg) || (k>=zg)) {
-        std::cout << "Index Error" << i <<" "<< xg <<" "<< j <<" "<< yg <<" "<< k <<" "<< zg << std::endl;
-        exit(1);
-    }
-#endif
-    return i * (yg * zg) + (j * zg) + k;
-}
+
 
 
 template <typename T, int QVecSize>
@@ -251,6 +241,18 @@ void ComputeUnit<T, QVecSize>::checkpoint_write(std::string dirname, std::string
 
 
 
+
+template <typename T, int QVecSize>
+tNi ComputeUnit<T, QVecSize>::index(tNi i, tNi j, tNi k)
+{
+#ifdef DEBUG
+    if ((i>=xg) || (j>=yg) || (k>=zg)) {
+        std::cout << "Index Error" << i <<" "<< xg <<" "<< j <<" "<< yg <<" "<< k <<" "<< zg << std::endl;
+        exit(1);
+    }
+#endif
+    return i * (yg * zg) + (j * zg) + k;
+}
 
 
 

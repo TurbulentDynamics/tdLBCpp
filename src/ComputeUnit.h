@@ -79,6 +79,8 @@ public:
     void collision_Entropic();
     void collision_EgglesSomers();
     void collision_EgglesSomers_LES();
+    
+    void moments();
 
     
     void bounceBackBoundary();

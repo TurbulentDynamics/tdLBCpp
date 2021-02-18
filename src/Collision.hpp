@@ -152,3 +152,151 @@ void ComputeUnit<T, QVecSize>::collision_EgglesSomers(){
         }
     }
 }
+
+
+
+template <typename T, int QVecSize>
+void ComputeUnit<T, QVecSize>::moments(){
+
+
+
+    for (tNi i = 1;  i <= xg1; i++) {
+        for (tNi j = 1; j <= yg1; j++) {
+
+            for (tNi k = 1; k <= zg1; k++) {
+                
+                
+                QVec<T, QVecSize> qVec = Q[index(i, j, k)];
+
+    
+                QVec<T, QVecSize> alf1 = Q[index(i, j, k)];
+
+    
+            
+                
+                //the first position is simply the entire mass-vector (N] summed up
+                alf1[1] = qVec.q[ 1] + qVec.q[ 2] + qVec.q[ 3] + qVec.q[ 4] +
+                qVec.q[ 5] + qVec.q[ 6] + qVec.q[ 7] + qVec.q[ 8] +
+                qVec.q[ 9] + qVec.q[10] + qVec.q[11] + qVec.q[12] +
+                qVec.q[13] + qVec.q[14] + qVec.q[15] + qVec.q[16] +
+                qVec.q[17] + qVec.q[18];
+                
+    //                if (alf1[1]<0.00001]  printf("alf1 %f\n", alf1[1]];
+                
+            
+                //the second position is everything with an x-component
+                alf1[2] = qVec.q[ 1] - qVec.q[ 3] +
+                qVec.q[ 7] - qVec.q[ 8] -
+                qVec.q[ 9] + qVec.q[10] + qVec.q[11] - qVec.q[12] -
+                qVec.q[13] + qVec.q[14];
+                
+                
+                //the third position is everything with an y-component
+                alf1[3] = qVec.q[ 2] - qVec.q[ 4] +
+                qVec.q[ 7] + qVec.q[ 8] -
+                qVec.q[ 9] - qVec.q[10] + qVec.q[15] - qVec.q[16] -
+                qVec.q[17] + qVec.q[18];
+                
+                
+                //the fourth position is everything with a z-component
+                alf1[4] = qVec.q[ 5] - qVec.q[ 6] +
+                qVec.q[11] + qVec.q[12] -
+                qVec.q[13] - qVec.q[14] + qVec.q[15] + qVec.q[16] -
+                qVec.q[17] - qVec.q[18];
+                
+                
+                //starting from the fifth position, it gets more complicated in
+                //structure, but it still follows the article by Eggels and Somers
+                alf1[5] =  - qVec.q[ 2] - qVec.q[ 4] -
+                qVec.q[ 5] - qVec.q[ 6] + qVec.q[ 7] + qVec.q[ 8] +
+                qVec.q[ 9] + qVec.q[10] + qVec.q[11] + qVec.q[12] +
+                qVec.q[13] + qVec.q[14];
+                
+                
+                alf1[6] = qVec.q[ 7] - qVec.q[ 8] +
+                qVec.q[ 9] - qVec.q[10];
+                
+                alf1[7] =  - qVec.q[ 1] - qVec.q[ 3] -
+                qVec.q[ 5] - qVec.q[ 6] + qVec.q[ 7] + qVec.q[ 8] +
+                qVec.q[ 9] + qVec.q[10] + qVec.q[15] + qVec.q[16] +
+                qVec.q[17] + qVec.q[18];
+                
+                alf1[8] = qVec.q[11] - qVec.q[12] +
+                qVec.q[13] - qVec.q[14];
+                
+                alf1[9] = qVec.q[15] - qVec.q[16] +
+                qVec.q[17] - qVec.q[18];
+                
+                alf1[10] =  - qVec.q[ 1] - qVec.q[ 2] - qVec.q[ 3] - qVec.q[ 4] +
+                qVec.q[11] + qVec.q[12] +
+                qVec.q[13] + qVec.q[14] + qVec.q[15] + qVec.q[16] +
+                qVec.q[17] + qVec.q[18];
+                
+                alf1[11] =  - qVec.q[ 1] + qVec.q[ 3] +
+                2 * qVec.q[ 7] - 2 * qVec.q[ 8] -
+                2 * qVec.q[ 9] + 2 * qVec.q[10] - qVec.q[11] + qVec.q[12] +
+                qVec.q[13] - qVec.q[14];
+                
+                alf1[12] =  - qVec.q[ 2] + qVec.q[ 4] +
+                2 * qVec.q[ 7] + 2 * qVec.q[ 8] -
+                2 * qVec.q[ 9] - 2 * qVec.q[10] -
+                qVec.q[15] + qVec.q[16] +
+                qVec.q[17] - qVec.q[18];
+                
+                alf1[13] =  - 3 * qVec.q[ 1] + 3 * qVec.q[ 3] +
+                3 * qVec.q[11] - 3 * qVec.q[12] -
+                3 * qVec.q[13] + 3 * qVec.q[14];
+                
+                alf1[14] =  - 3 * qVec.q[ 2] + 3 * qVec.q[ 4] +
+                3 * qVec.q[15] - 3 * qVec.q[16] -
+                3 * qVec.q[17] + 3 * qVec.q[18];
+                
+                alf1[15] =  - 2 * qVec.q[ 5] + 2 * qVec.q[ 6] +
+                qVec.q[11] + qVec.q[12] -
+                qVec.q[13] - qVec.q[14] + qVec.q[15] + qVec.q[16] -
+                qVec.q[17] - qVec.q[18];
+                
+                alf1[16] =  - 3 * qVec.q[11] - 3 * qVec.q[12] +
+                3 * qVec.q[13] + 3 * qVec.q[14] + 3 * qVec.q[15] +
+                3 * qVec.q[16] -
+                3 * qVec.q[17] - 3 * qVec.q[18];
+                
+                alf1[17] = 0.5 * (qVec.q[ 1] + qVec.q[ 2] + qVec.q[ 3] + qVec.q[ 4]) -
+                (qVec.q[ 5] + qVec.q[ 6] + qVec.q[ 7] + qVec.q[ 8] +
+                 qVec.q[ 9] + qVec.q[10]) +
+                0.5 * (qVec.q[11] + qVec.q[12] +
+                       qVec.q[13] + qVec.q[14] + qVec.q[15] + qVec.q[16] +
+                       qVec.q[17] + qVec.q[18]);
+                
+                alf1[18] = 1.5 * (qVec.q[ 1] - qVec.q[ 2] + qVec.q[ 3] - qVec.q[ 4]) -
+                1.5 * (qVec.q[11] + qVec.q[12] +
+                       qVec.q[13] + qVec.q[14]) +
+                1.5 * (qVec.q[15] + qVec.q[16] +
+                       qVec.q[17] + qVec.q[18]);
+                
+                
+                for (int l=1; l<=18; l++){
+                    Q[index(i,j,k)].q[l] = alf1[ l ];
+                }
+                
+                
+                /*
+                if (i==2 && j==1 && k==1]{
+                    //if (qVec.q[ 1] < 0.00001] {
+                    printf("Moments %li %li %li     ", i,j,k];
+                    for (int l=0; l<Q; l++]{
+                        printf("% 1.4E ", qVec.q[l]];
+                    }
+                    printf("\n"];
+                }
+                */
+                
+            }}}//endfor i,j,k
+
+    
+    
+}//end of func
+
+
+
+

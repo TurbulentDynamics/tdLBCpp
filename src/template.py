@@ -155,9 +155,35 @@ for line in Q:
 
 
 
+def bounce_back(t):
+    print("Q[dirnQ%s(i,j,k)].q[Q%s] = Q[dirnQ000(i,j,k)].q[Q%s];" % (opposite(t), opposite(t), t))
 
-for line in Q:
 
+print("Right")
+for t in get_rights():
+    bounce_back(t)
+
+print("Left")
+for t in get_lefts():
+    bounce_back(t)
+
+
+print("Up")
+for t in get_ups():
+    bounce_back(t)
+
+print("Down")
+for t in get_downs():
+    bounce_back(t)
+
+
+print("Forwards")
+for t in get_forwards():
+    bounce_back(t)
+
+print("Backwards")
+for t in get_backwards():
+    bounce_back(t)
 
 
 
