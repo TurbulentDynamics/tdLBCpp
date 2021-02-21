@@ -81,9 +81,18 @@ public:
     void collision_EgglesSomers_LES();
     
     void moments();
+    
+    void forcing(std::vector<Pos3d<tNi>>, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius);
 
     
     void bounceBackBoundary();
+    void bounceBackBoundaryRight();
+    void bounceBackBoundaryLeft();
+    void bounceBackBoundaryUp();
+    void bounceBackBoundaryDown();
+    void bounceBackBoundaryBackward();
+    void bounceBackBoundaryForward();
+
 
         
         
@@ -132,7 +141,10 @@ private:
 
 
 #include "ComputeUnit.hpp"
-#include "Collision.hpp"
-#include "Streaming.hpp"
+#include "CollisionEgglesSomers.hpp"
+#include "CollisionEntropic.hpp"
+#include "StreamingNieve.hpp"
+#include "StreamingEsoteric.hpp"
 #include "Boundary.hpp"
+#include "Forcing.hpp"
 

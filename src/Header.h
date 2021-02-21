@@ -48,7 +48,6 @@ using let_tStep = const int;
 #define Q0 Unused_Error    // 0,  0,  0
 
 
-
 //Faces
 #define Q1 0           //+1,  0,  0
 #define Q2 1           //-1,  0,  0
@@ -81,6 +80,8 @@ using let_tStep = const int;
 #define Q25 24         //-1, +1, +1
 #define Q26 25         //+1, -1, -1
 
+
+#define RHOQ Q1
 
 
 

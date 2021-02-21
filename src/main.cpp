@@ -23,6 +23,7 @@
 #include "Header.h"
 #include "GridParams.hpp"
 #include "FlowParams.hpp"
+#include "../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
 #include "../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomMidPoint.hpp"
 #include "ComputeUnit.h"
 
@@ -72,8 +73,31 @@ int main(int argc, const char * argv[]) {
     
     ComputeUnit<float, QLen::D3Q19> lb = ComputeUnit<float, QLen::D3Q19>(0, 0, 0, grid.x, grid.y, grid.z, 1, flow);
 
+    
+    double startingAngle = 0.0;
+    float alpha = 0.97;
+    float beta = 1.9;
+    
+    
+    RushtonTurbine rt = RushtonTurbine(int(grid.x));
+    
+    Extents<tNi> e = Extents<tNi>(0, grid.x, 0, grid.y, 0, grid.z);
+
+    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
+
+    geom.generateFixedGeometry();
+    geom.generateRotatingGeometry(startingAngle);
+    geom.generateRotatingNonUpdatingGeometry();
+
+    std::vector<Pos3d<tNi>> geomFixed = geom.returnFixedGeometry();
+    std::vector<Pos3d<tNi>> geomRotating = geom.returnRotatingGeometry();
+    std::vector<Pos3d<tNi>> geomRotaingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+
+    lb.forcing(geomFixed, alpha, beta, geom.iCenter, geom.kCenter, geom.tankRadius);
+    lb.forcing(geomRotaingNonUpdating, alpha, beta, geom.iCenter, geom.kCenter, geom.tankRadius);
 
     
+    double impellerAngle = startingAngle;
     for (tStep step=0; step<num_steps; step++) {
 
         lb.collision(EgglesSomers);
@@ -94,6 +118,16 @@ int main(int argc, const char * argv[]) {
             std::string dirname = "checkpoint_test_step_" + std::to_string(step);
 //            lb.checkpoint_write(dirname);
         }
+
+        impellerAngle += 0.12;
+        geom.updateRotatingGeometry(impellerAngle);
+        std::vector<Pos3d<tNi>> geomRotation = geom.returnRotatingGeometry();
+        
+        
+
+        lb.forcing(geomRotating, alpha, beta, geom.iCenter, geom.kCenter, geom.tankRadius);
+
+            
     }
     return 0;
 

@@ -41,9 +41,12 @@
 		D6E5C5EF25DBEC2E0067FDE1 /* ComputeUnit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnit.hpp; sourceTree = "<group>"; };
 		D6E5C61225DD56F50067FDE1 /* GlobalStructures.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GlobalStructures.hpp; path = tdLBCppApi/include/GlobalStructures.hpp; sourceTree = "<group>"; };
 		D6E5C61425DD580C0067FDE1 /* GlobalStructures.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GlobalStructures.hpp; path = tdLBCppApi/include/GlobalStructures.hpp; sourceTree = SOURCE_ROOT; };
-		D6E5C61625DE3C440067FDE1 /* Collision.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Collision.hpp; sourceTree = "<group>"; };
-		D6E5C61725DE3C510067FDE1 /* Streaming.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Streaming.hpp; sourceTree = "<group>"; };
+		D6E5C61625DE3C440067FDE1 /* CollisionEgglesSomers.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEgglesSomers.hpp; sourceTree = "<group>"; };
+		D6E5C61725DE3C510067FDE1 /* StreamingNieve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingNieve.hpp; sourceTree = "<group>"; };
 		D6E5C61825DE3CCA0067FDE1 /* Boundary.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Boundary.hpp; sourceTree = "<group>"; };
+		D6E5C61E25DF79BE0067FDE1 /* CollisionEntropic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEntropic.hpp; sourceTree = "<group>"; };
+		D6E5C62025DF7A130067FDE1 /* StreamingEsoteric.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingEsoteric.hpp; sourceTree = "<group>"; };
+		D6E5C62225DF7EAE0067FDE1 /* Forcing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Forcing.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,9 +125,12 @@
 				D6E5C5E725DBEC2E0067FDE1 /* QVec.hpp */,
 				D6E5C5E925DBEC2E0067FDE1 /* ComputeUnit.h */,
 				D6E5C5EF25DBEC2E0067FDE1 /* ComputeUnit.hpp */,
-				D6E5C61625DE3C440067FDE1 /* Collision.hpp */,
-				D6E5C61725DE3C510067FDE1 /* Streaming.hpp */,
+				D6E5C61625DE3C440067FDE1 /* CollisionEgglesSomers.hpp */,
+				D6E5C61E25DF79BE0067FDE1 /* CollisionEntropic.hpp */,
+				D6E5C61725DE3C510067FDE1 /* StreamingNieve.hpp */,
+				D6E5C62025DF7A130067FDE1 /* StreamingEsoteric.hpp */,
 				D6E5C61825DE3CCA0067FDE1 /* Boundary.hpp */,
+				D6E5C62225DF7EAE0067FDE1 /* Forcing.hpp */,
 				D6E5C5ED25DBEC2E0067FDE1 /* main.cpp */,
 			);
 			path = src;

@@ -9,23 +9,8 @@
 
 #include "ComputeUnit.h"
 
-template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::streaming(Streaming scheme) {
-
-    switch( scheme ) {
-    case Streaming(Simple):
-        streaming_simple(); break;
-    case Streaming(Esotwist):
-        streaming_esotwist(); break;
-    }
-}
 
 
-
-template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::streaming_esotwist() {
-	//TODO
-}
 
 
 

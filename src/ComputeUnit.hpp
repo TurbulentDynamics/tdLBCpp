@@ -103,6 +103,37 @@ ComputeUnit<T, QVecSize>::~ComputeUnit()
 
 
 
+template <typename T, int QVecSize>
+void ComputeUnit<T, QVecSize>::collision(Collision scheme){
+    switch( scheme ) {
+
+        case Collision(EgglesSomers):
+            collision_EgglesSomers(); break;
+
+        case Collision(EgglesSomersLES):
+            collision_EgglesSomers_LES(); break;
+
+        case Collision(Entropic):
+            collision_Entropic(); break;
+    }
+};
+
+
+template <typename T, int QVecSize>
+void ComputeUnit<T, QVecSize>::streaming(Streaming scheme) {
+
+    switch( scheme ) {
+    case Streaming(Simple):
+        streaming_simple(); break;
+    case Streaming(Esotwist):
+        streaming_esotwist(); break;
+    }
+}
+
+
+
+
+
 
 template <typename T, int QVecSize>
 Velocity<T> ComputeUnit<T, QVecSize>::getVelocity(tNi i, tNi j, tNi k){
@@ -238,6 +269,22 @@ void ComputeUnit<T, QVecSize>::checkpoint_write(std::string dirname, std::string
     fread(    𝜈, sizeof(T), size, fpNue);
     fclose(fpNue);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -13,28 +13,6 @@
 
 
 
-template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::collision(Collision scheme){
-    switch( scheme ) {
-
-        case Collision(EgglesSomers):
-            collision_EgglesSomers(); break;
-
-        case Collision(EgglesSomersLES):
-            collision_EgglesSomers_LES(); break;
-
-        case Collision(Entropic):
-            collision_Entropic(); break;
-    }
-};
-
-
-
-template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::collision_Entropic() {
-    //TODO
-}
-
 
 
 template <typename T, int QVecSize>
