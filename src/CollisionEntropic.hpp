@@ -1,5 +1,5 @@
 //
-//  ComputeGroup.hpp
+//  CollisionEntropic.hpp
 //  tdLB
 //
 //  Created by Niall Ó Broin on 08/12/2020.

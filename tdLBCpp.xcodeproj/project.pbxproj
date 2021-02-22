@@ -34,7 +34,7 @@
 		D6E5C5E825DBEC2E0067FDE1 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
 		D6E5C5E925DBEC2E0067FDE1 /* ComputeUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComputeUnit.h; sourceTree = "<group>"; };
 		D6E5C5EA25DBEC2E0067FDE1 /* FlowParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FlowParams.hpp; sourceTree = "<group>"; };
-		D6E5C5EB25DBEC2E0067FDE1 /* BaseParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BaseParams.hpp; sourceTree = "<group>"; };
+		D6E5C5EB25DBEC2E0067FDE1 /* BaseParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseParams.h; sourceTree = "<group>"; };
 		D6E5C5EC25DBEC2E0067FDE1 /* GridParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GridParams.hpp; sourceTree = "<group>"; };
 		D6E5C5ED25DBEC2E0067FDE1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D6E5C5EE25DBEC2E0067FDE1 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
@@ -47,6 +47,12 @@
 		D6E5C61E25DF79BE0067FDE1 /* CollisionEntropic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEntropic.hpp; sourceTree = "<group>"; };
 		D6E5C62025DF7A130067FDE1 /* StreamingEsoteric.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingEsoteric.hpp; sourceTree = "<group>"; };
 		D6E5C62225DF7EAE0067FDE1 /* Forcing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Forcing.hpp; sourceTree = "<group>"; };
+		D6E5C62625E25F9F0067FDE1 /* Output.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Output.hpp; sourceTree = "<group>"; };
+		D6E5C62725E26B8B0067FDE1 /* OutputConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OutputConfig.h; sourceTree = "<group>"; };
+		D6E5C62C25E28C1D0067FDE1 /* PlotDirMeta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlotDirMeta.h; sourceTree = "<group>"; };
+		D6E5C62E25E3DB5B0067FDE1 /* cxxopts.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cxxopts.hpp; sourceTree = "<group>"; };
+		D6E5C63125E4031B0067FDE1 /* QVecBinMeta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QVecBinMeta.h; sourceTree = "<group>"; };
+		D6E5C63325E40AE30067FDE1 /* PlotDir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlotDir.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,10 +122,12 @@
 		D6E5C5E525DBEC2E0067FDE1 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				D6E5C62A25E28BB70067FDE1 /* Output */,
 				D6E5C5E825DBEC2E0067FDE1 /* json.h */,
+				D6E5C62E25E3DB5B0067FDE1 /* cxxopts.hpp */,
 				D6E5C5EE25DBEC2E0067FDE1 /* jsoncpp.cpp */,
 				D6E5C5E625DBEC2E0067FDE1 /* Header.h */,
-				D6E5C5EB25DBEC2E0067FDE1 /* BaseParams.hpp */,
+				D6E5C5EB25DBEC2E0067FDE1 /* BaseParams.h */,
 				D6E5C5EC25DBEC2E0067FDE1 /* GridParams.hpp */,
 				D6E5C5EA25DBEC2E0067FDE1 /* FlowParams.hpp */,
 				D6E5C5E725DBEC2E0067FDE1 /* QVec.hpp */,
@@ -131,6 +139,7 @@
 				D6E5C62025DF7A130067FDE1 /* StreamingEsoteric.hpp */,
 				D6E5C61825DE3CCA0067FDE1 /* Boundary.hpp */,
 				D6E5C62225DF7EAE0067FDE1 /* Forcing.hpp */,
+				D6E5C62625E25F9F0067FDE1 /* Output.hpp */,
 				D6E5C5ED25DBEC2E0067FDE1 /* main.cpp */,
 			);
 			path = src;
@@ -151,6 +160,17 @@
 				D6E5C61425DD580C0067FDE1 /* GlobalStructures.hpp */,
 			);
 			path = include;
+			sourceTree = "<group>";
+		};
+		D6E5C62A25E28BB70067FDE1 /* Output */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C62725E26B8B0067FDE1 /* OutputConfig.h */,
+				D6E5C62C25E28C1D0067FDE1 /* PlotDirMeta.h */,
+				D6E5C63125E4031B0067FDE1 /* QVecBinMeta.h */,
+				D6E5C63325E40AE30067FDE1 /* PlotDir.h */,
+			);
+			path = Output;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

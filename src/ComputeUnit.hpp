@@ -1,5 +1,5 @@
 //
-//  ComputeGroup.hpp
+//  ComputeUnit.hpp
 //  tdLB
 //
 //  Created by Niall Ó Broin on 08/12/2020.
@@ -8,6 +8,8 @@
 #pragma once
 
 #include "ComputeUnit.h"
+
+
 
 template <typename T, int QVecSize>
 ComputeUnit<T, QVecSize>::ComputeUnit(
@@ -194,7 +196,8 @@ void ComputeUnit<T, QVecSize>::fillForTest(){
                 F[index(i, j, k)].fy = 1;
                 F[index(i, j, k)].fz = 2;
 
-                    𝜈[index(i, j, k)] = 1;
+                𝜈[index(i, j, k)] = 1;
+                O[index(i, j, k)] = true;
 
             }
         }
@@ -266,7 +269,7 @@ void ComputeUnit<T, QVecSize>::checkpoint_write(std::string dirname, std::string
     fclose(fpF);
     
     FILE *fpNue = fopen_read(dirname, unit_name, "F");
-    fread(    𝜈, sizeof(T), size, fpNue);
+    fread(𝜈, sizeof(T), size, fpNue);
     fclose(fpNue);
 }
 

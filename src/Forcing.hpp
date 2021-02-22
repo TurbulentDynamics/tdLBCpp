@@ -1,5 +1,5 @@
 //
-//  ComputeGroup.hpp
+//  Forcing.hpp
 //  tdLB
 //
 //  Created by Niall Ó Broin on 08/12/2020.
@@ -190,12 +190,12 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<Pos3d<tNi>> geom, T alfa, T b
             
                 Velocity<T> u = Q[index(i2,j2,k2)].velocity();
 
-                F[i2,j2,k2].x = alfa * u.x - beta * ppp[j1+1][k1+1] * xs;
-                F[i2,j2,k2].y = alfa * u.y - beta * ppp[j1+1][k1+1] * ys;
-                F[i2,j2,k2].z = alfa * u.z - beta * ppp[j1+1][k1+1] * zs;
+                F[index(i2,j2,k2)].x = alfa * u.x - beta * ppp[j1+1][k1+1] * xs;
+                F[index(i2,j2,k2)].y = alfa * u.y - beta * ppp[j1+1][k1+1] * ys;
+                F[index(i2,j2,k2)].z = alfa * u.z - beta * ppp[j1+1][k1+1] * zs;
                 
                 
-                O[i2,j2,k2] = 1;
+                O[index(i2,j2,k2)] = 1;
                 
             }}//endfor  j1, k1
         
@@ -209,13 +209,13 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<Pos3d<tNi>> geom, T alfa, T b
             for (tNi k = 1; k<=zg1; k++){
                 
                 //pos =  offsetb + offsets + k;
-                if (O[i,j,k] == 0) {
-                    F[i,j,k].x = 0.0;
-                    F[i,j,k].y = 0.0;
-                    F[i,j,k].z = 0.0;
+                if (O[index(i,j,k)] == 0) {
+                    F[index(i,j,k)].x = 0.0;
+                    F[index(i,j,k)].y = 0.0;
+                    F[index(i,j,k)].z = 0.0;
                 } else {
                     //Set it back to 0
-                    O[i,j,k] = 0;
+                    O[index(i,j,k)] = 0;
                 }//endif
             }}}//endfor  ijk
     

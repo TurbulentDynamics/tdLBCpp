@@ -94,7 +94,7 @@ struct QVec {
         u.x = q[Q2] / q[Q1];
         u.y = q[Q3] / q[Q1];
         u.z = q[Q4] / q[Q1];
-        
+      
         return u;
     };
     
@@ -103,6 +103,8 @@ struct QVec {
 		return q[i];
 	}
 
+    
+    
 private:
     void freeMem() {
     }

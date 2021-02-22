@@ -26,8 +26,8 @@ using tNi = long int;
 using let_tNi = const long int;
 
 
-using tStep = int;
-using let_tStep = const int;
+using tStep = unsigned long int;
+using let_tStep = const unsigned long int;
 
 
 
