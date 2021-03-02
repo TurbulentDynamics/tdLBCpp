@@ -34,7 +34,6 @@
 		D6E5C72225EE184B0067FDE1 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		D6E5C72425EE184B0067FDE1 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
 		D6E5C72625EE184B0067FDE1 /* StreamingNieve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingNieve.hpp; sourceTree = "<group>"; };
-		D6E5C72725EE184B0067FDE1 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		D6E5C72825EE184B0067FDE1 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
 		D6E5C72925EE184B0067FDE1 /* GeomPolarLegacy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GeomPolarLegacy.cpp; sourceTree = "<group>"; };
 		D6E5C72A25EE184B0067FDE1 /* cxxopts.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cxxopts.hpp; sourceTree = "<group>"; };
@@ -54,7 +53,6 @@
 		D6E5C73925EE184B0067FDE1 /* CollisionEntropic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEntropic.hpp; sourceTree = "<group>"; };
 		D6E5C73A25EE184B0067FDE1 /* StreamingEsoteric.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingEsoteric.hpp; sourceTree = "<group>"; };
 		D6E5C73B25EE184B0067FDE1 /* GridParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GridParams.hpp; sourceTree = "<group>"; };
-		D6E5C73C25EE184B0067FDE1 /* spack.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = spack.yaml; sourceTree = "<group>"; };
 		D6E5C73D25EE184B0067FDE1 /* Forcing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Forcing.hpp; sourceTree = "<group>"; };
 		D6E5C73E25EE184B0067FDE1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
@@ -156,7 +154,6 @@
 			isa = PBXGroup;
 			children = (
 				D6E5C72625EE184B0067FDE1 /* StreamingNieve.hpp */,
-				D6E5C72725EE184B0067FDE1 /* CMakeLists.txt */,
 				D6E5C72825EE184B0067FDE1 /* Header.h */,
 				D6E5C72925EE184B0067FDE1 /* GeomPolarLegacy.cpp */,
 				D6E5C72A25EE184B0067FDE1 /* cxxopts.hpp */,
@@ -176,7 +173,6 @@
 				D6E5C73925EE184B0067FDE1 /* CollisionEntropic.hpp */,
 				D6E5C73A25EE184B0067FDE1 /* StreamingEsoteric.hpp */,
 				D6E5C73B25EE184B0067FDE1 /* GridParams.hpp */,
-				D6E5C73C25EE184B0067FDE1 /* spack.yaml */,
 				D6E5C73D25EE184B0067FDE1 /* Forcing.hpp */,
 				D6E5C73E25EE184B0067FDE1 /* main.cpp */,
 				D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */,

@@ -1,3 +1,7 @@
 tdLBGeometryRushtonTurbineLib/
 tdLBCppApi/
 
+
+build/
+.DS_Store
+

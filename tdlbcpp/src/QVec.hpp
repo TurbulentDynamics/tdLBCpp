@@ -12,7 +12,7 @@
 
 #include "Header.h"
 
-#include "../tdLBCppApi/include/GlobalStructures.hpp"
+#include "../../tdLBCppApi/include/GlobalStructures.hpp"
 
 
 

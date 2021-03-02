@@ -23,11 +23,11 @@
 #include "Header.h"
 #include "GridParams.hpp"
 #include "FlowParams.hpp"
-#include "../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
-#include "../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomMidPoint.hpp"
+#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
+#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomMidPoint.hpp"
 #include "ComputeUnit.h"
 #include "OutputConfig.h"
-#include "Output/PlotDir.h"
+#include "PlotDir.h"
 
 
 using tPrecision = float;

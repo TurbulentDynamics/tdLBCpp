@@ -23,9 +23,9 @@
 #include "Header.h"
 #include "FlowParams.hpp"
 #include "QVec.hpp"
-#include "Output/PlotDirMeta.h"
-#include "Output/QVecBinMeta.h"
-#include "Output/PlotDir.h"
+#include "PlotDirMeta.h"
+#include "QVecBinMeta.h"
+#include "PlotDir.h"
 
 
 

@@ -19,10 +19,10 @@
 #include <map>
 
 
-#include "../Header.h"
-#include "../BaseParams.h"
+#include "Header.h"
+#include "BaseParams.h"
 
-#include "../GridParams.hpp"
+#include "GridParams.hpp"
 
 
 

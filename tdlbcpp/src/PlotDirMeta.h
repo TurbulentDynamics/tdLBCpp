@@ -14,8 +14,8 @@
 
 #include "json.h"
 
-#include "../Header.h"
-#include "../BaseParams.h"
+#include "Header.h"
+#include "BaseParams.h"
 
 
 
