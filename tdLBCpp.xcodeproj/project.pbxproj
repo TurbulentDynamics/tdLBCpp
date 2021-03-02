@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D6E5C52825DBAD5C0067FDE1 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C52725DBAD5C0067FDE1 /* test.cpp */; };
-		D6E5C5F025DBEC2E0067FDE1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C5ED25DBEC2E0067FDE1 /* main.cpp */; };
-		D6E5C5F125DBEC2E0067FDE1 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C5EE25DBEC2E0067FDE1 /* jsoncpp.cpp */; };
-		D6E5C63F25ECC7430067FDE1 /* GeomPolarLegacy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C63D25ECC7430067FDE1 /* GeomPolarLegacy.cpp */; };
+		D6E5C74225EE184B0067FDE1 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C72425EE184B0067FDE1 /* test.cpp */; };
+		D6E5C74325EE184B0067FDE1 /* GeomPolarLegacy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C72925EE184B0067FDE1 /* GeomPolarLegacy.cpp */; };
+		D6E5C74425EE184B0067FDE1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C73E25EE184B0067FDE1 /* main.cpp */; };
+		D6E5C74525EE184B0067FDE1 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,35 +27,39 @@
 
 /* Begin PBXFileReference section */
 		D698D755257D036500A3BFD2 /* tdLBCpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tdLBCpp; sourceTree = BUILT_PRODUCTS_DIR; };
-		D6E5C52725DBAD5C0067FDE1 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
 		D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RushtonTurbine.hpp; sourceTree = "<group>"; };
 		D6E5C5BD25DBEC0B0067FDE1 /* GeomMidPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GeomMidPoint.hpp; sourceTree = "<group>"; };
-		D6E5C5E625DBEC2E0067FDE1 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
-		D6E5C5E725DBEC2E0067FDE1 /* QVec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = QVec.hpp; sourceTree = "<group>"; };
-		D6E5C5E825DBEC2E0067FDE1 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
-		D6E5C5E925DBEC2E0067FDE1 /* ComputeUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComputeUnit.h; sourceTree = "<group>"; };
-		D6E5C5EA25DBEC2E0067FDE1 /* FlowParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FlowParams.hpp; sourceTree = "<group>"; };
-		D6E5C5EB25DBEC2E0067FDE1 /* BaseParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseParams.h; sourceTree = "<group>"; };
-		D6E5C5EC25DBEC2E0067FDE1 /* GridParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GridParams.hpp; sourceTree = "<group>"; };
-		D6E5C5ED25DBEC2E0067FDE1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		D6E5C5EE25DBEC2E0067FDE1 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
-		D6E5C5EF25DBEC2E0067FDE1 /* ComputeUnit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnit.hpp; sourceTree = "<group>"; };
 		D6E5C61225DD56F50067FDE1 /* GlobalStructures.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GlobalStructures.hpp; path = tdLBCppApi/include/GlobalStructures.hpp; sourceTree = "<group>"; };
 		D6E5C61425DD580C0067FDE1 /* GlobalStructures.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GlobalStructures.hpp; path = tdLBCppApi/include/GlobalStructures.hpp; sourceTree = SOURCE_ROOT; };
-		D6E5C61625DE3C440067FDE1 /* CollisionEgglesSomers.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEgglesSomers.hpp; sourceTree = "<group>"; };
-		D6E5C61725DE3C510067FDE1 /* StreamingNieve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingNieve.hpp; sourceTree = "<group>"; };
-		D6E5C61825DE3CCA0067FDE1 /* Boundary.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Boundary.hpp; sourceTree = "<group>"; };
-		D6E5C61E25DF79BE0067FDE1 /* CollisionEntropic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEntropic.hpp; sourceTree = "<group>"; };
-		D6E5C62025DF7A130067FDE1 /* StreamingEsoteric.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingEsoteric.hpp; sourceTree = "<group>"; };
-		D6E5C62225DF7EAE0067FDE1 /* Forcing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Forcing.hpp; sourceTree = "<group>"; };
-		D6E5C62625E25F9F0067FDE1 /* Output.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Output.hpp; sourceTree = "<group>"; };
-		D6E5C62725E26B8B0067FDE1 /* OutputConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OutputConfig.h; sourceTree = "<group>"; };
-		D6E5C62C25E28C1D0067FDE1 /* PlotDirMeta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlotDirMeta.h; sourceTree = "<group>"; };
-		D6E5C62E25E3DB5B0067FDE1 /* cxxopts.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cxxopts.hpp; sourceTree = "<group>"; };
-		D6E5C63125E4031B0067FDE1 /* QVecBinMeta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QVecBinMeta.h; sourceTree = "<group>"; };
-		D6E5C63325E40AE30067FDE1 /* PlotDir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlotDir.h; sourceTree = "<group>"; };
-		D6E5C63D25ECC7430067FDE1 /* GeomPolarLegacy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GeomPolarLegacy.cpp; sourceTree = "<group>"; };
-		D6E5C63E25ECC7430067FDE1 /* GeomPolarLegacy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeomPolarLegacy.h; sourceTree = "<group>"; };
+		D6E5C72225EE184B0067FDE1 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		D6E5C72425EE184B0067FDE1 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
+		D6E5C72625EE184B0067FDE1 /* StreamingNieve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingNieve.hpp; sourceTree = "<group>"; };
+		D6E5C72725EE184B0067FDE1 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		D6E5C72825EE184B0067FDE1 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
+		D6E5C72925EE184B0067FDE1 /* GeomPolarLegacy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GeomPolarLegacy.cpp; sourceTree = "<group>"; };
+		D6E5C72A25EE184B0067FDE1 /* cxxopts.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cxxopts.hpp; sourceTree = "<group>"; };
+		D6E5C72B25EE184B0067FDE1 /* Boundary.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Boundary.hpp; sourceTree = "<group>"; };
+		D6E5C72C25EE184B0067FDE1 /* QVec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = QVec.hpp; sourceTree = "<group>"; };
+		D6E5C72E25EE184B0067FDE1 /* PlotDir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlotDir.h; sourceTree = "<group>"; };
+		D6E5C72F25EE184B0067FDE1 /* QVecBinMeta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QVecBinMeta.h; sourceTree = "<group>"; };
+		D6E5C73025EE184B0067FDE1 /* OutputConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutputConfig.h; sourceTree = "<group>"; };
+		D6E5C73125EE184B0067FDE1 /* PlotDirMeta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlotDirMeta.h; sourceTree = "<group>"; };
+		D6E5C73225EE184B0067FDE1 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
+		D6E5C73325EE184B0067FDE1 /* ComputeUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComputeUnit.h; sourceTree = "<group>"; };
+		D6E5C73425EE184B0067FDE1 /* FlowParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FlowParams.hpp; sourceTree = "<group>"; };
+		D6E5C73525EE184B0067FDE1 /* BaseParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseParams.h; sourceTree = "<group>"; };
+		D6E5C73625EE184B0067FDE1 /* template.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = template.py; sourceTree = "<group>"; };
+		D6E5C73725EE184B0067FDE1 /* Output.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Output.hpp; sourceTree = "<group>"; };
+		D6E5C73825EE184B0067FDE1 /* CollisionEgglesSomers.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEgglesSomers.hpp; sourceTree = "<group>"; };
+		D6E5C73925EE184B0067FDE1 /* CollisionEntropic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEntropic.hpp; sourceTree = "<group>"; };
+		D6E5C73A25EE184B0067FDE1 /* StreamingEsoteric.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingEsoteric.hpp; sourceTree = "<group>"; };
+		D6E5C73B25EE184B0067FDE1 /* GridParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GridParams.hpp; sourceTree = "<group>"; };
+		D6E5C73C25EE184B0067FDE1 /* spack.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = spack.yaml; sourceTree = "<group>"; };
+		D6E5C73D25EE184B0067FDE1 /* Forcing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Forcing.hpp; sourceTree = "<group>"; };
+		D6E5C73E25EE184B0067FDE1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
+		D6E5C74025EE184B0067FDE1 /* GeomPolarLegacy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeomPolarLegacy.h; sourceTree = "<group>"; };
+		D6E5C74125EE184B0067FDE1 /* ComputeUnit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnit.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,10 +76,9 @@
 		D698D74C257D036500A3BFD2 = {
 			isa = PBXGroup;
 			children = (
+				D6E5C72125EE184B0067FDE1 /* tdlbcpp */,
 				D6E5C5F325DBEC380067FDE1 /* tdLBCppApi */,
 				D6E5C5A925DBEC0A0067FDE1 /* tdLBGeometryRushtonTurbineLib */,
-				D6E5C5E525DBEC2E0067FDE1 /* src */,
-				D6E5C52A25DBAD610067FDE1 /* tests */,
 				D698D756257D036500A3BFD2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -86,14 +89,6 @@
 				D698D755257D036500A3BFD2 /* tdLBCpp */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		D6E5C52A25DBAD610067FDE1 /* tests */ = {
-			isa = PBXGroup;
-			children = (
-				D6E5C52725DBAD5C0067FDE1 /* test.cpp */,
-			);
-			path = tests;
 			sourceTree = "<group>";
 		};
 		D6E5C5A925DBEC0A0067FDE1 /* tdLBGeometryRushtonTurbineLib */ = {
@@ -122,34 +117,6 @@
 			path = tdLBGeometryRushtonTurbineLibCPP;
 			sourceTree = "<group>";
 		};
-		D6E5C5E525DBEC2E0067FDE1 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				D6E5C62A25E28BB70067FDE1 /* Output */,
-				D6E5C5E825DBEC2E0067FDE1 /* json.h */,
-				D6E5C62E25E3DB5B0067FDE1 /* cxxopts.hpp */,
-				D6E5C5EE25DBEC2E0067FDE1 /* jsoncpp.cpp */,
-				D6E5C5E625DBEC2E0067FDE1 /* Header.h */,
-				D6E5C5EB25DBEC2E0067FDE1 /* BaseParams.h */,
-				D6E5C5EC25DBEC2E0067FDE1 /* GridParams.hpp */,
-				D6E5C5EA25DBEC2E0067FDE1 /* FlowParams.hpp */,
-				D6E5C5E725DBEC2E0067FDE1 /* QVec.hpp */,
-				D6E5C5E925DBEC2E0067FDE1 /* ComputeUnit.h */,
-				D6E5C5EF25DBEC2E0067FDE1 /* ComputeUnit.hpp */,
-				D6E5C61625DE3C440067FDE1 /* CollisionEgglesSomers.hpp */,
-				D6E5C61E25DF79BE0067FDE1 /* CollisionEntropic.hpp */,
-				D6E5C61725DE3C510067FDE1 /* StreamingNieve.hpp */,
-				D6E5C62025DF7A130067FDE1 /* StreamingEsoteric.hpp */,
-				D6E5C63E25ECC7430067FDE1 /* GeomPolarLegacy.h */,
-				D6E5C63D25ECC7430067FDE1 /* GeomPolarLegacy.cpp */,
-				D6E5C61825DE3CCA0067FDE1 /* Boundary.hpp */,
-				D6E5C62225DF7EAE0067FDE1 /* Forcing.hpp */,
-				D6E5C62625E25F9F0067FDE1 /* Output.hpp */,
-				D6E5C5ED25DBEC2E0067FDE1 /* main.cpp */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
 		D6E5C5F325DBEC380067FDE1 /* tdLBCppApi */ = {
 			isa = PBXGroup;
 			children = (
@@ -167,15 +134,56 @@
 			path = include;
 			sourceTree = "<group>";
 		};
-		D6E5C62A25E28BB70067FDE1 /* Output */ = {
+		D6E5C72125EE184B0067FDE1 /* tdlbcpp */ = {
 			isa = PBXGroup;
 			children = (
-				D6E5C62725E26B8B0067FDE1 /* OutputConfig.h */,
-				D6E5C62C25E28C1D0067FDE1 /* PlotDirMeta.h */,
-				D6E5C63125E4031B0067FDE1 /* QVecBinMeta.h */,
-				D6E5C63325E40AE30067FDE1 /* PlotDir.h */,
+				D6E5C72225EE184B0067FDE1 /* CMakeLists.txt */,
+				D6E5C72325EE184B0067FDE1 /* tests */,
+				D6E5C72525EE184B0067FDE1 /* src */,
 			);
-			path = Output;
+			path = tdlbcpp;
+			sourceTree = "<group>";
+		};
+		D6E5C72325EE184B0067FDE1 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C72425EE184B0067FDE1 /* test.cpp */,
+			);
+			path = tests;
+			sourceTree = "<group>";
+		};
+		D6E5C72525EE184B0067FDE1 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5C72625EE184B0067FDE1 /* StreamingNieve.hpp */,
+				D6E5C72725EE184B0067FDE1 /* CMakeLists.txt */,
+				D6E5C72825EE184B0067FDE1 /* Header.h */,
+				D6E5C72925EE184B0067FDE1 /* GeomPolarLegacy.cpp */,
+				D6E5C72A25EE184B0067FDE1 /* cxxopts.hpp */,
+				D6E5C72B25EE184B0067FDE1 /* Boundary.hpp */,
+				D6E5C72C25EE184B0067FDE1 /* QVec.hpp */,
+				D6E5C72E25EE184B0067FDE1 /* PlotDir.h */,
+				D6E5C72F25EE184B0067FDE1 /* QVecBinMeta.h */,
+				D6E5C73025EE184B0067FDE1 /* OutputConfig.h */,
+				D6E5C73125EE184B0067FDE1 /* PlotDirMeta.h */,
+				D6E5C73225EE184B0067FDE1 /* json.h */,
+				D6E5C73325EE184B0067FDE1 /* ComputeUnit.h */,
+				D6E5C73425EE184B0067FDE1 /* FlowParams.hpp */,
+				D6E5C73525EE184B0067FDE1 /* BaseParams.h */,
+				D6E5C73625EE184B0067FDE1 /* template.py */,
+				D6E5C73725EE184B0067FDE1 /* Output.hpp */,
+				D6E5C73825EE184B0067FDE1 /* CollisionEgglesSomers.hpp */,
+				D6E5C73925EE184B0067FDE1 /* CollisionEntropic.hpp */,
+				D6E5C73A25EE184B0067FDE1 /* StreamingEsoteric.hpp */,
+				D6E5C73B25EE184B0067FDE1 /* GridParams.hpp */,
+				D6E5C73C25EE184B0067FDE1 /* spack.yaml */,
+				D6E5C73D25EE184B0067FDE1 /* Forcing.hpp */,
+				D6E5C73E25EE184B0067FDE1 /* main.cpp */,
+				D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */,
+				D6E5C74025EE184B0067FDE1 /* GeomPolarLegacy.h */,
+				D6E5C74125EE184B0067FDE1 /* ComputeUnit.hpp */,
+			);
+			path = src;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -234,10 +242,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D6E5C5F125DBEC2E0067FDE1 /* jsoncpp.cpp in Sources */,
-				D6E5C5F025DBEC2E0067FDE1 /* main.cpp in Sources */,
-				D6E5C52825DBAD5C0067FDE1 /* test.cpp in Sources */,
-				D6E5C63F25ECC7430067FDE1 /* GeomPolarLegacy.cpp in Sources */,
+				D6E5C74225EE184B0067FDE1 /* test.cpp in Sources */,
+				D6E5C74525EE184B0067FDE1 /* jsoncpp.cpp in Sources */,
+				D6E5C74325EE184B0067FDE1 /* GeomPolarLegacy.cpp in Sources */,
+				D6E5C74425EE184B0067FDE1 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
