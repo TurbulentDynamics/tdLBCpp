@@ -16,6 +16,7 @@
 #include <fstream>
 #include <vector>
 #include <cstdint>
+#include <map>
 
 
 #include "../Header.h"
@@ -44,6 +45,45 @@ template < typename T > std::string to_string( const T& n )
 }
 
 
+enum PlotDirKind {
+    XYplane,
+    XZplane,
+    YZplane,
+    rotational,
+    volume,
+    //    case sector = "sector"
+};
+
+static std::map< PlotDirKind, const char * > PlotDirKindMap = {
+    {XYplane, "XYplane"},
+    {XZplane, "XZplane"},
+    {YZplane, "YZplane"},
+    {rotational, "rotational_capture"},
+    {volume, "volume"}
+};
+
+
+enum binExt {bin, binJson, rho, ux, uy, uz, vorticity};
+
+static std::map< binExt, const char * > binExtMap = {
+    {bin, "bin"},
+    {binJson, "bin.json"},
+    {rho, "rho.bin"},
+    {ux, "ux.bin"},
+    {uy, "uy.bin"},
+    {uz, "uz.bin"},
+    {vorticity, "vorticity.bin"}
+};
+
+
+enum QvecNames {Qvec, F};
+
+static std::map< QvecNames, const char * > QvecNamesMap = {
+    {Qvec, "Qvec"},
+    {F, "Qvec.F"}
+};
+
+
 
 struct PlotDir {
 
@@ -61,27 +101,26 @@ struct PlotDir {
     }
     
     
-    std::string get_Qvec_fileroot(const std::string name, int _idi, int _idj, int _idk) {
-        return path + "/" + name + ".node." + std::to_string(_idi) + "." + std::to_string(_idj) + "." + std::to_string(_idk) + ".V4";
+    std::string get_Qvec_fileroot(QvecNames nameEnum, int _idi, int _idj, int _idk) {
+                
+        return path + "/" + QvecNamesMap[nameEnum] + ".node." + std::to_string(_idi) + "." + std::to_string(_idj) + "." + std::to_string(_idk) + ".V4";
     }
     
-    std::string get_Qvec_filename(const std::string name, int _idi, int _idj, int _idk) {
+    std::string get_Qvec_filename(QvecNames name, int _idi, int _idj, int _idk) {
         return get_Qvec_fileroot(name, _idi, _idj, _idk) + ".bin";
     }
     
-    std::string get_my_Qvec_filename(const std::string name) {
+    std::string get_my_Qvec_filename(QvecNames name) {
         return get_Qvec_filename(name, idi, idj, idk);
     }
     
-    std::string get_node000_Qvec_filename(const std::string name) {
+    std::string get_node000_Qvec_filename(QvecNames name) {
         return get_Qvec_filename(name, 0, 0, 0);
     }
     
-    std::string get_node000_Qvec_filename_json(const std::string name) {
+    std::string get_node000_Qvec_filename_json(QvecNames name) {
         return get_Qvec_filename(name, 0, 0, 0) + ".json";
     }
-    
-    
 };
 
 

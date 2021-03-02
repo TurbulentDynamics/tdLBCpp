@@ -16,7 +16,6 @@ struct MPI_Barrier{};
 #define MPI_COMM_WORLD
 #endif
 
-
 enum QLen {D3Q19 = 18, D3Q27 = 26};
 enum Collision {EgglesSomers, EgglesSomersLES, Entropic};
 enum Streaming {Simple, Esotwist};

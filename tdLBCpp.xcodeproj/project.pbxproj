@@ -10,6 +10,7 @@
 		D6E5C52825DBAD5C0067FDE1 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C52725DBAD5C0067FDE1 /* test.cpp */; };
 		D6E5C5F025DBEC2E0067FDE1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C5ED25DBEC2E0067FDE1 /* main.cpp */; };
 		D6E5C5F125DBEC2E0067FDE1 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C5EE25DBEC2E0067FDE1 /* jsoncpp.cpp */; };
+		D6E5C63F25ECC7430067FDE1 /* GeomPolarLegacy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C63D25ECC7430067FDE1 /* GeomPolarLegacy.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +54,8 @@
 		D6E5C62E25E3DB5B0067FDE1 /* cxxopts.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cxxopts.hpp; sourceTree = "<group>"; };
 		D6E5C63125E4031B0067FDE1 /* QVecBinMeta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QVecBinMeta.h; sourceTree = "<group>"; };
 		D6E5C63325E40AE30067FDE1 /* PlotDir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlotDir.h; sourceTree = "<group>"; };
+		D6E5C63D25ECC7430067FDE1 /* GeomPolarLegacy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GeomPolarLegacy.cpp; sourceTree = "<group>"; };
+		D6E5C63E25ECC7430067FDE1 /* GeomPolarLegacy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeomPolarLegacy.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +140,8 @@
 				D6E5C61E25DF79BE0067FDE1 /* CollisionEntropic.hpp */,
 				D6E5C61725DE3C510067FDE1 /* StreamingNieve.hpp */,
 				D6E5C62025DF7A130067FDE1 /* StreamingEsoteric.hpp */,
+				D6E5C63E25ECC7430067FDE1 /* GeomPolarLegacy.h */,
+				D6E5C63D25ECC7430067FDE1 /* GeomPolarLegacy.cpp */,
 				D6E5C61825DE3CCA0067FDE1 /* Boundary.hpp */,
 				D6E5C62225DF7EAE0067FDE1 /* Forcing.hpp */,
 				D6E5C62625E25F9F0067FDE1 /* Output.hpp */,
@@ -232,6 +237,7 @@
 				D6E5C5F125DBEC2E0067FDE1 /* jsoncpp.cpp in Sources */,
 				D6E5C5F025DBEC2E0067FDE1 /* main.cpp in Sources */,
 				D6E5C52825DBAD5C0067FDE1 /* test.cpp in Sources */,
+				D6E5C63F25ECC7430067FDE1 /* GeomPolarLegacy.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -142,7 +142,7 @@ public:
     
     
     template <typename tDiskPrecision, int tDiskSize>
-    void savePlaneXY(OutputDir outDir, int cutAt, tStep step){
+    void savePlaneXZ(OutputDir outDir, int cutAt, tStep step){
         
         tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg1*yg1];
         
@@ -150,33 +150,28 @@ public:
         int bufferLen = 0;
         for (tNi i=1; i<=xg1; i++){
             tNi j = cutAt;
-//            for (tNi j=1; j<=yg1; j++){
-                for (tNi k=1; k<=zg1; k++){
-                    
-                    tDiskGrid<tDiskPrecision, tDiskSize> tmp;
-                    tmp.iGrid = uint16_t(i);
-                    tmp.jGrid = uint16_t(j);
-                    tmp.kGrid = uint16_t(k);
-                    
-                    #pragma unroll
-                    for (int l=0; l<tDiskSize; l++){
-                        tmp.q[l] = Q[index(i,j,k)].q[l];
-                    }
-                    outputBuffer[bufferLen] = tmp;
-                    bufferLen++;
-                    
+            //            for (tNi j=1; j<=yg1; j++){
+            for (tNi k=1; k<=zg1; k++){
+                
+                tDiskGrid<tDiskPrecision, tDiskSize> tmp;
+                tmp.iGrid = uint16_t(i);
+                tmp.jGrid = uint16_t(j);
+                tmp.kGrid = uint16_t(k);
+                
+#pragma unroll
+                for (int l=0; l<tDiskSize; l++){
+                    tmp.q[l] = Q[index(i,j,k)].q[l];
                 }
+                outputBuffer[bufferLen] = tmp;
+                bufferLen++;
+                
+            }
         }
         
         
- 
-        
         std::string plotPath = outDir.get_XY_plane_dir(step, cutAt, tDiskSize);
-
         PlotDir p = PlotDir(plotPath, idi, idj, idk);
-        std::string qvecPath = p.get_my_Qvec_filename("Qvec");
-
-        
+        std::string qvecPath = p.get_my_Qvec_filename(QvecNames::Qvec);
         FILE *fp = fopen(qvecPath.c_str(), "wb");
         fwrite(outputBuffer, sizeof(tDiskGrid<tDiskPrecision, tDiskSize>), bufferLen, fp);
         fclose(fp);
@@ -185,7 +180,6 @@ public:
         delete[] outputBuffer;
         
         
-
         QVecBinMeta q;
         int has_grid_coords = 1;
         int has_col_row_coords = 0;

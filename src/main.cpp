@@ -166,11 +166,9 @@ int main(int argc, char* argv[]){
         if (step % plot_XZ_plane_repeat) {
 
             
-            int cutAt = 10;
-            lb.template savePlaneXY<float, 4>(outDir, cutAt, step);
+            int cutAt = rt.tankDiameter / 3;
+            lb.template savePlaneXZ<float, 4>(outDir, cutAt, step);
             
-            
-
             
             
             //lb.save_XZ_slice<half>(grid.y/2, "xz_slice", step);

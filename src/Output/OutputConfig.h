@@ -21,7 +21,7 @@
 
 
 
-struct plane {
+struct PLane {
     std::string name_root;
     tStep repeat = 0;
     tNi cut_at = 0;
@@ -36,7 +36,7 @@ struct plane {
 
 
 
-struct volume {
+struct Volume {
     std::string name_root;
     tStep repeat = 0;
     
@@ -53,7 +53,7 @@ struct volume {
 
 
 
-struct angle {
+struct Angle {
     std::string name_root;
     tStep repeat = 0;
     double degrees = 0;
@@ -69,7 +69,7 @@ struct angle {
 
 
 
-struct plane_at_angle {
+struct PLaneAtAngle {
     std::string name_root;
     double degrees = 0;
     double tolerance = 0;
@@ -86,7 +86,7 @@ struct plane_at_angle {
 
 
 
-struct sector {
+struct Sector {
     std::string name_root;
     tStep repeat = 0;
     
@@ -118,14 +118,14 @@ public:
     
     
     
-    std::vector<plane> XY_planes;
+    std::vector<PLane> XY_planes;
     void add_XY_plane(std::string dir, tStep repeat, tNi cut_at,
                       int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
         
         std::string Q_data_type = "tDisk_colrow_Q4";
         if (Q_output_len == 19) Q_data_type = "tDisk_colrow_Q19";
         
-        plane p;
+        PLane p;
         p.name_root = dir;
         p.repeat = repeat;
         p.cut_at = cut_at;
@@ -146,14 +146,14 @@ public:
     
     
     //formally axis
-    std::vector<plane> XZ_planes;
+    std::vector<PLane> XZ_planes;
     void add_XZ_plane(const std::string dir, tStep repeat, tNi cut_at,
                       int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
         
         std::string Q_data_type = "tDisk_colrow_Q4";
         if (Q_output_len == 19) Q_data_type = "tDisk_colrow_Q19";
         
-        plane p;
+        PLane p;
         p.name_root = dir;
         p.repeat = repeat;
         p.cut_at = cut_at;
@@ -170,14 +170,14 @@ public:
     
     
     //Formaly slice
-    std::vector<plane> YZ_planes;
+    std::vector<PLane> YZ_planes;
     void add_YZ_plane(const std::string dir, tStep repeat, tNi cut_at,
                       int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
         
         std::string Q_data_type = "tDisk_colrow_Q4";
         if (Q_output_len == 19) Q_data_type = "tDisk_colrow_Q19";
         
-        plane p;
+        PLane p;
         p.name_root = dir;
         p.repeat = repeat;
         p.cut_at = cut_at;
@@ -196,7 +196,7 @@ public:
     
     
     
-    std::vector<angle> capture_at_blade_angle;
+    std::vector<Angle> capture_at_blade_angle;
     void add_angle(const std::string dir,
                    tStep rotational_capture_repeat, double rotational_capture_behind_impeller_degrees,
                    int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
@@ -204,7 +204,7 @@ public:
         std::string Q_data_type = "tDisk_grid_colrow_Q4";
         if (Q_output_len == 19) Q_data_type = "tDisk_grid_colrow_Q19";
         
-        angle a;
+        Angle a;
         a.name_root = dir;
         a.repeat = rotational_capture_repeat;
         a.degrees = rotational_capture_behind_impeller_degrees;
@@ -219,14 +219,14 @@ public:
     }
     
     
-    std::vector<plane_at_angle> YZ_plane_when_angle;
+    std::vector<PLaneAtAngle> YZ_plane_when_angle;
     void add_YZ_plane_at_angle(const std::string dir, double fixed_axis_capture_behind_impeller_degrees,
                                double tolerance, tNi cut_at, int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
         
         std::string Q_data_type = "tDisk_colrow_Q4";
         if (Q_output_len == 19) Q_data_type = "tDisk_colrow_Q19";
         
-        plane_at_angle p;
+        PLaneAtAngle p;
         p.name_root = dir;
         p.degrees = fixed_axis_capture_behind_impeller_degrees;
         p.tolerance = tolerance;
@@ -245,14 +245,7 @@ public:
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    std::vector<volume> volumes;
+    std::vector<Volume> volumes;
     void add_volume(const std::string dir, tStep plot_full_repeat,
                     int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
         
@@ -260,7 +253,7 @@ public:
         if (Q_output_len == 19) Q_data_type = "tDisk_grid_Q19";
         
         
-        volume v;
+        Volume v;
         v.name_root = dir;
         v.repeat = plot_full_repeat;
         v.Q_output_len = Q_output_len;
@@ -275,7 +268,7 @@ public:
     
     
     
-    std::vector<sector> sectors;
+    std::vector<Sector> sectors;
     //Not Yet Implemenmted
 };
 

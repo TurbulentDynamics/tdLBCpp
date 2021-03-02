@@ -285,15 +285,8 @@ void ComputeUnit<T, QVecSize>::checkpoint_write(std::string dirname, std::string
 
 
 
-
-
-
-
-
-
-
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::index(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::index(tNi i, tNi j, tNi k)
 {
 #ifdef DEBUG
     if ((i>=xg) || (j>=yg) || (k>=zg)) {
@@ -309,7 +302,7 @@ tNi ComputeUnit<T, QVecSize>::index(tNi i, tNi j, tNi k)
 //NO DIRECTION
 // 0  0  0
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ000(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ000(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + k;
 }
@@ -318,7 +311,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ000(tNi i, tNi j, tNi k)
 //RIGHT DIRECTION
 // +1  0  0
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ1(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ1(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + (j * zg) + k;
 }
@@ -327,7 +320,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ1(tNi i, tNi j, tNi k)
 //LEFT DIRECTION
 // -1  0  0
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ2(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ2(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + (j * zg) + k;
 }
@@ -336,7 +329,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ2(tNi i, tNi j, tNi k)
 //UP DIRECTION
 //  0 +1  0
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ3(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ3(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j + 1) * zg) + k;
 }
@@ -345,7 +338,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ3(tNi i, tNi j, tNi k)
 //DOWN DIRECTION
 //  0 -1  0
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ4(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ4(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j - 1) * zg) + k;
 }
@@ -354,7 +347,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ4(tNi i, tNi j, tNi k)
 //BACKWARD DIRECTION
 //  0  0 +1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ5(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ5(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + (k + 1);
 }
@@ -363,7 +356,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ5(tNi i, tNi j, tNi k)
 //FORWARD DIRECTION
 //  0  0 -1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ6(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ6(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + (k - 1);
 }
@@ -372,7 +365,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ6(tNi i, tNi j, tNi k)
 //RIGHT_UP DIRECTION
 // +1 +1  0
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ7(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ7(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j + 1) * zg) + k;
 }
@@ -381,7 +374,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ7(tNi i, tNi j, tNi k)
 //LEFT_DOWN DIRECTION
 // -1 -1  0
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ8(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ8(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j - 1) * zg) + k;
 }
@@ -390,7 +383,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ8(tNi i, tNi j, tNi k)
 //RIGHT_BACKWARD DIRECTION
 // +1  0 +1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ9(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ9(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + (j * zg) + (k + 1);
 }
@@ -399,7 +392,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ9(tNi i, tNi j, tNi k)
 //LEFT_FORWARD DIRECTION
 // -1  0 -1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ10(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ10(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + (j * zg) + (k - 1);
 }
@@ -408,7 +401,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ10(tNi i, tNi j, tNi k)
 //UP_BACKWARD DIRECTION
 //  0 +1 +1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ11(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ11(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j + 1) * zg) + (k + 1);
 }
@@ -417,7 +410,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ11(tNi i, tNi j, tNi k)
 //DOWN_FORWARD DIRECTION
 //  0 -1 -1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ12(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ12(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j - 1) * zg) + (k - 1);
 }
@@ -426,7 +419,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ12(tNi i, tNi j, tNi k)
 //RIGHT_DOWN DIRECTION
 // +1 -1  0
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ13(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ13(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j - 1) * zg) + k;
 }
@@ -444,7 +437,7 @@ tNi inline ComputeUnit<T, QVecSize>::dirnQ14(tNi i, tNi j, tNi k)
 //RIGHT_FORWARD DIRECTION
 // +1  0 -1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ15(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ15(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + (j * zg) + (k - 1);
 }
@@ -453,7 +446,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ15(tNi i, tNi j, tNi k)
 //LEFT_BACKWARD DIRECTION
 // -1  0 +1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ16(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ16(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + (j * zg) + (k + 1);
 }
@@ -462,7 +455,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ16(tNi i, tNi j, tNi k)
 //UP_FORWARD DIRECTION
 //  0 +1 -1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ17(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ17(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j + 1) * zg) + (k - 1);
 }
@@ -471,7 +464,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ17(tNi i, tNi j, tNi k)
 //DOWN_BACKWARD DIRECTION
 //  0 -1 +1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ18(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ18(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j - 1) * zg) + (k + 1);
 }
@@ -480,7 +473,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ18(tNi i, tNi j, tNi k)
 //RIGHT_UP_BACKWARD DIRECTION
 // +1 +1 +1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ19(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ19(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j + 1) * zg) + (k + 1);
 }
@@ -489,7 +482,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ19(tNi i, tNi j, tNi k)
 //LEFT_DOWN_FORWARD DIRECTION
 // -1 -1 -1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ20(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ20(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j - 1) * zg) + (k - 1);
 }
@@ -498,7 +491,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ20(tNi i, tNi j, tNi k)
 //RIGHT_UP_FORWARD DIRECTION
 // +1 +1 -1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ21(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ21(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j + 1) * zg) + (k - 1);
 }
@@ -507,7 +500,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ21(tNi i, tNi j, tNi k)
 //LEFT_DOWN_BACKWARD DIRECTION
 // -1 -1 +1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ22(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ22(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j - 1) * zg) + (k + 1);
 }
@@ -516,7 +509,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ22(tNi i, tNi j, tNi k)
 //RIGHT_DOWN_BACKWARD DIRECTION
 // +1 -1 +1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ23(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ23(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j - 1) * zg) + (k + 1);
 }
@@ -525,7 +518,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ23(tNi i, tNi j, tNi k)
 //LEFT_UP_FORWARD DIRECTION
 // -1 +1 -1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ24(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ24(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j + 1) * zg) + (k - 1);
 }
@@ -534,7 +527,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ24(tNi i, tNi j, tNi k)
 //LEFT_UP_BACKWARD DIRECTION
 // -1 +1 +1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ25(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ25(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j + 1) * zg) + (k + 1);
 }
@@ -543,7 +536,7 @@ tNi ComputeUnit<T, QVecSize>::dirnQ25(tNi i, tNi j, tNi k)
 //RIGHT_DOWN_FORWARD DIRECTION
 // +1 -1 -1
 template <typename T, int QVecSize>
-tNi ComputeUnit<T, QVecSize>::dirnQ26(tNi i, tNi j, tNi k)
+tNi inline ComputeUnit<T, QVecSize>::dirnQ26(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j - 1) * zg) + (k - 1);
 }
