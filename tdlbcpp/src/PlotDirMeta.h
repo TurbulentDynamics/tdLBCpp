@@ -2,8 +2,8 @@
 //  define_datastructures.h
 //  stirred-tank-3d-xcode-cpp
 //
-//  Created by Nile Ó Broin on 08/01/2019.
-//  Copyright © 2019 Nile Ó Broin. All rights reserved.
+//  Created by Niall Ó Broin on 08/01/2019.
+//  Copyright © 2019 Niall Ó Broin. All rights reserved.
 //
 
 #pragma once

@@ -34,6 +34,7 @@ set(HEADERS
 	src/Boundary.hpp
 	src/Forcing.hpp
 	src/Output.hpp
+ tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCpp/GeomPolarLegacy.cpp
 )
 
 set(CPP

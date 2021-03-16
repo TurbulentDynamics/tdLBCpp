@@ -12,39 +12,7 @@
 
 #include "ComputeUnit.h"
 
-//struct geomFracion
-
-//template <typename T>
-//Pos3d<T> rotationForce(const tNi iCenter, const tNi kCenter, const tNi radius, Pos3d<tNi> p){
-//
-//
-//    //Angular velocity
-//
-//    double theta = 0.0;
-//
-//    double iFP = iCenter + radius * cosf(theta);
-//    double kFP = kCenter + radius * sinf(theta);
-//
-//    double integerPart;
-//
-//    T iFrac = T(modf(iFP, &integerPart));
-//    T kFrac = T(modf(kFP, &integerPart));
-//
-//    return Pos3d<T>(iFrac, 0.0, kFrac);
-//
-//
-//    g.r_polar = r;
-//    g.t_polar = theta;
-//    g.i_cart_fp = center.x + r * cosf(theta);
-//    g.j_cart_fp = (tGeomShape)y - 0.5f;
-//    g.k_cart_fp = center.z + r * sinf(theta);
-//
-//    g.u_delta_fp = -wa * g.r_polar * sinf(g.t_polar);
-//    g.v_delta_fp = 0.;
-//    g.w_delta_fp = wa * g.r_polar * cosf(g.t_polar);
-//}
-
-
+#include "../"
 
 
 
@@ -89,7 +57,7 @@ void inline smoothedDeltaFunction(T i_cart_fraction, T k_cart_fraction, T ppp[][
 
 
 template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::forcing(std::vector<Pos3d<tNi>> geom, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius){
+void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi>> geom, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius){
     
     
     //        T alfa = 0.97;
@@ -168,9 +136,9 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<Pos3d<tNi>> geom, T alfa, T b
         
         //calculating the difference between the actual (weighted) speed and
         //the required (no-slip) velocity
-//        xs -= rhos * g.u_delta_fp;
-//        ys -= rhos * g.v_delta_fp;
-//        zs -= rhos * g.w_delta_fp;
+        xs -= rhos * g.u_delta_fp;
+        ys -= rhos * g.v_delta_fp;
+        zs -= rhos * g.w_delta_fp;
         
         
         for (tNi k1 = -1; k1<=1; k1++){

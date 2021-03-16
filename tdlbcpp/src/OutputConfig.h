@@ -21,7 +21,7 @@
 
 
 
-struct PLane {
+struct Plane {
     std::string name_root;
     tStep repeat = 0;
     tNi cut_at = 0;
@@ -118,14 +118,14 @@ public:
     
     
     
-    std::vector<PLane> XY_planes;
+    std::vector<Plane> XY_planes;
     void add_XY_plane(std::string dir, tStep repeat, tNi cut_at,
                       int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
         
         std::string Q_data_type = "tDisk_colrow_Q4";
         if (Q_output_len == 19) Q_data_type = "tDisk_colrow_Q19";
         
-        PLane p;
+        Plane p;
         p.name_root = dir;
         p.repeat = repeat;
         p.cut_at = cut_at;
@@ -146,14 +146,14 @@ public:
     
     
     //formally axis
-    std::vector<PLane> XZ_planes;
+    std::vector<Plane> XZ_planes;
     void add_XZ_plane(const std::string dir, tStep repeat, tNi cut_at,
                       int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
         
         std::string Q_data_type = "tDisk_colrow_Q4";
         if (Q_output_len == 19) Q_data_type = "tDisk_colrow_Q19";
         
-        PLane p;
+        Plane p;
         p.name_root = dir;
         p.repeat = repeat;
         p.cut_at = cut_at;
@@ -170,14 +170,14 @@ public:
     
     
     //Formaly slice
-    std::vector<PLane> YZ_planes;
+    std::vector<Plane> YZ_planes;
     void add_YZ_plane(const std::string dir, tStep repeat, tNi cut_at,
                       int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
         
         std::string Q_data_type = "tDisk_colrow_Q4";
         if (Q_output_len == 19) Q_data_type = "tDisk_colrow_Q19";
         
-        PLane p;
+        Plane p;
         p.name_root = dir;
         p.repeat = repeat;
         p.cut_at = cut_at;

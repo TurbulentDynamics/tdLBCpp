@@ -3,7 +3,7 @@
 //  tdLB_with_Soklev
 //
 //  Created by Niall Ó Broin on 20/12/2020.
-//  Copyright © 2019 Nile Ó Broin. All rights reserved.
+//  Copyright © 2019 Niall Ó Broin. All rights reserved.
 //
 
 #pragma once
