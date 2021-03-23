@@ -50,7 +50,7 @@ ComputeUnit<T, QVecSize>::ComputeUnit(
 
     Q = new QVec<T, QVecSize>[size];
     F = new Force<T>[size];
-        𝜈 = new T[size];
+    𝜈 = new T[size];
     O = new bool[size];
 
 

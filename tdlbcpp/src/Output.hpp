@@ -14,6 +14,29 @@
 
 
 
+template <typename T, int size>
+struct tDiskDense {
+    T q[size];
+};
+
+template <typename T, int size>
+struct tDiskGrid {
+    uint16_t iGrid, jGrid, kGrid;
+    T q[size];
+};
+
+template <typename T, int size>
+struct tDiskColRow {
+    uint16_t col, row;
+    T q[size];
+};
+
+template <typename T, int size>
+struct tDiskGridColRow {
+    uint16_t iGrid, jGrid, kGrid;
+    uint16_t col, row;
+    T q[size];
+};
 
 
 

@@ -26,34 +26,14 @@
 #include "PlotDirMeta.h"
 #include "QVecBinMeta.h"
 #include "PlotDir.h"
+#include "Output.hpp"
+//#include "GlobalStructures.hpp"
+#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
+#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 
 
 
 
-
-template <typename T, int size>
-struct tDiskDense {
-    T q[size];
-};
-
-template <typename T, int size>
-struct tDiskGrid {
-    uint16_t iGrid, jGrid, kGrid;
-    T q[size];
-};
-
-template <typename T, int size>
-struct tDiskColRow {
-    uint16_t col, row;
-    T q[size];
-};
-
-template <typename T, int size>
-struct tDiskGridColRow {
-    uint16_t iGrid, jGrid, kGrid;
-    uint16_t col, row;
-    T q[size];
-};
 
 
 
@@ -64,8 +44,6 @@ struct tDiskGridColRow {
 template <typename T, int QVecSize>
 class ComputeUnit {
 public:
-    
-    
     
     
     tNi idi, idj, idk;
@@ -120,7 +98,7 @@ public:
     
     void moments();
     
-    void forcing(std::vector<Pos3d<tNi>>, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius);
+    void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius);
     
     
     void bounceBackBoundary();
@@ -144,7 +122,9 @@ public:
     template <typename tDiskPrecision, int tDiskSize>
     void savePlaneXZ(OutputDir outDir, int cutAt, tStep step){
         
-        tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg1*yg1];
+        
+        
+        tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg*zg];
         
         
         int bufferLen = 0;
@@ -154,9 +134,9 @@ public:
             for (tNi k=1; k<=zg1; k++){
                 
                 tDiskGrid<tDiskPrecision, tDiskSize> tmp;
-                tmp.iGrid = uint16_t(i);
-                tmp.jGrid = uint16_t(j);
-                tmp.kGrid = uint16_t(k);
+                tmp.iGrid = uint16_t(i - 1);
+                tmp.jGrid = uint16_t(j - 1);
+                tmp.kGrid = uint16_t(k - 1);
                 
 #pragma unroll
                 for (int l=0; l<tDiskSize; l++){
@@ -170,8 +150,18 @@ public:
         
         
         std::string plotPath = outDir.get_XY_plane_dir(step, cutAt, tDiskSize);
+
+        outDir.createDir(plotPath);
+
+        
+        
         PlotDir p = PlotDir(plotPath, idi, idj, idk);
         std::string qvecPath = p.get_my_Qvec_filename(QvecNames::Qvec);
+        
+        
+        std::cout<< qvecPath<<std::endl;
+        
+
         FILE *fp = fopen(qvecPath.c_str(), "wb");
         fwrite(outputBuffer, sizeof(tDiskGrid<tDiskPrecision, tDiskSize>), bufferLen, fp);
         fclose(fp);

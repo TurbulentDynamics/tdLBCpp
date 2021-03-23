@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(td_lb LANGUAGES CXX)
+project(tdlb LANGUAGES CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
@@ -8,6 +8,8 @@ cmake_host_system_information(RESULT host_name QUERY HOSTNAME)
 #Needed for Output and Checkpoint files
 include (TestBigEndian)
 TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
+
+find_package(BLAS REQUIRED)
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
@@ -34,7 +36,7 @@ set(HEADERS
 	src/Boundary.hpp
 	src/Forcing.hpp
 	src/Output.hpp
- tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCpp/GeomPolarLegacy.cpp
+    tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCpp/GeomPolarLegacy.hpp
 )
 
 set(CPP

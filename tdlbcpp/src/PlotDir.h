@@ -91,15 +91,11 @@ struct PlotDir {
     int idi, idj, idk;
 
     
-    PlotDir(std::string path, int idi, int idj, int idk):path(path), idi(idi), idj(idj), idk(idk){};
+    PlotDir(std::string path, int idi, int idj, int idk):path(path), idi(idi), idj(idj), idk(idk){
+    };
 
-    PlotDir(std::string path, tNi idi, tNi idj, tNi idk){
-        path = path;
-        idi = int(idi);
-        idj = int(idj);
-        idk = int(idk);
-    }
-    
+    PlotDir(std::string path, tNi idi, tNi idj, tNi idk):path(path), idi((int)idi), idj((int)idj), idk((int)idk){
+    };
     
     std::string get_Qvec_fileroot(QvecNames nameEnum, int _idi, int _idj, int _idk) {
                 
@@ -136,9 +132,7 @@ public:
     OutputDir(){};
     
     
-    OutputDir(std::string rootDir, GridParams _grid){
-        rootDir = rootDir;
-        grid = _grid;
+    OutputDir(std::string rootDir, GridParams grid):rootDir(rootDir), grid(grid){
     };
     
 
@@ -156,34 +150,42 @@ public:
     
 
     
-    std::string get_start(std::string dir_root, std::string name, std::string plot_type, int Q_length, tStep step) {
-        return dir_root + "/" + name + "." + plot_type + ".V_4.Q_" + patch::to_string(Q_length) + ".step_" + format_step(step);
+    std::string get_start(std::string name, std::string plot_type, int Q_length, tStep step) {
+        return rootDir + "/" + name + "." + plot_type + ".V_4.Q_" + patch::to_string(Q_length) + ".step_" + format_step(step);
     }
     
+    void createDir(std::string dir){
+
+        std::cout << dir << std::endl;
+        mkdir(dir.c_str(), 0775);
     
+    }
+
+                       
     
+    std::string get_XY_plane_dir(tStep step, tNi at_k, int Q_length, const std::string name="plot"){
+
+        return get_start(name, "XYplane", Q_length, step) + ".cut_" + patch::to_string(at_k);
+    }
     
-    std::string get_XY_plane_dir(tStep step, tNi at_k, int Q_length, const std::string name="plot", const std::string dir_root="."){
         
-        return get_start(dir_root, name, "XYplane", Q_length, step) + ".cut_" + patch::to_string(at_k);
-    }
-    
+        
     //Formally Axis
-    std::string get_XZ_plane_dir(tStep step, tNi at_j, int Q_length, const std::string name="plot", const std::string dir_root="."){
+    std::string get_XZ_plane_dir(tStep step, tNi at_j, int Q_length, const std::string name="plot"){
         
-        return get_start(dir_root, name, "XZplane", Q_length, step) + ".cut_" + patch::to_string(at_j);
+        return get_start(name, "XZplane", Q_length, step) + ".cut_" + patch::to_string(at_j);
     }
     
     //Formally Slice
-    std::string get_YZ_plane_dir(tStep step, tNi at_i, int Q_length, const std::string name="plot", const std::string dir_root="."){
+    std::string get_YZ_plane_dir(tStep step, tNi at_i, int Q_length, const std::string name="plot"){
         
-        return get_start(dir_root, name, "YZplane", Q_length, step) + ".cut_" + patch::to_string(at_i);
+        return get_start(name, "YZplane", Q_length, step) + ".cut_" + patch::to_string(at_i);
     }
     
     
     
-    std::string get_volume_dir(tStep step, int Q_length, const std::string name="plot", const std::string dir_root="."){
-        return get_start(dir_root, name, "volume", Q_length, step);
+    std::string get_volume_dir(tStep step, int Q_length, const std::string name="plot"){
+        return get_start(name, "volume", Q_length, step);
     }
     
     
@@ -191,20 +193,20 @@ public:
     
     
     
-    std::string get_capture_at_blade_angle_dir(tStep step, int angle, int blade_id, int Q_length, const std::string name="plot_", const std::string dir_root="."){
+    std::string get_capture_at_blade_angle_dir(tStep step, int angle, int blade_id, int Q_length, const std::string name="plot_"){
         
-        return get_start(dir_root, name, "rotational_capture", Q_length, step) + ".angle_" + patch::to_string(angle) + ".blade_id_" + patch::to_string(blade_id);
+        return get_start(name, "rotational_capture", Q_length, step) + ".angle_" + patch::to_string(angle) + ".blade_id_" + patch::to_string(blade_id);
     }
     
     
-    std::string get_axis_when_blade_angle_dir(tStep step, int angle, int Q_length, const std::string name="plot", const std::string dir_root="."){
+    std::string get_axis_when_blade_angle_dir(tStep step, int angle, int Q_length, const std::string name="plot"){
         
-        return get_start(dir_root, name, "YZplane", Q_length, step) + ".angle_" + patch::to_string(angle);
+        return get_start(name, "YZplane", Q_length, step) + ".angle_" + patch::to_string(angle);
     }
     
     
     
-    std::string get_rotating_sector_dir(tStep step, int angle, int Q_length, const std::string name="plot", const std::string dir_root="."){
+    std::string get_rotating_sector_dir(tStep step, int angle, int Q_length, const std::string name="plot"){
         
         std::string ret = "";
         return ret;

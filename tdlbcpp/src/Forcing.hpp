@@ -12,7 +12,7 @@
 
 #include "ComputeUnit.h"
 
-#include "../"
+#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 
 
 
@@ -57,7 +57,7 @@ void inline smoothedDeltaFunction(T i_cart_fraction, T k_cart_fraction, T ppp[][
 
 
 template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi>> geom, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius){
+void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius){
     
     
     //        T alfa = 0.97;
@@ -136,9 +136,9 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi>> geom, T alfa, 
         
         //calculating the difference between the actual (weighted) speed and
         //the required (no-slip) velocity
-        xs -= rhos * g.u_delta_fp;
-        ys -= rhos * g.v_delta_fp;
-        zs -= rhos * g.w_delta_fp;
+        xs -= rhos * g.uDelta;
+        ys -= rhos * g.vDelta;
+        zs -= rhos * g.wDelta;
         
         
         for (tNi k1 = -1; k1<=1; k1++){

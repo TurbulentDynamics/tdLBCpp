@@ -24,37 +24,39 @@
 #include "GridParams.hpp"
 #include "FlowParams.hpp"
 #include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
-#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomMidPoint.hpp"
+#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 #include "ComputeUnit.h"
 #include "OutputConfig.h"
 #include "PlotDir.h"
 
 
-using tPrecision = float;
+using usePrecision = float;
 
 int main(int argc, char* argv[]){
 
     
     GridParams grid;
-    grid.x = 200;
-    grid.y = 200;
-    grid.z = 200;
+    grid.x = 44;
+    grid.y = 44;
+    grid.z = 44;
+    
+    tStep num_steps = 20;
+
     
     grid.ngx = 1;
     grid.ngy = 1;
     grid.ngz = 1;
     
     
-    FlowParams<tPrecision> flow;
+    FlowParams<usePrecision> flow;
     flow.initial_rho = 8.0;
     flow.re_m_nondimensional = 7000.0;
     flow.uav = 0.1;
     flow.g3 = 0.1;
 
     
-    
-    
-    tStep num_steps = 20;
+
+
 
     bool start_with_checkpoint = 0;
     std::string load_checkpoint_dirname = "checkpoint_step_10000";
@@ -75,8 +77,8 @@ int main(int argc, char* argv[]){
 
     
     double startingAngle = 0.0;
-    tPrecision alpha = 0.97;
-    tPrecision beta = 1.9;
+    usePrecision alpha = 0.97;
+    usePrecision beta = 1.9;
     
     
     
@@ -94,7 +96,7 @@ int main(int argc, char* argv[]){
 
         ("n,num_steps", "Number of Steps", cxxopts::value<tStep>(num_steps))
 
-        ("re_m", "Reynolds Number  (Re_m will be *M_PI/2)", cxxopts::value<tPrecision>(flow.re_m_nondimensional))
+        ("re_m", "Reynolds Number  (Re_m will be *M_PI/2)", cxxopts::value<usePrecision>(flow.re_m_nondimensional))
         ("start_with_checkpoint", "start_with_checkpoint", cxxopts::value<bool>(start_with_checkpoint))
         ("load_checkpoint_dirname", "load_checkpoint_dirname", cxxopts::value<std::string>(load_checkpoint_dirname))
 //        ("upscale_factor", "upscale_factor", cxxopts::value<tNi>(upscale_factor))
@@ -129,34 +131,29 @@ int main(int argc, char* argv[]){
     
     Extents<tNi> e = Extents<tNi>(0, grid.x, 0, grid.y, 0, grid.z);
 
-    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
+//    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
+    RushtonTurbinePolarCPP<tNi, usePrecision> geom = RushtonTurbinePolarCPP<tNi, usePrecision>(rt, e);
 
+    
     geom.generateFixedGeometry();
     geom.generateRotatingGeometry(startingAngle);
     geom.generateRotatingNonUpdatingGeometry();
 
-    std::vector<Pos3d<tNi>> geomFixed = geom.returnFixedGeometry();
-    std::vector<Pos3d<tNi>> geomRotating = geom.returnRotatingGeometry();
-    std::vector<Pos3d<tNi>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+    std::vector<PosPolar<tNi, usePrecision>> geomFixed = geom.returnFixedGeometry();
+    std::vector<PosPolar<tNi, usePrecision>> geomRotating = geom.returnRotatingGeometry();
+    std::vector<PosPolar<tNi, usePrecision>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
 
     
-    
-    
-    
-    
-    
-    
-    
-    
-    ComputeUnit<tPrecision, QLen::D3Q19> lb = ComputeUnit<tPrecision, QLen::D3Q19>(0, 0, 0, grid.x, grid.y, grid.z, 1, flow);
+        
+    ComputeUnit<usePrecision, QLen::D3Q19> lb = ComputeUnit<usePrecision, QLen::D3Q19>(5, 5, 5, grid.x, grid.y, grid.z, 1, flow);
 
     
-    lb.forcing(geomFixed, alpha, beta, geom.iCenter, geom.kCenter, geom.tankRadius);
-    lb.forcing(geomRotatingNonUpdating, alpha, beta, geom.iCenter, geom.kCenter, geom.tankRadius);
+    lb.forcing(geomFixed, alpha, beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
+    lb.forcing(geomRotatingNonUpdating, alpha, beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
 
     
     double impellerAngle = startingAngle;
-    for (tStep step=0; step<num_steps; step++) {
+    for (tStep step=1; step<=num_steps; step++) {
 
         lb.collision(EgglesSomers);
 
@@ -164,9 +161,9 @@ int main(int argc, char* argv[]){
 
 
         if (step % plot_XZ_plane_repeat) {
-
             
             int cutAt = rt.tankDiameter / 3;
+            
             lb.template savePlaneXZ<float, 4>(outDir, cutAt, step);
             
             
@@ -185,11 +182,11 @@ int main(int argc, char* argv[]){
 
         impellerAngle += 0.12;
         geom.updateRotatingGeometry(impellerAngle);
-        std::vector<Pos3d<tNi>> geomRotation = geom.returnRotatingGeometry();
+        std::vector<PosPolar<tNi, usePrecision>> geomRotation = geom.returnRotatingGeometry();
         
         
 
-        lb.forcing(geomRotating, alpha, beta, geom.iCenter, geom.kCenter, geom.tankRadius);
+        lb.forcing(geomRotating, alpha, beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
 
             
         

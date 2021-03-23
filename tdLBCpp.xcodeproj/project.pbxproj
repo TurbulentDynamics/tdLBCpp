@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D689CD6426010D0600DF4E61 /* testComputeUnit.mm in Sources */ = {isa = PBXBuildFile; fileRef = D689CD6326010D0600DF4E61 /* testComputeUnit.mm */; };
 		D6E5C74225EE184B0067FDE1 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C72425EE184B0067FDE1 /* test.cpp */; };
 		D6E5C74425EE184B0067FDE1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C73E25EE184B0067FDE1 /* main.cpp */; };
 		D6E5C74525EE184B0067FDE1 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */; };
@@ -25,6 +26,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D689CD6126010D0600DF4E61 /* testComputeUnit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testComputeUnit.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D689CD6326010D0600DF4E61 /* testComputeUnit.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = testComputeUnit.mm; sourceTree = "<group>"; };
+		D689CD6526010D0600DF4E61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D698D755257D036500A3BFD2 /* tdLBCpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tdLBCpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6ACCEF325F60FEA00705722 /* GlobalStructures.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GlobalStructures.hpp; sourceTree = "<group>"; };
 		D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RushtonTurbine.hpp; sourceTree = "<group>"; };
@@ -54,12 +58,18 @@
 		D6E5C73E25EE184B0067FDE1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
 		D6E5C74125EE184B0067FDE1 /* ComputeUnit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnit.hpp; sourceTree = "<group>"; };
+		D6E86A742600D86200534D6F /* GeomPolarLegacy.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GeomPolarLegacy.hpp; sourceTree = "<group>"; };
 		D6F65EE125F5FBB90057F354 /* GlobalStructures.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GlobalStructures.hpp; sourceTree = "<group>"; };
-		D6F65EE325F5FBF00057F354 /* GeomPolarLegacy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeomPolarLegacy.h; sourceTree = "<group>"; };
-		D6F65EE425F5FBF00057F354 /* GeomPolarLegacy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GeomPolarLegacy.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		D689CD5E26010D0600DF4E61 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D698D752257D036500A3BFD2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -70,11 +80,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D689CD6226010D0600DF4E61 /* testComputeUnit */ = {
+			isa = PBXGroup;
+			children = (
+				D689CD6326010D0600DF4E61 /* testComputeUnit.mm */,
+				D689CD6526010D0600DF4E61 /* Info.plist */,
+			);
+			path = testComputeUnit;
+			sourceTree = "<group>";
+		};
 		D698D74C257D036500A3BFD2 = {
 			isa = PBXGroup;
 			children = (
 				D6E5C72125EE184B0067FDE1 /* tdlbcpp */,
 				D6E5C5A925DBEC0A0067FDE1 /* tdLBGeometryRushtonTurbineLib */,
+				D689CD6226010D0600DF4E61 /* testComputeUnit */,
 				D698D756257D036500A3BFD2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -83,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				D698D755257D036500A3BFD2 /* tdLBCpp */,
+				D689CD6126010D0600DF4E61 /* testComputeUnit.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -106,8 +127,7 @@
 		D6E5C5BA25DBEC0B0067FDE1 /* tdLBGeometryRushtonTurbineLibCPP */ = {
 			isa = PBXGroup;
 			children = (
-				D6F65EE325F5FBF00057F354 /* GeomPolarLegacy.h */,
-				D6F65EE425F5FBF00057F354 /* GeomPolarLegacy.cpp */,
+				D6E86A742600D86200534D6F /* GeomPolarLegacy.hpp */,
 				D6F65EE125F5FBB90057F354 /* GlobalStructures.hpp */,
 				D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */,
 				D6E5C5BD25DBEC0B0067FDE1 /* GeomMidPoint.hpp */,
@@ -167,6 +187,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		D689CD6026010D0600DF4E61 /* testComputeUnit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D689CD6826010D0600DF4E61 /* Build configuration list for PBXNativeTarget "testComputeUnit" */;
+			buildPhases = (
+				D689CD5D26010D0600DF4E61 /* Sources */,
+				D689CD5E26010D0600DF4E61 /* Frameworks */,
+				D689CD5F26010D0600DF4E61 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = testComputeUnit;
+			productName = testComputeUnit;
+			productReference = D689CD6126010D0600DF4E61 /* testComputeUnit.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		D698D754257D036500A3BFD2 /* tdLBCpp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D698D75C257D036600A3BFD2 /* Build configuration list for PBXNativeTarget "tdLBCpp" */;
@@ -192,6 +229,9 @@
 			attributes = {
 				LastUpgradeCheck = 1240;
 				TargetAttributes = {
+					D689CD6026010D0600DF4E61 = {
+						CreatedOnToolsVersion = 12.4;
+					};
 					D698D754257D036500A3BFD2 = {
 						CreatedOnToolsVersion = 12.2;
 					};
@@ -211,11 +251,30 @@
 			projectRoot = "";
 			targets = (
 				D698D754257D036500A3BFD2 /* tdLBCpp */,
+				D689CD6026010D0600DF4E61 /* testComputeUnit */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		D689CD5F26010D0600DF4E61 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		D689CD5D26010D0600DF4E61 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D689CD6426010D0600DF4E61 /* testComputeUnit.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D698D751257D036500A3BFD2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -229,6 +288,44 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		D689CD6626010D0600DF4E61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = D77CH63CLG;
+				INFOPLIST_FILE = testComputeUnit/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "Turbulent-Dynamics.testComputeUnit";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D689CD6726010D0600DF4E61 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = D77CH63CLG;
+				INFOPLIST_FILE = testComputeUnit/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "Turbulent-Dynamics.testComputeUnit";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		D698D75A257D036600A3BFD2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -365,6 +462,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D689CD6826010D0600DF4E61 /* Build configuration list for PBXNativeTarget "testComputeUnit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D689CD6626010D0600DF4E61 /* Debug */,
+				D689CD6726010D0600DF4E61 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		D698D750257D036500A3BFD2 /* Build configuration list for PBXProject "tdLBCpp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
