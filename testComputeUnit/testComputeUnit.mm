@@ -43,8 +43,8 @@
     
     
     FlowParams<float> flow;
-    flow.initial_rho = 8.0;
-    flow.re_m_nondimensional = 7000.0;
+    flow.initialRho = 8.0;
+    flow.reMNonDimensional = 7000.0;
     flow.uav = 0.1;
     flow.g3 = 0.1;
     
@@ -54,26 +54,26 @@
 
 //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
 
-//    RushtonTurbinePolarCPP<tNi, usePrecision> geom = RushtonTurbinePolarCPP<tNi, usePrecision>(rt, e);
+//    RushtonTurbinePolarCPP<tNi, useQVecPrecision> geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
     ComputeUnit<float, QLen::D3Q19> lb = ComputeUnit<float, QLen::D3Q19>(1, 2, 3, 101, 102, 103, 1, flow);
 
     
     XCTAssertEqual(lb.idi, 1);
     
     
-    std::string output_root_dir = "output_root_dir";
-    OutputDir outDir = OutputDir(output_root_dir, grid);
+    std::string diskOutputDir = "diskOutputDir";
+    DiskOutputTree outDir = OutputDir(diskOutputDir, grid);
     
-    std::string plotPath = outDir.get_XY_plane_dir(18, 14, 4);
+    std::string plotPath = outDir.get_XY_plane_dir(18, 14);
     
-    XCTAssertEqual(plotPath, "./output_root_dir/plot.XYplane.V_4.Q_4.step_00000018.cut_14");
+    XCTAssertEqual(plotPath, "./diskOutputDir/plot.XYplane.V5.step00000018.cut_14");
     
     PlotDir p = PlotDir(plotPath, 1, 2, 3);
 
     std::string qvecPath = p.get_my_Qvec_filename(QvecNames::Qvec);
     std::cout<<qvecPath<<std::endl;
     
-    XCTAssertEqual(qvecPath, "./output_root_dir/plot.XYplane.V_4.Q_4.step_00000018.cut_14/Qvec.node.1.2.3.V4.bin");
+    XCTAssertEqual(qvecPath, "./diskOutputDir/plot.XYplane.V4.Q4.step00000018.cut14/Qvec.node.1.2.3.V5.bin");
     
     
     

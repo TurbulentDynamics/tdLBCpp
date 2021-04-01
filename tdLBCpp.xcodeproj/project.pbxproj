@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D689CD6426010D0600DF4E61 /* testComputeUnit.mm in Sources */ = {isa = PBXBuildFile; fileRef = D689CD6326010D0600DF4E61 /* testComputeUnit.mm */; };
+		D6930C67261366B4004245CB /* testJsonFiles.mm in Sources */ = {isa = PBXBuildFile; fileRef = D6930C66261366B4004245CB /* testJsonFiles.mm */; };
 		D6E5C74225EE184B0067FDE1 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C72425EE184B0067FDE1 /* test.cpp */; };
 		D6E5C74425EE184B0067FDE1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C73E25EE184B0067FDE1 /* main.cpp */; };
 		D6E5C74525EE184B0067FDE1 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */; };
@@ -29,6 +30,7 @@
 		D689CD6126010D0600DF4E61 /* testComputeUnit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testComputeUnit.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D689CD6326010D0600DF4E61 /* testComputeUnit.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = testComputeUnit.mm; sourceTree = "<group>"; };
 		D689CD6526010D0600DF4E61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D6930C66261366B4004245CB /* testJsonFiles.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = testJsonFiles.mm; sourceTree = "<group>"; };
 		D698D755257D036500A3BFD2 /* tdLBCpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tdLBCpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6ACCEF325F60FEA00705722 /* GlobalStructures.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GlobalStructures.hpp; sourceTree = "<group>"; };
 		D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RushtonTurbine.hpp; sourceTree = "<group>"; };
@@ -40,25 +42,27 @@
 		D6E5C72A25EE184B0067FDE1 /* cxxopts.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cxxopts.hpp; sourceTree = "<group>"; };
 		D6E5C72B25EE184B0067FDE1 /* Boundary.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Boundary.hpp; sourceTree = "<group>"; };
 		D6E5C72C25EE184B0067FDE1 /* QVec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = QVec.hpp; sourceTree = "<group>"; };
-		D6E5C72E25EE184B0067FDE1 /* PlotDir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlotDir.h; sourceTree = "<group>"; };
-		D6E5C72F25EE184B0067FDE1 /* QVecBinMeta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QVecBinMeta.h; sourceTree = "<group>"; };
+		D6E5C72E25EE184B0067FDE1 /* DiskOutputTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskOutputTree.h; sourceTree = "<group>"; };
 		D6E5C73025EE184B0067FDE1 /* OutputConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutputConfig.h; sourceTree = "<group>"; };
-		D6E5C73125EE184B0067FDE1 /* PlotDirMeta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlotDirMeta.h; sourceTree = "<group>"; };
 		D6E5C73225EE184B0067FDE1 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
 		D6E5C73325EE184B0067FDE1 /* ComputeUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComputeUnit.h; sourceTree = "<group>"; };
-		D6E5C73425EE184B0067FDE1 /* FlowParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FlowParams.hpp; sourceTree = "<group>"; };
-		D6E5C73525EE184B0067FDE1 /* BaseParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseParams.h; sourceTree = "<group>"; };
+		D6E5C73425EE184B0067FDE1 /* Flow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Flow.hpp; sourceTree = "<group>"; };
 		D6E5C73625EE184B0067FDE1 /* template.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = template.py; sourceTree = "<group>"; };
 		D6E5C73725EE184B0067FDE1 /* Output.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Output.hpp; sourceTree = "<group>"; };
 		D6E5C73825EE184B0067FDE1 /* CollisionEgglesSomers.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEgglesSomers.hpp; sourceTree = "<group>"; };
 		D6E5C73925EE184B0067FDE1 /* CollisionEntropic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEntropic.hpp; sourceTree = "<group>"; };
 		D6E5C73A25EE184B0067FDE1 /* StreamingEsoteric.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingEsoteric.hpp; sourceTree = "<group>"; };
-		D6E5C73B25EE184B0067FDE1 /* GridParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GridParams.hpp; sourceTree = "<group>"; };
+		D6E5C73B25EE184B0067FDE1 /* Grid.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Grid.hpp; sourceTree = "<group>"; };
 		D6E5C73D25EE184B0067FDE1 /* Forcing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Forcing.hpp; sourceTree = "<group>"; };
 		D6E5C73E25EE184B0067FDE1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
 		D6E5C74125EE184B0067FDE1 /* ComputeUnit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnit.hpp; sourceTree = "<group>"; };
 		D6E86A742600D86200534D6F /* GeomPolarLegacy.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GeomPolarLegacy.hpp; sourceTree = "<group>"; };
+		D6F5334A2615819500A715C9 /* Running.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Running.hpp; sourceTree = "<group>"; };
+		D6F5334D2615948E00A715C9 /* BinFile.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BinFile.hpp; sourceTree = "<group>"; };
+		D6F533502615A0A000A715C9 /* ComputeUnitParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnitParams.hpp; sourceTree = "<group>"; };
+		D6F5335D2615E78B00A715C9 /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
+		D6F5335E2615E84F00A715C9 /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
 		D6F65EE125F5FBB90057F354 /* GlobalStructures.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GlobalStructures.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,6 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				D689CD6326010D0600DF4E61 /* testComputeUnit.mm */,
+				D6930C66261366B4004245CB /* testJsonFiles.mm */,
 				D689CD6526010D0600DF4E61 /* Info.plist */,
 			);
 			path = testComputeUnit;
@@ -156,20 +161,16 @@
 		D6E5C72525EE184B0067FDE1 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				D6F5335D2615E78B00A715C9 /* BUILD */,
+				D6F533492615815D00A715C9 /* Params */,
 				D6E5C72625EE184B0067FDE1 /* StreamingNieve.hpp */,
 				D6E5C72825EE184B0067FDE1 /* Header.h */,
 				D6E5C72A25EE184B0067FDE1 /* cxxopts.hpp */,
 				D6E5C72B25EE184B0067FDE1 /* Boundary.hpp */,
 				D6E5C72C25EE184B0067FDE1 /* QVec.hpp */,
-				D6E5C72E25EE184B0067FDE1 /* PlotDir.h */,
-				D6E5C72F25EE184B0067FDE1 /* QVecBinMeta.h */,
+				D6E5C72E25EE184B0067FDE1 /* DiskOutputTree.h */,
 				D6E5C73025EE184B0067FDE1 /* OutputConfig.h */,
-				D6E5C73125EE184B0067FDE1 /* PlotDirMeta.h */,
-				D6E5C73225EE184B0067FDE1 /* json.h */,
 				D6E5C73325EE184B0067FDE1 /* ComputeUnit.h */,
-				D6E5C73425EE184B0067FDE1 /* FlowParams.hpp */,
-				D6E5C73B25EE184B0067FDE1 /* GridParams.hpp */,
-				D6E5C73525EE184B0067FDE1 /* BaseParams.h */,
 				D6E5C73625EE184B0067FDE1 /* template.py */,
 				D6E5C73725EE184B0067FDE1 /* Output.hpp */,
 				D6E5C73825EE184B0067FDE1 /* CollisionEgglesSomers.hpp */,
@@ -178,10 +179,24 @@
 				D6E5C73D25EE184B0067FDE1 /* Forcing.hpp */,
 				D6E5C73E25EE184B0067FDE1 /* main.cpp */,
 				D6ACCEF325F60FEA00705722 /* GlobalStructures.hpp */,
-				D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */,
 				D6E5C74125EE184B0067FDE1 /* ComputeUnit.hpp */,
 			);
 			path = src;
+			sourceTree = "<group>";
+		};
+		D6F533492615815D00A715C9 /* Params */ = {
+			isa = PBXGroup;
+			children = (
+				D6F5335E2615E84F00A715C9 /* BUILD */,
+				D6E5C73225EE184B0067FDE1 /* json.h */,
+				D6E5C73425EE184B0067FDE1 /* Flow.hpp */,
+				D6E5C73B25EE184B0067FDE1 /* Grid.hpp */,
+				D6F5334A2615819500A715C9 /* Running.hpp */,
+				D6F5334D2615948E00A715C9 /* BinFile.hpp */,
+				D6F533502615A0A000A715C9 /* ComputeUnitParams.hpp */,
+				D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */,
+			);
+			path = Params;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -272,6 +287,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D689CD6426010D0600DF4E61 /* testComputeUnit.mm in Sources */,
+				D6930C67261366B4004245CB /* testJsonFiles.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,7 +307,8 @@
 		D689CD6626010D0600DF4E61 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = D77CH63CLG;
@@ -310,7 +327,8 @@
 		D689CD6726010D0600DF4E61 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = D77CH63CLG;

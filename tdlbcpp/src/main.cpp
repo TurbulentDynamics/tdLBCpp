@@ -18,19 +18,64 @@
 #include <cfenv>
 
 #include "cxxopts.hpp"
-#include "json.h"
 
 #include "Header.h"
-#include "GridParams.hpp"
-#include "FlowParams.hpp"
+#include "Params/Grid.hpp"
+#include "Params/Flow.hpp"
+#include "Params/Running.hpp"
+#include "Params/ComputeUnitParams.hpp"
+
+
+
 #include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
 #include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 #include "ComputeUnit.h"
 #include "OutputConfig.h"
-#include "PlotDir.h"
+
+//TODO: Temporary, different ComputeUnits could have different precision
+using useQVecPrecision = float;
 
 
-using usePrecision = float;
+//https://stackoverflow.com/questions/16357999/current-date-and-time-as-string
+std::string getTimeNowAsString(){
+
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
+
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    strftime(buffer, sizeof(buffer), "%Y_%m_%d_%H_%M_%S", timeinfo);
+    std::string time_now(buffer);
+
+    //https://www.techiedelight.com/replace-occurrences-character-string-cpp/
+    size_t pos;
+    while ((pos = time_now.find("-")) != std::string::npos) {time_now.replace(pos, 1, "_");}
+    while ((pos = time_now.find(" ")) != std::string::npos) {time_now.replace(pos, 1, "_");}
+    while ((pos = time_now.find(":")) != std::string::npos) {time_now.replace(pos, 1, "_");}
+
+
+    return time_now;
+}
+
+
+std::string formatDirWithTimeAndParams(std::string root, tNi gridX, int re_m, bool les, float uav, tStep step = 0){
+
+    std::string str = root + "_";
+
+    if (step) str += "step_" + std::to_string(step) + "__";
+
+    str += "datetime_" + getTimeNowAsString() + "_";
+    str += "gridx_" + std::to_string(gridX) + "_";
+    str += "re_" + std::to_string(re_m) + "_";
+    str += "les_" + std::to_string(les) + "_";
+    str += "uav_" + std::to_string(uav);
+
+    return str;
+}
+
+
 
 int main(int argc, char* argv[]){
 
@@ -48,9 +93,9 @@ int main(int argc, char* argv[]){
     grid.ngz = 1;
     
     
-    FlowParams<usePrecision> flow;
-    flow.initial_rho = 8.0;
-    flow.re_m_nondimensional = 7000.0;
+    FlowParams<useQVecPrecision> flow;
+    flow.initialRho = 8.0;
+    flow.reMNonDimensional = 7000.0;
     flow.uav = 0.1;
     flow.g3 = 0.1;
 
@@ -65,7 +110,16 @@ int main(int argc, char* argv[]){
     tStep checkpoint_repeat = 10;
     std::string checkpoint_root_dir = "checkpoint_root_dir";
 
-    std::string output_root_dir = "output_root_dir";
+    int useLES = 0;
+
+ 
+    //    std::string diskOutputDir = formatDirWithTimeAndParams("run_", grid.x, flow.reMNonDimensional, useLES, flow.uav);
+
+    std::string driveRoot = ".";
+
+    std::string diskOutputDir = "output_debug";
+
+    
     tStep plot_XY_plane_repeat = 10;
     tStep plot_XZ_plane_repeat = 10;
     tStep plot_YZ_plane_repeat = 10;
@@ -77,8 +131,8 @@ int main(int argc, char* argv[]){
 
     
     double startingAngle = 0.0;
-    usePrecision alpha = 0.97;
-    usePrecision beta = 1.9;
+    useQVecPrecision alpha = 0.97;
+    useQVecPrecision beta = 1.9;
     
     
     
@@ -96,7 +150,7 @@ int main(int argc, char* argv[]){
 
         ("n,num_steps", "Number of Steps", cxxopts::value<tStep>(num_steps))
 
-        ("re_m", "Reynolds Number  (Re_m will be *M_PI/2)", cxxopts::value<usePrecision>(flow.re_m_nondimensional))
+        ("re_m", "Reynolds Number  (Re_m will be *M_PI/2)", cxxopts::value<useQVecPrecision>(flow.reMNonDimensional))
         ("start_with_checkpoint", "start_with_checkpoint", cxxopts::value<bool>(start_with_checkpoint))
         ("load_checkpoint_dirname", "load_checkpoint_dirname", cxxopts::value<std::string>(load_checkpoint_dirname))
 //        ("upscale_factor", "upscale_factor", cxxopts::value<tNi>(upscale_factor))
@@ -123,58 +177,89 @@ int main(int argc, char* argv[]){
 
     
     
-    OutputDir outDir = OutputDir(output_root_dir, grid);
-    
-    
     
     RushtonTurbine rt = RushtonTurbine(int(grid.x));
     
     Extents<tNi> e = Extents<tNi>(0, grid.x, 0, grid.y, 0, grid.z);
 
-//    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
-    RushtonTurbinePolarCPP<tNi, usePrecision> geom = RushtonTurbinePolarCPP<tNi, usePrecision>(rt, e);
+    //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
+        RushtonTurbinePolarCPP<tNi, useQVecPrecision> geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
 
     
     geom.generateFixedGeometry();
     geom.generateRotatingGeometry(startingAngle);
     geom.generateRotatingNonUpdatingGeometry();
 
-    std::vector<PosPolar<tNi, usePrecision>> geomFixed = geom.returnFixedGeometry();
-    std::vector<PosPolar<tNi, usePrecision>> geomRotating = geom.returnRotatingGeometry();
-    std::vector<PosPolar<tNi, usePrecision>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
 
     
+    
+    ComputeUnitParams cu;
+    cu.idi = 0;
+    cu.idj = 0;
+    cu.idk = 0;
+    cu.x = grid.x;
+    cu.y = grid.y;
+    cu.z = grid.z;
+    cu.x0 = 0;
+    cu.y0 = 0;
+    cu.z0 = 0;
+    cu.ghost = 1;
         
-    ComputeUnit<usePrecision, QLen::D3Q19> lb = ComputeUnit<usePrecision, QLen::D3Q19>(5, 5, 5, grid.x, grid.y, grid.z, 1, flow);
+    
+    DiskOutputTree outputTree = DiskOutputTree(driveRoot, diskOutputDir, grid, flow.asDouble(), cu);
 
+    
+    ComputeUnit<useQVecPrecision, QLen::D3Q19> lb = ComputeUnit<useQVecPrecision, QLen::D3Q19>(cu, flow, outputTree);
+    
+    
     
     lb.forcing(geomFixed, alpha, beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
     lb.forcing(geomRotatingNonUpdating, alpha, beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
 
     
     double impellerAngle = startingAngle;
+    RunningParams runParams;
     for (tStep step=1; step<=num_steps; step++) {
 
+        runParams.update(step, (double)impellerAngle);
+        
         lb.collision(EgglesSomers);
 
         lb.streaming(Simple);
 
 
-        if (step % plot_XZ_plane_repeat) {
+        
+        //SetUp OutputFormat
+        BinFileFormat binFormat;
+        //format.filePath = plotPath;
+        binFormat.structName = "tDisk_grid_Q4_V5";
+        //format.binFileSizeInStructs set at the end
+        binFormat.coordsType = "uint16_t";
+        binFormat.hasGridtCoords = 1;
+        binFormat.hasColRowtCoords = 0;
+        binFormat.QDataType = "float";
+        binFormat.QOutputLength = 4;
+
+        
+        if (step % plot_XZ_plane_repeat == 0) {
+          
+            binFormat.cutAt = rt.tankDiameter / 3;
             
-            int cutAt = rt.tankDiameter / 3;
             
-            lb.template savePlaneXZ<float, 4>(outDir, cutAt, step);
-            
+            lb.template savePlaneXZ<float, 4>(binFormat, runParams);
             
             
-            //lb.save_XZ_slice<half>(grid.y/2, "xz_slice", step);
-//            lb.save_XZ_slice<float>(grid.y/2, "xz_slice", step);
-//            lb.save_XZ_slice<double>(grid.y/2, "xz_slice", step);
+            
+            //lb.save_XZ_slice<half>(format, grid.y/2, "xz_slice", step);
+//            lb.save_XZ_slice<float>(format, grid.y/2, "xz_slice", step);
+//            lb.save_XZ_slice<double>(format, grid.y/2, "xz_slice", step);
 
         }
         
-        
+
         if (checkpoint_repeat && (step % checkpoint_repeat == 0)) {
             std::string dirname = "checkpoint_test_step_" + std::to_string(step);
 //            lb.checkpoint_write(dirname);
@@ -182,9 +267,9 @@ int main(int argc, char* argv[]){
 
         impellerAngle += 0.12;
         geom.updateRotatingGeometry(impellerAngle);
-        std::vector<PosPolar<tNi, usePrecision>> geomRotation = geom.returnRotatingGeometry();
-        
-        
+        std::vector<PosPolar<tNi, useQVecPrecision>> geomRotation = geom.returnRotatingGeometry();
+
+
 
         lb.forcing(geomRotating, alpha, beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
 

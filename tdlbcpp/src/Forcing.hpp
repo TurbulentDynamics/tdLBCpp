@@ -91,9 +91,7 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alf
         tNi i = g.i;
         tNi j = g.j;
         tNi k = g.k;
-
-        
-        
+    
         T rhos = 0.0;
         T xs = 0.0;
         T ys = 0.0;
@@ -102,10 +100,10 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alf
         
         
         for (tNi k1 = -1; k1<=1; k1++){
-            for (tNi j1 = -1; j1<=1; j1++){
+            for (tNi i1 = -1; i1<=1; i1++){
                 
-                tNi i2 = i;
-                tNi j2 = j + j1;
+                tNi i2 = i + i1;
+                tNi j2 = j;
                 tNi k2 = k + k1;
                 
 //                if (j2 < 1)  j2 = j2 + ny;
@@ -121,15 +119,15 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alf
                 
                 
                 //adding the density of a nearby point using a weight (in ppp)
-                rhos += ppp[j1+1][k1+1] * rho;
+                rhos += ppp[i1+1][k1+1] * rho;
                 
                 //printf("  %f %f   %f  \n", rho, rhos, ppp[j1+1][k1+1] );
                 
                 
                 //adding the velocity of a nearby point using a weight (in ppp)
-                xs += ppp[j1+1][k1+1] * u.x;
-                ys += ppp[j1+1][k1+1] * u.y;
-                zs += ppp[j1+1][k1+1] * u.z;
+                xs += ppp[i1+1][k1+1] * u.x;
+                ys += ppp[i1+1][k1+1] * u.y;
+                zs += ppp[i1+1][k1+1] * u.z;
             }
         }//endfor  j1, k1
         
@@ -142,12 +140,12 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alf
         
         
         for (tNi k1 = -1; k1<=1; k1++){
-            for (tNi j1 = -1; j1<=1; j1++){
+            for (tNi i1 = -1; i1<=1; i1++){
                 
                 //printf("fx,  %i %i %i % 1.8E % 1.8E % 1.8E  \n", i2, j2, k2, xs, ys, zs);
                 
-                tNi i2 = i;
-                tNi j2 = j + j1;
+                tNi i2 = i + i1;
+                tNi j2 = j;
                 tNi k2 = k + k1;
 
 //                if (j2 < 1)  j2 = j2+ny;
@@ -158,9 +156,9 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alf
             
                 Velocity<T> u = Q[index(i2,j2,k2)].velocity();
 
-                F[index(i2,j2,k2)].x = alfa * u.x - beta * ppp[j1+1][k1+1] * xs;
-                F[index(i2,j2,k2)].y = alfa * u.y - beta * ppp[j1+1][k1+1] * ys;
-                F[index(i2,j2,k2)].z = alfa * u.z - beta * ppp[j1+1][k1+1] * zs;
+                F[index(i2,j2,k2)].x = alfa * u.x - beta * ppp[i1+1][k1+1] * xs;
+                F[index(i2,j2,k2)].y = alfa * u.y - beta * ppp[i1+1][k1+1] * ys;
+                F[index(i2,j2,k2)].z = alfa * u.z - beta * ppp[i1+1][k1+1] * zs;
                 
                 
                 O[index(i2,j2,k2)] = 1;
@@ -172,7 +170,7 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alf
     
     
 
-    for (tNi i=0; i<=xg1; i++) {
+    for (tNi i=1; i<=xg1; i++) {
         for (tNi j = 1; j<=yg1; j++){
             for (tNi k = 1; k<=zg1; k++){
                 

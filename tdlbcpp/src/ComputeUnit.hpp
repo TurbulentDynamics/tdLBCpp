@@ -8,29 +8,30 @@
 #pragma once
 
 #include "ComputeUnit.h"
+#include "DiskOutputTree.h"
+
 
 
 
 template <typename T, int QVecSize>
-ComputeUnit<T, QVecSize>::ComputeUnit(
-	tNi idi,
-	tNi idj,
-	tNi idk,
-	tNi x,
-	tNi y,
-	tNi z,
-	tNi ghost,
-	FlowParams<T> flow
-) :
-	idi(idi),
-	idj(idj),
-	idk(idk),
-	x(x),
-	y(y),
-	z(z),
-	ghost(ghost),
-	flow(flow)
-{
+ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
+
+    
+    idi = cuJson.idi;
+    idj = cuJson.idj;
+    idk = cuJson.idk;
+
+    x = cuJson.x;
+    y = cuJson.y;
+    z = cuJson.z;
+
+    x0 = cuJson.x0;
+    y0 = cuJson.y0;
+    z0 = cuJson.z0;
+
+    ghost = cuJson.ghost;
+
+    
     xg = x + 2 * ghost;
     yg = y + 2 * ghost;
     zg = z + 2 * ghost;
@@ -45,12 +46,13 @@ ComputeUnit<T, QVecSize>::ComputeUnit(
     yg1 = yg - 2;
     zg1 = zg - 2;
 
-    
-    size = size_t(xg) * yg * zg;
 
+    size = size_t(xg) * yg * zg;
+    
+    
     Q = new QVec<T, QVecSize>[size];
     F = new Force<T>[size];
-    𝜈 = new T[size];
+    Nu = new T[size];
     O = new bool[size];
 
 
@@ -69,7 +71,7 @@ ComputeUnit<T, QVecSize>::ComputeUnit(
 
     checkCudaErrors(cudaMalloc((void **)&devN, sizeof(QVec<T, QVecSize>) * size));
     checkCudaErrors(cudaMalloc((void **)&devF, sizeof(Force<T>) * size));
-    checkCudaErrors(cudaMalloc((void **)&devNue, sizeof(T) * size));
+    checkCudaErrors(cudaMalloc((void **)&devNu, sizeof(T) * size));
 
     int threads_per_warp = 32;
     int max_threads_per_block = 512;
@@ -91,6 +93,10 @@ ComputeUnit<T, QVecSize>::ComputeUnit(
 #endif
 };
 
+
+
+
+
 template <typename T, int QVecSize>
 ComputeUnit<T, QVecSize>::~ComputeUnit()
 {
@@ -98,7 +104,7 @@ ComputeUnit<T, QVecSize>::~ComputeUnit()
     checkCudaErrors(cudaSetDevice(0));
     checkCudaErrors(cudaFree(devN));
     checkCudaErrors(cudaFree(devF));
-    checkCudaErrors(cudaFree(devNue));
+    checkCudaErrors(cudaFree(devNu));
 #endif
 }
 
@@ -196,7 +202,7 @@ void ComputeUnit<T, QVecSize>::fillForTest(){
                 F[index(i, j, k)].fy = 1;
                 F[index(i, j, k)].fz = 2;
 
-                𝜈[index(i, j, k)] = 1;
+                Nu[index(i, j, k)] = 1;
                 O[index(i, j, k)] = true;
 
             }
@@ -222,7 +228,7 @@ FILE* ComputeUnit<T, QVecSize>::fopen_read(std::string dirname, std::string unit
 
     std::string pathname = get_checkpoint_filename(dirname, unit_name, matrix);
 
-    std::cout << "Node " << rank << " Load " << pathname << std::endl;
+    std::cout << "Node " << mpiRank << " Load " << pathname << std::endl;
 
     return fopen(pathname.c_str(), "r");
 }
@@ -232,7 +238,7 @@ FILE* ComputeUnit<T, QVecSize>::fopen_write(std::string dirname, std::string uni
 
     std::string pathname = get_checkpoint_filename(dirname, unit_name, matrix);
 
-    std::cout << "Node " << rank << " Save " << pathname << std::endl;
+    std::cout << "Node " << mpiRank << " Save " << pathname << std::endl;
 
     return fopen(pathname.c_str(), "w");
 }
@@ -240,6 +246,7 @@ FILE* ComputeUnit<T, QVecSize>::fopen_write(std::string dirname, std::string uni
 
 
 
+//checkpoint_read(outputDirTree.checkpoint())
 
 template <typename T, int QVecSize>
 void ComputeUnit<T, QVecSize>::checkpoint_read(std::string dirname, std::string unit_name){
@@ -252,9 +259,9 @@ void ComputeUnit<T, QVecSize>::checkpoint_read(std::string dirname, std::string 
     fread(F, sizeof(Force<T>), size, fpF);
     fclose(fpF);
     
-    FILE *fpNue = fopen_read(dirname, unit_name, "Nue");
-    fread(    𝜈, sizeof(T), size, fpNue);
-    fclose(fpNue);
+    FILE *fpNu = fopen_read(dirname, unit_name, "Nu");
+    fread(Nu, sizeof(T), size, fpNu);
+    fclose(fpNu);
 }
 
 template <typename T, int QVecSize>
@@ -268,9 +275,9 @@ void ComputeUnit<T, QVecSize>::checkpoint_write(std::string dirname, std::string
     fread(F, sizeof(Force<T>), size, fpF);
     fclose(fpF);
     
-    FILE *fpNue = fopen_read(dirname, unit_name, "F");
-    fread(𝜈, sizeof(T), size, fpNue);
-    fclose(fpNue);
+    FILE *fpNu = fopen_read(dirname, unit_name, "F");
+    fread(Nu, sizeof(T), size, fpNu);
+    fclose(fpNu);
 }
 
 
@@ -290,7 +297,7 @@ tNi inline ComputeUnit<T, QVecSize>::index(tNi i, tNi j, tNi k)
 {
 #ifdef DEBUG
     if ((i>=xg) || (j>=yg) || (k>=zg)) {
-        std::cout << "Index Error" << i <<" "<< xg <<" "<< j <<" "<< yg <<" "<< k <<" "<< zg << std::endl;
+        std::cout << "Index Error  " << i <<" "<< xg <<" "<< j <<" "<< yg <<" "<< k <<" "<< zg << std::endl;
         exit(1);
     }
 #endif

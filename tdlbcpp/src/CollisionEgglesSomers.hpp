@@ -18,7 +18,7 @@
 template <typename T, int QVecSize>
 void ComputeUnit<T, QVecSize>::collision_EgglesSomers_LES(){
 
-//    alf2[ 5] = (2.0 * (q[2] + 0.5 * f.x) * u.x - q[ 5]*c)*b * Nue.getNue(i,j,k);
+//    alf2[ 5] = (2.0 * (q[2] + 0.5 * f.x) * u.x - q[ 5]*c)*b * Nu.getNu(i,j,k);
 
 }
 

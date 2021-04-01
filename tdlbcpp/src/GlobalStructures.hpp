@@ -111,4 +111,24 @@ struct Extents{
 };
 
 
+
+inline bool pathExists(std::string path) {
+
+    if (FILE *file = fopen(path.c_str(), "r")) {
+        fclose(file);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+inline bool fileExists(std::string path) {
+    return pathExists(path);
+}
+
+
+
+
+
 #endif /* Header_h */

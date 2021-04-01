@@ -21,13 +21,15 @@
 
 
 #include "Header.h"
-#include "FlowParams.hpp"
+#include "Params/Flow.hpp"
+#include "Params/ComputeUnitParams.hpp"
+#include "Params/BinFile.hpp"
+
 #include "QVec.hpp"
-#include "PlotDirMeta.h"
-#include "QVecBinMeta.h"
-#include "PlotDir.h"
+#include "DiskOutputTree.h"
 #include "Output.hpp"
-//#include "GlobalStructures.hpp"
+
+
 #include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
 #include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 
@@ -45,9 +47,18 @@ template <typename T, int QVecSize>
 class ComputeUnit {
 public:
     
+    //Position in the grid
+    int idi, idj, idk;
+    int mpiRank;
+
     
-    tNi idi, idj, idk;
+    //Size of this ComputeUnit
     tNi x, y, z;
+    
+    //Starting absolute position in the grid
+    tNi x0, y0, z0;
+
+    
     
     tNi xg, yg, zg;
     tNi xg0, yg0, zg0;
@@ -57,7 +68,6 @@ public:
     tNi ghost;
     size_t size;
     
-    int rank;
     
     FlowParams<T> flow;
     
@@ -67,16 +77,15 @@ public:
     Force<T> *F;
     //    std::vector<Force<T>> sparseF;
     
-    T *𝜈;
+    DiskOutputTree outputTree;
+    
+    T *Nu;
     
     bool *O;
-    
-    ComputeUnit(tNi idi, tNi idj, tNi idk, tNi x, tNi y, tNi z, tNi ghost, FlowParams<T> flow);
+        
+    ComputeUnit(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
     
     ~ComputeUnit();
-    
-    
-    
     
     
     tNi inline index(tNi i, tNi j, tNi k);
@@ -109,9 +118,16 @@ public:
     void bounceBackBoundaryBackward();
     void bounceBackBoundaryForward();
     
-    
-    
-    
+
+      
+
+    void setGhostSizes();
+    void getParamFromJson(const std::string filePath);
+    int writeParams(const std::string filePath);
+    Json::Value getJson();
+    void printParams();
+
+        
     
     
     void checkpoint_read(std::string dirname, std::string unit_name);
@@ -120,62 +136,88 @@ public:
     
     
     template <typename tDiskPrecision, int tDiskSize>
-    void savePlaneXZ(OutputDir outDir, int cutAt, tStep step){
+    void savePlaneXZ(BinFileFormat binFormat, RunningParams runParam){
         
+       
+        tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg * zg];
         
+        tDiskGrid<tDiskPrecision, 3> *F3outputBuffer = new tDiskGrid<tDiskPrecision, 3>[xg*zg];
+
+
         
-        tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg*zg];
-        
-        
-        int bufferLen = 0;
+        long int qVecBufferLen = 0;
+        long int F3BufferLen = 0;
         for (tNi i=1; i<=xg1; i++){
-            tNi j = cutAt;
-            //            for (tNi j=1; j<=yg1; j++){
+            tNi j = binFormat.cutAt;
             for (tNi k=1; k<=zg1; k++){
                 
                 tDiskGrid<tDiskPrecision, tDiskSize> tmp;
-                tmp.iGrid = uint16_t(i - 1);
-                tmp.jGrid = uint16_t(j - 1);
-                tmp.kGrid = uint16_t(k - 1);
+                
+                //Set position with absolute value
+                tmp.iGrid = uint16_t(x0 + i - 1);
+                tmp.jGrid = uint16_t(j);
+                tmp.kGrid = uint16_t(z0 + k - 1);
                 
 #pragma unroll
                 for (int l=0; l<tDiskSize; l++){
                     tmp.q[l] = Q[index(i,j,k)].q[l];
                 }
-                outputBuffer[bufferLen] = tmp;
-                bufferLen++;
+                outputBuffer[qVecBufferLen] = tmp;
+                qVecBufferLen++;
+                
+                
+                if (F[index(i,j,k)].isNotZero()) {
+                
+                    tDiskGrid<tDiskPrecision, 3> tmp;
+                    
+                    //Set position with absolute value
+                    tmp.iGrid = uint16_t(x0 + i - 1);
+                    tmp.jGrid = uint16_t(j);
+                    tmp.kGrid = uint16_t(z0 + k - 1);
+                    
+                    tmp.q[0] = F[index(i,j,k)].x;
+                    tmp.q[1] = F[index(i,j,k)].y;
+                    tmp.q[2] = F[index(i,j,k)].z;
+                    
+                    F3outputBuffer[F3BufferLen] = tmp;
+                    F3BufferLen++;
+                }
+                
                 
             }
         }
         
         
-        std::string plotPath = outDir.get_XY_plane_dir(step, cutAt, tDiskSize);
-
-        outDir.createDir(plotPath);
-
+        std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, binFormat.cutAt);
+        binFormat.filePath = outputTree.formatQVecBinFileNamePath(plotDir);
+        binFormat.binFileSizeInStructs = qVecBufferLen;
         
         
-        PlotDir p = PlotDir(plotPath, idi, idj, idk);
-        std::string qvecPath = p.get_my_Qvec_filename(QvecNames::Qvec);
-        
-        
-        std::cout<< qvecPath<<std::endl;
         
 
-        FILE *fp = fopen(qvecPath.c_str(), "wb");
-        fwrite(outputBuffer, sizeof(tDiskGrid<tDiskPrecision, tDiskSize>), bufferLen, fp);
+        std::cout<< "Writing output to: " << binFormat.filePath <<std::endl;
+        outputTree.writeBinFileJson(binFormat, runParam);
+
+        FILE *fp = fopen(binFormat.filePath.c_str(), "wb");
+        fwrite(outputBuffer, sizeof(tDiskGrid<tDiskPrecision, tDiskSize>), qVecBufferLen, fp);
         fclose(fp);
+
         
+        
+        //======================
+        binFormat.QOutputLength = 3;
+        binFormat.binFileSizeInStructs = F3BufferLen;
+        binFormat.filePath = outputTree.formatF3BinFileNamePath(plotDir);
+        outputTree.writeBinFileJson(binFormat, runParam);
+
+        
+        FILE *fpF3 = fopen(binFormat.filePath.c_str(), "wb");
+        fwrite(F3outputBuffer, sizeof(tDiskGrid<tDiskPrecision, 3>), F3BufferLen, fpF3);
+        fclose(fpF3);
+
         
         delete[] outputBuffer;
-        
-        
-        QVecBinMeta q;
-        int has_grid_coords = 1;
-        int has_col_row_coords = 0;
-        q.set_file_content("tDisk_grid_Q4_V4", bufferLen, "uint16_t", has_grid_coords, has_col_row_coords, "float", tDiskSize);
-        q.save_json_to_Qvec_filepath(qvecPath);
-        
+        delete[] F3outputBuffer;
         
     }
     

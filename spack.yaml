@@ -24,8 +24,8 @@ spack:
   # add package specs to the `specs` list
   #install_missing_compilers: true
   specs:
-    - gcc@10.2.0
-  #  - gcc@7.4.0
+  #  - gcc@10.2.0
+    - gcc@7.4.0
   #  - boost%gcc@7.5.0
   #  - openmpi%gcc@7.5.0
   #  - mpich@3.3.2%gcc@10.2.0
