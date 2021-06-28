@@ -98,18 +98,25 @@ int main(int argc, char* argv[]){
     flow.reMNonDimensional = 7000.0;
     flow.uav = 0.1;
     flow.g3 = 0.1;
+    flow.alpha = 0.97;
+    flow.beta = 1.9;
 
     
 
-
-
-    bool start_with_checkpoint = 0;
-    std::string load_checkpoint_dirname = "checkpoint_step_10000";
+    RunningParams running;
+    running.angle = 0.0;
+    running.step = 0;
 
     
-    tStep checkpoint_repeat = 10;
-    std::string checkpoint_root_dir = "checkpoint_root_dir";
+    Checkpoint checkpoint;
+    checkpoint.start_with_checkpoint = 0;
+    checkpoint.load_checkpoint_dirname = "checkpoint_step_10000";
 
+    checkpoint.checkpoint_repeat = 10;
+    checkpoint.checkpoint_root_dir = "checkpoint_root_dir";
+
+    
+    
     int useLES = 0;
 
  
@@ -128,11 +135,8 @@ int main(int argc, char* argv[]){
     tStep plot_ml_slices_repeat = 0;
 
     
-
     
-    double startingAngle = 0.0;
-    useQVecPrecision alpha = 0.97;
-    useQVecPrecision beta = 1.9;
+    
     
     
     
@@ -203,9 +207,9 @@ int main(int argc, char* argv[]){
     cu.x = grid.x;
     cu.y = grid.y;
     cu.z = grid.z;
-    cu.x0 = 0;
-    cu.y0 = 0;
-    cu.z0 = 0;
+    cu.i0 = 0;
+    cu.j0 = 0;
+    cu.k0 = 0;
     cu.ghost = 1;
         
     

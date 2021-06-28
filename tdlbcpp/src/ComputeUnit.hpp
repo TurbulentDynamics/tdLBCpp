@@ -25,9 +25,9 @@ ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuJson, FlowParams<T> fl
     y = cuJson.y;
     z = cuJson.z;
 
-    x0 = cuJson.x0;
-    y0 = cuJson.y0;
-    z0 = cuJson.z0;
+    i0 = cuJson.i0;
+    j0 = cuJson.j0;
+    k0 = cuJson.k0;
 
     ghost = cuJson.ghost;
 

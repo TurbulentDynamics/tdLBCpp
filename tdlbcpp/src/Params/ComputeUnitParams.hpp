@@ -26,9 +26,9 @@ struct ComputeUnitParams
     tNi x = 0;
     tNi y = 0;
     tNi z = 0;
-    tNi x0 = 0;
-    tNi y0 = 0;
-    tNi z0 = 0;
+    tNi i0 = 0;
+    tNi j0 = 0;
+    tNi k0 = 0;
     tNi ghost = 0;
     
 
@@ -54,9 +54,9 @@ struct ComputeUnitParams
             p.y = jsonParams["y"].asInt();
             p.z = jsonParams["z"].asInt();
             
-            p.x0 = jsonParams["x0"].asInt();
-            p.y0 = jsonParams["y0"].asInt();
-            p.z0 = jsonParams["z0"].asInt();
+            p.i0 = jsonParams["i0"].asInt();
+            p.j0 = jsonParams["j0"].asInt();
+            p.k0 = jsonParams["k0"].asInt();
     
             p.ghost = jsonParams["ghost"].asInt();
             
@@ -109,8 +109,6 @@ struct ComputeUnitParams
             
             Json::Value jsonParams;
 
-//            jsonParams["note"] = note;
-
 //            jsonParams["mpiRank"] = mpiRank;
             jsonParams["idi"] = idi;
             jsonParams["idj"] = idj;
@@ -120,9 +118,9 @@ struct ComputeUnitParams
             jsonParams["y"] = (int)y;
             jsonParams["z"] = (int)z;
             
-            jsonParams["x0"] = (int)x0;
-            jsonParams["y0"] = (int)y0;
-            jsonParams["z0"] = (int)z0;
+            jsonParams["i0"] = (int)i0;
+            jsonParams["j0"] = (int)j0;
+            jsonParams["k0"] = (int)k0;
                     
             jsonParams["ghost"] = (int)ghost;
             
@@ -147,9 +145,9 @@ struct ComputeUnitParams
         << " idk:" << idk
         
         
-        << " x0:" << x0
-        << " y0:" << y0
-        << " z0:" << z0
+        << " x0:" << i0
+        << " y0:" << j0
+        << " z0:" << k0
         
         << " x:" << x
         << " y:" << y

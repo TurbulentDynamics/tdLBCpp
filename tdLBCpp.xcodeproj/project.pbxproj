@@ -33,6 +33,8 @@
 		D6930C66261366B4004245CB /* testJsonFiles.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = testJsonFiles.mm; sourceTree = "<group>"; };
 		D698D755257D036500A3BFD2 /* tdLBCpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tdLBCpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6ACCEF325F60FEA00705722 /* GlobalStructures.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GlobalStructures.hpp; sourceTree = "<group>"; };
+		D6AF70B22689BC2100022ECF /* OutputData.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = OutputData.hpp; sourceTree = "<group>"; };
+		D6AF70B32689C69000022ECF /* Checkpoint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Checkpoint.hpp; sourceTree = "<group>"; };
 		D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RushtonTurbine.hpp; sourceTree = "<group>"; };
 		D6E5C5BD25DBEC0B0067FDE1 /* GeomMidPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GeomMidPoint.hpp; sourceTree = "<group>"; };
 		D6E5C72225EE184B0067FDE1 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
@@ -57,12 +59,12 @@
 		D6E5C73E25EE184B0067FDE1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
 		D6E5C74125EE184B0067FDE1 /* ComputeUnit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnit.hpp; sourceTree = "<group>"; };
-		D6E86A742600D86200534D6F /* GeomPolarLegacy.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GeomPolarLegacy.hpp; sourceTree = "<group>"; };
 		D6F5334A2615819500A715C9 /* Running.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Running.hpp; sourceTree = "<group>"; };
 		D6F5334D2615948E00A715C9 /* BinFile.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BinFile.hpp; sourceTree = "<group>"; };
 		D6F533502615A0A000A715C9 /* ComputeUnitParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnitParams.hpp; sourceTree = "<group>"; };
 		D6F5335D2615E78B00A715C9 /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
 		D6F5335E2615E84F00A715C9 /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
+		D6F533612615F85300A715C9 /* GeomPolar.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GeomPolar.hpp; sourceTree = "<group>"; };
 		D6F65EE125F5FBB90057F354 /* GlobalStructures.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GlobalStructures.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -132,7 +134,7 @@
 		D6E5C5BA25DBEC0B0067FDE1 /* tdLBGeometryRushtonTurbineLibCPP */ = {
 			isa = PBXGroup;
 			children = (
-				D6E86A742600D86200534D6F /* GeomPolarLegacy.hpp */,
+				D6F533612615F85300A715C9 /* GeomPolar.hpp */,
 				D6F65EE125F5FBB90057F354 /* GlobalStructures.hpp */,
 				D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */,
 				D6E5C5BD25DBEC0B0067FDE1 /* GeomMidPoint.hpp */,
@@ -193,6 +195,8 @@
 				D6E5C73B25EE184B0067FDE1 /* Grid.hpp */,
 				D6F5334A2615819500A715C9 /* Running.hpp */,
 				D6F5334D2615948E00A715C9 /* BinFile.hpp */,
+				D6AF70B32689C69000022ECF /* Checkpoint.hpp */,
+				D6AF70B22689BC2100022ECF /* OutputData.hpp */,
 				D6F533502615A0A000A715C9 /* ComputeUnitParams.hpp */,
 				D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */,
 			);

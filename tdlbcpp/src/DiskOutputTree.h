@@ -60,9 +60,9 @@ public:
     
     
     
-    DiskOutputTree(std::string driveRoot, std::string _rootDir, GridParams grid, FlowParams<double> flow, ComputeUnitParams cuJson): grid(grid), flow(flow), cuJson(cuJson){
+    DiskOutputTree(std::string diskDir, std::string _rootDir, GridParams grid, FlowParams<double> flow, ComputeUnitParams cuJson): grid(grid), flow(flow), cuJson(cuJson){
         
-        rootDir = driveRoot + "/" + _rootDir;
+        rootDir = diskDir + "/" + _rootDir;
         
         createDir(rootDir);
     };
@@ -85,7 +85,16 @@ public:
     inline bool fileExists(std::string path) {
         return pathExists(path);
     }
+
     
+    void createDir(std::string dir){
+        
+        std::cout << "Creating DiskOutputTree " << dir << std::endl;
+        mkdir(dir.c_str(), 0775);
+        
+    }
+    
+    //==================================================
     
     
     std::string formatStep(tStep step){
@@ -98,19 +107,8 @@ public:
     }
     
     
-    void createDir(std::string dir){
-        
-        std::cout << "Creating outputFilesTree " << dir << std::endl;
-        mkdir(dir.c_str(), 0775);
-        
-    }
-    
-    //==================================================
-    
-    
-    
-    std::string formatDir(std::string prefix, std::string plot_type, tStep step) {
-        return rootDir + "/" + prefix + "." + plot_type + ".V5.step_" + formatStep(step);
+    std::string formatDir(std::string prefix, std::string plotType, tStep step) {
+        return rootDir + "/" + prefix + "." + plotType + ".V5.step_" + formatStep(step);
     }
     
     std::string formatXYPlaneDir(tStep step, tNi atK, const std::string prefix="plot"){
@@ -140,9 +138,9 @@ public:
     }
     
     
-    std::string formatCaptureAtBladeAngleDir(tStep step, int angle, int blade_id, const std::string prefix="plot_"){
+    std::string formatCaptureAtBladeAngleDir(tStep step, int angle, int bladeId, const std::string prefix="plot"){
         
-        return formatDir(prefix, "rotational_capture", step) + ".angle_" + patch::to_string(angle) + ".blade_id_" + patch::to_string(blade_id);
+        return formatDir(prefix, "rotational_capture", step) + ".angle_" + patch::to_string(angle) + ".bladeId_" + patch::to_string(bladeId);
     }
     
     

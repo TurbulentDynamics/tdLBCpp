@@ -24,6 +24,8 @@
 #include "Params/Flow.hpp"
 #include "Params/ComputeUnitParams.hpp"
 #include "Params/BinFile.hpp"
+#include "Params/BinFile.hpp"
+
 
 #include "QVec.hpp"
 #include "DiskOutputTree.h"
@@ -56,7 +58,7 @@ public:
     tNi x, y, z;
     
     //Starting absolute position in the grid
-    tNi x0, y0, z0;
+    tNi i0, j0, k0;
 
     
     
@@ -136,7 +138,7 @@ public:
     
     
     template <typename tDiskPrecision, int tDiskSize>
-    void savePlaneXZ(BinFileFormat binFormat, RunningParams runParam){
+    void savePlaneXZ(Plane plane, BinFileFormat binFormat, RunningParams runParam){
         
        
         tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg * zg];
@@ -154,9 +156,9 @@ public:
                 tDiskGrid<tDiskPrecision, tDiskSize> tmp;
                 
                 //Set position with absolute value
-                tmp.iGrid = uint16_t(x0 + i - 1);
+                tmp.iGrid = uint16_t(i0 + i - 1);
                 tmp.jGrid = uint16_t(j);
-                tmp.kGrid = uint16_t(z0 + k - 1);
+                tmp.kGrid = uint16_t(k0 + k - 1);
                 
 #pragma unroll
                 for (int l=0; l<tDiskSize; l++){
@@ -171,9 +173,9 @@ public:
                     tDiskGrid<tDiskPrecision, 3> tmp;
                     
                     //Set position with absolute value
-                    tmp.iGrid = uint16_t(x0 + i - 1);
+                    tmp.iGrid = uint16_t(i0 + i - 1);
                     tmp.jGrid = uint16_t(j);
-                    tmp.kGrid = uint16_t(z0 + k - 1);
+                    tmp.kGrid = uint16_t(k0 + k - 1);
                     
                     tmp.q[0] = F[index(i,j,k)].x;
                     tmp.q[1] = F[index(i,j,k)].y;

@@ -37,9 +37,6 @@ struct BinFileFormat
     int QOutputLength = 0;
     
     
-    tNi cutAt = 0;
-    
-    
 
     BinFileFormat getParamFromJson(const std::string filePath){
         
@@ -66,14 +63,6 @@ struct BinFileFormat
             g.QDataType = jsonParams["QDataType"].asString();
             g.QOutputLength = jsonParams["QOutputLength"].asInt();
            
-            
-            
-            
-            g.cutAt = (tNi)jsonParams["cutAt"].asInt();
-
-            
-            
-            
             in.close();
             
             
@@ -138,13 +127,7 @@ struct BinFileFormat
             jsonParams["QDataType"] = QDataType;
             jsonParams["QOutputLength"] = (int)QOutputLength;
 
-            
-
-            //Formally PlotDirMeta////////////////////////////
-
-            jsonParams["cutAt"] = (int)cutAt;
-            
-            
+        
 
             
             return jsonParams;
@@ -175,10 +158,6 @@ struct BinFileFormat
         << " QDataType:" << QDataType
         << " QOutputLength:" << QOutputLength
         
-        
-        //Formally PlotDirMeta////////////////////////////
-        << " cutAt:" << cutAt
-
         << std::endl;
         
     }

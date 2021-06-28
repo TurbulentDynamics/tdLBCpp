@@ -12,7 +12,7 @@
 
 
 //TODO
-//J is +ve downwards????????
+//J is +ve downwards. Change? Why?
 
 
 

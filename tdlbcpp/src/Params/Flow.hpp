@@ -39,6 +39,11 @@ struct FlowParams {
     T Re_f = 0.0;
     T uf = 0.0;
     
+    T alpha = 0.0;
+    T beta = 0.0;
+
+    
+    
     FlowParams<double> asDouble(){
     
         FlowParams<double> f;
@@ -59,7 +64,10 @@ struct FlowParams {
         f.Re_m = (double)Re_m;
         f.Re_f = (double)Re_f;
         f.uf = (double)uf;
-    
+
+        f.alpha = (double)alpha;
+        f.beta = (double)beta;
+        
         return f;
     }
     
@@ -85,7 +93,10 @@ struct FlowParams {
             p.Re_f = (T)jsonParams["Re_f"].asDouble();
             p.uf = (T)jsonParams["uf"].asDouble();
             p.Re_m = (T)jsonParams["Re_m"].asDouble();
-            
+
+            p.alpha = (T)jsonParams["alpha"].asDouble();
+            p.beta = (T)jsonParams["beta"].asDouble();
+
             
             in.close();
             
