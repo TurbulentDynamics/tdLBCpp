@@ -7,7 +7,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <filesystem>
 
 #include "gtest/gtest.h"
 
@@ -16,12 +15,12 @@
 
 #include "tdlbcpp/tests/utils.hpp"
 
-#define KEEP_TEMP_FILES
+//#define KEEP_TEMP_FILES
 
 std::string getTempFilename(const std::string fileName)
 {
 #ifndef KEEP_TEMP_FILES
-    return std::filesystem::path(testing::TempDir()) / std::filesystem::path(fileName);
+    return testing::TempDir() + "/" + fileName;
 #else
     return std::string("/tmp/") + fileName;
 #endif
@@ -33,7 +32,7 @@ protected:
     std::string filename;
     const int randomStringLength = 400;
 
-    void checkAllFields(BinFileFormat &expected, BinFileFormat &actual)
+    void checkAllFields(BinFileParams &expected, BinFileParams &actual)
     {
         ASSERT_EQ(expected.filePath, actual.filePath) << "filePath field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.name, actual.name) << "name field has a wrong value after being written to a file and then read";
@@ -65,7 +64,7 @@ public:
 
 TEST_F(JsonTests, BinFileWriteReadValidTest)
 {
-    BinFileFormat binFileFormat;
+    BinFileParams binFileFormat;
     binFileFormat.filePath = "test";
     binFileFormat.name = "test1";
     binFileFormat.note = "test2";
@@ -80,14 +79,15 @@ TEST_F(JsonTests, BinFileWriteReadValidTest)
     binFileFormat.writeParams(filename);
     std::cerr << filename << std::endl;
 
-    BinFileFormat binFileFormatRead = BinFileFormat::getParamFromJson(filename);
+    BinFileParams binFileFormatRead;
+    binFileFormatRead.getParamFromJson(filename);
 
     checkAllFields(binFileFormatRead, binFileFormat);
 }
 
 TEST_F(JsonTests, BinFileWriteReadValidRandomTest)
 {
-    BinFileFormat binFileFormat;
+    BinFileParams binFileFormat;
     binFileFormat.filePath = TestUtils::random_string(randomStringLength);
     binFileFormat.name = TestUtils::random_string(randomStringLength);
     binFileFormat.note = TestUtils::random_string(randomStringLength);
@@ -102,7 +102,8 @@ TEST_F(JsonTests, BinFileWriteReadValidRandomTest)
     binFileFormat.writeParams(filename);
     std::cerr << filename << std::endl;
 
-    BinFileFormat binFileFormatRead = BinFileFormat::getParamFromJson(filename);
+    BinFileParams binFileFormatRead;
+    binFileFormatRead.getParamFromJson(filename);
 
     checkAllFields(binFileFormatRead, binFileFormat);
 }
@@ -114,7 +115,8 @@ TEST_F(JsonTests, BinFileReadInValidTest)
     out.close();
     std::cerr << filename << std::endl;
 
-    BinFileFormat binFileFormatToRead = BinFileFormat::getParamFromJson(filename);
+    BinFileParams binFileFormatRead;
+    binFileFormatRead.getParamFromJson(filename);
 
-    ASSERT_EQ(binFileFormatToRead.filePath, "somepath") << "filePath field has a wrong value";
+    ASSERT_EQ(binFileFormatRead.filePath, "somepath") << "filePath field has a wrong value";
 }
