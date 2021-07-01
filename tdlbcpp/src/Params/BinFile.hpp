@@ -38,7 +38,7 @@ struct BinFileFormat
     
     
 
-    BinFileFormat getParamFromJson(const std::string filePath){
+    static BinFileFormat getParamFromJson(const std::string filePath){
         
         BinFileFormat g;
         
@@ -109,7 +109,7 @@ struct BinFileFormat
             
             Json::Value jsonParams;
 
-            jsonParams["filePath"] = note;
+            jsonParams["filePath"] = filePath;
             jsonParams["name"] = name;
             jsonParams["note"] = note;
             
