@@ -1,7 +1,7 @@
 #include <string>
 #include <cstdlib>
 
-#define KEEP_TEMP_FILES
+//#define KEEP_TEMP_FILES
 
 namespace TestUtils
 {
