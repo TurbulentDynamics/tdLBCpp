@@ -1,6 +1,6 @@
 cc_test(
   name = "tests",
-  srcs = ["BinFileTest.cpp", "CheckpointTest.cpp", "ComputeUnitParamsTest.cpp"],
+  srcs = ["BinFileTest.cpp", "CheckpointTest.cpp", "ComputeUnitParamsTest.cpp", "FlowTest.cpp"],
   deps = [
           "//tdlbcpp/src/Params:params",
           "//tdlbcpp/src:computeUnit",

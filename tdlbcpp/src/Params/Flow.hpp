@@ -101,8 +101,8 @@ struct FlowParams {
             beta = (T)jsonParams["beta"].asDouble();
             
             useLES = (T)jsonParams["useLES"].asBool();
-            collision = (T)jsonParams["collision"].asString();
-            streaming = (T)jsonParams["streaming"].asString();
+            collision = jsonParams["collision"].asString();
+            streaming = jsonParams["streaming"].asString();
 
             in.close();
             
