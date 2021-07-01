@@ -28,12 +28,10 @@ struct GridParams
     tNi y = 0;
     tNi z = 0;
     
+
     
-    
-    
-    GridParams getParamFromJson(const std::string filePath){
+    void getParamFromJson(const std::string filePath){
         
-        GridParams p;
         
         try
         {
@@ -41,13 +39,13 @@ struct GridParams
             Json::Value jsonParams;
             in >> jsonParams;
             
-            p.ngx = (tNi)jsonParams["ngx"].asInt();
-            p.ngy = (tNi)jsonParams["ngy"].asInt();
-            p.ngz = (tNi)jsonParams["ngz"].asInt();
+            ngx = (tNi)jsonParams["ngx"].asInt();
+            ngy = (tNi)jsonParams["ngy"].asInt();
+            ngz = (tNi)jsonParams["ngz"].asInt();
             
-            p.x = (tNi)jsonParams["x"].asInt();
-            p.y = (tNi)jsonParams["y"].asInt();
-            p.z = (tNi)jsonParams["z"].asInt();
+            x = (tNi)jsonParams["x"].asInt();
+            y = (tNi)jsonParams["y"].asInt();
+            z = (tNi)jsonParams["z"].asInt();
             
             in.close();
             
@@ -57,12 +55,9 @@ struct GridParams
         {
             std::cerr << "Unhandled Exception reached parsing arguments: "
             << e.what() << ", application will now exit" << std::endl;
-            return p;
         }
-        
-        return p;
-        
-    };
+                
+    }
     
     
     
@@ -119,16 +114,10 @@ struct GridParams
     
     
     
-    void print(){
+    void print(GridParams grid){
         
         std::cout
-        << " name:" << "GridParams"
-        << " ngx:" << ngx
-        << " ngx:" << ngy
-        << " ngx:" << ngz
-        << " x:" << x
-        << " y:" << y
-        << " z:" << y
+        << getJson()
         << std::endl;
         
     }

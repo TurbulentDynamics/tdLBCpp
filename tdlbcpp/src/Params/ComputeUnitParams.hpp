@@ -33,10 +33,7 @@ struct ComputeUnitParams
     
 
         
-    ComputeUnitParams getParamFromJson(const std::string filePath) {
-        
-        ComputeUnitParams p;
-
+    void getParamFromJson(const std::string filePath) {
         
         try
         {
@@ -46,19 +43,19 @@ struct ComputeUnitParams
             
 //            mpiRank = jsonParams["mpiRank"].asInt();
             
-            p.idi = jsonParams["idi"].asInt();
-            p.idj = jsonParams["idj"].asInt();
-            p.idk = jsonParams["idk"].asInt();
+            idi = jsonParams["idi"].asInt();
+            idj = jsonParams["idj"].asInt();
+            idk = jsonParams["idk"].asInt();
             
-            p.x = jsonParams["x"].asInt();
-            p.y = jsonParams["y"].asInt();
-            p.z = jsonParams["z"].asInt();
+            x = jsonParams["x"].asInt();
+            y = jsonParams["y"].asInt();
+            z = jsonParams["z"].asInt();
             
-            p.i0 = jsonParams["i0"].asInt();
-            p.j0 = jsonParams["j0"].asInt();
-            p.k0 = jsonParams["k0"].asInt();
+            i0 = jsonParams["i0"].asInt();
+            j0 = jsonParams["j0"].asInt();
+            k0 = jsonParams["k0"].asInt();
     
-            p.ghost = jsonParams["ghost"].asInt();
+            ghost = jsonParams["ghost"].asInt();
             
             
             in.close();
@@ -69,10 +66,7 @@ struct ComputeUnitParams
         {
             std::cerr << "Unhandled Exception reached parsing arguments: "
             << e.what() << ", application will now exit" << std::endl;
-            return p;
         }
-        
-        return p;
         
     };
     
@@ -139,22 +133,7 @@ struct ComputeUnitParams
     void printParams() {
         
         std::cout
-        << " mpiRank:" << "mpiRank"
-        << " idi:" << idi
-        << " idj:" << idj
-        << " idk:" << idk
-        
-        
-        << " x0:" << i0
-        << " y0:" << j0
-        << " z0:" << k0
-        
-        << " x:" << x
-        << " y:" << y
-        << " z:" << z
-        
-        << " ghost:" << ghost
-        
+        << getJson()
         << std::endl;
         
     }

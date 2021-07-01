@@ -23,17 +23,16 @@ struct FlowParams {
     T initialRho = 0.0;
     T reMNonDimensional = 0.0;
     
-    //This is not a flow param but is needed here
     T uav = 0.0;
+ 
+    
     
     T cs0 = 0.0;
     T g3 = 0.8;
     
-    
     T nu = 0.0;
     
     T fx0 = 0.0;
-    
     
     T Re_m = 0.0;
     T Re_f = 0.0;
@@ -42,62 +41,69 @@ struct FlowParams {
     T alpha = 0.0;
     T beta = 0.0;
 
+    bool useLES = 0;
+    std::string collision = "EgglesSomers";
+    std::string streaming = "Nieve";
+    
     
     
     FlowParams<double> asDouble(){
-    
         FlowParams<double> f;
-        f.initialRho = (double)uav;
+
+        f.initialRho = (double)initialRho;
         f.reMNonDimensional = (double)reMNonDimensional;
-        
         f.uav = (double)uav;
-       
         f.cs0 = (double)cs0;
         f.g3 = (double)g3;
-        
-        
         f.nu = (double)nu;
-        
         f.fx0 = (double)fx0;
-        
-        
         f.Re_m = (double)Re_m;
         f.Re_f = (double)Re_f;
         f.uf = (double)uf;
-
+        
         f.alpha = (double)alpha;
         f.beta = (double)beta;
-        
+
+        f.useLES = useLES;
+        f.collision = collision;
+        f.streaming = streaming;
+
         return f;
     }
-    
-    GridParams getParamFromJson(const std::string filePath){
         
-        FlowParams p;
-        
+
+
+    void getParamFromJson(const std::string filePath){
+
         try
         {
             std::ifstream in(filePath.c_str());
             Json::Value jsonParams;
             in >> jsonParams;
-            
-            p.initialRho = (T)jsonParams["initialRho"].asDouble();
-            p.reMNonDimensional = (T)jsonParams["reMNonDimensional"].asDouble();
-            p.uav = (T)jsonParams["uav"].asDouble();
-            
-            p.cs0 = (T)jsonParams["cs0"].asDouble();
-            
-            p.nu = (T)jsonParams["nu"].asDouble();
-            p.g3 = (T)jsonParams["g3"].asDouble();
-            p.fx0 = (T)jsonParams["fx0"].asDouble();
-            p.Re_f = (T)jsonParams["Re_f"].asDouble();
-            p.uf = (T)jsonParams["uf"].asDouble();
-            p.Re_m = (T)jsonParams["Re_m"].asDouble();
-
-            p.alpha = (T)jsonParams["alpha"].asDouble();
-            p.beta = (T)jsonParams["beta"].asDouble();
 
             
+            initialRho = (T)jsonParams["initialRho"].asDouble();
+            reMNonDimensional = (T)jsonParams["reMNonDimensional"].asDouble();
+
+            uav = (T)jsonParams["uav"].asDouble();
+
+            cs0 = (T)jsonParams["cs0"].asDouble();
+            g3 = (T)jsonParams["g3"].asDouble();
+
+            nu = (T)jsonParams["nu"].asDouble();
+            fx0 = (T)jsonParams["fx0"].asDouble();
+
+            Re_m = (T)jsonParams["Re_m"].asDouble();
+            Re_f = (T)jsonParams["Re_f"].asDouble();
+            uf = (T)jsonParams["uf"].asDouble();
+
+            alpha = (T)jsonParams["alpha"].asDouble();
+            beta = (T)jsonParams["beta"].asDouble();
+            
+            useLES = (T)jsonParams["useLES"].asBool();
+            collision = (T)jsonParams["collision"].asString();
+            streaming = (T)jsonParams["streaming"].asString();
+
             in.close();
             
         }
@@ -105,17 +111,12 @@ struct FlowParams {
         {
             std::cerr << "Unhandled Exception reached parsing arguments: "
             << e.what() << ", application will now exit" << std::endl;
-            return p;
         }
+    }
+    
+    
+    int writeParams(const std::string filePath) {
         
-        return p;
-        
-    };
-    
-    
-    
-    
-    int writeParams(const std::string filePath){
         try {
             
             Json::Value jsonParams = getJson();
@@ -133,7 +134,6 @@ struct FlowParams {
         
         return 0;
     }
-    
     
     
     Json::Value getJson(){
@@ -154,6 +154,15 @@ struct FlowParams {
             jsonParams["uf"] = (double)uf;
             jsonParams["Re_m"] = (double)Re_m;
             
+            jsonParams["alpha"] = (double)alpha;
+            jsonParams["beta"] = (double)beta;
+
+            jsonParams["useLES"] = (bool)useLES;
+            jsonParams["collision"] = (std::string)collision;
+            jsonParams["streaming"] = (std::string)streaming;
+
+            
+            
             return jsonParams;
             
         } catch(std::exception& e) {
@@ -168,21 +177,12 @@ struct FlowParams {
     void print(){
         
         std::cout
-        << " name:" << "FlowParams"
-        << " initialRho:" << initialRho
-        << " reMNonDimensional:" << reMNonDimensional
-        << " uav:" << uav
-        << " cs0:" << cs0
-        
-        << " nu:" << nu
-        << " g3:" << g3
-        << " fx0:" << fx0
-        << " Re_f:" << Re_f
-        << " uf:" << uf
-        << " Re_m:" << Re_m
+        << getJson()
         << std::endl;
         
     }
+    
+    
     
     
 }; //end of struct

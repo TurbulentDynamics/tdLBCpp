@@ -20,23 +20,22 @@
 struct RunningParams
 {
     uint64_t step = 0;
+    uint64_t num_steps = 0;
 
     double angle = 0;
 
     
     void update(tStep _step, double _angle){
-        
-        
+                
         step = (uint64_t)_step;
         angle = (double)_angle;
-        
-        
-    
+
     }
     
-    RunningParams getParamFromJson(const std::string filePath){
+    
+    
+    void getParamFromJson(const std::string filePath){
         
-        RunningParams g;
         
         try
         {
@@ -44,10 +43,11 @@ struct RunningParams
             Json::Value jsonParams;
             in >> jsonParams;
             
-            g.angle = jsonParams["angle"].asDouble();
+            angle = jsonParams["angle"].asDouble();
             
-            g.step = (tStep)jsonParams["step"].asUInt64();
-            
+            step = (tStep)jsonParams["step"].asUInt64();
+            num_steps = (tStep)jsonParams["num_steps"].asUInt64();
+
             in.close();
             
             
@@ -56,11 +56,8 @@ struct RunningParams
         {
             std::cerr << "Unhandled Exception reached parsing arguments: "
             << e.what() << ", application will now exit" << std::endl;
-            return g;
         }
-        
-        return g;
-        
+            
     };
     
     
@@ -97,6 +94,7 @@ struct RunningParams
             jsonParams["name"] = "Running";
             
             jsonParams["step"] = (uint64_t)step;
+            jsonParams["num_steps"] = (uint64_t)num_steps;
             jsonParams["angle"] = (double)angle;
 
             
@@ -113,10 +111,7 @@ struct RunningParams
     void print(){
         
         std::cout
-        << " name:" << "RunningParams"
-        << " step:" << step
-        << " angle:" << angle
-
+        << getJson()
         << std::endl;
         
     }

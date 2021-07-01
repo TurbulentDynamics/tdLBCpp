@@ -17,7 +17,7 @@
 
 
 
-struct BinFileFormat
+struct BinFileParams
 {
 
     
@@ -38,30 +38,28 @@ struct BinFileFormat
     
     
 
-    static BinFileFormat getParamFromJson(const std::string filePath){
-        
-        BinFileFormat g;
+    void getParamFromJson(const std::string filePathLocation){
         
         try
         {
-            std::ifstream in(filePath.c_str());
+            std::ifstream in(filePathLocation.c_str());
             Json::Value jsonParams;
             in >> jsonParams;
             
-            g.filePath = jsonParams["filePath"].asString();
-            g.name = jsonParams["name"].asString();
-            g.note = jsonParams["note"].asString();
+            filePath = jsonParams["filePath"].asString();
+            name = jsonParams["name"].asString();
+            note = jsonParams["note"].asString();
 
-            g.structName = jsonParams["structName"].asString();
-            g.binFileSizeInStructs = (tNi)jsonParams["binFileSizeInStructs"].asUInt64();
+            structName = jsonParams["structName"].asString();
+            binFileSizeInStructs = (tNi)jsonParams["binFileSizeInStructs"].asUInt64();
 
-            g.coordsType = jsonParams["coordsType"].asString();
-            g.hasGridtCoords = jsonParams["hasGridtCoords"].asBool();
-            g.hasColRowtCoords = jsonParams["hasColRowtCoords"].asBool();
+            coordsType = jsonParams["coordsType"].asString();
+            hasGridtCoords = jsonParams["hasGridtCoords"].asBool();
+            hasColRowtCoords = jsonParams["hasColRowtCoords"].asBool();
 
             
-            g.QDataType = jsonParams["QDataType"].asString();
-            g.QOutputLength = jsonParams["QOutputLength"].asInt();
+            QDataType = jsonParams["QDataType"].asString();
+            QOutputLength = jsonParams["QOutputLength"].asInt();
            
             in.close();
             
@@ -71,11 +69,8 @@ struct BinFileFormat
         {
             std::cerr << "Unhandled Exception reached parsing arguments: "
             << e.what() << ", application will now exit" << std::endl;
-            return g;
         }
-        
-        return g;
-        
+                
     };
     
     
@@ -140,24 +135,11 @@ struct BinFileFormat
         }
     }
     
+    
     void print(){
         
         std::cout
-        << " name:" << "BinFileParams"
-        << " filePath:" << filePath
-        << " note:" << note
-
-        
-        << " structName:" << structName
-        << " binFileSizeInStructs:" << binFileSizeInStructs
-        
-        << " coordsType:" << coordsType
-        << " hasGridtCoords:" << hasGridtCoords
-        << " hasColRowtCoords:" << hasColRowtCoords
-
-        << " QDataType:" << QDataType
-        << " QOutputLength:" << QOutputLength
-        
+        << getJson()
         << std::endl;
         
     }

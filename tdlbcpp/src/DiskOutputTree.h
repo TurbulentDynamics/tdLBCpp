@@ -19,6 +19,7 @@
 #include <map>
 #include <string>
 #include <time.h>
+#include "Params/json.h"
 
 
 #include "Header.h"
@@ -46,21 +47,43 @@ template < typename T > std::string to_string( const T& n )
 
 
 
+
+
 class DiskOutputTree {
     
 private:
+
+    ComputeUnitParams cu;
+
     
-    GridParams grid;
-    FlowParams<double> flow;
-    ComputeUnitParams cuJson;
+    Json::Value grid;
+    Json::Value flow;
+    Json::Value running;
+    Json::Value checkpoint;
+    Json::Value cuJson;
+    Json::Value output;
+    
     
 public:
     
-    std::string rootDir;
+    std::string rootDir = ".";
+    std::string runDir = "output_debug";
+
     
+    DiskOutputTree(std::string _rootDir){
+        rootDir = _rootDir;
+        createDir(rootDir);
+    };
     
+    DiskOutputTree(std::string _diskDir, std::string _rootDir){
+        rootDir = _diskDir + "/" + _rootDir;
+        createDir(rootDir);
+    };
     
-    DiskOutputTree(std::string diskDir, std::string _rootDir, GridParams grid, FlowParams<double> flow, ComputeUnitParams cuJson): grid(grid), flow(flow), cuJson(cuJson){
+
+    
+    DiskOutputTree(std::string diskDir, std::string _rootDir, ComputeUnitParams cu, Json::Value grid, Json::Value flow, Json::Value running, Json::Value checkpoint, Json::Value cuJson, Json::Value output): cu(cu), grid(grid), flow(flow), running(running), checkpoint(checkpoint), cuJson(cuJson), output(output){
+        
         
         rootDir = diskDir + "/" + _rootDir;
         
@@ -69,7 +92,44 @@ public:
     
     
     
+    DiskOutputTree(std::string diskDir, std::string _rootDir, ComputeUnitParams cu1, GridParams grid1, FlowParams<double> flow1, RunningParams running1, CheckpointParams checkpoint1, OutputParams output1){
+        
+        cu = cu1;
+        
+        grid = grid1.getJson();
+        flow =  flow1.getJson();
+        running = running1.getJson();
+        checkpoint = checkpoint1.getJson();
+        cuJson = cu1.getJson();
+        output = output1.getJson();
+
+        
+        rootDir = diskDir + "/" + _rootDir;
+        
+        createDir(rootDir);
+    };
     
+
+    void setParams(ComputeUnitParams cu1, GridParams grid1, FlowParams<double> flow1, RunningParams running1, CheckpointParams checkpoint1, OutputParams output1){
+        
+        cu = cu1;
+        
+        grid = grid1.getJson();
+        flow =  flow1.getJson();
+        running = running1.getJson();
+        checkpoint = checkpoint1.getJson();
+        cuJson = cu1.getJson();
+        output = output1.getJson();
+
+    };
+        
+    
+
+    
+
+    
+    
+
     
     inline bool pathExists(std::string path) {
         
@@ -94,7 +154,53 @@ public:
         
     }
     
+    
     //==================================================
+    
+    
+    //https://stackoverflow.com/questions/16357999/current-date-and-time-as-string
+    std::string getTimeNowAsString(){
+
+        time_t rawtime;
+        struct tm * timeinfo;
+        char buffer[80];
+
+        time (&rawtime);
+        timeinfo = localtime(&rawtime);
+
+        strftime(buffer, sizeof(buffer), "%Y_%m_%d_%H_%M_%S", timeinfo);
+        std::string time_now(buffer);
+
+        //https://www.techiedelight.com/replace-occurrences-character-string-cpp/
+        size_t pos;
+        while ((pos = time_now.find("-")) != std::string::npos) {time_now.replace(pos, 1, "_");}
+        while ((pos = time_now.find(" ")) != std::string::npos) {time_now.replace(pos, 1, "_");}
+        while ((pos = time_now.find(":")) != std::string::npos) {time_now.replace(pos, 1, "_");}
+
+
+        return time_now;
+    }
+
+
+    void setRunDirWithTimeAndParams(std::string prefix, tNi gridX, int re_m, bool les, float uav, tStep step = 0){
+
+        std::string str = rootDir + "/" + prefix + "_";
+
+        if (step) str += "step_" + std::to_string(step) + "__";
+
+        str += "datetime_" + getTimeNowAsString() + "_";
+        str += "gridx_" + std::to_string(gridX) + "_";
+        str += "re_" + std::to_string(re_m) + "_";
+        str += "les_" + std::to_string(les) + "_";
+        str += "uav_" + std::to_string(uav);
+
+        runDir = str;
+        createDir(str);
+    }
+    
+    
+    //==================================================
+    
     
     
     std::string formatStep(tStep step){
@@ -108,7 +214,7 @@ public:
     
     
     std::string formatDir(std::string prefix, std::string plotType, tStep step) {
-        return rootDir + "/" + prefix + "." + plotType + ".V5.step_" + formatStep(step);
+        return runDir + "/" + prefix + "." + plotType + ".V5.step_" + formatStep(step);
     }
     
     std::string formatXYPlaneDir(tStep step, tNi atK, const std::string prefix="plot"){
@@ -161,7 +267,7 @@ public:
     
     
     std::string formatCUid(){
-        return "CUid." + patch::to_string(cuJson.idi) + "." + patch::to_string(cuJson.idj) + "." + patch::to_string(cuJson.idk);
+        return "CUid." + patch::to_string(cu.idi) + "." + patch::to_string(cu.idj) + "." + patch::to_string(cu.idk);
     }
     
     
@@ -174,11 +280,24 @@ public:
     }
     
     
-    int writeBinFileJson(BinFileFormat format, RunningParams runParam){
-        //Save Grid
-        //save flow,
-        //etc/
-        format.writeParams(format.filePath + ".json");
+    int writeBinFileJson(BinFileParams format, RunningParams runParam){
+
+        //TODO Write to file format.filePath + ".json"
+        //{filePath: "path",
+        //structName" : ""
+//        etc
+//    grid: { ngx:ngx, }
+//    flow: {flow:uav...
+
+//        for all
+//        Json::Value running;
+//        Json::Value checkpoint;
+//        Json::Value cuJson;
+//        Json::Value output;
+
+        
+        
+//        writeParams(format.filePath + ".json");
     
         return 0;
         
