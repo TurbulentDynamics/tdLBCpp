@@ -54,16 +54,15 @@ class DiskOutputTree {
 private:
 
     ComputeUnitParams cu;
-    CheckpointParams checkpoint;
-
     
+    Json::Value cuJson;
+
     Json::Value grid;
     Json::Value flow;
     Json::Value running;
-    Json::Value checkpointJson;
-    Json::Value cuJson;
     Json::Value output;
-    
+    Json::Value checkpoint;
+
     
 public:
     
@@ -71,60 +70,59 @@ public:
     std::string checkpointRootDir = "checkpoint_dir";
 
     
-    DiskOutputTree(std::string outDir, std::string chkDir){
-        outputRootDir = outDir;
-        createDir(outDir);
+    DiskOutputTree(CheckpointParams checkpoint, OutputParams output){
+        outputRootDir = output.rootDir;
+        createDir(outputRootDir);
 
-        checkpointRootDir = chkDir;
-        createDir(chkDir);
+        checkpointRootDir = checkpoint.checkpoint_root_dir;
+        createDir(checkpointRootDir);
     };
 
     
-    DiskOutputTree(std::string outDir, std::string chkDir, ComputeUnitParams cu, CheckpointParams checkpoint, Json::Value grid, Json::Value flow, Json::Value running, Json::Value output): cu(cu), checkpoint(checkpoint), grid(grid), flow(flow), running(running), output(output){
+    DiskOutputTree(ComputeUnitParams cu, Json::Value grid, Json::Value flow, Json::Value running, Json::Value output, Json::Value checkpoint): cu(cu),  grid(grid), flow(flow), running(running), output(output), checkpoint(checkpoint) {
         
         cuJson = cu.getJson();
-        checkpointJson = checkpoint.getJson();
         
-        outputRootDir = outDir;
-        createDir(outDir);
+        outputRootDir = output["root_dir"].asString();
+        createDir(outputRootDir);
 
-        checkpointRootDir = chkDir;
-        createDir(chkDir);
+        checkpointRootDir = checkpoint["checkpoint_root_dir"].asString();
+        createDir(checkpointRootDir);
     };
     
     
-    DiskOutputTree(std::string outDir, std::string chkDir, ComputeUnitParams cu1, CheckpointParams checkpoint1, GridParams grid1, FlowParams<double> flow1, RunningParams running1,  OutputParams output1){
+    DiskOutputTree(ComputeUnitParams cu1, GridParams grid1, FlowParams<double> flow1, RunningParams running1,  OutputParams output1, CheckpointParams checkpoint1){
         
         cu = cu1;
-        checkpoint = checkpoint1;
+        
+        cuJson = cu1.getJson();
+
+        grid = grid1.getJson();
+        flow =  flow1.getJson();
+        running = running1.getJson();
+        output = output1.getJson();
+        checkpoint = checkpoint1.getJson();
+
+        
+        outputRootDir = output1.rootDir;
+        createDir(outputRootDir);
+
+        checkpointRootDir = checkpoint1.checkpoint_root_dir;
+        createDir(checkpointRootDir);
+    };
+    
+
+    void setParams(ComputeUnitParams cu1, GridParams grid1, FlowParams<double> flow1, RunningParams running1, OutputParams output1, CheckpointParams checkpoint1){
+        
+        cu = cu1;
+        cuJson = cu1.getJson();
         
         grid = grid1.getJson();
         flow =  flow1.getJson();
         running = running1.getJson();
-        checkpointJson = checkpoint1.getJson();
-        cuJson = cu1.getJson();
         output = output1.getJson();
-
+        checkpoint = checkpoint1.getJson();
         
-        outputRootDir = outDir;
-        createDir(outDir);
-
-        checkpointRootDir = chkDir;
-        createDir(chkDir);
-    };
-    
-
-    void setParams(ComputeUnitParams cu1, GridParams grid1, FlowParams<double> flow1, RunningParams running1, CheckpointParams checkpoint1, OutputParams output1){
-        
-        cu = cu1;
-        
-        grid = grid1.getJson();
-        flow =  flow1.getJson();
-        running = running1.getJson();
-        checkpointJson = checkpoint1.getJson();
-        cuJson = cu1.getJson();
-        output = output1.getJson();
-
     };
         
     
@@ -288,24 +286,77 @@ public:
     }
     
     
-    int writeBinFileJson(BinFileParams format, RunningParams runParam){
+    int writeAllParamsJson(BinFileParams format, RunningParams runParam){
 
-        //TODO Write to file format.filePath + ".json"
-        //{filePath: "path",
-        //structName" : ""
-//        etc
-//    grid: { ngx:ngx, }
-//    flow: {flow:uav...
+        try {
 
-//        for all
-//        Json::Value running;
-//        Json::Value checkpoint;
-//        Json::Value cuJson;
-//        Json::Value output;
+            Json::Value jsonParams;
 
+            jsonParams["ComputeUnitParams"] = cuJson;
+
+            jsonParams["BinFileParams"] = format.getJson();
+            jsonParams["GridParams"] = grid;
+            jsonParams["FlowParams"] = flow;
+            jsonParams["RunningParams"] = running;
+            jsonParams["OutputParams"] = output;
+            jsonParams["CheckpointParams"] = checkpoint;
+
+            
+            std::string path = format.filePath + ".json";
+            
+            std::ofstream out(path.c_str(), std::ofstream::out);
+            out << jsonParams;
+            out.close();
+
+            return 0;
+        }
+        catch(std::exception& e) {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+            return 1;
+        }
+
+    
+        return 0;
         
-        
-//        writeParams(format.filePath + ".json");
+    }
+    
+    
+    int readAllParamsJson(std::string filePath, BinFileParams format, RunningParams runParam){
+
+
+        try {
+            std::ifstream in(filePath.c_str());
+            Json::Value jsonParams;
+            in >> jsonParams;
+            in.close();
+
+            
+            //TODO
+
+
+            cuJson = jsonParams["ComputeUnitParams"];
+            cu.getParamsFromJson(cuJson);
+            
+            //Not necessary atm
+//            binFileJson = jsonParams["BinFileParams"];
+
+            grid = jsonParams["GridParams"];
+            flow = jsonParams["FlowParams"];
+            running = jsonParams["RunningParams"];
+            output = jsonParams["OutputParams"];
+            checkpoint = jsonParams["CheckpointParams"];
+
+
+
+        }
+        catch(std::exception& e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+        }
+    
+
     
         return 0;
         
@@ -318,7 +369,11 @@ public:
     
     std::string getCheckpointDirName(RunningParams run, bool create=true){
        
-        std::string dirName = checkpointRootDir + "/step_" + std::to_string(run.step);
+        
+        std::string dirName = checkpoint["checkpoint_root_dir"].asString() + "/step_" + std::to_string(run.step);
+     
+        
+//        std::string dirName = checkpointRootDir + "/step_" + std::to_string(run.step);
      
         if (create) {
             createDir(dirName);

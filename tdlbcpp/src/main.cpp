@@ -134,7 +134,6 @@ int main(int argc, char* argv[]){
 
     
     
-    DiskOutputTree outputTree = DiskOutputTree(output.rootDir, checkpoint.checkpoint_root_dir);
 
     
     
@@ -170,14 +169,17 @@ int main(int argc, char* argv[]){
         
     
 
+    DiskOutputTree outputTree = DiskOutputTree(checkpoint, output);
 
     FlowParams<double> flowAsDouble = flow.asDouble();
-    outputTree.setParams(cu, grid, flowAsDouble, running, checkpoint, output);
+    outputTree.setParams(cu, grid, flowAsDouble, running, output, checkpoint);
 
+    
+    
+    
+    
     
     ComputeUnit<useQVecPrecision, QLen::D3Q19> lb = ComputeUnit<useQVecPrecision, QLen::D3Q19>(cu, flow, outputTree);
-    
-
     
     
     lb.forcing(geomFixed, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);

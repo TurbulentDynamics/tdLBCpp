@@ -195,7 +195,7 @@ public:
         
 
         std::cout<< "Writing output to: " << binFormat.filePath <<std::endl;
-        outputTree.writeBinFileJson(binFormat, runParam);
+        outputTree.writeAllParamsJson(binFormat, runParam);
 
         FILE *fp = fopen(binFormat.filePath.c_str(), "wb");
         fwrite(outputBuffer, sizeof(tDiskGrid<tDiskPrecision, tDiskSize>), qVecBufferLen, fp);
@@ -207,7 +207,7 @@ public:
         binFormat.QOutputLength = 3;
         binFormat.binFileSizeInStructs = F3BufferLen;
         binFormat.filePath = outputTree.formatF3BinFileNamePath(plotDir);
-        outputTree.writeBinFileJson(binFormat, runParam);
+        outputTree.writeAllParamsJson(binFormat, runParam);
 
         
         FILE *fpF3 = fopen(binFormat.filePath.c_str(), "wb");

@@ -30,15 +30,12 @@ struct GridParams
     
 
     
-    void getParamFromJson(const std::string filePath){
-        
+    void getParamsFromJson(Json::Value jsonParams) {
+
         
         try
         {
-            std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
-            in >> jsonParams;
-            
+
             ngx = (tNi)jsonParams["ngx"].asInt();
             ngy = (tNi)jsonParams["ngy"].asInt();
             ngz = (tNi)jsonParams["ngz"].asInt();
@@ -46,9 +43,6 @@ struct GridParams
             x = (tNi)jsonParams["x"].asInt();
             y = (tNi)jsonParams["y"].asInt();
             z = (tNi)jsonParams["z"].asInt();
-            
-            in.close();
-            
             
         }
         catch(std::exception& e)
@@ -58,30 +52,6 @@ struct GridParams
         }
                 
     }
-    
-    
-    
-    
-    
-    int writeParams(const std::string filePath){
-        try {
-            
-            Json::Value jsonParams = getJson();
-            
-            std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
-            out.close();
-            
-        } catch(std::exception& e){
-            
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
-            return 1;
-        }
-        
-        return 0;
-    }
-    
     
     
     Json::Value getJson(){
@@ -113,8 +83,52 @@ struct GridParams
     
     
     
+    void getParamsFromJsonFile(const std::string filePath) {
+        
+        try
+        {
+            std::ifstream in(filePath.c_str());
+            Json::Value jsonParams;
+            in >> jsonParams;
+            in.close();
+            
+            getParamsFromJson(jsonParams);
+            
+        }
+        catch(std::exception& e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+        }
+        
+    };
     
-    void print(GridParams grid){
+    
+    
+    
+    int writeParamsToJsonFile(const std::string filePath) {
+        
+        
+        try {
+            
+            Json::Value jsonParams = getJson();
+            
+            std::ofstream out(filePath.c_str(), std::ofstream::out);
+            out << jsonParams;
+            out.close();
+            
+        } catch(std::exception& e){
+            
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+            return 1;
+        }
+        
+        return 0;
+    }
+    
+    
+    void printParams() {
         
         std::cout
         << getJson()

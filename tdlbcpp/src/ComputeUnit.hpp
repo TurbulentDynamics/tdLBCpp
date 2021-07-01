@@ -266,7 +266,7 @@ void ComputeUnit<T, QVecSize>::checkpoint_write(std::string unit_name, RunningPa
     
     
     BinFileParams binFormat;
-    binFormat.filePath = dirname;
+    binFormat.filePath = dirname + "/AllParams";
     binFormat.structName = "checkpoint";
     binFormat.binFileSizeInStructs = (uint64_t)size;
     binFormat.coordsType = "none";
@@ -276,7 +276,7 @@ void ComputeUnit<T, QVecSize>::checkpoint_write(std::string unit_name, RunningPa
     binFormat.QOutputLength = QVecSize;
 
     
-    outputTree.writeBinFileJson(binFormat, run);
+    outputTree.writeAllParamsJson(binFormat, run);
     
     std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
     FILE *fpQ = fopen_write(filePath);

@@ -33,13 +33,10 @@ struct ComputeUnitParams
     
 
         
-    void getParamFromJson(const std::string filePath) {
+    void getParamsFromJson(Json::Value jsonParams) {
         
         try
         {
-            std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
-            in >> jsonParams;
             
 //            mpiRank = jsonParams["mpiRank"].asInt();
             
@@ -56,11 +53,7 @@ struct ComputeUnitParams
             k0 = jsonParams["k0"].asInt();
     
             ghost = jsonParams["ghost"].asInt();
-            
-            
-            in.close();
-            
-            
+                        
         }
         catch(std::exception& e)
         {
@@ -70,43 +63,19 @@ struct ComputeUnitParams
         
     };
     
-    
-    
-    
-    int writeParams(const std::string filePath) {
-        
-        
-        try {
-            
-            Json::Value jsonParams = getJson();
-            
-            std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
-            out.close();
-            
-        } catch(std::exception& e){
-            
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
-            return 1;
-        }
-        
-        return 0;
-    }
-    
+
+
     
     Json::Value getJson() {
-        
-        
         
         try {
             
             Json::Value jsonParams;
 
 //            jsonParams["mpiRank"] = mpiRank;
-            jsonParams["idi"] = idi;
-            jsonParams["idj"] = idj;
-            jsonParams["idk"] = idk;
+            jsonParams["idi"] = (int)idi;
+            jsonParams["idj"] = (int)idj;
+            jsonParams["idk"] = (int)idk;
             
             jsonParams["x"] = (int)x;
             jsonParams["y"] = (int)y;
@@ -127,6 +96,51 @@ struct ComputeUnitParams
             << e.what() << ", application will now exit" << std::endl;
             return "";
         }
+    }
+    
+    
+    void getParamsFromJsonFile(const std::string filePath) {
+        
+        try
+        {
+            std::ifstream in(filePath.c_str());
+            Json::Value jsonParams;
+            in >> jsonParams;
+            in.close();
+            
+            getParamsFromJson(jsonParams);
+            
+        }
+        catch(std::exception& e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+        }
+        
+    };
+    
+    
+    
+    
+    int writeParamsToJsonFile(const std::string filePath) {
+        
+        
+        try {
+            
+            Json::Value jsonParams = getJson();
+            
+            std::ofstream out(filePath.c_str(), std::ofstream::out);
+            out << jsonParams;
+            out.close();
+            
+        } catch(std::exception& e){
+            
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+            return 1;
+        }
+        
+        return 0;
     }
     
     
