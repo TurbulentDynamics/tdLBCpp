@@ -40,9 +40,9 @@
     flow.g3 = 0.1;
     
     
-    gridSave.writeParams("testJson");
+    gridSave.writeParamsToJsonFile("testJson");
     
-    GridParams gridLoad = grid.getParamFromJson("testJson");
+    GridParams gridLoad = grid.getParamsFromJson("testJson");
     
     XCTAssertEqual(gridSave.ngx, gridLoad.ngx);
     

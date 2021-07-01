@@ -124,8 +124,8 @@ public:
       
 
     void setGhostSizes();
-    void getParamFromJson(const std::string filePath);
-    int writeParams(const std::string filePath);
+    void getParamsFromJson(const std::string filePath);
+    int writeParamsToJsonFile(const std::string filePath);
     Json::Value getJson();
     void printParams();
 

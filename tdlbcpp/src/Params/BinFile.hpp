@@ -71,25 +71,6 @@ struct BinFileParams
     
     
     
-    int writeParams(const std::string filePath){
-        try {
-            
-            Json::Value jsonParams = getJson();
-            
-            std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
-            out.close();
-            
-        } catch(std::exception& e){
-            
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
-            return 1;
-        }
-        
-        return 0;
-    }
-    
     
     
     Json::Value getJson(){
