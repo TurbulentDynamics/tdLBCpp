@@ -75,11 +75,11 @@ TEST_F(FlowParamsTests, FlowDoubleWriteReadValidTest)
     flowParams.collision = "test1";
     flowParams.streaming = "test2";
 
-    flowParams.writeParams(filename);
+    flowParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
 
     FlowParams<double> flowParamsRead;
-    flowParamsRead.getParamFromJson(filename);
+    flowParamsRead.getParamsFromJsonFile(filename);
 
     checkAllFields(flowParams, flowParamsRead);
 }
@@ -107,11 +107,11 @@ TEST_F(FlowParamsTests, FlowDoubleWriteReadRandomValidTest)
     flowParams.collision = TestUtils::random_string(randomStringLength);
     flowParams.streaming = TestUtils::random_string(randomStringLength);
 
-    flowParams.writeParams(filename);
+    flowParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
 
     FlowParams<double> flowParamsRead;
-    flowParamsRead.getParamFromJson(filename);
+    flowParamsRead.getParamsFromJsonFile(filename);
 
     checkAllFields(flowParams, flowParamsRead);
 }
@@ -125,7 +125,7 @@ TEST_F(FlowParamsTests, FlowParamsReadInValidTest)
 
     FlowParams<double> flowParamsRead;
     testing::internal::CaptureStderr();
-    flowParamsRead.getParamFromJson(filename);
+    flowParamsRead.getParamsFromJsonFile(filename);
     std::string capturedStdErr = testing::internal::GetCapturedStderr();
 
     ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 16\n"
