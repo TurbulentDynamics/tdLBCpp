@@ -5,7 +5,7 @@ This is a basic version of the multi-node heterogeneous HPC code to run billions
 
 
 
-##Building
+## Building
 ```
 bazel run --verbose_failures //tdlbcpp/src:tdlbcpp
 ```

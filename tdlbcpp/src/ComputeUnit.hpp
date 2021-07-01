@@ -14,22 +14,22 @@
 
 
 template <typename T, int QVecSize>
-ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
+ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
 
     
-    idi = cuJson.idi;
-    idj = cuJson.idj;
-    idk = cuJson.idk;
+    idi = cuParams.idi;
+    idj = cuParams.idj;
+    idk = cuParams.idk;
 
-    x = cuJson.x;
-    y = cuJson.y;
-    z = cuJson.z;
+    x = cuParams.x;
+    y = cuParams.y;
+    z = cuParams.z;
 
-    i0 = cuJson.i0;
-    j0 = cuJson.j0;
-    k0 = cuJson.k0;
+    i0 = cuParams.i0;
+    j0 = cuParams.j0;
+    k0 = cuParams.k0;
 
-    ghost = cuJson.ghost;
+    ghost = cuParams.ghost;
 
     
     xg = x + 2 * ghost;
@@ -212,72 +212,89 @@ void ComputeUnit<T, QVecSize>::fillForTest(){
 };
 
 
+
+
 template <typename T, int QVecSize>
-std::string ComputeUnit<T, QVecSize>::get_checkpoint_filename(std::string dirname, std::string unit_name, std::string matrix){
+FILE* ComputeUnit<T, QVecSize>::fopen_read(std::string filePath){
 
-    
-    std::string path = dirname + "/checkpoint_grid." + std::to_string(idi) + "." + std::to_string(idj) + "." + std::to_string(idk) + ".";
+    std::cout << "Node " << mpiRank << " Load " << filePath << std::endl;
 
-    path += unit_name + "." + matrix;
-
-    return path;
+    return fopen(filePath.c_str(), "r");
 }
 
 template <typename T, int QVecSize>
-FILE* ComputeUnit<T, QVecSize>::fopen_read(std::string dirname, std::string unit_name, std::string matrix){
+FILE* ComputeUnit<T, QVecSize>::fopen_write(std::string filePath){
 
-    std::string pathname = get_checkpoint_filename(dirname, unit_name, matrix);
+    std::cout << "Node " << mpiRank << " Save " << filePath << std::endl;
 
-    std::cout << "Node " << mpiRank << " Load " << pathname << std::endl;
-
-    return fopen(pathname.c_str(), "r");
-}
-
-template <typename T, int QVecSize>
-FILE* ComputeUnit<T, QVecSize>::fopen_write(std::string dirname, std::string unit_name, std::string matrix){
-
-    std::string pathname = get_checkpoint_filename(dirname, unit_name, matrix);
-
-    std::cout << "Node " << mpiRank << " Save " << pathname << std::endl;
-
-    return fopen(pathname.c_str(), "w");
+    return fopen(filePath.c_str(), "w");
 }
 
 
 
 
-//checkpoint_read(outputDirTree.checkpoint())
 
 template <typename T, int QVecSize>
 void ComputeUnit<T, QVecSize>::checkpoint_read(std::string dirname, std::string unit_name){
     
-    FILE *fpN = fopen_read(dirname, unit_name, "N");
-    fread(Q, sizeof(QVec<T, QVecSize>), size, fpN);
-    fclose(fpN);
     
-    FILE *fpF = fopen_read(dirname, unit_name, "F");
+    std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
+    FILE *fpQ = fopen_read(filePath);
+    fread(Q, sizeof(QVec<T, QVecSize>), size, fpQ);
+    fclose(fpQ);
+
+    
+    filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "F");
+    FILE *fpF = fopen_read(filePath);
     fread(F, sizeof(Force<T>), size, fpF);
     fclose(fpF);
+
     
-    FILE *fpNu = fopen_read(dirname, unit_name, "Nu");
+    filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Nu");
+    FILE *fpNu = fopen_read(filePath);
     fread(Nu, sizeof(T), size, fpNu);
     fclose(fpNu);
+
 }
 
+
 template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::checkpoint_write(std::string dirname, std::string unit_name){
+void ComputeUnit<T, QVecSize>::checkpoint_write(std::string unit_name, RunningParams run){
     
-    FILE *fpN = fopen_read(dirname, unit_name, "F");
-    fread(Q, sizeof(QVec<T, QVecSize>), size, fpN);
-    fclose(fpN);
+
+    std::string dirname = outputTree.getCheckpointDirName(run);
     
-    FILE *fpF = fopen_read(dirname, unit_name, "F");
-    fread(F, sizeof(Force<T>), size, fpF);
+    
+    BinFileParams binFormat;
+    binFormat.filePath = dirname;
+    binFormat.structName = "checkpoint";
+    binFormat.binFileSizeInStructs = (uint64_t)size;
+    binFormat.coordsType = "none";
+    binFormat.hasGridtCoords = 0;
+    binFormat.hasColRowtCoords = 0;
+    binFormat.QDataType = "none";
+    binFormat.QOutputLength = QVecSize;
+
+    
+    outputTree.writeBinFileJson(binFormat, run);
+    
+    std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
+    FILE *fpQ = fopen_write(filePath);
+    fwrite(Q, sizeof(QVec<T, QVecSize>), size, fpQ);
+    fclose(fpQ);
+    
+    
+    filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "F");
+    FILE *fpF = fopen_write(filePath);
+    fwrite(F, sizeof(Force<T>), size, fpF);
     fclose(fpF);
     
-    FILE *fpNu = fopen_read(dirname, unit_name, "F");
-    fread(Nu, sizeof(T), size, fpNu);
+    
+    filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Nu");
+    FILE *fpNu = fopen_write(filePath);
+    fwrite(Nu, sizeof(T), size, fpNu);
     fclose(fpNu);
+
 }
 
 

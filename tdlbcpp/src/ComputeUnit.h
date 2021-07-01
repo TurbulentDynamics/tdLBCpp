@@ -77,13 +77,14 @@ public:
     
     Force<T> *F;
     //    std::vector<Force<T>> sparseF;
-    
-    DiskOutputTree outputTree;
-    
+        
     T *Nu;
     
     bool *O;
-        
+    
+    DiskOutputTree outputTree;
+
+    
     ComputeUnit(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
     
     ~ComputeUnit();
@@ -130,10 +131,8 @@ public:
 
         
     
-    
     void checkpoint_read(std::string dirname, std::string unit_name);
-    void checkpoint_write(std::string dirname, std::string unit_name);
-    
+    void checkpoint_write(std::string unit_name, RunningParams run);
     
     
     template <typename tDiskPrecision, int tDiskSize>
@@ -226,9 +225,10 @@ public:
     
     
 private:
-    std::string get_checkpoint_filename(std::string dirname, std::string unit_name, std::string matrix);
-    FILE* fopen_read(std::string dirname, std::string unit_name, std::string matrix);
-    FILE* fopen_write(std::string dirname, std::string unit_name, std::string matrix);
+
+    FILE* fopen_read(std::string filePath);
+    FILE* fopen_write(std::string filePath);
+
     
     
     tNi inline dirnQ000(tNi i, tNi j, tNi k);

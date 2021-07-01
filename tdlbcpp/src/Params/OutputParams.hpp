@@ -109,6 +109,8 @@ struct Sector {
 struct OutputParams {
     
     
+    std::string rootDir = "plot_root_dir";
+    
     //    OutputConfig(){};
     std::vector<OrthoPlane> XY_planes;
     std::vector<OrthoPlane> XZ_planes;
@@ -122,7 +124,7 @@ struct OutputParams {
     //std::vector<Sector> sectors;
     
     
-    
+    OutputParams(std::string rootDir):rootDir(rootDir){};
     
     
     void print_output_config_data();

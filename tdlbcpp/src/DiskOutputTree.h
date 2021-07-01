@@ -54,59 +54,63 @@ class DiskOutputTree {
 private:
 
     ComputeUnitParams cu;
+    CheckpointParams checkpoint;
 
     
     Json::Value grid;
     Json::Value flow;
     Json::Value running;
-    Json::Value checkpoint;
+    Json::Value checkpointJson;
     Json::Value cuJson;
     Json::Value output;
     
     
 public:
     
-    std::string rootDir = ".";
-    std::string runDir = "output_debug";
+    std::string outputRootDir = "output_dir";
+    std::string checkpointRootDir = "checkpoint_dir";
 
     
-    DiskOutputTree(std::string _rootDir){
-        rootDir = _rootDir;
-        createDir(rootDir);
+    DiskOutputTree(std::string outDir, std::string chkDir){
+        outputRootDir = outDir;
+        createDir(outDir);
+
+        checkpointRootDir = chkDir;
+        createDir(chkDir);
     };
-    
-    DiskOutputTree(std::string _diskDir, std::string _rootDir){
-        rootDir = _diskDir + "/" + _rootDir;
-        createDir(rootDir);
-    };
-    
 
     
-    DiskOutputTree(std::string diskDir, std::string _rootDir, ComputeUnitParams cu, Json::Value grid, Json::Value flow, Json::Value running, Json::Value checkpoint, Json::Value cuJson, Json::Value output): cu(cu), grid(grid), flow(flow), running(running), checkpoint(checkpoint), cuJson(cuJson), output(output){
+    DiskOutputTree(std::string outDir, std::string chkDir, ComputeUnitParams cu, CheckpointParams checkpoint, Json::Value grid, Json::Value flow, Json::Value running, Json::Value output): cu(cu), checkpoint(checkpoint), grid(grid), flow(flow), running(running), output(output){
         
+        cuJson = cu.getJson();
+        checkpointJson = checkpoint.getJson();
         
-        rootDir = diskDir + "/" + _rootDir;
-        
-        createDir(rootDir);
+        outputRootDir = outDir;
+        createDir(outDir);
+
+        checkpointRootDir = chkDir;
+        createDir(chkDir);
     };
     
     
-    
-    DiskOutputTree(std::string diskDir, std::string _rootDir, ComputeUnitParams cu1, GridParams grid1, FlowParams<double> flow1, RunningParams running1, CheckpointParams checkpoint1, OutputParams output1){
+    DiskOutputTree(std::string outDir, std::string chkDir, ComputeUnitParams cu1, CheckpointParams checkpoint1, GridParams grid1, FlowParams<double> flow1, RunningParams running1,  OutputParams output1){
         
         cu = cu1;
+        checkpoint = checkpoint1;
         
         grid = grid1.getJson();
         flow =  flow1.getJson();
         running = running1.getJson();
-        checkpoint = checkpoint1.getJson();
+        checkpointJson = checkpoint1.getJson();
         cuJson = cu1.getJson();
         output = output1.getJson();
 
         
-        rootDir = diskDir + "/" + _rootDir;
-        
-        createDir(rootDir);
+        outputRootDir = outDir;
+        createDir(outDir);
+
+        checkpointRootDir = chkDir;
+        createDir(chkDir);
     };
     
 
@@ -117,7 +121,7 @@ public:
         grid = grid1.getJson();
         flow =  flow1.getJson();
         running = running1.getJson();
-        checkpoint = checkpoint1.getJson();
+        checkpointJson = checkpoint1.getJson();
         cuJson = cu1.getJson();
         output = output1.getJson();
 
@@ -182,9 +186,14 @@ public:
     }
 
 
-    void setRunDirWithTimeAndParams(std::string prefix, tNi gridX, int re_m, bool les, float uav, tStep step = 0){
+    void setRunDir(std::string runDir1){
 
-        std::string str = rootDir + "/" + prefix + "_";
+        outputRootDir = runDir1;
+    }
+    
+    std::string getRunDirWithTimeAndParams(std::string prefix, tNi gridX, int re_m, bool les, float uav, tStep step = 0){
+
+        std::string str = prefix + "_";
 
         if (step) str += "step_" + std::to_string(step) + "__";
 
@@ -194,8 +203,7 @@ public:
         str += "les_" + std::to_string(les) + "_";
         str += "uav_" + std::to_string(uav);
 
-        runDir = str;
-        createDir(str);
+        return str;
     }
     
     
@@ -214,7 +222,7 @@ public:
     
     
     std::string formatDir(std::string prefix, std::string plotType, tStep step) {
-        return runDir + "/" + prefix + "." + plotType + ".V5.step_" + formatStep(step);
+        return outputRootDir + "/" + prefix + "." + plotType + ".V5.step_" + formatStep(step);
     }
     
     std::string formatXYPlaneDir(tStep step, tNi atK, const std::string prefix="plot"){
@@ -304,10 +312,33 @@ public:
     }
     
     
+    //===================================
     
     
     
+    std::string getCheckpointDirName(RunningParams run, bool create=true){
+       
+        std::string dirName = checkpointRootDir + "/step_" + std::to_string(run.step);
+     
+        if (create) {
+            createDir(dirName);
+        }
+
+        return dirName;
+    }
     
+    std::string getCheckpointFilePath(std::string dirName, std::string unit_name, std::string matrix){
+
+        
+        std::string path = dirName + "/checkpoint_grid." + std::to_string(cu.idi) + "." + std::to_string(cu.idj) + "." + std::to_string(cu.idk) + ".";
+
+        path += unit_name + "." + matrix;
+
+        return path;
+    }
+    
+
+
     
     
     

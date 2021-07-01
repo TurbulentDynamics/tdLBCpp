@@ -69,16 +69,11 @@ int main(int argc, char* argv[]){
     running.num_steps = 20;
     
     
-    CheckpointParams checkpoint;
-    checkpoint.start_with_checkpoint = 0;
-    checkpoint.load_checkpoint_dirname = "checkpoint_step_10000";
-
-    checkpoint.checkpoint_repeat = 10;
-    checkpoint.checkpoint_root_dir = "checkpoint_root_dir";
-
-
     
-    OutputParams output;
+    OutputParams output("output_debug");
+//    std::string dir = output.getRunDirWithTimeAndParams("run_", grid.x, flow.reMNonDimensional, flow.useLES, flow.uav);
+
+
     output.add_XY_plane("plot", 10, grid.x/2);
     output.add_XZ_plane("plot_slice", 10, grid.y/3);
     output.add_YZ_plane("plot", 10, grid.x/2);
@@ -88,12 +83,15 @@ int main(int argc, char* argv[]){
     output.add_XZ_plane("ml_slice", 0, grid.y/3+1);
 
     
+        
     
-    std::string rootDir = ".";
-    DiskOutputTree outputTree = DiskOutputTree(rootDir);
+    CheckpointParams checkpoint;
+    checkpoint.start_with_checkpoint = 0;
+    checkpoint.load_checkpoint_dirname = "checkpoint_debug/step_20";
 
-    outputTree.setRunDirWithTimeAndParams("run_", grid.x, flow.reMNonDimensional, flow.useLES, flow.uav);
-
+    checkpoint.checkpoint_repeat = 20;
+    checkpoint.checkpoint_root_dir = "checkpoint_debug";
+//    checkpoint.checkpoint_root_dir = "checkpoint_" + dir;
     
     
     try {
@@ -135,6 +133,9 @@ int main(int argc, char* argv[]){
     }
 
     
+    
+    DiskOutputTree outputTree = DiskOutputTree(output.rootDir, checkpoint.checkpoint_root_dir);
+
     
     
     RushtonTurbine rt = RushtonTurbine(int(grid.x));
@@ -189,23 +190,40 @@ int main(int argc, char* argv[]){
 
         runParams.update(step, (double)impellerAngle);
         
+        
+        impellerAngle += geom.calcThisStepImpellerIncrement(step);
+        
+        geom.updateRotatingGeometry(impellerAngle);
+        geomRotating = geom.returnRotatingGeometry();
+
+        
+        
+        
         lb.collision(EgglesSomers);
 
         lb.streaming(Simple);
 
+        lb.moments();
 
+        
+        lb.forcing(geomRotating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
+        
+        
+        
+        
         
         //SetUp OutputFormat
         BinFileParams binFormat;
-        //format.filePath = plotPath;
+        //format.filePath = plotPath; //Set in savePlane* method
         binFormat.structName = "tDisk_grid_Q4_V5";
-        //format.binFileSizeInStructs set at the end
+        //format.binFileSizeInStructs //Set in savePlane* method
         binFormat.coordsType = "uint16_t";
         binFormat.hasGridtCoords = 1;
         binFormat.hasColRowtCoords = 0;
         binFormat.QDataType = "float";
         binFormat.QOutputLength = 4;
 
+        
         
         //TODO Cycle though all planes.
         OrthoPlane xzTMP = output.XZ_planes[0];
@@ -222,22 +240,19 @@ int main(int argc, char* argv[]){
         }
         
 
+        
+        
         if (checkpoint.checkpoint_repeat && (step % checkpoint.checkpoint_repeat == 0)) {
-            std::string dirname = "checkpoint_test_step_" + std::to_string(step);
-//            lb.checkpoint_write(dirname);
+                        
+            lb.checkpoint_write("Device", runParams);
         }
 
-        impellerAngle += 0.12;
-        geom.updateRotatingGeometry(impellerAngle);
-        std::vector<PosPolar<tNi, useQVecPrecision>> geomRotation = geom.returnRotatingGeometry();
-
-
-
-        lb.forcing(geomRotating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
-
         
         
-        
+
+
+
+
         
     }
     return 0;

@@ -22,7 +22,7 @@ struct CheckpointParams
     std::string load_checkpoint_dirname = "";
     
     int checkpoint_repeat = 0;
-    std::string checkpoint_root_dir = ".";
+    std::string checkpoint_root_dir = "checkpoint_root_dir";
 
     
     
