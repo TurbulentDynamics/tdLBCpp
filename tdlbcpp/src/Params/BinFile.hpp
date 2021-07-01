@@ -104,7 +104,7 @@ struct BinFileParams
             
             Json::Value jsonParams;
 
-            jsonParams["filePath"] = note;
+            jsonParams["filePath"] = filePath;
             jsonParams["name"] = name;
             jsonParams["note"] = note;
             
