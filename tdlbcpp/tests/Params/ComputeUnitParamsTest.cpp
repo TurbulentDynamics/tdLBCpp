@@ -60,11 +60,11 @@ TEST_F(ComputeUnitParamsTests, ComputeUnitParamsWriteReadValidTest)
     computeUnitParams.k0 = 9;
     computeUnitParams.ghost = 10;
 
-    computeUnitParams.writeParams(filename);
+    computeUnitParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
 
     ComputeUnitParams computeUnitParamsRead;
-    computeUnitParamsRead.getParamFromJson(filename);
+    computeUnitParamsRead.getParamsFromJsonFile(filename);
 
     checkAllFields(computeUnitParams, computeUnitParamsRead);
 }
@@ -83,11 +83,11 @@ TEST_F(ComputeUnitParamsTests, ComputeUnitParamsWriteReadValidRandomTest)
     computeUnitParams.k0 = rand();
     computeUnitParams.ghost = rand();
 
-    computeUnitParams.writeParams(filename);
+    computeUnitParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
 
     ComputeUnitParams computeUnitParamsRead;
-    computeUnitParamsRead.getParamFromJson(filename);
+    computeUnitParamsRead.getParamsFromJsonFile(filename);
 
     checkAllFields(computeUnitParams, computeUnitParamsRead);
 }
@@ -101,7 +101,7 @@ TEST_F(ComputeUnitParamsTests, ComputeUnitParamsReadInValidTest)
 
     ComputeUnitParams computeUnitParamsRead;
     testing::internal::CaptureStderr();
-    computeUnitParamsRead.getParamFromJson(filename);
+    computeUnitParamsRead.getParamsFromJsonFile(filename);
     std::string capturedStdErr = testing::internal::GetCapturedStderr();
 
     ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 9\n"

@@ -153,109 +153,115 @@ void ComputeUnit<T, QVecSize>::moments(){
             
                 
                 //the first position is simply the entire mass-vector (N] summed up
-                alf1[1] = qVec.q[ 1] + qVec.q[ 2] + qVec.q[ 3] + qVec.q[ 4] +
-                qVec.q[ 5] + qVec.q[ 6] + qVec.q[ 7] + qVec.q[ 8] +
-                qVec.q[ 9] + qVec.q[10] + qVec.q[11] + qVec.q[12] +
-                qVec.q[13] + qVec.q[14] + qVec.q[15] + qVec.q[16] +
-                qVec.q[17] + qVec.q[18];
+                alf1[Q1] = qVec.q[ Q1] + qVec.q[ Q2] + qVec.q[ Q3] + qVec.q[ Q4] +
+                qVec.q[ Q5] + qVec.q[ Q6] + qVec.q[ Q7] + qVec.q[ Q8] +
+                qVec.q[ Q9] + qVec.q[Q10] + qVec.q[Q11] + qVec.q[Q12] +
+                qVec.q[Q13] + qVec.q[Q14] + qVec.q[Q15] + qVec.q[Q16] +
+                qVec.q[Q17] + qVec.q[Q18];
                 
     //                if (alf1[1]<0.00001]  printf("alf1 %f\n", alf1[1]];
                 
             
                 //the second position is everything with an x-component
-                alf1[2] = qVec.q[ 1] - qVec.q[ 3] +
-                qVec.q[ 7] - qVec.q[ 8] -
-                qVec.q[ 9] + qVec.q[10] + qVec.q[11] - qVec.q[12] -
-                qVec.q[13] + qVec.q[14];
+                alf1[Q2] = qVec.q[ Q1] - qVec.q[ Q3] +
+                qVec.q[ Q7] - qVec.q[ Q8] -
+                qVec.q[ Q9] + qVec.q[Q10] + qVec.q[Q11] - qVec.q[Q12] -
+                qVec.q[Q13] + qVec.q[Q14];
                 
                 
                 //the third position is everything with an y-component
-                alf1[3] = qVec.q[ 2] - qVec.q[ 4] +
-                qVec.q[ 7] + qVec.q[ 8] -
-                qVec.q[ 9] - qVec.q[10] + qVec.q[15] - qVec.q[16] -
-                qVec.q[17] + qVec.q[18];
+                alf1[Q3] = qVec.q[ Q2] - qVec.q[ Q4] +
+                qVec.q[ Q7] + qVec.q[ Q8] -
+                qVec.q[ Q9] - qVec.q[Q10] + qVec.q[Q15] - qVec.q[Q16] -
+                qVec.q[Q17] + qVec.q[Q18];
                 
                 
                 //the fourth position is everything with a z-component
-                alf1[4] = qVec.q[ 5] - qVec.q[ 6] +
-                qVec.q[11] + qVec.q[12] -
-                qVec.q[13] - qVec.q[14] + qVec.q[15] + qVec.q[16] -
-                qVec.q[17] - qVec.q[18];
+                alf1[Q4] = qVec.q[ Q5] - qVec.q[ Q6] +
+                qVec.q[Q11] + qVec.q[Q12] -
+                qVec.q[Q13] - qVec.q[Q14] + qVec.q[Q15] + qVec.q[Q16] -
+                qVec.q[Q17] - qVec.q[Q18];
                 
                 
                 //starting from the fifth position, it gets more complicated in
                 //structure, but it still follows the article by Eggels and Somers
-                alf1[5] =  - qVec.q[ 2] - qVec.q[ 4] -
-                qVec.q[ 5] - qVec.q[ 6] + qVec.q[ 7] + qVec.q[ 8] +
-                qVec.q[ 9] + qVec.q[10] + qVec.q[11] + qVec.q[12] +
-                qVec.q[13] + qVec.q[14];
+                alf1[Q5] =  - qVec.q[ Q2] - qVec.q[ Q4] -
+                qVec.q[ Q5] - qVec.q[ Q6] + qVec.q[ Q7] + qVec.q[ Q8] +
+                qVec.q[ Q9] + qVec.q[Q10] + qVec.q[Q11] + qVec.q[Q12] +
+                qVec.q[Q13] + qVec.q[Q14];
                 
                 
-                alf1[6] = qVec.q[ 7] - qVec.q[ 8] +
-                qVec.q[ 9] - qVec.q[10];
+                alf1[Q6] = qVec.q[ Q7] - qVec.q[ Q8] +
+                qVec.q[ Q9] - qVec.q[Q10];
                 
-                alf1[7] =  - qVec.q[ 1] - qVec.q[ 3] -
-                qVec.q[ 5] - qVec.q[ 6] + qVec.q[ 7] + qVec.q[ 8] +
-                qVec.q[ 9] + qVec.q[10] + qVec.q[15] + qVec.q[16] +
-                qVec.q[17] + qVec.q[18];
+                alf1[Q7] =  - qVec.q[ Q1] - qVec.q[ Q3] -
+                qVec.q[ Q5] - qVec.q[ Q6] + qVec.q[ Q7] + qVec.q[ Q8] +
+                qVec.q[ Q9] + qVec.q[Q10] + qVec.q[Q15] + qVec.q[Q16] +
+                qVec.q[Q17] + qVec.q[Q18];
                 
-                alf1[8] = qVec.q[11] - qVec.q[12] +
-                qVec.q[13] - qVec.q[14];
+                alf1[Q8] = qVec.q[Q11] - qVec.q[Q12] +
+                qVec.q[Q13] - qVec.q[Q14];
                 
-                alf1[9] = qVec.q[15] - qVec.q[16] +
-                qVec.q[17] - qVec.q[18];
+                alf1[Q9] = qVec.q[Q15] - qVec.q[Q16] +
+                qVec.q[Q17] - qVec.q[Q18];
                 
-                alf1[10] =  - qVec.q[ 1] - qVec.q[ 2] - qVec.q[ 3] - qVec.q[ 4] +
-                qVec.q[11] + qVec.q[12] +
-                qVec.q[13] + qVec.q[14] + qVec.q[15] + qVec.q[16] +
-                qVec.q[17] + qVec.q[18];
+                alf1[Q10] =  - qVec.q[ Q1] - qVec.q[ Q2] - qVec.q[ Q3] - qVec.q[ Q4] +
+                qVec.q[Q11] + qVec.q[Q12] +
+                qVec.q[Q13] + qVec.q[Q14] + qVec.q[Q15] + qVec.q[Q16] +
+                qVec.q[Q17] + qVec.q[Q18];
                 
-                alf1[11] =  - qVec.q[ 1] + qVec.q[ 3] +
-                2 * qVec.q[ 7] - 2 * qVec.q[ 8] -
-                2 * qVec.q[ 9] + 2 * qVec.q[10] - qVec.q[11] + qVec.q[12] +
-                qVec.q[13] - qVec.q[14];
+                alf1[Q11] =  - qVec.q[ Q1] + qVec.q[ Q3] +
+                2 * qVec.q[ Q7] - 2 * qVec.q[ Q8] -
+                2 * qVec.q[ Q9] + 2 * qVec.q[Q10] - qVec.q[Q11] + qVec.q[Q12] +
+                qVec.q[Q13] - qVec.q[Q14];
                 
-                alf1[12] =  - qVec.q[ 2] + qVec.q[ 4] +
-                2 * qVec.q[ 7] + 2 * qVec.q[ 8] -
-                2 * qVec.q[ 9] - 2 * qVec.q[10] -
-                qVec.q[15] + qVec.q[16] +
-                qVec.q[17] - qVec.q[18];
+                alf1[Q12] =  - qVec.q[ Q2] + qVec.q[ Q4] +
+                2 * qVec.q[ Q7] + 2 * qVec.q[ Q8] -
+                2 * qVec.q[ Q9] - 2 * qVec.q[Q10] -
+                qVec.q[Q15] + qVec.q[Q16] +
+                qVec.q[Q17] - qVec.q[Q18];
                 
-                alf1[13] =  - 3 * qVec.q[ 1] + 3 * qVec.q[ 3] +
-                3 * qVec.q[11] - 3 * qVec.q[12] -
-                3 * qVec.q[13] + 3 * qVec.q[14];
+                alf1[Q13] =  - 3 * qVec.q[ Q1] + 3 * qVec.q[ Q3] +
+                3 * qVec.q[Q11] - 3 * qVec.q[Q12] -
+                3 * qVec.q[Q13] + 3 * qVec.q[Q14];
                 
-                alf1[14] =  - 3 * qVec.q[ 2] + 3 * qVec.q[ 4] +
-                3 * qVec.q[15] - 3 * qVec.q[16] -
-                3 * qVec.q[17] + 3 * qVec.q[18];
+                alf1[Q14] =  - 3 * qVec.q[ Q2] + 3 * qVec.q[ Q4] +
+                3 * qVec.q[Q15] - 3 * qVec.q[Q16] -
+                3 * qVec.q[Q17] + 3 * qVec.q[Q18];
                 
-                alf1[15] =  - 2 * qVec.q[ 5] + 2 * qVec.q[ 6] +
-                qVec.q[11] + qVec.q[12] -
-                qVec.q[13] - qVec.q[14] + qVec.q[15] + qVec.q[16] -
-                qVec.q[17] - qVec.q[18];
+                alf1[Q15] =  - 2 * qVec.q[ Q5] + 2 * qVec.q[ Q6] +
+                qVec.q[Q11] + qVec.q[Q12] -
+                qVec.q[Q13] - qVec.q[Q14] + qVec.q[Q15] + qVec.q[Q16] -
+                qVec.q[Q17] - qVec.q[Q18];
                 
-                alf1[16] =  - 3 * qVec.q[11] - 3 * qVec.q[12] +
-                3 * qVec.q[13] + 3 * qVec.q[14] + 3 * qVec.q[15] +
-                3 * qVec.q[16] -
-                3 * qVec.q[17] - 3 * qVec.q[18];
+                alf1[Q16] =  - 3 * qVec.q[Q11] - 3 * qVec.q[Q12] +
+                3 * qVec.q[Q13] + 3 * qVec.q[Q14] + 3 * qVec.q[Q15] +
+                3 * qVec.q[Q16] -
+                3 * qVec.q[Q17] - 3 * qVec.q[Q18];
                 
-                alf1[17] = 0.5 * (qVec.q[ 1] + qVec.q[ 2] + qVec.q[ 3] + qVec.q[ 4]) -
-                (qVec.q[ 5] + qVec.q[ 6] + qVec.q[ 7] + qVec.q[ 8] +
-                 qVec.q[ 9] + qVec.q[10]) +
-                0.5 * (qVec.q[11] + qVec.q[12] +
-                       qVec.q[13] + qVec.q[14] + qVec.q[15] + qVec.q[16] +
-                       qVec.q[17] + qVec.q[18]);
+                alf1[Q17] = 0.5 * (qVec.q[ Q1] + qVec.q[ Q2] + qVec.q[ Q3] + qVec.q[ Q4]) -
+                (qVec.q[ Q5] + qVec.q[ Q6] + qVec.q[ Q7] + qVec.q[ Q8] +
+                 qVec.q[ Q9] + qVec.q[Q10]) +
+                0.5 * (qVec.q[Q11] + qVec.q[Q12] +
+                       qVec.q[Q13] + qVec.q[Q14] + qVec.q[Q15] + qVec.q[Q16] +
+                       qVec.q[Q17] + qVec.q[Q18]);
                 
-                alf1[18] = 1.5 * (qVec.q[ 1] - qVec.q[ 2] + qVec.q[ 3] - qVec.q[ 4]) -
-                1.5 * (qVec.q[11] + qVec.q[12] +
-                       qVec.q[13] + qVec.q[14]) +
-                1.5 * (qVec.q[15] + qVec.q[16] +
-                       qVec.q[17] + qVec.q[18]);
+                alf1[Q18] = 1.5 * (qVec.q[ Q1] - qVec.q[ Q2] + qVec.q[ Q3] - qVec.q[ Q4]) -
+                1.5 * (qVec.q[Q11] + qVec.q[Q12] +
+                       qVec.q[Q13] + qVec.q[Q14]) +
+                1.5 * (qVec.q[Q15] + qVec.q[Q16] +
+                       qVec.q[Q17] + qVec.q[Q18]);
                 
-                
-                for (int l=1; l<=18; l++){
+
+                for (int l=Q1; l<=Q18; l++){
                     Q[index(i,j,k)].q[l] = alf1[ l ];
                 }
+
+                
+                
+//                for (int l=1; l<=18; l++){
+//                    Q[index(i,j,k)].q[l] = alf1[ l ];
+//                }
                 
                 
                 /*

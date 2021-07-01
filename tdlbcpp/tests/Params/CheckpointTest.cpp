@@ -48,11 +48,11 @@ TEST_F(CheckpointParamsTests, CheckpointWriteReadValidTest)
     checkpointParams.checkpoint_repeat = 1;
     checkpointParams.checkpoint_root_dir = "test2";
 
-    checkpointParams.writeParams(filename);
+    checkpointParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
 
     CheckpointParams checkpointParamsRead;
-    checkpointParamsRead.getParamFromJson(filename);
+    checkpointParamsRead.getParamsFromJsonFile(filename);
 
     checkAllFields(checkpointParams, checkpointParamsRead);
 }
@@ -65,11 +65,11 @@ TEST_F(CheckpointParamsTests, CheckpointParamsWriteReadValidRandomTest)
     checkpointParams.checkpoint_repeat = rand();
     checkpointParams.checkpoint_root_dir = TestUtils::random_string(randomStringLength);
 
-    checkpointParams.writeParams(filename);
+    checkpointParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
 
     CheckpointParams checkpointParamsRead;
-    checkpointParamsRead.getParamFromJson(filename);
+    checkpointParamsRead.getParamsFromJsonFile(filename);
 
     checkAllFields(checkpointParams, checkpointParamsRead);
 }
@@ -82,7 +82,7 @@ TEST_F(CheckpointParamsTests, CheckpointParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     CheckpointParams checkpointParamsRead;
-    checkpointParamsRead.getParamFromJson(filename);
+    checkpointParamsRead.getParamsFromJsonFile(filename);
 
     ASSERT_EQ(checkpointParamsRead.start_with_checkpoint, true) << "start_with_checkpoint field has a wrong value";
 }

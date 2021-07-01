@@ -60,11 +60,11 @@ TEST_F(BinFileTests, BinFileWriteReadValidTest)
     binFileParams.QDataType = "test5";
     binFileParams.QOutputLength = 0x8fffffff;
 
-    binFileParams.writeParams(filename);
+    binFileParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
 
     BinFileParams binFileParamsRead;
-    binFileParamsRead.getParamFromJson(filename);
+    binFileParamsRead.getParamsFromJsonFile(filename);
 
     checkAllFields(binFileParamsRead, binFileParams);
 }
@@ -83,11 +83,11 @@ TEST_F(BinFileTests, BinFileWriteReadValidRandomTest)
     binFileParams.QDataType = TestUtils::random_string(randomStringLength);
     binFileParams.QOutputLength = rand();
 
-    binFileParams.writeParams(filename);
+    binFileParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
 
     BinFileParams binFileParamsRead;
-    binFileParamsRead.getParamFromJson(filename);
+    binFileParamsRead.getParamsFromJsonFile(filename);
 
     checkAllFields(binFileParamsRead, binFileParams);
 }
@@ -100,7 +100,7 @@ TEST_F(BinFileTests, BinFileReadInValidTest)
     std::cerr << filename << std::endl;
 
     BinFileParams binFileParamsRead;
-    binFileParamsRead.getParamFromJson(filename);
+    binFileParamsRead.getParamsFromJsonFile(filename);
 
     ASSERT_EQ(binFileParamsRead.filePath, "somepath") << "filePath field has a wrong value";
 }

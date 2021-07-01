@@ -77,13 +77,14 @@ public:
     
     Force<T> *F;
     //    std::vector<Force<T>> sparseF;
-    
-    DiskOutputTree outputTree;
-    
+        
     T *Nu;
     
     bool *O;
-        
+    
+    DiskOutputTree outputTree;
+
+    
     ComputeUnit(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
     
     ~ComputeUnit();
@@ -123,17 +124,15 @@ public:
       
 
     void setGhostSizes();
-    void getParamFromJson(const std::string filePath);
-    int writeParams(const std::string filePath);
+    void getParamsFromJson(const std::string filePath);
+    int writeParamsToJsonFile(const std::string filePath);
     Json::Value getJson();
     void printParams();
 
         
     
-    
     void checkpoint_read(std::string dirname, std::string unit_name);
-    void checkpoint_write(std::string dirname, std::string unit_name);
-    
+    void checkpoint_write(std::string unit_name, RunningParams run);
     
     
     template <typename tDiskPrecision, int tDiskSize>
@@ -196,7 +195,7 @@ public:
         
 
         std::cout<< "Writing output to: " << binFormat.filePath <<std::endl;
-        outputTree.writeBinFileJson(binFormat, runParam);
+        outputTree.writeAllParamsJson(binFormat, runParam);
 
         FILE *fp = fopen(binFormat.filePath.c_str(), "wb");
         fwrite(outputBuffer, sizeof(tDiskGrid<tDiskPrecision, tDiskSize>), qVecBufferLen, fp);
@@ -208,7 +207,7 @@ public:
         binFormat.QOutputLength = 3;
         binFormat.binFileSizeInStructs = F3BufferLen;
         binFormat.filePath = outputTree.formatF3BinFileNamePath(plotDir);
-        outputTree.writeBinFileJson(binFormat, runParam);
+        outputTree.writeAllParamsJson(binFormat, runParam);
 
         
         FILE *fpF3 = fopen(binFormat.filePath.c_str(), "wb");
@@ -226,9 +225,10 @@ public:
     
     
 private:
-    std::string get_checkpoint_filename(std::string dirname, std::string unit_name, std::string matrix);
-    FILE* fopen_read(std::string dirname, std::string unit_name, std::string matrix);
-    FILE* fopen_write(std::string dirname, std::string unit_name, std::string matrix);
+
+    FILE* fopen_read(std::string filePath);
+    FILE* fopen_write(std::string filePath);
+
     
     
     tNi inline dirnQ000(tNi i, tNi j, tNi k);

@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		D689CD6426010D0600DF4E61 /* testComputeUnit.mm in Sources */ = {isa = PBXBuildFile; fileRef = D689CD6326010D0600DF4E61 /* testComputeUnit.mm */; };
 		D6930C67261366B4004245CB /* testJsonFiles.mm in Sources */ = {isa = PBXBuildFile; fileRef = D6930C66261366B4004245CB /* testJsonFiles.mm */; };
+		D6AC3269268E20090057E1E1 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6AC3262268E20090057E1E1 /* utils.cpp */; };
+		D6AC326A268E20090057E1E1 /* ComputeUnitParamsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6AC3264268E20090057E1E1 /* ComputeUnitParamsTest.cpp */; };
+		D6AC326B268E20090057E1E1 /* CheckpointTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6AC3265268E20090057E1E1 /* CheckpointTest.cpp */; };
+		D6AC326C268E20090057E1E1 /* BinFileTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6AC3266268E20090057E1E1 /* BinFileTest.cpp */; };
 		D6E5C74225EE184B0067FDE1 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C72425EE184B0067FDE1 /* test.cpp */; };
 		D6E5C74425EE184B0067FDE1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C73E25EE184B0067FDE1 /* main.cpp */; };
 		D6E5C74525EE184B0067FDE1 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */; };
@@ -32,6 +36,13 @@
 		D689CD6526010D0600DF4E61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D6930C66261366B4004245CB /* testJsonFiles.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = testJsonFiles.mm; sourceTree = "<group>"; };
 		D698D755257D036500A3BFD2 /* tdLBCpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tdLBCpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		D6AC3261268E20090057E1E1 /* utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
+		D6AC3262268E20090057E1E1 /* utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utils.cpp; sourceTree = "<group>"; };
+		D6AC3264268E20090057E1E1 /* ComputeUnitParamsTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ComputeUnitParamsTest.cpp; sourceTree = "<group>"; };
+		D6AC3265268E20090057E1E1 /* CheckpointTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckpointTest.cpp; sourceTree = "<group>"; };
+		D6AC3266268E20090057E1E1 /* BinFileTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BinFileTest.cpp; sourceTree = "<group>"; };
+		D6AC3267268E20090057E1E1 /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
+		D6AC3268268E20090057E1E1 /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
 		D6ACCEF325F60FEA00705722 /* GlobalStructures.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GlobalStructures.hpp; sourceTree = "<group>"; };
 		D6AF70B22689BC2100022ECF /* OutputParams.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = OutputParams.hpp; sourceTree = "<group>"; };
 		D6AF70B32689C69000022ECF /* Checkpoint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Checkpoint.hpp; sourceTree = "<group>"; };
@@ -114,6 +125,17 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		D6AC3263268E20090057E1E1 /* Params */ = {
+			isa = PBXGroup;
+			children = (
+				D6AC3264268E20090057E1E1 /* ComputeUnitParamsTest.cpp */,
+				D6AC3265268E20090057E1E1 /* CheckpointTest.cpp */,
+				D6AC3266268E20090057E1E1 /* BinFileTest.cpp */,
+				D6AC3267268E20090057E1E1 /* BUILD */,
+			);
+			path = Params;
+			sourceTree = "<group>";
+		};
 		D6E5C5A925DBEC0A0067FDE1 /* tdLBGeometryRushtonTurbineLib */ = {
 			isa = PBXGroup;
 			children = (
@@ -154,6 +176,10 @@
 		D6E5C72325EE184B0067FDE1 /* tests */ = {
 			isa = PBXGroup;
 			children = (
+				D6AC3268268E20090057E1E1 /* BUILD */,
+				D6AC3263268E20090057E1E1 /* Params */,
+				D6AC3262268E20090057E1E1 /* utils.cpp */,
+				D6AC3261268E20090057E1E1 /* utils.hpp */,
 				D6E5C72425EE184B0067FDE1 /* test.cpp */,
 			);
 			path = tests;
@@ -298,8 +324,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				D6E5C74225EE184B0067FDE1 /* test.cpp in Sources */,
+				D6AC326A268E20090057E1E1 /* ComputeUnitParamsTest.cpp in Sources */,
 				D6E5C74525EE184B0067FDE1 /* jsoncpp.cpp in Sources */,
 				D6E5C74425EE184B0067FDE1 /* main.cpp in Sources */,
+				D6AC3269268E20090057E1E1 /* utils.cpp in Sources */,
+				D6AC326B268E20090057E1E1 /* CheckpointTest.cpp in Sources */,
+				D6AC326C268E20090057E1E1 /* BinFileTest.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
