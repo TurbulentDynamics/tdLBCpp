@@ -23,6 +23,8 @@
 #include "Params/Grid.hpp"
 #include "Params/Flow.hpp"
 #include "Params/Running.hpp"
+#include "Params/Checkpoint.hpp"
+#include "Params/OutputParams.hpp"
 #include "Params/ComputeUnitParams.hpp"
 
 
@@ -30,50 +32,11 @@
 #include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
 #include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 #include "ComputeUnit.h"
-#include "OutputConfig.h"
 
 //TODO: Temporary, different ComputeUnits could have different precision
 using useQVecPrecision = float;
 
 
-//https://stackoverflow.com/questions/16357999/current-date-and-time-as-string
-std::string getTimeNowAsString(){
-
-    time_t rawtime;
-    struct tm * timeinfo;
-    char buffer[80];
-
-    time (&rawtime);
-    timeinfo = localtime(&rawtime);
-
-    strftime(buffer, sizeof(buffer), "%Y_%m_%d_%H_%M_%S", timeinfo);
-    std::string time_now(buffer);
-
-    //https://www.techiedelight.com/replace-occurrences-character-string-cpp/
-    size_t pos;
-    while ((pos = time_now.find("-")) != std::string::npos) {time_now.replace(pos, 1, "_");}
-    while ((pos = time_now.find(" ")) != std::string::npos) {time_now.replace(pos, 1, "_");}
-    while ((pos = time_now.find(":")) != std::string::npos) {time_now.replace(pos, 1, "_");}
-
-
-    return time_now;
-}
-
-
-std::string formatDirWithTimeAndParams(std::string root, tNi gridX, int re_m, bool les, float uav, tStep step = 0){
-
-    std::string str = root + "_";
-
-    if (step) str += "step_" + std::to_string(step) + "__";
-
-    str += "datetime_" + getTimeNowAsString() + "_";
-    str += "gridx_" + std::to_string(gridX) + "_";
-    str += "re_" + std::to_string(re_m) + "_";
-    str += "les_" + std::to_string(les) + "_";
-    str += "uav_" + std::to_string(uav);
-
-    return str;
-}
 
 
 
@@ -84,9 +47,6 @@ int main(int argc, char* argv[]){
     grid.x = 44;
     grid.y = 44;
     grid.z = 44;
-    
-    tStep num_steps = 20;
-
     
     grid.ngx = 1;
     grid.ngy = 1;
@@ -100,45 +60,40 @@ int main(int argc, char* argv[]){
     flow.g3 = 0.1;
     flow.alpha = 0.97;
     flow.beta = 1.9;
-
+    flow.useLES = 0;
     
 
     RunningParams running;
     running.angle = 0.0;
     running.step = 0;
-
+    running.num_steps = 20;
     
-    Checkpoint checkpoint;
+    
+    CheckpointParams checkpoint;
     checkpoint.start_with_checkpoint = 0;
     checkpoint.load_checkpoint_dirname = "checkpoint_step_10000";
 
     checkpoint.checkpoint_repeat = 10;
     checkpoint.checkpoint_root_dir = "checkpoint_root_dir";
 
-    
-    
-    int useLES = 0;
-
- 
-    //    std::string diskOutputDir = formatDirWithTimeAndParams("run_", grid.x, flow.reMNonDimensional, useLES, flow.uav);
-
-    std::string driveRoot = ".";
-
-    std::string diskOutputDir = "output_debug";
 
     
-    tStep plot_XY_plane_repeat = 10;
-    tStep plot_XZ_plane_repeat = 10;
-    tStep plot_YZ_plane_repeat = 10;
+    OutputParams output;
+    output.add_XY_plane("plot", 10, grid.x/2);
+    output.add_XZ_plane("plot_slice", 10, grid.y/3);
+    output.add_YZ_plane("plot", 10, grid.x/2);
     
-    tStep plot_volume_repeat = 20;
-    tStep plot_ml_slices_repeat = 0;
+    output.add_volume("volume", 20);
+    output.add_XZ_plane("ml_slice", 0, grid.y/3-1);
+    output.add_XZ_plane("ml_slice", 0, grid.y/3+1);
 
     
     
-    
-    
-    
+    std::string rootDir = ".";
+    DiskOutputTree outputTree = DiskOutputTree(rootDir);
+
+    outputTree.setRunDirWithTimeAndParams("run_", grid.x, flow.reMNonDimensional, flow.useLES, flow.uav);
+
     
     
     try {
@@ -152,15 +107,15 @@ int main(int argc, char* argv[]){
         ("y,sny", "Number of Cells in y direction sny=snz", cxxopts::value<tNi>(grid.y))
         //("z,snz", "Number of Cells in z direction sny=snz", cxxopts::value<tNi>(grid.z))
 
-        ("n,num_steps", "Number of Steps", cxxopts::value<tStep>(num_steps))
+        ("n,num_steps", "Number of Steps", cxxopts::value<uint64_t>(running.num_steps))
 
         ("re_m", "Reynolds Number  (Re_m will be *M_PI/2)", cxxopts::value<useQVecPrecision>(flow.reMNonDimensional))
-        ("start_with_checkpoint", "start_with_checkpoint", cxxopts::value<bool>(start_with_checkpoint))
-        ("load_checkpoint_dirname", "load_checkpoint_dirname", cxxopts::value<std::string>(load_checkpoint_dirname))
+        ("start_with_checkpoint", "start_with_checkpoint", cxxopts::value<bool>(checkpoint.start_with_checkpoint))
+        ("load_checkpoint_dirname", "load_checkpoint_dirname", cxxopts::value<std::string>(checkpoint.load_checkpoint_dirname))
 //        ("upscale_factor", "upscale_factor", cxxopts::value<tNi>(upscale_factor))
-        ("plot_slice_repeat", "plot_slice_repeat", cxxopts::value<tStep>(plot_XY_plane_repeat))
-        ("plot_axis_repeat", "plot_axis_repeat", cxxopts::value<tStep>(plot_XZ_plane_repeat))
-        ("plot_full_repeat", "plot_full_repeat", cxxopts::value<tStep>(plot_volume_repeat))
+        ("plot_slice_repeat", "plot_slice_repeat", cxxopts::value<tStep>(output.XY_planes[0].repeat))
+        ("plot_axis_repeat", "plot_axis_repeat", cxxopts::value<tStep>(output.XY_planes[0].repeat))
+        ("plot_full_repeat", "plot_full_repeat", cxxopts::value<tStep>(output.volumes[0].repeat))
         ("h,help", "Lots of Arguments")
         ;
 
@@ -191,7 +146,7 @@ int main(int argc, char* argv[]){
 
     
     geom.generateFixedGeometry();
-    geom.generateRotatingGeometry(startingAngle);
+    geom.generateRotatingGeometry(running.angle);
     geom.generateRotatingNonUpdatingGeometry();
 
     std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
@@ -213,20 +168,24 @@ int main(int argc, char* argv[]){
     cu.ghost = 1;
         
     
-    DiskOutputTree outputTree = DiskOutputTree(driveRoot, diskOutputDir, grid, flow.asDouble(), cu);
+
+
+    FlowParams<double> flowAsDouble = flow.asDouble();
+    outputTree.setParams(cu, grid, flowAsDouble, running, checkpoint, output);
 
     
     ComputeUnit<useQVecPrecision, QLen::D3Q19> lb = ComputeUnit<useQVecPrecision, QLen::D3Q19>(cu, flow, outputTree);
     
-    
-    
-    lb.forcing(geomFixed, alpha, beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
-    lb.forcing(geomRotatingNonUpdating, alpha, beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
 
     
-    double impellerAngle = startingAngle;
+    
+    lb.forcing(geomFixed, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
+    lb.forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
+
+    
+    double impellerAngle = running.angle;
     RunningParams runParams;
-    for (tStep step=1; step<=num_steps; step++) {
+    for (tStep step=1; step<=running.num_steps; step++) {
 
         runParams.update(step, (double)impellerAngle);
         
@@ -237,7 +196,7 @@ int main(int argc, char* argv[]){
 
         
         //SetUp OutputFormat
-        BinFileFormat binFormat;
+        BinFileParams binFormat;
         //format.filePath = plotPath;
         binFormat.structName = "tDisk_grid_Q4_V5";
         //format.binFileSizeInStructs set at the end
@@ -248,12 +207,11 @@ int main(int argc, char* argv[]){
         binFormat.QOutputLength = 4;
 
         
-        if (step % plot_XZ_plane_repeat == 0) {
-          
-            binFormat.cutAt = rt.tankDiameter / 3;
+        //TODO Cycle though all planes.
+        OrthoPlane xzTMP = output.XZ_planes[0];
+        if (step % xzTMP.repeat == 0) {
             
-            
-            lb.template savePlaneXZ<float, 4>(binFormat, runParams);
+            lb.template savePlaneXZ<float, 4>(xzTMP, binFormat, runParams);
             
             
             
@@ -264,7 +222,7 @@ int main(int argc, char* argv[]){
         }
         
 
-        if (checkpoint_repeat && (step % checkpoint_repeat == 0)) {
+        if (checkpoint.checkpoint_repeat && (step % checkpoint.checkpoint_repeat == 0)) {
             std::string dirname = "checkpoint_test_step_" + std::to_string(step);
 //            lb.checkpoint_write(dirname);
         }
@@ -275,10 +233,7 @@ int main(int argc, char* argv[]){
 
 
 
-        lb.forcing(geomRotating, alpha, beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
-
-            
-        
+        lb.forcing(geomRotating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
 
         
         

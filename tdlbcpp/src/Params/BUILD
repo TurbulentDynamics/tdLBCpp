@@ -7,7 +7,7 @@ cc_library(
 
 cc_library(
     name = "params",
-    hdrs = ["Flow.hpp", "Grid.hpp", "Running.hpp", "BinFile.hpp", "ComputeUnitParams.hpp"],
+    hdrs = ["Checkpoint.hpp", "OutputParams.hpp", "Flow.hpp", "Grid.hpp", "Running.hpp", "BinFile.hpp", "ComputeUnitParams.hpp"],
     deps = [":pjson"],
     visibility = ["//tdlbcpp/src:__pkg__"],
 )

@@ -22,12 +22,12 @@ struct CheckpointParams
     std::string load_checkpoint_dirname = "";
     
     int checkpoint_repeat = 0;
-    std::string checkpoint_root_dir = "";
+    std::string checkpoint_root_dir = ".";
 
-
-    CheckpointParams getParamFromJson(const std::string filePath){
+    
+    
+    void getParamFromJson(const std::string filePath){
         
-        CheckpointParams g;
         
         try
         {
@@ -35,11 +35,11 @@ struct CheckpointParams
             Json::Value jsonParams;
             in >> jsonParams;
             
-            g.start_with_checkpoint = jsonParams["start_with_checkpoint"].asBool();
-            g.load_checkpoint_dirname = jsonParams["load_checkpoint_dirname"].asString();
+            start_with_checkpoint = jsonParams["start_with_checkpoint"].asBool();
+            load_checkpoint_dirname = jsonParams["load_checkpoint_dirname"].asString();
             
-            g.checkpoint_repeat = jsonParams["checkpoint_repeat"].asInt();
-            g.checkpoint_root_dir = jsonParams["checkpoint_root_dir"].asString();
+            checkpoint_repeat = jsonParams["checkpoint_repeat"].asInt();
+            checkpoint_root_dir = jsonParams["checkpoint_root_dir"].asString();
            
             in.close();
             
@@ -49,16 +49,12 @@ struct CheckpointParams
         {
             std::cerr << "Unhandled Exception reached parsing arguments: "
             << e.what() << ", application will now exit" << std::endl;
-            return g;
         }
-        
-        return g;
-        
     };
     
     
     
-    
+
     
     int writeParams(const std::string filePath){
         try {
@@ -78,7 +74,6 @@ struct CheckpointParams
         
         return 0;
     }
-    
     
     
     Json::Value getJson(){
@@ -103,6 +98,17 @@ struct CheckpointParams
             return "";
         }
     }
+    
+    
+    void print(){
+        
+        std::cout
+        << getJson()
+        << std::endl;
+        
+    }
+    
+    
     
 };//end of struct
 

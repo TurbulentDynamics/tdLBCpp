@@ -24,13 +24,12 @@
 #include "Params/Flow.hpp"
 #include "Params/ComputeUnitParams.hpp"
 #include "Params/BinFile.hpp"
-#include "Params/BinFile.hpp"
+#include "Params/OutputParams.hpp"
 
 
 #include "QVec.hpp"
 #include "DiskOutputTree.h"
 #include "Output.hpp"
-
 
 #include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
 #include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
@@ -138,19 +137,18 @@ public:
     
     
     template <typename tDiskPrecision, int tDiskSize>
-    void savePlaneXZ(Plane plane, BinFileFormat binFormat, RunningParams runParam){
+    void savePlaneXZ(OrthoPlane plane, BinFileParams binFormat, RunningParams runParam){
         
        
         tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg * zg];
         
         tDiskGrid<tDiskPrecision, 3> *F3outputBuffer = new tDiskGrid<tDiskPrecision, 3>[xg*zg];
-
-
+        
         
         long int qVecBufferLen = 0;
         long int F3BufferLen = 0;
         for (tNi i=1; i<=xg1; i++){
-            tNi j = binFormat.cutAt;
+            tNi j = plane.cutAt;
             for (tNi k=1; k<=zg1; k++){
                 
                 tDiskGrid<tDiskPrecision, tDiskSize> tmp;
@@ -190,7 +188,7 @@ public:
         }
         
         
-        std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, binFormat.cutAt);
+        std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, plane.cutAt);
         binFormat.filePath = outputTree.formatQVecBinFileNamePath(plotDir);
         binFormat.binFileSizeInStructs = qVecBufferLen;
         
