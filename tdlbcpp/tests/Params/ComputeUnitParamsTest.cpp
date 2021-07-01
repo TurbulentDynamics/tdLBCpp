@@ -1,8 +1,8 @@
 //
-//  BinFileTest.cpp
-//  BinFileTest
+//  ComputeUnitParamsTest.cpp
+//  ComputeUnitParamsTest
 //
-//
+//  Unit tests for ComputeUnitParams
 //
 
 #include <cstdio>

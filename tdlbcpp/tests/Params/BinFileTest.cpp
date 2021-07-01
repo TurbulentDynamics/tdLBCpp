@@ -2,7 +2,7 @@
 //  BinFileTest.cpp
 //  BinFileTest
 //
-//
+//  Unit tests for BinFileParams
 //
 
 #include <cstdio>
@@ -48,48 +48,48 @@ public:
 
 TEST_F(BinFileTests, BinFileWriteReadValidTest)
 {
-    BinFileParams binFileFormat;
-    binFileFormat.filePath = "test";
-    binFileFormat.name = "test1";
-    binFileFormat.note = "test2";
-    binFileFormat.structName = "test3";
-    binFileFormat.binFileSizeInStructs = 2;
-    binFileFormat.coordsType = "test4";
-    binFileFormat.hasGridtCoords = true;
-    binFileFormat.hasColRowtCoords = true;
-    binFileFormat.QDataType = "test5";
-    binFileFormat.QOutputLength = 0x8fffffff;
+    BinFileParams binFileParams;
+    binFileParams.filePath = "test";
+    binFileParams.name = "test1";
+    binFileParams.note = "test2";
+    binFileParams.structName = "test3";
+    binFileParams.binFileSizeInStructs = 2;
+    binFileParams.coordsType = "test4";
+    binFileParams.hasGridtCoords = true;
+    binFileParams.hasColRowtCoords = true;
+    binFileParams.QDataType = "test5";
+    binFileParams.QOutputLength = 0x8fffffff;
 
-    binFileFormat.writeParams(filename);
+    binFileParams.writeParams(filename);
     std::cerr << filename << std::endl;
 
-    BinFileParams binFileFormatRead;
-    binFileFormatRead.getParamFromJson(filename);
+    BinFileParams binFileParamsRead;
+    binFileParamsRead.getParamFromJson(filename);
 
-    checkAllFields(binFileFormatRead, binFileFormat);
+    checkAllFields(binFileParamsRead, binFileParams);
 }
 
 TEST_F(BinFileTests, BinFileWriteReadValidRandomTest)
 {
-    BinFileParams binFileFormat;
-    binFileFormat.filePath = TestUtils::random_string(randomStringLength);
-    binFileFormat.name = TestUtils::random_string(randomStringLength);
-    binFileFormat.note = TestUtils::random_string(randomStringLength);
-    binFileFormat.structName = TestUtils::random_string(randomStringLength);
-    binFileFormat.binFileSizeInStructs = rand();
-    binFileFormat.coordsType = TestUtils::random_string(randomStringLength);
-    binFileFormat.hasGridtCoords = (rand() & 1) == 1;
-    binFileFormat.hasColRowtCoords = (rand() & 1) == 1;
-    binFileFormat.QDataType = TestUtils::random_string(randomStringLength);
-    binFileFormat.QOutputLength = rand();
+    BinFileParams binFileParams;
+    binFileParams.filePath = TestUtils::random_string(randomStringLength);
+    binFileParams.name = TestUtils::random_string(randomStringLength);
+    binFileParams.note = TestUtils::random_string(randomStringLength);
+    binFileParams.structName = TestUtils::random_string(randomStringLength);
+    binFileParams.binFileSizeInStructs = rand();
+    binFileParams.coordsType = TestUtils::random_string(randomStringLength);
+    binFileParams.hasGridtCoords = (rand() & 1) == 1;
+    binFileParams.hasColRowtCoords = (rand() & 1) == 1;
+    binFileParams.QDataType = TestUtils::random_string(randomStringLength);
+    binFileParams.QOutputLength = rand();
 
-    binFileFormat.writeParams(filename);
+    binFileParams.writeParams(filename);
     std::cerr << filename << std::endl;
 
-    BinFileParams binFileFormatRead;
-    binFileFormatRead.getParamFromJson(filename);
+    BinFileParams binFileParamsRead;
+    binFileParamsRead.getParamFromJson(filename);
 
-    checkAllFields(binFileFormatRead, binFileFormat);
+    checkAllFields(binFileParamsRead, binFileParams);
 }
 
 TEST_F(BinFileTests, BinFileReadInValidTest)
@@ -99,8 +99,8 @@ TEST_F(BinFileTests, BinFileReadInValidTest)
     out.close();
     std::cerr << filename << std::endl;
 
-    BinFileParams binFileFormatRead;
-    binFileFormatRead.getParamFromJson(filename);
+    BinFileParams binFileParamsRead;
+    binFileParamsRead.getParamFromJson(filename);
 
-    ASSERT_EQ(binFileFormatRead.filePath, "somepath") << "filePath field has a wrong value";
+    ASSERT_EQ(binFileParamsRead.filePath, "somepath") << "filePath field has a wrong value";
 }

@@ -1,8 +1,8 @@
 //
-//  BinFileTest.cpp
-//  BinFileTest
+//  CheckpointTest.cpp
+//  CheckpointTest
 //
-//
+//  Unit tests for Checkpoint
 //
 
 #include <cstdio>
