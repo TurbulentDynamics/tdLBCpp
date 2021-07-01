@@ -38,10 +38,7 @@ protected:
 public:
     BinFileTests()
     {
-        const testing::TestInfo *const test_info =
-            testing::UnitTest::GetInstance()->current_test_info();
-        std::string testName = test_info->name();
-        filename = TestUtils::getTempFilename(testName + "_to_delete.json");
+        filename = TestUtils::getTempFilename("_to_delete.json");
     }
     ~BinFileTests()
     {
