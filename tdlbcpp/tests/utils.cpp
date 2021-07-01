@@ -31,7 +31,7 @@ namespace TestUtils
 #ifndef KEEP_TEMP_FILES
         return testing::TempDir() + "/" + testName + suffix;
 #else
-        return std::string("/tmp/") + filename;
+        return std::string("/tmp/") + testName + suffix;
 #endif
     }
     void removeTempFile(const std::string filename)
