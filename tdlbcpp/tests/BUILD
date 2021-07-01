@@ -3,4 +3,5 @@ cc_library(
     hdrs = ["utils.hpp"],
     srcs = ["utils.cpp"],
     visibility = ["//tdlbcpp/tests/Params:__pkg__"],
+    deps = ["@googletest//:gtest_main"],
 )

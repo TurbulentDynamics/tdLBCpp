@@ -15,18 +15,7 @@
 
 #include "tdlbcpp/tests/utils.hpp"
 
-//#define KEEP_TEMP_FILES
-
-std::string getTempFilename(const std::string fileName)
-{
-#ifndef KEEP_TEMP_FILES
-    return testing::TempDir() + "/" + fileName;
-#else
-    return std::string("/tmp/") + fileName;
-#endif
-}
-
-class JsonTests : public ::testing::Test
+class BinFileTests : public ::testing::Test
 {
 protected:
     std::string filename;
@@ -47,22 +36,20 @@ protected:
     }
 
 public:
-    JsonTests()
+    BinFileTests()
     {
         const testing::TestInfo *const test_info =
             testing::UnitTest::GetInstance()->current_test_info();
         std::string testName = test_info->name();
-        filename = getTempFilename(testName + "_to_delete.json");
+        filename = TestUtils::getTempFilename(testName + "_to_delete.json");
     }
-    ~JsonTests()
+    ~BinFileTests()
     {
-#ifndef KEEP_TEMP_FILES
-        std::remove(filename.c_str());
-#endif
+        TestUtils::removeTempFile(filename);
     }
 };
 
-TEST_F(JsonTests, BinFileWriteReadValidTest)
+TEST_F(BinFileTests, BinFileWriteReadValidTest)
 {
     BinFileParams binFileFormat;
     binFileFormat.filePath = "test";
@@ -85,7 +72,7 @@ TEST_F(JsonTests, BinFileWriteReadValidTest)
     checkAllFields(binFileFormatRead, binFileFormat);
 }
 
-TEST_F(JsonTests, BinFileWriteReadValidRandomTest)
+TEST_F(BinFileTests, BinFileWriteReadValidRandomTest)
 {
     BinFileParams binFileFormat;
     binFileFormat.filePath = TestUtils::random_string(randomStringLength);
@@ -108,7 +95,7 @@ TEST_F(JsonTests, BinFileWriteReadValidRandomTest)
     checkAllFields(binFileFormatRead, binFileFormat);
 }
 
-TEST_F(JsonTests, BinFileReadInValidTest)
+TEST_F(BinFileTests, BinFileReadInValidTest)
 {
     std::ofstream out(filename);
     out << "{\"filePath\":\"somepath\"}";
