@@ -38,7 +38,7 @@ protected:
 public:
     ComputeUnitParamsTests()
     {
-        filename = TestUtils::getTempFilename("_to_delete.json");
+        filename = TestUtils::getTempFilename();
     }
     ~ComputeUnitParamsTests()
     {

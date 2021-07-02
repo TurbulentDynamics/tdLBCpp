@@ -23,15 +23,15 @@ namespace TestUtils
         return str;
     }
 
-    std::string getTempFilename(const std::string suffix)
+    std::string getTempFilename()
     {
         const testing::TestInfo *const test_info =
             testing::UnitTest::GetInstance()->current_test_info();
         std::string testName = test_info->name();
 #ifndef KEEP_TEMP_FILES
-        return testing::TempDir() + "/" + testName + suffix;
+        return testing::TempDir() + "/" + testName + temporaryFilenameSuffx;
 #else
-        return std::string("/tmp/") + testName + suffix;
+        return std::string("/tmp/") + testName + temporaryFilenameSuffx;
 #endif
     }
     void removeTempFile(const std::string filename)

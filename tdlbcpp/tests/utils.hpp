@@ -10,7 +10,9 @@ namespace TestUtils
     const double randomDoubleLowerBound = -10000;
     const double randomDoubleUpperBound = 10000;
 
+    const std::string temporaryFilenameSuffx = "_to_delete.json";
+
     std::string random_string(size_t length);
-    std::string getTempFilename(const std::string fileName);
+    std::string getTempFilename();
     void removeTempFile(const std::string filename);
 }

@@ -32,7 +32,7 @@ protected:
 public:
     CheckpointParamsTests()
     {
-        filename = TestUtils::getTempFilename("_to_delete.json");
+        filename = TestUtils::getTempFilename();
     }
     ~CheckpointParamsTests()
     {

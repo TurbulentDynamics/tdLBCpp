@@ -38,7 +38,7 @@ protected:
 public:
     BinFileTests()
     {
-        filename = TestUtils::getTempFilename("_to_delete.json");
+        filename = TestUtils::getTempFilename();
     }
     ~BinFileTests()
     {

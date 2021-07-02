@@ -130,7 +130,7 @@ protected:
 public:
     OutputParamsTests()
     {
-        filename = TestUtils::getTempFilename("_to_delete.json");
+        filename = TestUtils::getTempFilename();
     }
     ~OutputParamsTests()
     {

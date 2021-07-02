@@ -71,7 +71,7 @@ protected:
 public:
     FlowParamsTests()
     {
-        filename = TestUtils::getTempFilename("_to_delete.json");
+        filename = TestUtils::getTempFilename();
     }
     ~FlowParamsTests()
     {
