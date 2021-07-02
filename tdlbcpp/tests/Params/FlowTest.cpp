@@ -20,9 +20,33 @@ class FlowParamsTests : public ::testing::Test
 {
 protected:
     std::string filename;
-    const int randomStringLength = 400;
-    const double lower_bound = -10000;
-    const double upper_bound = 10000;
+
+    template <typename T>
+    FlowParams<T> createFlowParamsWithRandomValues()
+    {
+        FlowParams<T> flowParams;
+
+        std::uniform_real_distribution<double> unif(TestUtils::randomDoubleLowerBound, TestUtils::randomDoubleUpperBound);
+        std::default_random_engine re;
+
+        flowParams.initialRho = (T)unif(re);
+        flowParams.reMNonDimensional = (T)unif(re);
+        flowParams.uav = (T)unif(re);
+        flowParams.cs0 = (T)unif(re);
+        flowParams.g3 = (T)unif(re);
+        flowParams.nu = (T)unif(re);
+        flowParams.fx0 = (T)unif(re);
+        flowParams.Re_m = (T)unif(re);
+        flowParams.Re_f = (T)unif(re);
+        flowParams.uf = (T)unif(re);
+        flowParams.alpha = (T)unif(re);
+        flowParams.beta = (T)unif(re);
+        flowParams.useLES = (rand() & 1) == 1;
+        flowParams.collision = TestUtils::random_string(TestUtils::randomStringLength);
+        flowParams.streaming = TestUtils::random_string(TestUtils::randomStringLength);
+
+        return flowParams;
+    }
 
     template <typename T>
     void checkAllFields(FlowParams<T> &expected, FlowParams<T> &actual)
@@ -86,31 +110,25 @@ TEST_F(FlowParamsTests, FlowDoubleWriteReadValidTest)
 
 TEST_F(FlowParamsTests, FlowDoubleWriteReadRandomValidTest)
 {
-    FlowParams<double> flowParams;
-
-    std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
-    std::default_random_engine re;
-
-    flowParams.initialRho = unif(re);
-    flowParams.reMNonDimensional = unif(re);
-    flowParams.uav = unif(re);
-    flowParams.cs0 = unif(re);
-    flowParams.g3 = unif(re);
-    flowParams.nu = unif(re);
-    flowParams.fx0 = unif(re);
-    flowParams.Re_m = unif(re);
-    flowParams.Re_f = unif(re);
-    flowParams.uf = unif(re);
-    flowParams.alpha = unif(re);
-    flowParams.beta = unif(re);
-    flowParams.useLES = (rand() & 1) == 1;
-    flowParams.collision = TestUtils::random_string(randomStringLength);
-    flowParams.streaming = TestUtils::random_string(randomStringLength);
+    FlowParams<double> flowParams = createFlowParamsWithRandomValues<double>();
 
     flowParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
 
     FlowParams<double> flowParamsRead;
+    flowParamsRead.getParamsFromJsonFile(filename);
+
+    checkAllFields(flowParams, flowParamsRead);
+}
+
+TEST_F(FlowParamsTests, FlowFloatWriteReadRandomValidTest)
+{
+    FlowParams<float> flowParams = createFlowParamsWithRandomValues<float>();
+
+    flowParams.writeParamsToJsonFile(filename);
+    std::cerr << filename << std::endl;
+
+    FlowParams<float> flowParamsRead;
     flowParamsRead.getParamsFromJsonFile(filename);
 
     checkAllFields(flowParams, flowParamsRead);
@@ -130,6 +148,24 @@ TEST_F(FlowParamsTests, FlowParamsReadInValidTest)
 
     ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 16\n"
                               "  Missing ',' or '}' in object declaration\n"
+                              ", application will now exit\n")
+        << "cerr should contain error";
+}
+
+TEST_F(FlowParamsTests, FlowParamsReadInValidTestInvalidType)
+{
+    std::ofstream out(filename);
+    out << "{\"initialRho\":\"test\"}";
+    out.close();
+    std::cerr << filename << std::endl;
+
+    FlowParams<double> flowParamsRead;
+    testing::internal::CaptureStderr();
+    flowParamsRead.getParamsFromJsonFile(filename);
+    std::string capturedStdErr = testing::internal::GetCapturedStderr();
+
+    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
+                              "Value is not convertible to double."
                               ", application will now exit\n")
         << "cerr should contain error";
 }
