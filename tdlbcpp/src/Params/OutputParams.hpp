@@ -61,12 +61,12 @@ struct OrthoPlane {
             Json::Value jsonParams;
 
             jsonParams["name_root"] = name_root;
-            jsonParams["repeat"] = (tStep)repeat;
-            jsonParams["cutAt"] = (tNi)cutAt;
+            jsonParams["repeat"] = (Json::UInt64)repeat;
+            jsonParams["cutAt"] = (Json::Int64)cutAt;
 
             jsonParams["Q_output_len"] = Q_output_len;
-            jsonParams["start_at_step"] = (tStep)start_at_step;
-            jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
+            jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
+            jsonParams["end_at_repeat"] = (Json::UInt64)end_at_repeat;
             jsonParams["use_half_float"] = use_half_float;
 
             jsonParams["QDataType"] = QDataType;
@@ -125,11 +125,11 @@ struct Volume {
             Json::Value jsonParams;
 
             jsonParams["name_root"] = name_root;
-            jsonParams["repeat"] = (tStep)repeat;
+            jsonParams["repeat"] = (Json::UInt64)repeat;
 
             jsonParams["Q_output_len"] = Q_output_len;
-            jsonParams["start_at_step"] = (tStep)start_at_step;
-            jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
+            jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
+            jsonParams["end_at_repeat"] = (Json::UInt64)end_at_repeat;
             jsonParams["use_half_float"] = use_half_float;
 
             jsonParams["QDataType"] = QDataType;
@@ -193,12 +193,12 @@ struct Angle {
             Json::Value jsonParams;
 
             jsonParams["name_root"] = name_root;
-            jsonParams["repeat"] = (tStep)repeat;
+            jsonParams["repeat"] = (Json::UInt64)repeat;
             jsonParams["degrees"] = (double)degrees;
 
             jsonParams["Q_output_len"] = Q_output_len;
-            jsonParams["start_at_step"] = (tStep)start_at_step;
-            jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
+            jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
+            jsonParams["end_at_repeat"] = (Json::UInt64)end_at_repeat;
             jsonParams["use_half_float"] = use_half_float;
 
             jsonParams["QDataType"] = QDataType;
@@ -265,12 +265,12 @@ struct PlaneAtAngle {
             jsonParams["name_root"] = name_root;
             jsonParams["degrees"] = (double)degrees;
             jsonParams["tolerance"] = (double)tolerance;
-            jsonParams["cutAt"] = (tNi)cutAt;
+            jsonParams["cutAt"] = (Json::Int64)cutAt;
 
 
             jsonParams["Q_output_len"] = Q_output_len;
-            jsonParams["start_at_step"] = (tStep)start_at_step;
-            jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
+            jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
+            jsonParams["end_at_repeat"] = (Json::UInt64)end_at_repeat;
             jsonParams["use_half_float"] = use_half_float;
 
             jsonParams["QDataType"] = QDataType;
@@ -337,15 +337,15 @@ struct Sector {
             Json::Value jsonParams;
 
             jsonParams["name_root"] = name_root;
-            jsonParams["repeat"] = (tStep)repeat;
+            jsonParams["repeat"] = (Json::UInt64)repeat;
 
 
             jsonParams["angle_infront_blade"] = (double)angle_infront_blade;
             jsonParams["angle_behind_blade"] = (double)angle_behind_blade;
 
             jsonParams["Q_output_len"] = Q_output_len;
-            jsonParams["start_at_step"] = (tStep)start_at_step;
-            jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
+            jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
+            jsonParams["end_at_repeat"] = (Json::UInt64)end_at_repeat;
             jsonParams["use_half_float"] = use_half_float;
 
             jsonParams["QDataType"] = QDataType;
