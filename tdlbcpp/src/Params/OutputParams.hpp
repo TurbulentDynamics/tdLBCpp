@@ -52,8 +52,9 @@ struct Volume {
     std::string QDataType;
 
     void getParamsFromJson(Json::Value jsonParams);
+    static void getParamsFromJsonArray(Json::Value jsonArray, std::vector<Volume> &array);
     Json::Value getJson();
-
+    static Json::Value getJson(std::vector<Volume>&);
 };
 
 
@@ -74,7 +75,9 @@ struct Angle {
     std::string QDataType;
 
     void getParamsFromJson(Json::Value jsonParams);
+    static void getParamsFromJsonArray(Json::Value jsonArray, std::vector<Angle> &array);
     Json::Value getJson();
+    static Json::Value getJson(std::vector<Angle>&);
 };
 
 
@@ -95,7 +98,9 @@ struct PlaneAtAngle {
     std::string QDataType;
 
     void getParamsFromJson(Json::Value jsonParams);
+    static void getParamsFromJsonArray(Json::Value jsonArray, std::vector<PlaneAtAngle> &array);
     Json::Value getJson();
+    static Json::Value getJson(std::vector<PlaneAtAngle>&);
 };
 
 
@@ -116,7 +121,9 @@ struct Sector {
     std::string QDataType;
 
     void getParamsFromJson(Json::Value jsonParams);
+    static void getParamsFromJsonArray(Json::Value jsonArray, std::vector<Sector> &array);
     Json::Value getJson();
+    static Json::Value getJson(std::vector<Sector>&);
 };
 
 
@@ -296,30 +303,9 @@ struct OutputParams {
             OrthoPlane::getParamsFromJsonArray(jsonParams["XY_planes"], XY_planes);
             OrthoPlane::getParamsFromJsonArray(jsonParams["XZ_planes"], XZ_planes);
             OrthoPlane::getParamsFromJsonArray(jsonParams["YZ_planes"], YZ_planes);
-
-            Json::Value capture_at_blade_angle_array = jsonParams["capture_at_blade_angle"];
-            capture_at_blade_angle.clear();
-            for (Json::Value::ArrayIndex i = 0; i < capture_at_blade_angle_array.size(); i++) {
-                Angle angle;
-                angle.getParamsFromJson(capture_at_blade_angle_array[i]);
-                capture_at_blade_angle.push_back(angle);
-            }
-
-            Json::Value YZ_plane_when_angle_array = jsonParams["YZ_plane_when_angle"];
-            YZ_plane_when_angle.clear();
-            for (Json::Value::ArrayIndex i = 0; i < YZ_plane_when_angle_array.size(); i++) {
-                PlaneAtAngle planeAtAngle;
-                planeAtAngle.getParamsFromJson(YZ_plane_when_angle_array[i]);
-                YZ_plane_when_angle.push_back(planeAtAngle);
-            }
-
-            Json::Value volumes_array = jsonParams["volumes"];
-            volumes.clear();
-            for (Json::Value::ArrayIndex i = 0; i < volumes_array.size(); i++) {
-                Volume volume;
-                volume.getParamsFromJson(volumes_array[i]);
-                volumes.push_back(volume);
-            }
+            Angle::getParamsFromJsonArray(jsonParams["capture_at_blade_angle"], capture_at_blade_angle);
+            PlaneAtAngle::getParamsFromJsonArray(jsonParams["YZ_plane_when_angle"], YZ_plane_when_angle);
+            Volume::getParamsFromJsonArray(jsonParams["volumes"], volumes);
         }
         catch(std::exception& e)
         {
@@ -338,24 +324,9 @@ struct OutputParams {
             jsonParams["XY_planes"] = OrthoPlane::getJson(XY_planes);
             jsonParams["XZ_planes"] = OrthoPlane::getJson(XZ_planes);
             jsonParams["YZ_planes"] = OrthoPlane::getJson(YZ_planes);
-
-            Json::Value capture_at_blade_angle_array = Json::arrayValue;
-            for (Angle angle : capture_at_blade_angle) {
-                capture_at_blade_angle_array.append(angle.getJson());
-            }
-            jsonParams["capture_at_blade_angle"] = capture_at_blade_angle_array;
-
-            Json::Value YZ_plane_when_angle_array = Json::arrayValue;
-            for (PlaneAtAngle planeAtAngle : YZ_plane_when_angle) {
-                YZ_plane_when_angle_array.append(planeAtAngle.getJson());
-            }
-            jsonParams["YZ_plane_when_angle"] = YZ_plane_when_angle_array;
-
-            Json::Value volumes_array = Json::arrayValue;
-            for (Volume volume : volumes) {
-                volumes_array.append(volume.getJson());
-            }
-            jsonParams["volumes"] = volumes_array;
+            jsonParams["capture_at_blade_angle"] = Angle::getJson(capture_at_blade_angle);
+            jsonParams["YZ_plane_when_angle"] = PlaneAtAngle::getJson(YZ_plane_when_angle);
+            jsonParams["volumes"] = Volume::getJson(volumes);
 
             return jsonParams;
         }
@@ -515,6 +486,14 @@ void Volume::getParamsFromJson(Json::Value jsonParams)
     }
 }
 
+void Volume::getParamsFromJsonArray(Json::Value jsonArray, std::vector<Volume> &array) {
+    array.clear();
+    for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
+        Volume volume;
+        volume.getParamsFromJson(jsonArray[i]);
+        array.push_back(volume);
+    }
+}
 
 Json::Value Volume::getJson()
 {
@@ -544,6 +523,14 @@ Json::Value Volume::getJson()
     }
 }
 
+Json::Value Volume::getJson(std::vector<Volume> &array) {
+    Json::Value jsonArray = Json::arrayValue;
+    for (Volume volume : array) {
+        jsonArray.append(volume.getJson());
+    }
+    return jsonArray;
+}
+
 void Angle::getParamsFromJson(Json::Value jsonParams)
 {
     try
@@ -567,6 +554,14 @@ void Angle::getParamsFromJson(Json::Value jsonParams)
     }
 }
 
+void Angle::getParamsFromJsonArray(Json::Value jsonArray, std::vector<Angle> &array) {
+    array.clear();
+    for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
+        Angle angle;
+        angle.getParamsFromJson(jsonArray[i]);
+        array.push_back(angle);
+    }
+}
 
 Json::Value Angle::getJson()
 {
@@ -596,6 +591,14 @@ Json::Value Angle::getJson()
     }
 }
 
+Json::Value Angle::getJson(std::vector<Angle> &array) {
+    Json::Value jsonArray = Json::arrayValue;
+    for (Angle angle : array) {
+        jsonArray.append(angle.getJson());
+    }
+    return jsonArray;
+}
+
 void PlaneAtAngle::getParamsFromJson(Json::Value jsonParams)
 {
     try
@@ -621,6 +624,14 @@ void PlaneAtAngle::getParamsFromJson(Json::Value jsonParams)
     }
 }
 
+void PlaneAtAngle::getParamsFromJsonArray(Json::Value jsonArray, std::vector<PlaneAtAngle> &array) {
+    array.clear();
+    for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
+        PlaneAtAngle planeAtAngle;
+        planeAtAngle.getParamsFromJson(jsonArray[i]);
+        array.push_back(planeAtAngle);
+    }
+}
 
 Json::Value PlaneAtAngle::getJson()
 {
@@ -653,6 +664,13 @@ Json::Value PlaneAtAngle::getJson()
     }
 }
 
+Json::Value PlaneAtAngle::getJson(std::vector<PlaneAtAngle> &array) {
+    Json::Value jsonArray = Json::arrayValue;
+    for (PlaneAtAngle planeAtAngle : array) {
+        jsonArray.append(planeAtAngle.getJson());
+    }
+    return jsonArray;
+}
 
 void Sector::getParamsFromJson(Json::Value jsonParams)
 {
@@ -680,6 +698,14 @@ void Sector::getParamsFromJson(Json::Value jsonParams)
     }
 }
 
+void Sector::getParamsFromJsonArray(Json::Value jsonArray, std::vector<Sector> &array) {
+    array.clear();
+    for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
+        Sector sector;
+        sector.getParamsFromJson(jsonArray[i]);
+        array.push_back(sector);
+    }
+}
 
 Json::Value Sector::getJson()
 {
@@ -713,5 +739,12 @@ Json::Value Sector::getJson()
     }
 }
 
+Json::Value Sector::getJson(std::vector<Sector> &array) {
+    Json::Value jsonArray = Json::arrayValue;
+    for (Sector sector : array) {
+        jsonArray.append(sector.getJson());
+    }
+    return jsonArray;
+}
 
 #endif
