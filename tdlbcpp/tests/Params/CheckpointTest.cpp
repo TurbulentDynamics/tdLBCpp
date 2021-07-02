@@ -19,7 +19,6 @@ class CheckpointParamsTests : public ::testing::Test
 {
 protected:
     std::string filename;
-    const int randomStringLength = 400;
 
     void checkAllFields(CheckpointParams &expected, CheckpointParams &actual)
     {
@@ -32,7 +31,7 @@ protected:
 public:
     CheckpointParamsTests()
     {
-        filename = TestUtils::getTempFilename("_to_delete.json");
+        filename = TestUtils::getTempFilename();
     }
     ~CheckpointParamsTests()
     {
@@ -61,9 +60,9 @@ TEST_F(CheckpointParamsTests, CheckpointParamsWriteReadValidRandomTest)
 {
     CheckpointParams checkpointParams;
     checkpointParams.start_with_checkpoint = (rand() & 1) == 1;
-    checkpointParams.load_checkpoint_dirname = TestUtils::random_string(randomStringLength);
+    checkpointParams.load_checkpoint_dirname = TestUtils::random_string(TestUtils::randomStringLength);
     checkpointParams.checkpoint_repeat = rand();
-    checkpointParams.checkpoint_root_dir = TestUtils::random_string(randomStringLength);
+    checkpointParams.checkpoint_root_dir = TestUtils::random_string(TestUtils::randomStringLength);
 
     checkpointParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
@@ -77,12 +76,35 @@ TEST_F(CheckpointParamsTests, CheckpointParamsWriteReadValidRandomTest)
 TEST_F(CheckpointParamsTests, CheckpointParamsReadInValidTest)
 {
     std::ofstream out(filename);
-    out << "{\"start_with_checkpoint\":true}";
+    out << "{\"load_checkpoint_dirname\":\"somepath\"";
     out.close();
     std::cerr << filename << std::endl;
 
     CheckpointParams checkpointParamsRead;
+    TestUtils::captureStderr();
     checkpointParamsRead.getParamsFromJsonFile(filename);
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
 
-    ASSERT_EQ(checkpointParamsRead.start_with_checkpoint, true) << "start_with_checkpoint field has a wrong value";
+    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 38\n"
+                              "  Missing ',' or '}' in object declaration\n"
+                              ", application will now exit\n")
+        << "cerr should contain error";
+}
+
+TEST_F(CheckpointParamsTests, CheckpointParamsReadInValidTestInvalidType)
+{
+    std::ofstream out(filename);
+    out << "{\"load_checkpoint_dirname\":\"somepath\", \"checkpoint_repeat\": \"invalidNumber\"}";
+    out.close();
+    std::cerr << filename << std::endl;
+
+    CheckpointParams checkpointParamsRead;
+    TestUtils::captureStderr();
+    checkpointParamsRead.getParamsFromJsonFile(filename);
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
+
+    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
+                              "Value is not convertible to Int."
+                              ", application will now exit\n")
+        << "cerr should contain error";
 }

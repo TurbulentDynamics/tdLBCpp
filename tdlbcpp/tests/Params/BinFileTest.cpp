@@ -19,7 +19,6 @@ class BinFileTests : public ::testing::Test
 {
 protected:
     std::string filename;
-    const int randomStringLength = 400;
 
     void checkAllFields(BinFileParams &expected, BinFileParams &actual)
     {
@@ -38,7 +37,7 @@ protected:
 public:
     BinFileTests()
     {
-        filename = TestUtils::getTempFilename("_to_delete.json");
+        filename = TestUtils::getTempFilename();
     }
     ~BinFileTests()
     {
@@ -72,15 +71,15 @@ TEST_F(BinFileTests, BinFileWriteReadValidTest)
 TEST_F(BinFileTests, BinFileWriteReadValidRandomTest)
 {
     BinFileParams binFileParams;
-    binFileParams.filePath = TestUtils::random_string(randomStringLength);
-    binFileParams.name = TestUtils::random_string(randomStringLength);
-    binFileParams.note = TestUtils::random_string(randomStringLength);
-    binFileParams.structName = TestUtils::random_string(randomStringLength);
+    binFileParams.filePath = TestUtils::random_string(TestUtils::randomStringLength);
+    binFileParams.name = TestUtils::random_string(TestUtils::randomStringLength);
+    binFileParams.note = TestUtils::random_string(TestUtils::randomStringLength);
+    binFileParams.structName = TestUtils::random_string(TestUtils::randomStringLength);
     binFileParams.binFileSizeInStructs = rand();
-    binFileParams.coordsType = TestUtils::random_string(randomStringLength);
+    binFileParams.coordsType = TestUtils::random_string(TestUtils::randomStringLength);
     binFileParams.hasGridtCoords = (rand() & 1) == 1;
     binFileParams.hasColRowtCoords = (rand() & 1) == 1;
-    binFileParams.QDataType = TestUtils::random_string(randomStringLength);
+    binFileParams.QDataType = TestUtils::random_string(TestUtils::randomStringLength);
     binFileParams.QOutputLength = rand();
 
     binFileParams.writeParamsToJsonFile(filename);
@@ -92,15 +91,38 @@ TEST_F(BinFileTests, BinFileWriteReadValidRandomTest)
     checkAllFields(binFileParamsRead, binFileParams);
 }
 
-TEST_F(BinFileTests, BinFileReadInValidTest)
+TEST_F(BinFileTests, BinFileParamsReadInValidTest)
 {
     std::ofstream out(filename);
-    out << "{\"filePath\":\"somepath\"}";
+    out << "{\"filePath\":\"somepath\"";
     out.close();
     std::cerr << filename << std::endl;
 
     BinFileParams binFileParamsRead;
+    TestUtils::captureStderr();
     binFileParamsRead.getParamsFromJsonFile(filename);
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
 
-    ASSERT_EQ(binFileParamsRead.filePath, "somepath") << "filePath field has a wrong value";
+    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 23\n"
+                              "  Missing ',' or '}' in object declaration\n"
+                              ", application will now exit\n")
+        << "cerr should contain error";
+}
+
+TEST_F(BinFileTests, BinFileParamsReadInValidTestInvalidType)
+{
+    std::ofstream out(filename);
+    out << "{\"filePath\":\"somepath\", \"binFileSizeInStructs\": \"invalidNumber\"}";
+    out.close();
+    std::cerr << filename << std::endl;
+
+    BinFileParams binFileParamsRead;
+    TestUtils::captureStderr();
+    binFileParamsRead.getParamsFromJsonFile(filename);
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
+
+    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
+                              "Value is not convertible to UInt64."
+                              ", application will now exit\n")
+        << "cerr should contain error";
 }

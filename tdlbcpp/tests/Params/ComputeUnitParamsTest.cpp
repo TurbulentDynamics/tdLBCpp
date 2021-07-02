@@ -19,7 +19,6 @@ class ComputeUnitParamsTests : public ::testing::Test
 {
 protected:
     std::string filename;
-    const int randomStringLength = 400;
 
     void checkAllFields(ComputeUnitParams &expected, ComputeUnitParams &actual)
     {
@@ -38,7 +37,7 @@ protected:
 public:
     ComputeUnitParamsTests()
     {
-        filename = TestUtils::getTempFilename("_to_delete.json");
+        filename = TestUtils::getTempFilename();
     }
     ~ComputeUnitParamsTests()
     {
@@ -100,12 +99,30 @@ TEST_F(ComputeUnitParamsTests, ComputeUnitParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     ComputeUnitParams computeUnitParamsRead;
-    testing::internal::CaptureStderr();
+    TestUtils::captureStderr();
     computeUnitParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = testing::internal::GetCapturedStderr();
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
 
     ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 9\n"
                               "  Missing ',' or '}' in object declaration\n"
+                              ", application will now exit\n")
+        << "cerr should contain error";
+}
+
+TEST_F(ComputeUnitParamsTests, ComputeUnitParamsReadInValidTestInvalidType)
+{
+    std::ofstream out(filename);
+    out << "{\"idi\":\"invalidNumber\"}";
+    out.close();
+    std::cerr << filename << std::endl;
+
+    ComputeUnitParams computeUnitParamsRead;
+    TestUtils::captureStderr();
+    computeUnitParamsRead.getParamsFromJsonFile(filename);
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
+
+    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
+                              "Value is not convertible to Int."
                               ", application will now exit\n")
         << "cerr should contain error";
 }
