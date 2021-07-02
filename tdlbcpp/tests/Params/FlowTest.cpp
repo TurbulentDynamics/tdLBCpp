@@ -142,9 +142,9 @@ TEST_F(FlowParamsTests, FlowParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     FlowParams<double> flowParamsRead;
-    testing::internal::CaptureStderr();
+    TestUtils::captureStderr();
     flowParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = testing::internal::GetCapturedStderr();
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
 
     ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 16\n"
                               "  Missing ',' or '}' in object declaration\n"
@@ -160,9 +160,9 @@ TEST_F(FlowParamsTests, FlowParamsReadInValidTestInvalidType)
     std::cerr << filename << std::endl;
 
     FlowParams<double> flowParamsRead;
-    testing::internal::CaptureStderr();
+    TestUtils::captureStderr();
     flowParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = testing::internal::GetCapturedStderr();
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
 
     ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
                               "Value is not convertible to double."

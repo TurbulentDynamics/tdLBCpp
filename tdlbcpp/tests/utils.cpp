@@ -1,5 +1,6 @@
-#include <string>
 #include <algorithm>
+#include <fstream>
+#include <string>
 
 #include "gtest/gtest.h"
 
@@ -23,21 +24,60 @@ namespace TestUtils
         return str;
     }
 
-    std::string getTempFilename()
+    std::string getTestName()
     {
         const testing::TestInfo *const test_info =
             testing::UnitTest::GetInstance()->current_test_info();
-        std::string testName = test_info->name();
-#ifndef KEEP_TEMP_FILES
-        return testing::TempDir() + "/" + testName + temporaryFilenameSuffx;
-#else
-        return std::string("/tmp/") + testName + temporaryFilenameSuffx;
-#endif
+        return test_info->name();
     }
+
+    std::string getTempFilename(std::string folder)
+    {
+        std::string testName = getTestName();
+        return folder + "/" + testName + temporaryFilenameSuffx;
+    }
+
+    std::string getTempFilename()
+    {
+        return getTempFilename(testing::TempDir());
+    }
+
+    std::string getGlobalTempDirectory()
+    {
+        if (std::getenv("TMP"))
+        {
+            return std::getenv("TMP");
+        }
+        else if (std::getenv("TEMP"))
+        {
+            return std::getenv("TEMP");
+        }
+        return "/tmp";
+    }
+
     void removeTempFile(const std::string filename)
     {
-#ifndef KEEP_TEMP_FILES
+        // in case of failure copy json file to some accessible directory
+        if (testing::Test::HasFailure())
+        {
+            std::ifstream src(filename, std::ios::binary);
+            std::string globalName = getTempFilename(getGlobalTempDirectory());
+            std::ofstream dst(globalName, std::ios::binary);
+            dst << src.rdbuf();
+            dst.close();
+            src.close();
+            std::cerr << "Copied temporary file to " << globalName << std::endl;
+        }
         std::remove(filename.c_str());
-#endif
+    }
+
+    void captureStderr()
+    {
+        testing::internal::CaptureStderr();
+    }
+
+    std::string getCapturedStderr()
+    {
+        return testing::internal::GetCapturedStderr();
     }
 }

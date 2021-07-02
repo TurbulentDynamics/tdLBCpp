@@ -20,10 +20,6 @@ class OutputParamsTests : public ::testing::Test
 {
 protected:
     std::string filename;
-    const int randomStringLength = 400;
-    const int randomArraySize = 5;
-    const double lower_bound = -10000;
-    const double upper_bound = 10000;
 
     void checkAllFields(OrthoPlane &expected, OrthoPlane &actual)
     {
@@ -179,36 +175,36 @@ TEST_F(OutputParamsTests, OutputParamsWriteReadValidTest)
 
 TEST_F(OutputParamsTests, OutputParamsRandomWriteReadValidTest)
 {
-    OutputParams outputParams(TestUtils::random_string(randomStringLength));
-    for (int i = 0; i < 2 + rand() % randomArraySize; i++)
+    OutputParams outputParams(TestUtils::random_string(TestUtils::randomStringLength));
+    for (int i = 0; i < TestUtils::randomArrayMinimalSize + rand() % TestUtils::randomArraySize; i++)
     {
-        outputParams.add_XY_plane(TestUtils::random_string(randomStringLength), rand(), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
+        outputParams.add_XY_plane(TestUtils::random_string(TestUtils::randomStringLength), rand(), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
-    for (int i = 0; i < rand() % randomArraySize; i++)
+    for (int i = 0; i < TestUtils::randomArrayMinimalSize + rand() % TestUtils::randomArraySize; i++)
     {
-        outputParams.add_XZ_plane(TestUtils::random_string(randomStringLength), rand(), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
+        outputParams.add_XZ_plane(TestUtils::random_string(TestUtils::randomStringLength), rand(), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
-    for (int i = 0; i < 2 + rand() % randomArraySize; i++)
+    for (int i = 0; i < TestUtils::randomArrayMinimalSize + rand() % TestUtils::randomArraySize; i++)
     {
-        outputParams.add_YZ_plane(TestUtils::random_string(randomStringLength), rand(), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
+        outputParams.add_YZ_plane(TestUtils::random_string(TestUtils::randomStringLength), rand(), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
 
-    std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
+    std::uniform_real_distribution<double> unif(TestUtils::randomDoubleLowerBound, TestUtils::randomDoubleUpperBound);
     std::default_random_engine re;
 
-    for (int i = 0; i < 2 + rand() % randomArraySize; i++)
+    for (int i = 0; i < TestUtils::randomArrayMinimalSize + rand() % TestUtils::randomArraySize; i++)
     {
-        outputParams.add_angle(TestUtils::random_string(randomStringLength), rand(), unif(re), rand(), rand(), rand(), ((rand() & 1) == 1));
+        outputParams.add_angle(TestUtils::random_string(TestUtils::randomStringLength), rand(), unif(re), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
 
-    for (int i = 0; i < 2 + rand() % randomArraySize; i++)
+    for (int i = 0; i < TestUtils::randomArrayMinimalSize + rand() % TestUtils::randomArraySize; i++)
     {
-        outputParams.add_YZ_plane_at_angle(TestUtils::random_string(randomStringLength), unif(re), unif(re), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
+        outputParams.add_YZ_plane_at_angle(TestUtils::random_string(TestUtils::randomStringLength), unif(re), unif(re), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
 
-    for (int i = 0; i < 2 + rand() % randomArraySize; i++)
+    for (int i = 0; i < TestUtils::randomArrayMinimalSize + rand() % TestUtils::randomArraySize; i++)
     {
-        outputParams.add_volume(TestUtils::random_string(randomStringLength), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
+        outputParams.add_volume(TestUtils::random_string(TestUtils::randomStringLength), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
 
     outputParams.writeParamsToJsonFile(filename);
@@ -223,17 +219,35 @@ TEST_F(OutputParamsTests, OutputParamsRandomWriteReadValidTest)
 TEST_F(OutputParamsTests, OutputParamsInvalidTest)
 {
     std::ofstream out(filename);
-    out << "{\"XY_plane\":[}";
+    out << "{\"XY_planes\":[}";
     out.close();
     std::cerr << filename << std::endl;
 
     OutputParams outputParamsRead("test");
-    testing::internal::CaptureStderr();
+    TestUtils::captureStderr();
     outputParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = testing::internal::GetCapturedStderr();
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
 
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 14\n"
+    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 15\n"
                               "  Syntax error: value, object or array expected.\n"
+                              ", application will now exit\n")
+        << "cerr should contain error";
+}
+
+TEST_F(OutputParamsTests, OutputParamsInvalidTestInvalidType)
+{
+    std::ofstream out(filename);
+    out << "{\"XY_planes\":[{\"repeat\":\"invalidNumber\"}]}";
+    out.close();
+    std::cerr << filename << std::endl;
+
+    OutputParams outputParamsRead("test");
+    TestUtils::captureStderr();
+    outputParamsRead.getParamsFromJsonFile(filename);
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
+
+    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
+                              "Value is not convertible to UInt64."
                               ", application will now exit\n")
         << "cerr should contain error";
 }

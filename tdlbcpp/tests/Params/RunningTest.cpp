@@ -81,9 +81,9 @@ TEST_F(RunningParamsTests, RunningParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     RunningParams runningParamsRead;
-    testing::internal::CaptureStderr();
+    TestUtils::captureStderr();
     runningParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = testing::internal::GetCapturedStderr();
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
 
     ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 35\n"
                               "  Missing '}' or object member name\n"
@@ -99,9 +99,9 @@ TEST_F(RunningParamsTests, RunningParamsReadInValidTestInvalidType)
     std::cerr << filename << std::endl;
 
     RunningParams runningParamsRead;
-    testing::internal::CaptureStderr();
+    TestUtils::captureStderr();
     runningParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = testing::internal::GetCapturedStderr();
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
 
     ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
                               "Value is not convertible to UInt64."

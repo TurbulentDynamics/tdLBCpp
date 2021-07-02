@@ -70,9 +70,9 @@ TEST_F(GridParamsTests, GridParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     GridParams gridParamsRead;
-    testing::internal::CaptureStderr();
+    TestUtils::captureStderr();
     gridParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = testing::internal::GetCapturedStderr();
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
 
     ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 24\n"
                               "  Missing '}' or object member name\n"
@@ -88,9 +88,9 @@ TEST_F(GridParamsTests, GridParamsReadInValidTestInvalidType)
     std::cerr << filename << std::endl;
 
     GridParams gridParamsRead;
-    testing::internal::CaptureStderr();
+    TestUtils::captureStderr();
     gridParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = testing::internal::GetCapturedStderr();
+    std::string capturedStdErr = TestUtils::getCapturedStderr();
 
     ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
                               "Value is not convertible to Int."
