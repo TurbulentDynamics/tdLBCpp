@@ -180,7 +180,7 @@ TEST_F(OutputParamsTests, OutputParamsWriteReadValidTest)
 TEST_F(OutputParamsTests, OutputParamsRandomWriteReadValidTest)
 {
     OutputParams outputParams(TestUtils::random_string(randomStringLength));
-    for (int i = 0; i < rand() % randomArraySize; i++)
+    for (int i = 0; i < 2 + rand() % randomArraySize; i++)
     {
         outputParams.add_XY_plane(TestUtils::random_string(randomStringLength), rand(), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
@@ -188,7 +188,7 @@ TEST_F(OutputParamsTests, OutputParamsRandomWriteReadValidTest)
     {
         outputParams.add_XZ_plane(TestUtils::random_string(randomStringLength), rand(), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
-    for (int i = 0; i < rand() % randomArraySize; i++)
+    for (int i = 0; i < 2 + rand() % randomArraySize; i++)
     {
         outputParams.add_YZ_plane(TestUtils::random_string(randomStringLength), rand(), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
@@ -196,17 +196,17 @@ TEST_F(OutputParamsTests, OutputParamsRandomWriteReadValidTest)
     std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
     std::default_random_engine re;
 
-    for (int i = 0; i < rand() % randomArraySize; i++)
+    for (int i = 0; i < 2 + rand() % randomArraySize; i++)
     {
         outputParams.add_angle(TestUtils::random_string(randomStringLength), rand(), unif(re), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
 
-    for (int i = 0; i < rand() % randomArraySize; i++)
+    for (int i = 0; i < 2 + rand() % randomArraySize; i++)
     {
         outputParams.add_YZ_plane_at_angle(TestUtils::random_string(randomStringLength), unif(re), unif(re), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
     }
 
-    for (int i = 0; i < rand() % randomArraySize; i++)
+    for (int i = 0; i < 2 + rand() % randomArraySize; i++)
     {
         outputParams.add_volume(TestUtils::random_string(randomStringLength), rand(), rand(), rand(), rand(), ((rand() & 1) == 1));
     }

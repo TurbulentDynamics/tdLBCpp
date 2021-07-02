@@ -32,9 +32,7 @@ struct OrthoPlane {
     std::string QDataType;
 
     void getParamsFromJson(Json::Value jsonParams);
-    static void getParamsFromJsonArray(Json::Value jsonArray, std::vector<OrthoPlane> &array);
     Json::Value getJson();
-    static Json::Value getJson(std::vector<OrthoPlane>&);
 };
 
 
@@ -52,9 +50,7 @@ struct Volume {
     std::string QDataType;
 
     void getParamsFromJson(Json::Value jsonParams);
-    static void getParamsFromJsonArray(Json::Value jsonArray, std::vector<Volume> &array);
     Json::Value getJson();
-    static Json::Value getJson(std::vector<Volume>&);
 };
 
 
@@ -75,9 +71,7 @@ struct Angle {
     std::string QDataType;
 
     void getParamsFromJson(Json::Value jsonParams);
-    static void getParamsFromJsonArray(Json::Value jsonArray, std::vector<Angle> &array);
     Json::Value getJson();
-    static Json::Value getJson(std::vector<Angle>&);
 };
 
 
@@ -98,9 +92,7 @@ struct PlaneAtAngle {
     std::string QDataType;
 
     void getParamsFromJson(Json::Value jsonParams);
-    static void getParamsFromJsonArray(Json::Value jsonArray, std::vector<PlaneAtAngle> &array);
     Json::Value getJson();
-    static Json::Value getJson(std::vector<PlaneAtAngle>&);
 };
 
 
@@ -121,9 +113,7 @@ struct Sector {
     std::string QDataType;
 
     void getParamsFromJson(Json::Value jsonParams);
-    static void getParamsFromJsonArray(Json::Value jsonArray, std::vector<Sector> &array);
     Json::Value getJson();
-    static Json::Value getJson(std::vector<Sector>&);
 };
 
 
@@ -295,23 +285,40 @@ struct OutputParams {
         
     }
 
+    template <typename ParamType> void getParamsFromJsonArray(Json::Value jsonArray, std::vector<ParamType> &array) {
+       array.clear();
+        for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
+            ParamType param;
+            param.getParamsFromJson(jsonArray[i]);
+            array.push_back(param);
+        }
+    }
+
     void getParamsFromJson(Json::Value jsonParams) {
         try
         {
             rootDir = jsonParams["rootDir"].asString();
             
-            OrthoPlane::getParamsFromJsonArray(jsonParams["XY_planes"], XY_planes);
-            OrthoPlane::getParamsFromJsonArray(jsonParams["XZ_planes"], XZ_planes);
-            OrthoPlane::getParamsFromJsonArray(jsonParams["YZ_planes"], YZ_planes);
-            Angle::getParamsFromJsonArray(jsonParams["capture_at_blade_angle"], capture_at_blade_angle);
-            PlaneAtAngle::getParamsFromJsonArray(jsonParams["YZ_plane_when_angle"], YZ_plane_when_angle);
-            Volume::getParamsFromJsonArray(jsonParams["volumes"], volumes);
+            getParamsFromJsonArray(jsonParams["XY_planes"], XY_planes);
+            getParamsFromJsonArray(jsonParams["XZ_planes"], XZ_planes);
+            getParamsFromJsonArray(jsonParams["YZ_planes"], YZ_planes);
+            getParamsFromJsonArray(jsonParams["capture_at_blade_angle"], capture_at_blade_angle);
+            getParamsFromJsonArray(jsonParams["YZ_plane_when_angle"], YZ_plane_when_angle);
+            getParamsFromJsonArray(jsonParams["volumes"], volumes);
         }
         catch(std::exception& e)
         {
             std::cerr << "Unhandled Exception reached parsing arguments: "
             << e.what() << ", application will now exit" << std::endl;
         }
+    }
+
+    template <typename ParamType> Json::Value getJson(std::vector<ParamType> &array) {
+        Json::Value jsonArray = Json::arrayValue;
+        for (ParamType param : array) {
+            jsonArray.append(param.getJson());
+        }
+        return jsonArray;
     }
     
     Json::Value getJson() {
@@ -321,12 +328,12 @@ struct OutputParams {
 
             jsonParams["rootDir"] = rootDir;
     
-            jsonParams["XY_planes"] = OrthoPlane::getJson(XY_planes);
-            jsonParams["XZ_planes"] = OrthoPlane::getJson(XZ_planes);
-            jsonParams["YZ_planes"] = OrthoPlane::getJson(YZ_planes);
-            jsonParams["capture_at_blade_angle"] = Angle::getJson(capture_at_blade_angle);
-            jsonParams["YZ_plane_when_angle"] = PlaneAtAngle::getJson(YZ_plane_when_angle);
-            jsonParams["volumes"] = Volume::getJson(volumes);
+            jsonParams["XY_planes"] = getJson(XY_planes);
+            jsonParams["XZ_planes"] = getJson(XZ_planes);
+            jsonParams["YZ_planes"] = getJson(YZ_planes);
+            jsonParams["capture_at_blade_angle"] = getJson(capture_at_blade_angle);
+            jsonParams["YZ_plane_when_angle"] = getJson(YZ_plane_when_angle);
+            jsonParams["volumes"] = getJson(volumes);
 
             return jsonParams;
         }
@@ -419,15 +426,6 @@ void OrthoPlane::getParamsFromJson(Json::Value jsonParams)
     }
 }
 
-void OrthoPlane::getParamsFromJsonArray(Json::Value jsonArray, std::vector<OrthoPlane> &array) {
-    array.clear();
-    for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
-        OrthoPlane orthoPlane;
-        orthoPlane.getParamsFromJson(jsonArray[i]);
-        array.push_back(orthoPlane);
-    }
-}
-
 Json::Value OrthoPlane::getJson()
 {
     try
@@ -449,19 +447,10 @@ Json::Value OrthoPlane::getJson()
     }
     catch (std::exception &e)
     {
-
         std::cerr << "Unhandled Exception reached parsing arguments: "
                     << e.what() << ", application will now exit" << std::endl;
         return "";
     }
-}
-
-Json::Value OrthoPlane::getJson(std::vector<OrthoPlane> &array) {
-    Json::Value jsonArray = Json::arrayValue;
-    for (OrthoPlane plane : array) {
-        jsonArray.append(plane.getJson());
-    }
-    return jsonArray;
 }
 
 void Volume::getParamsFromJson(Json::Value jsonParams)
@@ -486,15 +475,6 @@ void Volume::getParamsFromJson(Json::Value jsonParams)
     }
 }
 
-void Volume::getParamsFromJsonArray(Json::Value jsonArray, std::vector<Volume> &array) {
-    array.clear();
-    for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
-        Volume volume;
-        volume.getParamsFromJson(jsonArray[i]);
-        array.push_back(volume);
-    }
-}
-
 Json::Value Volume::getJson()
 {
     try
@@ -516,19 +496,10 @@ Json::Value Volume::getJson()
     }
     catch (std::exception &e)
     {
-
         std::cerr << "Unhandled Exception reached parsing arguments: "
                     << e.what() << ", application will now exit" << std::endl;
         return "";
     }
-}
-
-Json::Value Volume::getJson(std::vector<Volume> &array) {
-    Json::Value jsonArray = Json::arrayValue;
-    for (Volume volume : array) {
-        jsonArray.append(volume.getJson());
-    }
-    return jsonArray;
 }
 
 void Angle::getParamsFromJson(Json::Value jsonParams)
@@ -554,15 +525,6 @@ void Angle::getParamsFromJson(Json::Value jsonParams)
     }
 }
 
-void Angle::getParamsFromJsonArray(Json::Value jsonArray, std::vector<Angle> &array) {
-    array.clear();
-    for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
-        Angle angle;
-        angle.getParamsFromJson(jsonArray[i]);
-        array.push_back(angle);
-    }
-}
-
 Json::Value Angle::getJson()
 {
     try
@@ -584,19 +546,10 @@ Json::Value Angle::getJson()
     }
     catch (std::exception &e)
     {
-
         std::cerr << "Unhandled Exception reached parsing arguments: "
                     << e.what() << ", application will now exit" << std::endl;
         return "";
     }
-}
-
-Json::Value Angle::getJson(std::vector<Angle> &array) {
-    Json::Value jsonArray = Json::arrayValue;
-    for (Angle angle : array) {
-        jsonArray.append(angle.getJson());
-    }
-    return jsonArray;
 }
 
 void PlaneAtAngle::getParamsFromJson(Json::Value jsonParams)
@@ -624,15 +577,6 @@ void PlaneAtAngle::getParamsFromJson(Json::Value jsonParams)
     }
 }
 
-void PlaneAtAngle::getParamsFromJsonArray(Json::Value jsonArray, std::vector<PlaneAtAngle> &array) {
-    array.clear();
-    for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
-        PlaneAtAngle planeAtAngle;
-        planeAtAngle.getParamsFromJson(jsonArray[i]);
-        array.push_back(planeAtAngle);
-    }
-}
-
 Json::Value PlaneAtAngle::getJson()
 {
     try
@@ -657,19 +601,10 @@ Json::Value PlaneAtAngle::getJson()
     }
     catch (std::exception &e)
     {
-
         std::cerr << "Unhandled Exception reached parsing arguments: "
                     << e.what() << ", application will now exit" << std::endl;
         return "";
     }
-}
-
-Json::Value PlaneAtAngle::getJson(std::vector<PlaneAtAngle> &array) {
-    Json::Value jsonArray = Json::arrayValue;
-    for (PlaneAtAngle planeAtAngle : array) {
-        jsonArray.append(planeAtAngle.getJson());
-    }
-    return jsonArray;
 }
 
 void Sector::getParamsFromJson(Json::Value jsonParams)
@@ -698,15 +633,6 @@ void Sector::getParamsFromJson(Json::Value jsonParams)
     }
 }
 
-void Sector::getParamsFromJsonArray(Json::Value jsonArray, std::vector<Sector> &array) {
-    array.clear();
-    for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
-        Sector sector;
-        sector.getParamsFromJson(jsonArray[i]);
-        array.push_back(sector);
-    }
-}
-
 Json::Value Sector::getJson()
 {
     try
@@ -732,19 +658,10 @@ Json::Value Sector::getJson()
     }
     catch (std::exception &e)
     {
-
         std::cerr << "Unhandled Exception reached parsing arguments: "
                     << e.what() << ", application will now exit" << std::endl;
         return "";
     }
-}
-
-Json::Value Sector::getJson(std::vector<Sector> &array) {
-    Json::Value jsonArray = Json::arrayValue;
-    for (Sector sector : array) {
-        jsonArray.append(sector.getJson());
-    }
-    return jsonArray;
 }
 
 #endif
