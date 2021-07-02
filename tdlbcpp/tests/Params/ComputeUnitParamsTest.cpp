@@ -14,25 +14,12 @@
 #include "Params/ComputeUnitParams.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
+#include "tdlbcpp/tests/Params/ParamsCommon.hpp"
 
 class ComputeUnitParamsTests : public ::testing::Test
 {
 protected:
     std::string filename;
-
-    void checkAllFields(ComputeUnitParams &expected, ComputeUnitParams &actual)
-    {
-        ASSERT_EQ(expected.idi, actual.idi) << "idi field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.idj, actual.idj) << "idj field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.idk, actual.idk) << "idk field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.x, actual.x) << "x field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.y, actual.y) << "y field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.z, actual.z) << "z field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.i0, actual.i0) << "i0 field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.j0, actual.j0) << "j0 field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.k0, actual.k0) << "k0 field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.ghost, actual.ghost) << "ghost field has a wrong value after being written to a file and then read";
-    }
 
 public:
     ComputeUnitParamsTests()
@@ -47,17 +34,7 @@ public:
 
 TEST_F(ComputeUnitParamsTests, ComputeUnitParamsWriteReadValidTest)
 {
-    ComputeUnitParams computeUnitParams;
-    computeUnitParams.idi = 1;
-    computeUnitParams.idj = 2;
-    computeUnitParams.idk = 3;
-    computeUnitParams.x = 4;
-    computeUnitParams.y = 5;
-    computeUnitParams.z = 6;
-    computeUnitParams.i0 = 7;
-    computeUnitParams.j0 = 8;
-    computeUnitParams.k0 = 9;
-    computeUnitParams.ghost = 10;
+    ComputeUnitParams computeUnitParams = ParamsCommon::createComputeUnitParamsFixed();
 
     computeUnitParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
@@ -65,22 +42,12 @@ TEST_F(ComputeUnitParamsTests, ComputeUnitParamsWriteReadValidTest)
     ComputeUnitParams computeUnitParamsRead;
     computeUnitParamsRead.getParamsFromJsonFile(filename);
 
-    checkAllFields(computeUnitParams, computeUnitParamsRead);
+    ParamsCommon::checkAllFields(computeUnitParams, computeUnitParamsRead);
 }
 
 TEST_F(ComputeUnitParamsTests, ComputeUnitParamsWriteReadValidRandomTest)
 {
-    ComputeUnitParams computeUnitParams;
-    computeUnitParams.idi = rand();
-    computeUnitParams.idj = rand();
-    computeUnitParams.idk = rand();
-    computeUnitParams.x = rand();
-    computeUnitParams.y = rand();
-    computeUnitParams.z = rand();
-    computeUnitParams.i0 = rand();
-    computeUnitParams.j0 = rand();
-    computeUnitParams.k0 = rand();
-    computeUnitParams.ghost = rand();
+    ComputeUnitParams computeUnitParams = ParamsCommon::createComputeUnitParamsRandom();
 
     computeUnitParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
@@ -88,7 +55,7 @@ TEST_F(ComputeUnitParamsTests, ComputeUnitParamsWriteReadValidRandomTest)
     ComputeUnitParams computeUnitParamsRead;
     computeUnitParamsRead.getParamsFromJsonFile(filename);
 
-    checkAllFields(computeUnitParams, computeUnitParamsRead);
+    ParamsCommon::checkAllFields(computeUnitParams, computeUnitParamsRead);
 }
 
 TEST_F(ComputeUnitParamsTests, ComputeUnitParamsReadInValidTest)
