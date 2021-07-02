@@ -313,7 +313,7 @@ struct OutputParams {
         }
     }
 
-    template <typename ParamType> Json::Value getJson(std::vector<ParamType> &array) {
+    template <typename ParamType> Json::Value getJsonOfArray(std::vector<ParamType> &array) {
         Json::Value jsonArray = Json::arrayValue;
         for (ParamType param : array) {
             jsonArray.append(param.getJson());
@@ -328,12 +328,12 @@ struct OutputParams {
 
             jsonParams["rootDir"] = rootDir;
     
-            jsonParams["XY_planes"] = getJson(XY_planes);
-            jsonParams["XZ_planes"] = getJson(XZ_planes);
-            jsonParams["YZ_planes"] = getJson(YZ_planes);
-            jsonParams["capture_at_blade_angle"] = getJson(capture_at_blade_angle);
-            jsonParams["YZ_plane_when_angle"] = getJson(YZ_plane_when_angle);
-            jsonParams["volumes"] = getJson(volumes);
+            jsonParams["XY_planes"] = getJsonOfArray(XY_planes);
+            jsonParams["XZ_planes"] = getJsonOfArray(XZ_planes);
+            jsonParams["YZ_planes"] = getJsonOfArray(YZ_planes);
+            jsonParams["capture_at_blade_angle"] = getJsonOfArray(capture_at_blade_angle);
+            jsonParams["YZ_plane_when_angle"] = getJsonOfArray(YZ_plane_when_angle);
+            jsonParams["volumes"] = getJsonOfArray(volumes);
 
             return jsonParams;
         }
