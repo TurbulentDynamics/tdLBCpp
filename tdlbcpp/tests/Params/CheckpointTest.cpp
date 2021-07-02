@@ -14,19 +14,12 @@
 #include "Params/Checkpoint.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
+#include "tdlbcpp/tests/Params/ParamsCommon.hpp"
 
 class CheckpointParamsTests : public ::testing::Test
 {
 protected:
     std::string filename;
-
-    void checkAllFields(CheckpointParams &expected, CheckpointParams &actual)
-    {
-        ASSERT_EQ(expected.start_with_checkpoint, actual.start_with_checkpoint) << "start_with_checkpoint field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.load_checkpoint_dirname, actual.load_checkpoint_dirname) << "load_checkpoint_dirname field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.checkpoint_repeat, actual.checkpoint_repeat) << "checkpoint_repeat field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.checkpoint_root_dir, actual.checkpoint_root_dir) << "checkpoint_root_dir field has a wrong value after being written to a file and then read";
-    }
 
 public:
     CheckpointParamsTests()
@@ -41,11 +34,7 @@ public:
 
 TEST_F(CheckpointParamsTests, CheckpointWriteReadValidTest)
 {
-    CheckpointParams checkpointParams;
-    checkpointParams.start_with_checkpoint = true;
-    checkpointParams.load_checkpoint_dirname = "test1";
-    checkpointParams.checkpoint_repeat = 1;
-    checkpointParams.checkpoint_root_dir = "test2";
+    CheckpointParams checkpointParams = ParamsCommon::createCheckpointParamsFixed();
 
     checkpointParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
@@ -53,16 +42,12 @@ TEST_F(CheckpointParamsTests, CheckpointWriteReadValidTest)
     CheckpointParams checkpointParamsRead;
     checkpointParamsRead.getParamsFromJsonFile(filename);
 
-    checkAllFields(checkpointParams, checkpointParamsRead);
+    ParamsCommon::checkAllFields(checkpointParams, checkpointParamsRead);
 }
 
 TEST_F(CheckpointParamsTests, CheckpointParamsWriteReadValidRandomTest)
 {
-    CheckpointParams checkpointParams;
-    checkpointParams.start_with_checkpoint = (rand() & 1) == 1;
-    checkpointParams.load_checkpoint_dirname = TestUtils::random_string(TestUtils::randomStringLength);
-    checkpointParams.checkpoint_repeat = rand();
-    checkpointParams.checkpoint_root_dir = TestUtils::random_string(TestUtils::randomStringLength);
+    CheckpointParams checkpointParams = ParamsCommon::createCheckpointParamsRandom();
 
     checkpointParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
@@ -70,7 +55,7 @@ TEST_F(CheckpointParamsTests, CheckpointParamsWriteReadValidRandomTest)
     CheckpointParams checkpointParamsRead;
     checkpointParamsRead.getParamsFromJsonFile(filename);
 
-    checkAllFields(checkpointParams, checkpointParamsRead);
+    ParamsCommon::checkAllFields(checkpointParams, checkpointParamsRead);
 }
 
 TEST_F(CheckpointParamsTests, CheckpointParamsReadInValidTest)

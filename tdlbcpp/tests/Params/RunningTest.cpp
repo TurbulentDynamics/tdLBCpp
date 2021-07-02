@@ -15,18 +15,12 @@
 #include "Params/Running.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
+#include "tdlbcpp/tests/Params/ParamsCommon.hpp"
 
 class RunningParamsTests : public ::testing::Test
 {
 protected:
     std::string filename;
-
-    void checkAllFields(RunningParams &expected, RunningParams &actual)
-    {
-        ASSERT_EQ(expected.step, actual.step) << "step field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.num_steps, actual.num_steps) << "num_steps field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.angle, actual.angle) << "angle field has a wrong value after being written to a file and then read";
-    }
 
 public:
     RunningParamsTests()
@@ -41,11 +35,7 @@ public:
 
 TEST_F(RunningParamsTests, RunningParamsWriteReadValidTest)
 {
-    RunningParams runningParams;
-
-    runningParams.step = 1;
-    runningParams.num_steps = 2;
-    runningParams.angle = 3;
+    RunningParams runningParams = ParamsCommon::createRunningParamsFixed();
 
     runningParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
@@ -53,16 +43,12 @@ TEST_F(RunningParamsTests, RunningParamsWriteReadValidTest)
     RunningParams runningParamsRead;
     runningParamsRead.getParamsFromJsonFile(filename);
 
-    checkAllFields(runningParams, runningParamsRead);
+    ParamsCommon::checkAllFields(runningParams, runningParamsRead);
 }
 
 TEST_F(RunningParamsTests, RunningParamsRandomWriteReadValidTest)
 {
-    RunningParams runningParams;
-
-    runningParams.step = rand();
-    runningParams.num_steps = rand();
-    runningParams.angle = rand();
+    RunningParams runningParams = ParamsCommon::createRunningParamsRandom();
 
     runningParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
@@ -70,7 +56,7 @@ TEST_F(RunningParamsTests, RunningParamsRandomWriteReadValidTest)
     RunningParams runningParamsRead;
     runningParamsRead.getParamsFromJsonFile(filename);
 
-    checkAllFields(runningParams, runningParamsRead);
+    ParamsCommon::checkAllFields(runningParams, runningParamsRead);
 }
 
 TEST_F(RunningParamsTests, RunningParamsReadInValidTest)

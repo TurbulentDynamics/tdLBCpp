@@ -15,21 +15,12 @@
 #include "Params/Grid.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
+#include "tdlbcpp/tests/Params/ParamsCommon.hpp"
 
 class GridParamsTests : public ::testing::Test
 {
 protected:
     std::string filename;
-
-    void checkAllFields(GridParams &expected, GridParams &actual)
-    {
-        ASSERT_EQ(expected.ngx, actual.ngx) << "ngx field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.ngy, actual.ngy) << "ngy field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.ngz, actual.ngz) << "ngz field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.x, actual.x) << "x field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.y, actual.y) << "y field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.z, actual.z) << "z field has a wrong value after being written to a file and then read";
-    }
 
 public:
     GridParamsTests()
@@ -44,14 +35,7 @@ public:
 
 TEST_F(GridParamsTests, GridParamsWriteReadValidTest)
 {
-    GridParams gridParams;
-
-    gridParams.ngx = 1;
-    gridParams.ngy = 2;
-    gridParams.ngz = 3;
-    gridParams.x = 4;
-    gridParams.y = 5;
-    gridParams.z = 6;
+    GridParams gridParams = ParamsCommon::createGridParamsFixed();
 
     gridParams.writeParamsToJsonFile(filename);
     std::cerr << filename << std::endl;
@@ -59,7 +43,20 @@ TEST_F(GridParamsTests, GridParamsWriteReadValidTest)
     GridParams gridParamsRead;
     gridParamsRead.getParamsFromJsonFile(filename);
 
-    checkAllFields(gridParams, gridParamsRead);
+    ParamsCommon::checkAllFields(gridParams, gridParamsRead);
+}
+
+TEST_F(GridParamsTests, GridParamsWriteReadRandomValidTest)
+{
+    GridParams gridParams = ParamsCommon::createGridParamsRandom();
+
+    gridParams.writeParamsToJsonFile(filename);
+    std::cerr << filename << std::endl;
+
+    GridParams gridParamsRead;
+    gridParamsRead.getParamsFromJsonFile(filename);
+
+    ParamsCommon::checkAllFields(gridParams, gridParamsRead);
 }
 
 TEST_F(GridParamsTests, GridParamsReadInValidTest)

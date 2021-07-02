@@ -31,10 +31,15 @@ namespace TestUtils
         return test_info->name();
     }
 
-    std::string getTempFilename(std::string folder)
+    std::string getTempFilename(std::string folder, std::string suffix)
     {
         std::string testName = getTestName();
-        return folder + "/" + testName + temporaryFilenameSuffx;
+        return folder + "/" + testName + suffix;
+    }
+
+    std::string getTempFilename(std::string folder)
+    {
+        return getTempFilename(folder, temporaryFilenameSuffix);
     }
 
     std::string getTempFilename()
@@ -79,5 +84,10 @@ namespace TestUtils
     std::string getCapturedStderr()
     {
         return testing::internal::GetCapturedStderr();
+    }
+
+    std::string joinPath(const std::string &p1, const std::string &p2)
+    {
+        return std::string(p1 + "/" + p2);
     }
 }

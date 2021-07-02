@@ -31,8 +31,55 @@ struct OrthoPlane {
     
     std::string QDataType;
 
-    void getParamsFromJson(Json::Value jsonParams);
-    Json::Value getJson();
+    void getParamsFromJson(Json::Value jsonParams)    
+    {
+        try
+        {
+            name_root = jsonParams["name_root"].asString();
+            repeat = jsonParams["repeat"].asUInt64();
+            cutAt = jsonParams["cutAt"].asInt64();
+
+            Q_output_len = jsonParams["Q_output_len"].asInt();
+            start_at_step = jsonParams["start_at_step"].asUInt64();
+            end_at_repeat = jsonParams["end_at_repeat"].asUInt64();
+            use_half_float = jsonParams["use_half_float"].asBool();
+
+            QDataType = jsonParams["QDataType"].asString();
+
+        }
+        catch(std::exception& e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+        }
+    }
+
+    Json::Value getJson()
+    {
+        try
+        {
+            Json::Value jsonParams;
+
+            jsonParams["name_root"] = name_root;
+            jsonParams["repeat"] = (tStep)repeat;
+            jsonParams["cutAt"] = (tNi)cutAt;
+
+            jsonParams["Q_output_len"] = Q_output_len;
+            jsonParams["start_at_step"] = (tStep)start_at_step;
+            jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
+            jsonParams["use_half_float"] = use_half_float;
+
+            jsonParams["QDataType"] = QDataType;
+
+            return jsonParams;
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+                        << e.what() << ", application will now exit" << std::endl;
+            return "";
+        }
+    }
 };
 
 
@@ -49,8 +96,54 @@ struct Volume {
     
     std::string QDataType;
 
-    void getParamsFromJson(Json::Value jsonParams);
-    Json::Value getJson();
+    void getParamsFromJson(Json::Value jsonParams)
+    {
+        try
+        {
+            name_root = jsonParams["name_root"].asString();
+            repeat = jsonParams["repeat"].asUInt64();
+
+            Q_output_len = jsonParams["Q_output_len"].asInt();
+            start_at_step = jsonParams["start_at_step"].asUInt64();
+            end_at_repeat = jsonParams["end_at_repeat"].asUInt64();
+            use_half_float = jsonParams["use_half_float"].asBool();
+
+            QDataType = jsonParams["QDataType"].asString();
+
+        }
+        catch(std::exception& e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+        }
+    }
+
+    Json::Value getJson()
+    {
+        try
+        {
+            Json::Value jsonParams;
+
+            jsonParams["name_root"] = name_root;
+            jsonParams["repeat"] = (tStep)repeat;
+
+            jsonParams["Q_output_len"] = Q_output_len;
+            jsonParams["start_at_step"] = (tStep)start_at_step;
+            jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
+            jsonParams["use_half_float"] = use_half_float;
+
+            jsonParams["QDataType"] = QDataType;
+
+            return jsonParams;        
+
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+                        << e.what() << ", application will now exit" << std::endl;
+            return "";
+        }
+    }
 };
 
 
@@ -70,8 +163,55 @@ struct Angle {
     
     std::string QDataType;
 
-    void getParamsFromJson(Json::Value jsonParams);
-    Json::Value getJson();
+    void getParamsFromJson(Json::Value jsonParams)
+    {
+        try
+        {
+            name_root = jsonParams["name_root"].asString();
+            repeat = jsonParams["repeat"].asUInt64();
+            degrees = jsonParams["degrees"].asDouble();
+
+            Q_output_len = jsonParams["Q_output_len"].asInt();
+            start_at_step = jsonParams["start_at_step"].asUInt64();
+            end_at_repeat = jsonParams["end_at_repeat"].asUInt64();
+            use_half_float = jsonParams["use_half_float"].asBool();
+
+            QDataType = jsonParams["QDataType"].asString();
+
+        }
+        catch(std::exception& e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+        }
+    }
+
+    Json::Value getJson()
+    {
+        try
+        {
+            Json::Value jsonParams;
+
+            jsonParams["name_root"] = name_root;
+            jsonParams["repeat"] = (tStep)repeat;
+            jsonParams["degrees"] = (double)degrees;
+
+            jsonParams["Q_output_len"] = Q_output_len;
+            jsonParams["start_at_step"] = (tStep)start_at_step;
+            jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
+            jsonParams["use_half_float"] = use_half_float;
+
+            jsonParams["QDataType"] = QDataType;
+
+            return jsonParams;
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+                        << e.what() << ", application will now exit" << std::endl;
+            return "";
+        }
+    }
 };
 
 
@@ -91,8 +231,60 @@ struct PlaneAtAngle {
     
     std::string QDataType;
 
-    void getParamsFromJson(Json::Value jsonParams);
-    Json::Value getJson();
+    void getParamsFromJson(Json::Value jsonParams)
+    {
+        try
+        {
+            name_root = jsonParams["name_root"].asString();
+            degrees = jsonParams["degrees"].asDouble();
+            tolerance = jsonParams["tolerance"].asDouble();
+            cutAt = jsonParams["cutAt"].asInt64();
+
+
+            Q_output_len = jsonParams["Q_output_len"].asInt();
+            start_at_step = jsonParams["start_at_step"].asUInt64();
+            end_at_repeat = jsonParams["end_at_repeat"].asUInt64();
+            use_half_float = jsonParams["use_half_float"].asBool();
+
+            QDataType = jsonParams["QDataType"].asString();
+
+        }
+        catch(std::exception& e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+        }
+    }
+
+    Json::Value getJson()
+    {
+        try
+        {
+            Json::Value jsonParams;
+
+            jsonParams["name_root"] = name_root;
+            jsonParams["degrees"] = (double)degrees;
+            jsonParams["tolerance"] = (double)tolerance;
+            jsonParams["cutAt"] = (tNi)cutAt;
+
+
+            jsonParams["Q_output_len"] = Q_output_len;
+            jsonParams["start_at_step"] = (tStep)start_at_step;
+            jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
+            jsonParams["use_half_float"] = use_half_float;
+
+            jsonParams["QDataType"] = QDataType;
+
+
+            return jsonParams;
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+                        << e.what() << ", application will now exit" << std::endl;
+            return "";
+        }
+    }
 };
 
 
@@ -112,8 +304,62 @@ struct Sector {
     
     std::string QDataType;
 
-    void getParamsFromJson(Json::Value jsonParams);
-    Json::Value getJson();
+    void getParamsFromJson(Json::Value jsonParams)
+    {
+        try
+        {
+            name_root = jsonParams["name_root"].asString();
+            repeat = jsonParams["repeat"].asUInt64();
+
+
+            angle_infront_blade = jsonParams["angle_infront_blade"].asDouble();
+            angle_behind_blade = jsonParams["angle_behind_blade"].asDouble();
+
+            Q_output_len = jsonParams["Q_output_len"].asInt();
+            start_at_step = jsonParams["start_at_step"].asUInt64();
+            end_at_repeat = jsonParams["end_at_repeat"].asUInt64();
+            use_half_float = jsonParams["use_half_float"].asBool();
+
+            QDataType = jsonParams["QDataType"].asString();
+
+        }
+        catch(std::exception& e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+            << e.what() << ", application will now exit" << std::endl;
+        }
+    }
+
+    Json::Value getJson()
+    {
+        try
+        {
+            Json::Value jsonParams;
+
+            jsonParams["name_root"] = name_root;
+            jsonParams["repeat"] = (tStep)repeat;
+
+
+            jsonParams["angle_infront_blade"] = (double)angle_infront_blade;
+            jsonParams["angle_behind_blade"] = (double)angle_behind_blade;
+
+            jsonParams["Q_output_len"] = Q_output_len;
+            jsonParams["start_at_step"] = (tStep)start_at_step;
+            jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
+            jsonParams["use_half_float"] = use_half_float;
+
+            jsonParams["QDataType"] = QDataType;
+
+
+            return jsonParams;
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << "Unhandled Exception reached parsing arguments: "
+                        << e.what() << ", application will now exit" << std::endl;
+            return "";
+        }
+    }
 };
 
 
@@ -402,266 +648,5 @@ struct OutputParams {
     
     
 };
-
-void OrthoPlane::getParamsFromJson(Json::Value jsonParams)    
-{
-    try
-    {
-        name_root = jsonParams["name_root"].asString();
-        repeat = jsonParams["repeat"].asUInt64();
-        cutAt = jsonParams["cutAt"].asInt64();
-
-        Q_output_len = jsonParams["Q_output_len"].asInt();
-        start_at_step = jsonParams["start_at_step"].asUInt64();
-        end_at_repeat = jsonParams["end_at_repeat"].asUInt64();
-        use_half_float = jsonParams["use_half_float"].asBool();
-
-        QDataType = jsonParams["QDataType"].asString();
-
-    }
-    catch(std::exception& e)
-    {
-        std::cerr << "Unhandled Exception reached parsing arguments: "
-        << e.what() << ", application will now exit" << std::endl;
-    }
-}
-
-Json::Value OrthoPlane::getJson()
-{
-    try
-    {
-        Json::Value jsonParams;
-
-        jsonParams["name_root"] = name_root;
-        jsonParams["repeat"] = (tStep)repeat;
-        jsonParams["cutAt"] = (tNi)cutAt;
-
-        jsonParams["Q_output_len"] = Q_output_len;
-        jsonParams["start_at_step"] = (tStep)start_at_step;
-        jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
-        jsonParams["use_half_float"] = use_half_float;
-
-        jsonParams["QDataType"] = QDataType;
-
-        return jsonParams;
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << "Unhandled Exception reached parsing arguments: "
-                    << e.what() << ", application will now exit" << std::endl;
-        return "";
-    }
-}
-
-void Volume::getParamsFromJson(Json::Value jsonParams)
-{
-    try
-    {
-        name_root = jsonParams["name_root"].asString();
-        repeat = jsonParams["repeat"].asUInt64();
-
-        Q_output_len = jsonParams["Q_output_len"].asInt();
-        start_at_step = jsonParams["start_at_step"].asUInt64();
-        end_at_repeat = jsonParams["end_at_repeat"].asUInt64();
-        use_half_float = jsonParams["use_half_float"].asBool();
-
-        QDataType = jsonParams["QDataType"].asString();
-
-    }
-    catch(std::exception& e)
-    {
-        std::cerr << "Unhandled Exception reached parsing arguments: "
-        << e.what() << ", application will now exit" << std::endl;
-    }
-}
-
-Json::Value Volume::getJson()
-{
-    try
-    {
-        Json::Value jsonParams;
-
-        jsonParams["name_root"] = name_root;
-        jsonParams["repeat"] = (tStep)repeat;
-
-        jsonParams["Q_output_len"] = Q_output_len;
-        jsonParams["start_at_step"] = (tStep)start_at_step;
-        jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
-        jsonParams["use_half_float"] = use_half_float;
-
-        jsonParams["QDataType"] = QDataType;
-
-        return jsonParams;        
-
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << "Unhandled Exception reached parsing arguments: "
-                    << e.what() << ", application will now exit" << std::endl;
-        return "";
-    }
-}
-
-void Angle::getParamsFromJson(Json::Value jsonParams)
-{
-    try
-    {
-        name_root = jsonParams["name_root"].asString();
-        repeat = jsonParams["repeat"].asUInt64();
-        degrees = jsonParams["degrees"].asDouble();
-
-        Q_output_len = jsonParams["Q_output_len"].asInt();
-        start_at_step = jsonParams["start_at_step"].asUInt64();
-        end_at_repeat = jsonParams["end_at_repeat"].asUInt64();
-        use_half_float = jsonParams["use_half_float"].asBool();
-
-        QDataType = jsonParams["QDataType"].asString();
-
-    }
-    catch(std::exception& e)
-    {
-        std::cerr << "Unhandled Exception reached parsing arguments: "
-        << e.what() << ", application will now exit" << std::endl;
-    }
-}
-
-Json::Value Angle::getJson()
-{
-    try
-    {
-        Json::Value jsonParams;
-
-        jsonParams["name_root"] = name_root;
-        jsonParams["repeat"] = (tStep)repeat;
-        jsonParams["degrees"] = (double)degrees;
-
-        jsonParams["Q_output_len"] = Q_output_len;
-        jsonParams["start_at_step"] = (tStep)start_at_step;
-        jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
-        jsonParams["use_half_float"] = use_half_float;
-
-        jsonParams["QDataType"] = QDataType;
-
-        return jsonParams;
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << "Unhandled Exception reached parsing arguments: "
-                    << e.what() << ", application will now exit" << std::endl;
-        return "";
-    }
-}
-
-void PlaneAtAngle::getParamsFromJson(Json::Value jsonParams)
-{
-    try
-    {
-        name_root = jsonParams["name_root"].asString();
-        degrees = jsonParams["degrees"].asDouble();
-        tolerance = jsonParams["tolerance"].asDouble();
-        cutAt = jsonParams["cutAt"].asInt64();
-
-
-        Q_output_len = jsonParams["Q_output_len"].asInt();
-        start_at_step = jsonParams["start_at_step"].asUInt64();
-        end_at_repeat = jsonParams["end_at_repeat"].asUInt64();
-        use_half_float = jsonParams["use_half_float"].asBool();
-
-        QDataType = jsonParams["QDataType"].asString();
-
-    }
-    catch(std::exception& e)
-    {
-        std::cerr << "Unhandled Exception reached parsing arguments: "
-        << e.what() << ", application will now exit" << std::endl;
-    }
-}
-
-Json::Value PlaneAtAngle::getJson()
-{
-    try
-    {
-        Json::Value jsonParams;
-
-        jsonParams["name_root"] = name_root;
-        jsonParams["degrees"] = (double)degrees;
-        jsonParams["tolerance"] = (double)tolerance;
-        jsonParams["cutAt"] = (tNi)cutAt;
-
-
-        jsonParams["Q_output_len"] = Q_output_len;
-        jsonParams["start_at_step"] = (tStep)start_at_step;
-        jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
-        jsonParams["use_half_float"] = use_half_float;
-
-        jsonParams["QDataType"] = QDataType;
-
-
-        return jsonParams;
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << "Unhandled Exception reached parsing arguments: "
-                    << e.what() << ", application will now exit" << std::endl;
-        return "";
-    }
-}
-
-void Sector::getParamsFromJson(Json::Value jsonParams)
-{
-    try
-    {
-        name_root = jsonParams["name_root"].asString();
-        repeat = jsonParams["repeat"].asUInt64();
-
-
-        angle_infront_blade = jsonParams["angle_infront_blade"].asDouble();
-        angle_behind_blade = jsonParams["angle_behind_blade"].asDouble();
-
-        Q_output_len = jsonParams["Q_output_len"].asInt();
-        start_at_step = jsonParams["start_at_step"].asUInt64();
-        end_at_repeat = jsonParams["end_at_repeat"].asUInt64();
-        use_half_float = jsonParams["use_half_float"].asBool();
-
-        QDataType = jsonParams["QDataType"].asString();
-
-    }
-    catch(std::exception& e)
-    {
-        std::cerr << "Unhandled Exception reached parsing arguments: "
-        << e.what() << ", application will now exit" << std::endl;
-    }
-}
-
-Json::Value Sector::getJson()
-{
-    try
-    {
-        Json::Value jsonParams;
-
-        jsonParams["name_root"] = name_root;
-        jsonParams["repeat"] = (tStep)repeat;
-
-
-        jsonParams["angle_infront_blade"] = (double)angle_infront_blade;
-        jsonParams["angle_behind_blade"] = (double)angle_behind_blade;
-
-        jsonParams["Q_output_len"] = Q_output_len;
-        jsonParams["start_at_step"] = (tStep)start_at_step;
-        jsonParams["end_at_repeat"] = (tStep)end_at_repeat;
-        jsonParams["use_half_float"] = use_half_float;
-
-        jsonParams["QDataType"] = QDataType;
-
-
-        return jsonParams;
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << "Unhandled Exception reached parsing arguments: "
-                    << e.what() << ", application will now exit" << std::endl;
-        return "";
-    }
-}
 
 #endif
