@@ -84,7 +84,7 @@ public:
     
     DiskOutputTree outputTree;
 
-    
+    ComputeUnit();
     ComputeUnit(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
     
     ~ComputeUnit();
@@ -99,7 +99,7 @@ public:
     
     
     void streaming(Streaming scheme);
-    void streaming_simple();
+    void streamingNieve();
     void streaming_esotwist();
     
     void collision(Collision scheme);

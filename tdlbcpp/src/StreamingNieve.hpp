@@ -16,20 +16,20 @@
 
 
 template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::streaming_simple(){
+void ComputeUnit<T, QVecSize>::streamingNieve(){
     for (tNi i=1; i<=xg1; i++){
         for (tNi j=1; j<=yg1; j++){
             for (tNi k=1; k<=zg1; k++){
                 //DST    =  SRC
-                Q[index(i, j, k)].q[ Q1] = Q[dirnQ1(i,j,k)].q[ Q1];
-                Q[index(i, j, k)].q[ Q4] = Q[dirnQ4(i,j,k)].q[ Q4];
-                Q[index(i, j, k)].q[ Q5] = Q[dirnQ5(i,j,k)].q[ Q5];
+                Q[index(i, j, k)].q[ Q1] = Q[ dirnQ1(i,j,k)].q[ Q1];
+                Q[index(i, j, k)].q[ Q4] = Q[ dirnQ4(i,j,k)].q[ Q4];
+                Q[index(i, j, k)].q[ Q5] = Q[ dirnQ5(i,j,k)].q[ Q5];
 
                 Q[index(i, j, k)].q[Q13] = Q[dirnQ13(i,j,k)].q[Q13];
-                Q[index(i, j, k)].q[ Q7] = Q[dirnQ7(i,j,k)].q[ Q7];
+                Q[index(i, j, k)].q[ Q7] = Q[ dirnQ7(i,j,k)].q[ Q7];
                 
                 Q[index(i, j, k)].q[Q15] = Q[dirnQ15(i,j,k)].q[Q15];
-                Q[index(i, j, k)].q[ Q9] = Q[dirnQ9(i,j,k)].q[ Q9];
+                Q[index(i, j, k)].q[ Q9] = Q[ dirnQ9(i,j,k)].q[ Q9];
                 
                 Q[index(i, j, k)].q[Q17] = Q[dirnQ17(i,j,k)].q[Q17];
                 Q[index(i, j, k)].q[Q11] = Q[dirnQ11(i,j,k)].q[Q11];
@@ -43,11 +43,11 @@ void ComputeUnit<T, QVecSize>::streaming_simple(){
             for (tNi k=zg1;  k>=1; k--) {
                 
                 //DST   =   SRC
-                Q[index(i, j, k)].q[ Q2] = Q[dirnQ2(i,j,k)].q[ Q2];
-                Q[index(i, j, k)].q[ Q3] = Q[dirnQ3(i,j,k)].q[ Q3];
-                Q[index(i, j, k)].q[ Q6] = Q[dirnQ6(i,j,k)].q[ Q6];
+                Q[index(i, j, k)].q[ Q2] = Q[ dirnQ2(i,j,k)].q[ Q2];
+                Q[index(i, j, k)].q[ Q3] = Q[ dirnQ3(i,j,k)].q[ Q3];
+                Q[index(i, j, k)].q[ Q6] = Q[ dirnQ6(i,j,k)].q[ Q6];
 
-                Q[index(i, j, k)].q[ Q8] = Q[dirnQ8(i,j,k)].q[ Q8];
+                Q[index(i, j, k)].q[ Q8] = Q[ dirnQ8(i,j,k)].q[ Q8];
                 Q[index(i, j, k)].q[Q14] = Q[dirnQ14(i,j,k)].q[Q14];
                 
                 Q[index(i, j, k)].q[Q10] = Q[dirnQ10(i,j,k)].q[Q10];

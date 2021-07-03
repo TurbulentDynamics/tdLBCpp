@@ -19,19 +19,21 @@
 
 struct RunningParams
 {
-    uint64_t step = 0;
-    uint64_t num_steps = 0;
-
+    tStep step = 0;
     double angle = 0;
 
-    
+    tStep num_steps = 1;
+
     void update(tStep _step, double _angle){
                 
-        step = (uint64_t)_step;
+        step = (tStep)_step;
         angle = (double)_angle;
 
     }
     
+    void incrementStep(){
+        step ++;
+    }
     
     
     void getParamsFromJson(Json::Value jsonParams) {
@@ -42,7 +44,7 @@ struct RunningParams
 
             angle = jsonParams["angle"].asDouble();
             
-            step = (tStep)jsonParams["step"].asUInt64();
+            step = (Json::UInt64)jsonParams["step"].asUInt64();
             num_steps = (tStep)jsonParams["num_steps"].asUInt64();
             
             
@@ -69,8 +71,8 @@ struct RunningParams
             
             jsonParams["name"] = "Running";
             
-            jsonParams["step"] = (uint64_t)step;
-            jsonParams["num_steps"] = (uint64_t)num_steps;
+            jsonParams["step"] = (Json::UInt64)step;
+            jsonParams["num_steps"] = (Json::UInt64)num_steps;
             jsonParams["angle"] = (double)angle;
 
             

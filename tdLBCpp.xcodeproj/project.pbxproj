@@ -9,11 +9,7 @@
 /* Begin PBXBuildFile section */
 		D689CD6426010D0600DF4E61 /* testComputeUnit.mm in Sources */ = {isa = PBXBuildFile; fileRef = D689CD6326010D0600DF4E61 /* testComputeUnit.mm */; };
 		D6930C67261366B4004245CB /* testJsonFiles.mm in Sources */ = {isa = PBXBuildFile; fileRef = D6930C66261366B4004245CB /* testJsonFiles.mm */; };
-		D6AC3269268E20090057E1E1 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6AC3262268E20090057E1E1 /* utils.cpp */; };
-		D6AC326A268E20090057E1E1 /* ComputeUnitParamsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6AC3264268E20090057E1E1 /* ComputeUnitParamsTest.cpp */; };
-		D6AC326B268E20090057E1E1 /* CheckpointTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6AC3265268E20090057E1E1 /* CheckpointTest.cpp */; };
-		D6AC326C268E20090057E1E1 /* BinFileTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6AC3266268E20090057E1E1 /* BinFileTest.cpp */; };
-		D6E5C74225EE184B0067FDE1 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C72425EE184B0067FDE1 /* test.cpp */; };
+		D6AC327C269059960057E1E1 /* ComputeUnitParamsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6AC3264268E20090057E1E1 /* ComputeUnitParamsTest.cpp */; };
 		D6E5C74425EE184B0067FDE1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C73E25EE184B0067FDE1 /* main.cpp */; };
 		D6E5C74525EE184B0067FDE1 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */; };
 /* End PBXBuildFile section */
@@ -316,6 +312,7 @@
 			files = (
 				D689CD6426010D0600DF4E61 /* testComputeUnit.mm in Sources */,
 				D6930C67261366B4004245CB /* testJsonFiles.mm in Sources */,
+				D6AC327C269059960057E1E1 /* ComputeUnitParamsTest.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -323,13 +320,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D6E5C74225EE184B0067FDE1 /* test.cpp in Sources */,
-				D6AC326A268E20090057E1E1 /* ComputeUnitParamsTest.cpp in Sources */,
 				D6E5C74525EE184B0067FDE1 /* jsoncpp.cpp in Sources */,
 				D6E5C74425EE184B0067FDE1 /* main.cpp in Sources */,
-				D6AC3269268E20090057E1E1 /* utils.cpp in Sources */,
-				D6AC326B268E20090057E1E1 /* CheckpointTest.cpp in Sources */,
-				D6AC326C268E20090057E1E1 /* BinFileTest.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

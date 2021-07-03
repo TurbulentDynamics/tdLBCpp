@@ -42,56 +42,21 @@ using useQVecPrecision = float;
 
 int main(int argc, char* argv[]){
 
+    std::feclearexcept(FE_OVERFLOW);
+    std::feclearexcept(FE_UNDERFLOW);
+    std::feclearexcept(FE_DIVBYZERO);
+    
+
     
     GridParams grid;
-    grid.x = 44;
-    grid.y = 44;
-    grid.z = 44;
-    
-    grid.ngx = 1;
-    grid.ngy = 1;
-    grid.ngz = 1;
-    
-    
     FlowParams<useQVecPrecision> flow;
-    flow.initialRho = 8.0;
-    flow.reMNonDimensional = 7000.0;
-    flow.uav = 0.1;
-    flow.g3 = 0.1;
-    flow.alpha = 0.97;
-    flow.beta = 1.9;
-    flow.useLES = 0;
-    
-
     RunningParams running;
-    running.angle = 0.0;
-    running.step = 0;
-    running.num_steps = 20;
-    
-    
-    
     OutputParams output("output_debug");
-//    std::string dir = output.getRunDirWithTimeAndParams("run_", grid.x, flow.reMNonDimensional, flow.useLES, flow.uav);
-
-
-    output.add_XY_plane("plot", 10, grid.x/2);
-    output.add_XZ_plane("plot_slice", 10, grid.y/3);
-    output.add_YZ_plane("plot", 10, grid.x/2);
-    
-    output.add_volume("volume", 20);
-    output.add_XZ_plane("ml_slice", 0, grid.y/3-1);
-    output.add_XZ_plane("ml_slice", 0, grid.y/3+1);
-
-    
-        
-    
     CheckpointParams checkpoint;
-    checkpoint.start_with_checkpoint = 0;
-    checkpoint.load_checkpoint_dirname = "checkpoint_debug/step_20";
 
-    checkpoint.checkpoint_repeat = 20;
-    checkpoint.checkpoint_root_dir = "checkpoint_debug";
-//    checkpoint.checkpoint_root_dir = "checkpoint_" + dir;
+    std::string jsonPath = "";
+    std::string geomJsonPath = "";
+    std::string checkpointPath = "";
     
     
     try {
@@ -102,19 +67,10 @@ int main(int argc, char* argv[]){
 
         options.add_options()
         ("x,snx", "Number of Cells in x direction ie snx", cxxopts::value<tNi>(grid.x))
-        ("y,sny", "Number of Cells in y direction sny=snz", cxxopts::value<tNi>(grid.y))
-        //("z,snz", "Number of Cells in z direction sny=snz", cxxopts::value<tNi>(grid.z))
-
-        ("n,num_steps", "Number of Steps", cxxopts::value<uint64_t>(running.num_steps))
-
-        ("re_m", "Reynolds Number  (Re_m will be *M_PI/2)", cxxopts::value<useQVecPrecision>(flow.reMNonDimensional))
-        ("start_with_checkpoint", "start_with_checkpoint", cxxopts::value<bool>(checkpoint.start_with_checkpoint))
-        ("load_checkpoint_dirname", "load_checkpoint_dirname", cxxopts::value<std::string>(checkpoint.load_checkpoint_dirname))
-//        ("upscale_factor", "upscale_factor", cxxopts::value<tNi>(upscale_factor))
-        ("plot_slice_repeat", "plot_slice_repeat", cxxopts::value<tStep>(output.XY_planes[0].repeat))
-        ("plot_axis_repeat", "plot_axis_repeat", cxxopts::value<tStep>(output.XY_planes[0].repeat))
-        ("plot_full_repeat", "plot_full_repeat", cxxopts::value<tStep>(output.volumes[0].repeat))
-        ("h,help", "Lots of Arguments")
+        ("j,json", "Load input json file", cxxopts::value<std::string>(jsonPath))
+        ("g,geom", "Load geometry input json file", cxxopts::value<std::string>(geomJsonPath))
+        ("c,checkpoint_dir", "Load from Checkpoint directory", cxxopts::value<std::string>(checkpointPath))
+        ("h,help", "Help")
         ;
 
         options.parse_positional({"input", "output", "positional"});
@@ -132,12 +88,72 @@ int main(int argc, char* argv[]){
         exit(1);
     }
 
+        
+    if (checkpointPath != ""){
+        jsonPath = checkpointPath + "/AllParams.json";
+    }
+        
+    /////////////////
+    std::cout<<"ADSFASDFASDF"<<jsonPath << checkpointPath<<std::endl;
     
+    
+    if (jsonPath != "") {
+        std::cout << "Loading " << jsonPath << std::endl;
+        
+        std::ifstream in(jsonPath.c_str());
+        Json::Value jsonParams;
+        in >> jsonParams;
+        in.close();
+        
+        grid.getParamsFromJson(jsonParams["GridParams"]);
+        flow.getParamsFromJson(jsonParams["FlowParams"]);
+        running.getParamsFromJson(jsonParams["RunningParams"]);
+        output.getParamsFromJson(jsonParams["OutputParams"]);
+        checkpoint.getParamsFromJson(jsonParams["CheckpointParams"]);
+        
+    } else {
+    
+        grid.y = grid.x;
+        grid.z = grid.x;
+        
+        flow.initialRho = 8.0;
+        flow.reMNonDimensional = 7000.0;
+        flow.uav = 0.1;
+
+        flow.useLES = 0;
+            
+        running.num_steps = 20;
+        
+        output.add_XY_plane("plot", 10, grid.x/2);
+        output.add_XZ_plane("plot_slice", 10, grid.y/3);
+        output.add_YZ_plane("plot", 10, grid.x/2);
+        
+        output.add_volume("volume", 20);
+        output.add_XZ_plane("ml_slice", 0, grid.y/3-1);
+        output.add_XZ_plane("ml_slice", 0, grid.y/3+1);
+
+        checkpoint.start_with_checkpoint = 0;
+        
+        checkpoint.checkpoint_repeat = 20;
+        
+    //    std::string dir = output.getRunDirWithTimeAndParams("run_", grid.x, flow.reMNonDimensional, flow.useLES, flow.uav);
+
+    }
+        
+    if (grid.x < 14 || grid.y < 14 || grid.z < 14) {
+        std::cout << "The grid should be larger than 14 cells in every direction" << std::endl;
+        exit(1);
+    }
+    
+    
+        
+        
     
 
     
     
     RushtonTurbine rt = RushtonTurbine(int(grid.x));
+    
     
     Extents<tNi> e = Extents<tNi>(0, grid.x, 0, grid.y, 0, grid.z);
 
@@ -178,24 +194,25 @@ int main(int argc, char* argv[]){
     
     
     
-    
     ComputeUnit<useQVecPrecision, QLen::D3Q19> lb = ComputeUnit<useQVecPrecision, QLen::D3Q19>(cu, flow, outputTree);
     
+    if (checkpointPath != ""){
+        lb.checkpoint_read(checkpointPath, "Device");
+    }
     
     lb.forcing(geomFixed, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
     lb.forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
 
     
-    double impellerAngle = running.angle;
-    RunningParams runParams;
-    for (tStep step=1; step<=running.num_steps; step++) {
-
-        runParams.update(step, (double)impellerAngle);
+    
+    
+    for (tStep step=running.step; step<=running.num_steps; step++) {
+        
+        running.incrementStep();
+        running.angle += geom.calcThisStepImpellerIncrement(running.step);
         
         
-        impellerAngle += geom.calcThisStepImpellerIncrement(step);
-        
-        geom.updateRotatingGeometry(impellerAngle);
+        geom.updateRotatingGeometry(running.angle);
         geomRotating = geom.returnRotatingGeometry();
 
         
@@ -229,9 +246,9 @@ int main(int argc, char* argv[]){
         
         //TODO Cycle though all planes.
         OrthoPlane xzTMP = output.XZ_planes[0];
-        if (step % xzTMP.repeat == 0) {
+        if (running.step % xzTMP.repeat == 0) {
             
-            lb.template savePlaneXZ<float, 4>(xzTMP, binFormat, runParams);
+            lb.template savePlaneXZ<float, 4>(xzTMP, binFormat, running);
             
             
             
@@ -244,9 +261,9 @@ int main(int argc, char* argv[]){
 
         
         
-        if (checkpoint.checkpoint_repeat && (step % checkpoint.checkpoint_repeat == 0)) {
+        if (checkpoint.checkpoint_repeat && (running.step % checkpoint.checkpoint_repeat == 0)) {
                         
-            lb.checkpoint_write("Device", runParams);
+            lb.checkpoint_write("Device", running);
         }
 
         

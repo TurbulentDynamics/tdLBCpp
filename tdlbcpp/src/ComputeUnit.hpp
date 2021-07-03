@@ -11,8 +11,11 @@
 #include "DiskOutputTree.h"
 
 
+//
+//template <typename T, int QVecSize>
+//ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
 
-
+    
 template <typename T, int QVecSize>
 ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
 
@@ -132,7 +135,7 @@ void ComputeUnit<T, QVecSize>::streaming(Streaming scheme) {
 
     switch( scheme ) {
     case Streaming(Simple):
-        streaming_simple(); break;
+        streamingNieve(); break;
     case Streaming(Esotwist):
         streaming_esotwist(); break;
     }
@@ -191,16 +194,16 @@ void ComputeUnit<T, QVecSize>::fillForTest(){
         for (tNi j=0; j<yg; j++){
             for (tNi k=0; k<zg; k++){
                 
-                QVec<int, QVecSize> qTmp;
+                QVec<unsigned long int, QVecSize> qTmp;
 
-                for (int l=0; l<QVecSize; l++){
+                for (unsigned long int l=0; l<QVecSize; l++){
                     qTmp.q[l] = i * 1000000 + j * 10000 + k * 100 + l;
                 }
                 Q[index(i, j, k)].q = qTmp;
                 
-                F[index(i, j, k)].fx = 0;
-                F[index(i, j, k)].fy = 1;
-                F[index(i, j, k)].fz = 2;
+                F[index(i, j, k)].x = 0;
+                F[index(i, j, k)].y = 1;
+                F[index(i, j, k)].z = 2;
 
                 Nu[index(i, j, k)] = 1;
                 O[index(i, j, k)] = true;
@@ -268,7 +271,7 @@ void ComputeUnit<T, QVecSize>::checkpoint_write(std::string unit_name, RunningPa
     BinFileParams binFormat;
     binFormat.filePath = dirname + "/AllParams";
     binFormat.structName = "checkpoint";
-    binFormat.binFileSizeInStructs = (uint64_t)size;
+    binFormat.binFileSizeInStructs = (Json::UInt64)size;
     binFormat.coordsType = "none";
     binFormat.hasGridtCoords = 0;
     binFormat.hasColRowtCoords = 0;

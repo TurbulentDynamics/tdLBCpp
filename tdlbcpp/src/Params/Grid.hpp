@@ -20,13 +20,13 @@
 //Grid Params are the maximum extent of the regular lattice.
 struct GridParams
 {
-    tNi ngx = 0;
-    tNi ngy = 0;
-    tNi ngz = 0;
+    tNi ngx = 1;
+    tNi ngy = 1;
+    tNi ngz = 1;
     
-    tNi x = 0;
-    tNi y = 0;
-    tNi z = 0;
+    tNi x = 44;
+    tNi y = 44;
+    tNi z = 44;
     
 
     

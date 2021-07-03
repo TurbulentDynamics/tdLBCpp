@@ -102,16 +102,18 @@ struct QVec {
         return u;
     };
     
+#ifndef RELEASE
 	T& operator[](int i) {
 		assert(i >=0 && i < size);
 		return q[i];
 	}
-
+#endif
     
     
 private:
     void freeMem() {
     }
+    
     void copy(const QVec<T, size> &other) {
         if (this != &other) {
             freeMem();

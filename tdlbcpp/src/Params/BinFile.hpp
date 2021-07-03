@@ -86,7 +86,7 @@ struct BinFileParams
             
             
             jsonParams["structName"] = structName;
-            jsonParams["binFileSizeInStructs"] = (uint64_t) binFileSizeInStructs;
+            jsonParams["binFileSizeInStructs"] = (Json::UInt64) binFileSizeInStructs;
             
             
             jsonParams["coordsType"] = coordsType;

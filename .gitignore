@@ -6,3 +6,7 @@ bazel-*
 build/
 .DS_Store
 
+
+checkpoint_debug
+output_debug
+

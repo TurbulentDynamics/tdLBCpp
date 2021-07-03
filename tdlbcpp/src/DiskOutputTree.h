@@ -151,7 +151,7 @@ public:
     
     void createDir(std::string dir){
         
-        std::cout << "Creating DiskOutputTree " << dir << std::endl;
+        std::cout << "DiskOutputTree creating directory: " << dir << std::endl;
         mkdir(dir.c_str(), 0775);
         
     }

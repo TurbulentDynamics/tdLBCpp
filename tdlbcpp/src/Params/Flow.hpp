@@ -20,13 +20,11 @@
 template <typename T>
 struct FlowParams {
     
-    T initialRho = 0.0;
-    T reMNonDimensional = 0.0;
+    T initialRho = 8.0;
+    T reMNonDimensional = 07000.0;
     
-    T uav = 0.0;
+    T uav = 0.1;
  
-    
-    
     T cs0 = 0.0;
     T g3 = 0.8;
     
@@ -38,10 +36,11 @@ struct FlowParams {
     T Re_f = 0.0;
     T uf = 0.0;
     
-    T alpha = 0.0;
-    T beta = 0.0;
+    T alpha = 0.97;
+    T beta = 1.9;
 
     bool useLES = 0;
+    
     std::string collision = "EgglesSomers";
     std::string streaming = "Nieve";
     

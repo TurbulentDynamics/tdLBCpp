@@ -1,0 +1,148 @@
+{
+	"BinFileParams" : 
+	{
+		"QDataType" : "none",
+		"QOutputLength" : 18,
+		"binFileSizeInStructs" : 1061208,
+		"coordsType" : "none",
+		"filePath" : "checkpoint_debug/step_20/AllParams",
+		"hasColRowtCoords" : false,
+		"hasGridtCoords" : false,
+		"name" : "",
+		"note" : "",
+		"structName" : "checkpoint"
+	},
+	"CheckpointParams" : 
+	{
+		"checkpoint_repeat" : 20,
+		"checkpoint_root_dir" : "checkpoint_debug",
+		"load_checkpoint_dirname" : "",
+		"start_with_checkpoint" : false
+	},
+	"ComputeUnitParams" : 
+	{
+		"ghost" : 1,
+		"i0" : 0,
+		"idi" : 0,
+		"idj" : 0,
+		"idk" : 0,
+		"j0" : 0,
+		"k0" : 0,
+		"x" : 60,
+		"y" : 60,
+		"z" : 60
+	},
+	"FlowParams" : 
+	{
+		"Re_f" : 0.0,
+		"Re_m" : 0.0,
+		"alpha" : 0.97000002861022949,
+		"beta" : 1.8999999761581421,
+		"collision" : "EgglesSomers",
+		"cs0" : 0.0,
+		"fx0" : 0.0,
+		"g3" : 0.80000001192092896,
+		"initialRho" : 8.0,
+		"name" : "FlowParams",
+		"nu" : 0.0,
+		"reMNonDimensional" : 7000.0,
+		"streaming" : "Nieve",
+		"uav" : 0.10000000149011612,
+		"uf" : 0.0,
+		"useLES" : false
+	},
+	"GridParams" : 
+	{
+		"name" : "GridParams",
+		"ngx" : 1,
+		"ngy" : 1,
+		"ngz" : 1,
+		"x" : 60,
+		"y" : 60,
+		"z" : 60
+	},
+	"OutputParams" : 
+	{
+		"XY_planes" : 
+		[
+			{
+				"QDataType" : "tDisk_colrow_Q4",
+				"Q_output_len" : 4,
+				"cutAt" : 50,
+				"end_at_repeat" : 0,
+				"name_root" : "plot",
+				"repeat" : 10,
+				"start_at_step" : 0,
+				"use_half_float" : false
+			}
+		],
+		"XZ_planes" : 
+		[
+			{
+				"QDataType" : "tDisk_colrow_Q4",
+				"Q_output_len" : 4,
+				"cutAt" : 33,
+				"end_at_repeat" : 0,
+				"name_root" : "plot_slice",
+				"repeat" : 10,
+				"start_at_step" : 0,
+				"use_half_float" : false
+			},
+			{
+				"QDataType" : "tDisk_colrow_Q4",
+				"Q_output_len" : 4,
+				"cutAt" : 32,
+				"end_at_repeat" : 0,
+				"name_root" : "ml_slice",
+				"repeat" : 0,
+				"start_at_step" : 0,
+				"use_half_float" : false
+			},
+			{
+				"QDataType" : "tDisk_colrow_Q4",
+				"Q_output_len" : 4,
+				"cutAt" : 34,
+				"end_at_repeat" : 0,
+				"name_root" : "ml_slice",
+				"repeat" : 0,
+				"start_at_step" : 0,
+				"use_half_float" : false
+			}
+		],
+		"YZ_plane_when_angle" : [],
+		"YZ_planes" : 
+		[
+			{
+				"QDataType" : "tDisk_colrow_Q4",
+				"Q_output_len" : 4,
+				"cutAt" : 50,
+				"end_at_repeat" : 0,
+				"name_root" : "plot",
+				"repeat" : 10,
+				"start_at_step" : 0,
+				"use_half_float" : false
+			}
+		],
+		"capture_at_blade_angle" : [],
+		"rootDir" : "output_debug",
+		"volumes" : 
+		[
+			{
+				"QDataType" : "tDisk_grid_Q4",
+				"Q_output_len" : 4,
+				"end_at_repeat" : 0,
+				"name_root" : "volume",
+				"repeat" : 20,
+				"start_at_step" : 0,
+				"use_half_float" : false
+			}
+		]
+	},
+	"RunningParams" : 
+	{
+		"angle" : 0.0,
+		"name" : "Running",
+		"num_steps" : 20,
+		"step" : 0
+	}
+}
