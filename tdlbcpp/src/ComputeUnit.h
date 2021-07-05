@@ -93,8 +93,7 @@ public:
     tNi inline index(tNi i, tNi j, tNi k);
     Velocity<T> inline getVelocity(tNi i, tNi j, tNi k);
     Velocity<T> inline getVelocitySparseF(tNi i, tNi j, tNi k, Force<T> f);
-    
-    void fillForTest();
+
     void setToZero();
     
     

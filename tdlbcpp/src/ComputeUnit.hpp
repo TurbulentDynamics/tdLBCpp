@@ -179,44 +179,6 @@ void ComputeUnit<T, QVecSize>::setToZero(){
 #endif
 };
 
-
-template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::fillForTest(){
-    
-    if (xg>99 || yg>99 || zg>99) {
-        std::cout << "Size too large for testing" << std::endl;
-        exit(1);
-    }
-#if WITH_GPU == 1
-    setToZero<<<numBlocks, threadsPerBlock>>>(devN, devF, xg, yg, zg, QVecSize);
-#else
-    for (tNi i=0; i<xg; i++){
-        for (tNi j=0; j<yg; j++){
-            for (tNi k=0; k<zg; k++){
-                
-                QVec<unsigned long int, QVecSize> qTmp;
-
-                for (unsigned long int l=0; l<QVecSize; l++){
-                    qTmp.q[l] = i * 1000000 + j * 10000 + k * 100 + l;
-                }
-                Q[index(i, j, k)].q = qTmp;
-                
-                F[index(i, j, k)].x = 0;
-                F[index(i, j, k)].y = 1;
-                F[index(i, j, k)].z = 2;
-
-                Nu[index(i, j, k)] = 1;
-                O[index(i, j, k)] = true;
-
-            }
-        }
-    }
-#endif
-};
-
-
-
-
 template <typename T, int QVecSize>
 FILE* ComputeUnit<T, QVecSize>::fopen_read(std::string filePath){
 
