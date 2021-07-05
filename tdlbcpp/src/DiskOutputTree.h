@@ -111,8 +111,8 @@ public:
         createDir(checkpointRootDir);
     };
     
-
-    void setParams(ComputeUnitParams cu1, GridParams grid1, FlowParams<double> flow1, RunningParams running1, OutputParams output1, CheckpointParams checkpoint1){
+    template <typename T>
+    void setParams(ComputeUnitParams cu1, GridParams grid1, FlowParams<T> flow1, RunningParams running1, OutputParams output1, CheckpointParams checkpoint1){
         
         cu = cu1;
         cuJson = cu1.getJson();

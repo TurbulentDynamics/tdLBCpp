@@ -8,12 +8,13 @@ cc_library(
 
 cc_test(
   name = "tests",
-  srcs = ["DiskOutputTreeTest.cpp"],
+  srcs = ["DiskOutputTreeTest.cpp", "StreamingNieveTest.cpp", "StreamingNieveTest.hpp"],
   deps = [
           "//tdlbcpp/src/Params:params",
           "//tdlbcpp/src:computeUnit",
           "//tdlbcpp/tests:utils",
           "//tdlbcpp/tests/Params:ParamsCommon",
+          "//tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib",
           "@googletest//:gtest_main"
   ],
   copts = ["-Itdlbcpp/src"]

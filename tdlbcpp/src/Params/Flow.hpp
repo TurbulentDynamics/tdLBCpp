@@ -20,13 +20,13 @@
 template <typename T>
 struct FlowParams {
     
-    T initialRho = 8.0;
-    T reMNonDimensional = 07000.0;
+    T initialRho = (T)8.0;
+    T reMNonDimensional = (T)07000.0;
     
-    T uav = 0.1;
+    T uav = (T)0.1;
  
     T cs0 = 0.0;
-    T g3 = 0.8;
+    T g3 = (T)0.8;
     
     T nu = 0.0;
     
@@ -36,8 +36,8 @@ struct FlowParams {
     T Re_f = 0.0;
     T uf = 0.0;
     
-    T alpha = 0.97;
-    T beta = 1.9;
+    T alpha = (T)0.97;
+    T beta = (T)1.9;
 
     bool useLES = 0;
     
