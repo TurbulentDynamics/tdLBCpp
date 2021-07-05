@@ -6,6 +6,7 @@
 //
 
 #include <cstdio>
+#include <fstream>
 
 #include "gtest/gtest.h"
 
@@ -59,12 +60,13 @@ void fillForTest(ComputeUnit<T, QVecSize> cu)
 };
 
 template <typename T, int QVecSize>
-void generateTestData(ComputeUnit<T, QVecSize> cu)
+void generateTestData(ComputeUnit<T, QVecSize> cu, std::string headerPath)
 {
-    std::cerr << "namespace TestUtils {\n";
-    std::cerr << "    template <typename T, int QVecSize>\n";
-    std::cerr << "    void fillExpectedComputeUnitValues(ComputeUnit<T, QVecSize> cu) {\n";
-    std::cerr << "        QVec<T, QVecSize> qTmp;\n";
+    std::ofstream hdr(headerPath);
+    hdr << "namespace TestUtils {\n";
+    hdr << "    template <typename T, int QVecSize>\n";
+    hdr << "    void fillExpectedComputeUnitValues(ComputeUnit<T, QVecSize> cu) {\n";
+    hdr << "        QVec<T, QVecSize> qTmp;\n";
     for (tNi i = 0; i < cu.xg; i++)
     {
         for (tNi j = 0; j < cu.yg; j++)
@@ -75,19 +77,20 @@ void generateTestData(ComputeUnit<T, QVecSize> cu)
                 {
                     if ((l > 0) && (l % 8 == 0))
                     {
-                        std::cerr << "\n       ";
+                        hdr << "\n       ";
                     }
                     if (l == 0)
                     {
-                        std::cerr << "       ";
+                        hdr << "       ";
                     }
-                    std::cerr << " qTmp.q[" << l << "] = " << cu.Q[cu.index(i, j, k)].q[l] << ";";
+                    hdr << " qTmp.q[" << l << "] = " << cu.Q[cu.index(i, j, k)].q[l] << ";";
                 }
-                std::cerr << "\n        cu.Q[cu.index(" << i << ", " << j << ", " << k << ")] = qTmp;\n";
+                hdr << "\n        cu.Q[cu.index(" << i << ", " << j << ", " << k << ")] = qTmp;\n";
             }
         }
     }
-    std::cerr << "    }\n};\n";
+    hdr << "    }\n};\n";
+    hdr.close();
 }
 
 template <typename T, int QVecSize>
@@ -135,6 +138,10 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
 
     fillForTest(lb2);
     lb2.streamingNieve();
-    //generateTestData(lb2);
+    if (std::getenv("GENERATE_STREAMING_NIEVE_TEST_HPP"))
+    {
+        std::string headerPath = std::getenv("GENERATE_STREAMING_NIEVE_TEST_HPP");
+        generateTestData(lb2, headerPath);
+    }
     testStream(cuParams, flow, diskOutputTree, lb2);
 }
