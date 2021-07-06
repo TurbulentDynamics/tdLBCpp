@@ -31,8 +31,8 @@
 #include "DiskOutputTree.h"
 #include "Output.hpp"
 
-#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
-#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
+#include "Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
+#include "Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 
 
 

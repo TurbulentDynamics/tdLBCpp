@@ -12,7 +12,7 @@
 
 #include "ComputeUnit.h"
 
-#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
+#include "Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 
 
 

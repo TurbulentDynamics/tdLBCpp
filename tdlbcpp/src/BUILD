@@ -14,7 +14,7 @@ cc_binary(
     name = "tdlbcpp",
     srcs = ["main.cpp"],
     deps = [":cxxopts", "//tdlbcpp/src/Params:params", ":computeUnit",
-            "//tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib"],
+            "@tdLBGeometryRushtonTurbineLib//Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib"],
 )
 
 

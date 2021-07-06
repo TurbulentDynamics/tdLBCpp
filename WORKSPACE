@@ -6,4 +6,7 @@ git_repository(
   tag = "release-1.11.0"
 )
 
-
+local_repository(
+    name = "tdLBGeometryRushtonTurbineLib",
+    path = __workspace_dir__ + "/tdLBGeometryRushtonTurbineLib",
+)

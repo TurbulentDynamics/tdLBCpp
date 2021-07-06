@@ -29,8 +29,8 @@
 
 
 
-#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
-#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
+#include "Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
+#include "Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 #include "ComputeUnit.h"
 
 //TODO: Temporary, different ComputeUnits could have different precision

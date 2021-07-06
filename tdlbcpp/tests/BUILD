@@ -14,7 +14,7 @@ cc_test(
           "//tdlbcpp/src:computeUnit",
           "//tdlbcpp/tests:utils",
           "//tdlbcpp/tests/Params:ParamsCommon",
-          "//tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib",
+          "@tdLBGeometryRushtonTurbineLib//Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib",
           "@googletest//:gtest_main"
   ],
   copts = ["-Itdlbcpp/src"]
