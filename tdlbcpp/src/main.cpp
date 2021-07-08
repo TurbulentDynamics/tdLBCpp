@@ -218,9 +218,9 @@ int main(int argc, char* argv[]){
         
         
         
-        lb.collision(EgglesSomers);
+        lb.collision<Esotwist>(EgglesSomers);
 
-        lb.streaming(Simple);
+        lb.streaming(Esotwist);
 
         lb.moments();
 

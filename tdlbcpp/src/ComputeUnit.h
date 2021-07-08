@@ -74,6 +74,8 @@ public:
     
     
     QVec<T, QVecSize> *Q;
+
+    bool evenStep;
     
     Force<T> *F;
     //    std::vector<Force<T>> sparseF;
@@ -101,8 +103,10 @@ public:
     void streamingNieve();
     void streaming_esotwist();
     
+    template <Streaming streaming>
     void collision(Collision scheme);
     void collision_Entropic();
+    template <Streaming streaming>
     void collision_EgglesSomers();
     void collision_EgglesSomers_LES();
     
@@ -228,7 +232,7 @@ private:
     FILE* fopen_read(std::string filePath);
     FILE* fopen_write(std::string filePath);
 
-    
+public:    
     
     tNi inline dirnQ000(tNi i, tNi j, tNi k);
     tNi inline dirnQ1(tNi i, tNi j, tNi k);
@@ -263,8 +267,21 @@ private:
     
 };
 
+template<typename T, int QVecSize, Streaming streaming>
+struct AccessField {
+    inline static QVec<T, QVecSize> read(ComputeUnit<T, QVecSize> cu, tNi i, tNi j, tNi k);
+    inline static void write(ComputeUnit<T, QVecSize> cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k);
+};
 
-
+template<typename T, int QVecSize>
+struct AccessField<T, QVecSize, Simple> {
+    inline static QVec<T, QVecSize> read(ComputeUnit<T, QVecSize> cu, tNi i, tNi j, tNi k) {
+        return cu.Q[cu.index(i,j,k)];
+    }
+    inline static void write(ComputeUnit<T, QVecSize> cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+        cu.Q[cu.index(i,j,k)] = q;
+    }
+};
 
 #include "ComputeUnit.hpp"
 #include "CollisionEgglesSomers.hpp"
