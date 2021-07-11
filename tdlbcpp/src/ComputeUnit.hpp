@@ -19,6 +19,7 @@
 template <typename T, int QVecSize>
 ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
 
+    evenStep = true;
     
     idi = cuParams.idi;
     idj = cuParams.idj;
@@ -115,11 +116,12 @@ ComputeUnit<T, QVecSize>::~ComputeUnit()
 
 
 template <typename T, int QVecSize>
+template <Streaming streaming>
 void ComputeUnit<T, QVecSize>::collision(Collision scheme){
     switch( scheme ) {
 
         case Collision(EgglesSomers):
-            collision_EgglesSomers(); break;
+            collision_EgglesSomers<streaming>(); break;
 
         case Collision(EgglesSomersLES):
             collision_EgglesSomers_LES(); break;
