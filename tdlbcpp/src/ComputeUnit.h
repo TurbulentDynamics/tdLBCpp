@@ -101,6 +101,7 @@ public:
     
     void streaming(Streaming scheme);
     void streamingNieve();
+    void streamingNieve2();
     void streaming_esotwist();
     
     template <Streaming streaming>
