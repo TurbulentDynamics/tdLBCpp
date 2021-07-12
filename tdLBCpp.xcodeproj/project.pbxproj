@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D66D0F87269C49E50079FCAC /* timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D66D0F86269C49E50079FCAC /* timer.cpp */; };
 		D689CD6426010D0600DF4E61 /* testComputeUnit.mm in Sources */ = {isa = PBXBuildFile; fileRef = D689CD6326010D0600DF4E61 /* testComputeUnit.mm */; };
 		D6930C67261366B4004245CB /* testJsonFiles.mm in Sources */ = {isa = PBXBuildFile; fileRef = D6930C66261366B4004245CB /* testJsonFiles.mm */; };
 		D6AC327C269059960057E1E1 /* ComputeUnitParamsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6AC3264268E20090057E1E1 /* ComputeUnitParamsTest.cpp */; };
@@ -27,6 +28,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D66D0F86269C49E50079FCAC /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
+		D66D0F88269C4A200079FCAC /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
 		D689CD6126010D0600DF4E61 /* testComputeUnit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testComputeUnit.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D689CD6326010D0600DF4E61 /* testComputeUnit.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = testComputeUnit.mm; sourceTree = "<group>"; };
 		D689CD6526010D0600DF4E61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -192,6 +195,8 @@
 				D6E5C73725EE184B0067FDE1 /* Output.hpp */,
 				D6E5C72E25EE184B0067FDE1 /* DiskOutputTree.h */,
 				D6E5C73625EE184B0067FDE1 /* template.py */,
+				D66D0F88269C4A200079FCAC /* timer.h */,
+				D66D0F86269C49E50079FCAC /* timer.cpp */,
 				D6E5C72C25EE184B0067FDE1 /* QVec.hpp */,
 				D6E5C73825EE184B0067FDE1 /* CollisionEgglesSomers.hpp */,
 				D6E5C73925EE184B0067FDE1 /* CollisionEntropic.hpp */,
@@ -322,6 +327,7 @@
 			files = (
 				D6E5C74525EE184B0067FDE1 /* jsoncpp.cpp in Sources */,
 				D6E5C74425EE184B0067FDE1 /* main.cpp in Sources */,
+				D66D0F87269C49E50079FCAC /* timer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

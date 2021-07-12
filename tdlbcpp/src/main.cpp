@@ -20,6 +20,7 @@
 #include "cxxopts.hpp"
 
 #include "Header.h"
+#include "timer.h"
 #include "Params/Grid.hpp"
 #include "Params/Flow.hpp"
 #include "Params/Running.hpp"
@@ -54,7 +55,7 @@ int main(int argc, char* argv[]){
     OutputParams output("output_debug");
     CheckpointParams checkpoint;
 
-    std::string jsonPath = "";
+    std::string inputJsonPath = "";
     std::string geomJsonPath = "";
     std::string checkpointPath = "";
 
@@ -67,7 +68,7 @@ int main(int argc, char* argv[]){
 
         options.add_options()
         ("x,snx", "Number of Cells in x direction ie snx", cxxopts::value<tNi>(grid.x))
-        ("j,json", "Load input json file", cxxopts::value<std::string>(jsonPath))
+        ("j,json", "Load input json file", cxxopts::value<std::string>(inputJsonPath))
         ("g,geom", "Load geometry input json file", cxxopts::value<std::string>(geomJsonPath))
         ("c,checkpoint_dir", "Load from Checkpoint directory", cxxopts::value<std::string>(checkpointPath))
         ("h,help", "Help")
@@ -90,17 +91,15 @@ int main(int argc, char* argv[]){
 
 
     if (checkpointPath != ""){
-        jsonPath = checkpointPath + "/AllParams.json";
+        inputJsonPath = checkpointPath + "/AllParams.json";
     }
 
-    /////////////////
-    std::cout<<"ADSFASDFASDF"<<jsonPath << checkpointPath<<std::endl;
+    std::cout << "Debug: inputJsonPath, checkpointPath" << inputJsonPath << checkpointPath << std::endl;
 
+    if (inputJsonPath != "") {
+        std::cout << "Loading " << inputJsonPath << std::endl;
 
-    if (jsonPath != "") {
-        std::cout << "Loading " << jsonPath << std::endl;
-
-        std::ifstream in(jsonPath.c_str());
+        std::ifstream in(inputJsonPath.c_str());
         Json::Value jsonParams;
         in >> jsonParams;
         in.close();
@@ -206,9 +205,18 @@ int main(int argc, char* argv[]){
     lb.forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
 
 
+    int rank = 0;
+    Multi_Timer mainTimer(rank);
+    mainTimer.set_average_steps(10);
+    outputTree.createDir("timer_tmp");
 
 
     for (tStep step=running.step; step<=running.num_steps; step++) {
+
+        mainTimer.start_epoch();
+        double main_time = mainTimer.time_now();
+        double total_time = mainTimer.time_now();
+
 
         running.incrementStep();
         running.angle += geom.calcThisStepImpellerIncrement(running.step);
@@ -216,20 +224,23 @@ int main(int argc, char* argv[]){
 
         geom.updateRotatingGeometry(running.angle);
         geomRotating = geom.returnRotatingGeometry();
+        main_time = mainTimer.check(0, 0, main_time, "updateRotatingGeometry");
 
 
 
 
         lb.collision(EgglesSomers);
+        main_time = mainTimer.check(0, 1, main_time, "Collision");
 
         lb.streaming(Simple);
+        main_time = mainTimer.check(0, 2, main_time, "Streaming");
+
 
         lb.moments();
 
 
         lb.forcing(geomRotating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
-
-
+        main_time = mainTimer.check(0, 3, main_time, "Forcing");
 
 
 
@@ -246,27 +257,23 @@ int main(int argc, char* argv[]){
 
 
 
-        for (auto xzTMP: output.XZ_planes){
+        for (auto xz: output.XZ_planes){
 
-            if (running.step % xzTMP.repeat == 0) {
+            if (running.step % xz.repeat == 0) {
 
-                lb.template savePlaneXZ<float, 4>(xzTMP, binFormat, running);
+                lb.template savePlaneXZ<float, 4>(xz, binFormat, running);
+                main_time = mainTimer.check(0, 4, main_time, "savePlaneXZ");
 
+                lb.calcVorticityXZ(xz.cutAt);
             }
         }
 
-
-        if (running.step % 100 == 0) {
-
-            //lb.save_XZ_slice<half>(format, grid.y/2, "xz_slice", step);
-            //            lb.save_XZ_slice<float>(format, grid.y/2, "xz_slice", step);
-            //            lb.save_XZ_slice<double>(format, grid.y/2, "xz_slice", step);
-        }
 
 
         if (checkpoint.checkpoint_repeat && (running.step % checkpoint.checkpoint_repeat == 0)) {
 
             lb.checkpoint_write("Device", running);
+            main_time = mainTimer.check(0, 5, main_time, "Checkpoint");
         }
 
 
@@ -274,9 +281,23 @@ int main(int argc, char* argv[]){
 
 
 
+        mainTimer.check(1, 0, total_time, "TOTAL STEP");
+
+        //MAINLY FOR FOR TESTING
+        mainTimer.print_timer_all_nodes_to_files(step, "timer_tmp");
+
+        tGeomShapeRT revs = running.angle * ((180.0/M_PI)/360);
+        printf("Node %2i Step %lu/%lu, Angle: % 1.4E (%.1f revs)    ",  rank, step, running.num_steps, running.angle, revs);
+        mainTimer.print_time_left(step, running.num_steps, total_time);
+
+        mainTimer.print_timer(step);
 
 
-    }
+
+
+    }//end of main for loop  end of main for loop
+
+
     return 0;
 
 }
