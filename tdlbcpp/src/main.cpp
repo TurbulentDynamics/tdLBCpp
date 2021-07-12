@@ -57,6 +57,7 @@ int main(int argc, char* argv[]){
     std::string jsonPath = "";
     std::string geomJsonPath = "";
     std::string checkpointPath = "";
+    std::string streaming = "";
 
 
     try {
@@ -70,6 +71,7 @@ int main(int argc, char* argv[]){
         ("j,json", "Load input json file", cxxopts::value<std::string>(jsonPath))
         ("g,geom", "Load geometry input json file", cxxopts::value<std::string>(geomJsonPath))
         ("c,checkpoint_dir", "Load from Checkpoint directory", cxxopts::value<std::string>(checkpointPath))
+        ("s,streaming", "Streaming simple or esoteric", cxxopts::value<std::string>(streaming)->default_value("simple"))
         ("h,help", "Help")
         ;
 
@@ -219,10 +221,15 @@ int main(int argc, char* argv[]){
 
         
         
-        
-        lb.collision<Esotwist>(EgglesSomers);
+        if (streaming == "simple") {
+            lb.collision<Simple>(EgglesSomers);
 
-        lb.streaming(Esotwist);
+            lb.streaming(Simple);
+        } else {
+            lb.collision<Esotwist>(EgglesSomers);
+
+            lb.streaming(Esotwist);
+        }
 
         lb.moments();
 
