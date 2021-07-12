@@ -192,6 +192,9 @@ public:
         
         
         std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, plane.cutAt);
+        outputTree.createDir(plotDir);
+
+
         binFormat.filePath = outputTree.formatQVecBinFileNamePath(plotDir);
         binFormat.binFileSizeInStructs = qVecBufferLen;
         
@@ -199,7 +202,10 @@ public:
         
 
         std::cout<< "Writing output to: " << binFormat.filePath <<std::endl;
+
+
         outputTree.writeAllParamsJson(binFormat, runParam);
+
 
         FILE *fp = fopen(binFormat.filePath.c_str(), "wb");
         fwrite(outputBuffer, sizeof(tDiskGrid<tDiskPrecision, tDiskSize>), qVecBufferLen, fp);

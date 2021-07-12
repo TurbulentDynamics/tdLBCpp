@@ -225,7 +225,7 @@ public:
     
     std::string formatXYPlaneDir(tStep step, tNi atK, const std::string prefix="plot"){
         
-        return formatDir(prefix, "XYplane", step) + ".cut_" + patch::to_string(atK);
+        return formatDir(prefix, "xyPlane", step) + ".cut_" + patch::to_string(atK);
     }
     
     //Formally Axis
@@ -233,16 +233,13 @@ public:
         
         //TOFIX TODO
         
-        std::string jijm =formatDir(prefix, "XZplane", step) + ".cut_" + patch::to_string(atJ);
-        mkdir(jijm.c_str(), 0775);
-        
-        return jijm;
+        return formatDir(prefix, "xzPlane", step) + ".cut_" + patch::to_string(atJ);
     }
     
     //Formally Slice
     std::string formatYZPlaneDir(tStep step, tNi atI, const std::string prefix="plot"){
         
-        return formatDir(prefix, "YZplane", step) + ".cut_" + patch::to_string(atI);
+        return formatDir(prefix, "yzPlane", step) + ".cut_" + patch::to_string(atI);
     }
     
     std::string formatVolumeDir(tStep step, const std::string prefix="plot"){
@@ -258,7 +255,7 @@ public:
     
     std::string formatAxisWhenBladeAngleDir(tStep step, int angle, const std::string prefix="plot"){
         
-        return formatDir(prefix, "YZplane", step) + ".angle_" + patch::to_string(angle);
+        return formatDir(prefix, "yzAnglePlane", step) + ".angle_" + patch::to_string(angle);
     }
     
     

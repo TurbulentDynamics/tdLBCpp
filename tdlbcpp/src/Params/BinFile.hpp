@@ -33,6 +33,12 @@ struct BinFileParams
     bool hasGridtCoords;
     bool hasColRowtCoords;
 
+    std::string reference = "absolute";
+    tNi i0;
+    tNi j0;
+    tNi k0;
+
+
     std::string QDataType = "";
     int QOutputLength = 0;
     
@@ -57,7 +63,12 @@ struct BinFileParams
             
             QDataType = jsonParams["QDataType"].asString();
             QOutputLength = jsonParams["QOutputLength"].asInt();
-           
+
+            reference = jsonParams["reference"].asString();
+            i0 = (tNi)jsonParams["i0"].asUInt64();
+            j0 = (tNi)jsonParams["j0"].asUInt64();
+            k0 = (tNi)jsonParams["k0"].asUInt64();
+
         }
         catch(std::exception& e)
         {
@@ -92,7 +103,12 @@ struct BinFileParams
             jsonParams["coordsType"] = coordsType;
             jsonParams["hasGridtCoords"] = hasGridtCoords;
             jsonParams["hasColRowtCoords"] = hasColRowtCoords;
-            
+
+            jsonParams["reference"] = reference;
+            jsonParams["i0"] = (Json::UInt64)i0;
+            jsonParams["j0"] = (Json::UInt64)j0;
+            jsonParams["k0"] = (Json::UInt64)k0;
+
             
             jsonParams["QDataType"] = QDataType;
             jsonParams["QOutputLength"] = (int)QOutputLength;
