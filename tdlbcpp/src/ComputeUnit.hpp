@@ -119,12 +119,12 @@ ComputeUnit<T, QVecSize>::~ComputeUnit()
 
 
 template <typename T, int QVecSize>
-template <Streaming streaming>
+template <Streaming streamingKind>
 void ComputeUnit<T, QVecSize>::collision(Collision scheme){
     switch( scheme ) {
 
         case Collision(EgglesSomers):
-            collision_EgglesSomers<streaming>(); break;
+            collision_EgglesSomers<streamingKind>(); break;
 
         case Collision(EgglesSomersLES):
             collision_EgglesSomers_LES(); break;

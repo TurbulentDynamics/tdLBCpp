@@ -104,10 +104,10 @@ public:
     void streamingNieve2();
     void streaming_esotwist();
     
-    template <Streaming streaming>
+    template <Streaming streamingKind>
     void collision(Collision scheme);
     void collision_Entropic();
-    template <Streaming streaming>
+    template <Streaming streamingKind>
     void collision_EgglesSomers();
     void collision_EgglesSomers_LES();
     
