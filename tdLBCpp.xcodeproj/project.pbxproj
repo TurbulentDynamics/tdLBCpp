@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3C71D865269E2E1D00C37F3D /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 3C71D861269E2E1D00C37F3D /* LICENSE */; };
+		3C71D866269E2E1D00C37F3D /* BUILD in Resources */ = {isa = PBXBuildFile; fileRef = 3C71D863269E2E1D00C37F3D /* BUILD */; };
+		3C71D867269E2E1D00C37F3D /* toojpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C71D864269E2E1D00C37F3D /* toojpeg.cpp */; };
+		3C71D868269E2E1D00C37F3D /* toojpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C71D864269E2E1D00C37F3D /* toojpeg.cpp */; };
 		D66D0F87269C49E50079FCAC /* timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D66D0F86269C49E50079FCAC /* timer.cpp */; };
 		D689CD6426010D0600DF4E61 /* testComputeUnit.mm in Sources */ = {isa = PBXBuildFile; fileRef = D689CD6326010D0600DF4E61 /* testComputeUnit.mm */; };
 		D6930C67261366B4004245CB /* testJsonFiles.mm in Sources */ = {isa = PBXBuildFile; fileRef = D6930C66261366B4004245CB /* testJsonFiles.mm */; };
@@ -28,6 +32,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3C71D861269E2E1D00C37F3D /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		3C71D862269E2E1D00C37F3D /* toojpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = toojpeg.h; sourceTree = "<group>"; };
+		3C71D863269E2E1D00C37F3D /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
+		3C71D864269E2E1D00C37F3D /* toojpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = toojpeg.cpp; sourceTree = "<group>"; };
 		D66D0F86269C49E50079FCAC /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		D66D0F88269C4A200079FCAC /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
 		D689CD6126010D0600DF4E61 /* testComputeUnit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testComputeUnit.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,6 +103,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3C71D860269E2E1D00C37F3D /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				3C71D861269E2E1D00C37F3D /* LICENSE */,
+				3C71D862269E2E1D00C37F3D /* toojpeg.h */,
+				3C71D863269E2E1D00C37F3D /* BUILD */,
+				3C71D864269E2E1D00C37F3D /* toojpeg.cpp */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
 		D689CD6226010D0600DF4E61 /* testComputeUnit */ = {
 			isa = PBXGroup;
 			children = (
@@ -187,6 +206,7 @@
 		D6E5C72525EE184B0067FDE1 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				3C71D860269E2E1D00C37F3D /* Tools */,
 				D6F5335D2615E78B00A715C9 /* BUILD */,
 				D6F533492615815D00A715C9 /* Params */,
 				D6E5C72825EE184B0067FDE1 /* Header.h */,
@@ -305,6 +325,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C71D865269E2E1D00C37F3D /* LICENSE in Resources */,
+				3C71D866269E2E1D00C37F3D /* BUILD in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,6 +337,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C71D868269E2E1D00C37F3D /* toojpeg.cpp in Sources */,
 				D689CD6426010D0600DF4E61 /* testComputeUnit.mm in Sources */,
 				D6930C67261366B4004245CB /* testJsonFiles.mm in Sources */,
 				D6AC327C269059960057E1E1 /* ComputeUnitParamsTest.cpp in Sources */,
@@ -325,6 +348,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C71D867269E2E1D00C37F3D /* toojpeg.cpp in Sources */,
 				D6E5C74525EE184B0067FDE1 /* jsoncpp.cpp in Sources */,
 				D6E5C74425EE184B0067FDE1 /* main.cpp in Sources */,
 				D66D0F87269C49E50079FCAC /* timer.cpp in Sources */,
