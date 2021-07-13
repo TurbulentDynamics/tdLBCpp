@@ -125,7 +125,7 @@ void ComputeUnit<T, QVecSize>::collision_EgglesSomers(){
                 q[Q18] = alf2[Q1] + 2*alf2[Q3] - 2*alf2[Q4] - 1.5*alf2[Q5] + 1.5*alf2[Q7] - 6*alf2[Q9] + 1.5*alf2[Q10] - alf2[Q12] + alf2[Q14] - alf2[Q15] - alf2[Q16] + alf2[Q17] + alf2[Q18];
 
 
-                AccessField<T, QVecSize, streaming>::write(*this, alf2, i, j, k);
+                AccessField<T, QVecSize, streaming>::write(*this, q, i, j, k);
 
             }
         }

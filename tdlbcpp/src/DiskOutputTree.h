@@ -281,6 +281,10 @@ public:
     std::string formatF3BinFileNamePath(std::string dir){
         return dir + "/" + formatCUid() + ".V5.F3.bin";
     }
+
+    std::string formatJpegFileNamePath(std::string dir){
+        return dir + "/" + formatCUid() + ".V5.jpg";
+    }
     
     
     int writeAllParamsJson(BinFileParams format, RunningParams runParam){

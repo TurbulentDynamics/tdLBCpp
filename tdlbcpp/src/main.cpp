@@ -267,12 +267,15 @@ int main(int argc, char* argv[]){
 
         for (auto xz: output.XZ_planes){
 
-            if (running.step % xz.repeat == 0) {
+            if ((running.step == xz.start_at_step) ||
+                   (running.step > xz.start_at_step 
+                && xz.repeat > 0 
+                && (running.step - xz.start_at_step) % xz.repeat == 0)) {
 
                 lb.template savePlaneXZ<float, 4>(xz, binFormat, running);
                 main_time = mainTimer.check(0, 4, main_time, "savePlaneXZ");
 
-                lb.calcVorticityXZ(xz.cutAt);
+                lb.calcVorticityXZ(xz.cutAt, running);
             }
         }
 
