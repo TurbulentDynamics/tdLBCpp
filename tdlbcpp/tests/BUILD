@@ -11,11 +11,12 @@ cc_test(
   srcs = ["DiskOutputTreeTest.cpp", "StreamingNieveTest.cpp", "StreamingNieveTest.hpp"],
   deps = [
           "//tdlbcpp/src/Params:params",
+          "//tdlbcpp/src/Tools:toojpeg",
           "//tdlbcpp/src:computeUnit",
           "//tdlbcpp/tests:utils",
           "//tdlbcpp/tests/Params:ParamsCommon",
           "@tdLBGeometryRushtonTurbineLib//Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib",
           "@googletest//:gtest_main"
   ],
-  copts = ["-Itdlbcpp/src"]
+  copts = ["-Itdlbcpp/src", "-Itdlbcpp/src/Tools"]
 )
