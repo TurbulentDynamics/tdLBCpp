@@ -125,7 +125,7 @@ public:
     void bounceBackBoundaryForward();
     
 
-      
+    T calcVorticityXZ(tNi j);
 
     void setGhostSizes();
     void getParamsFromJson(const std::string filePath);

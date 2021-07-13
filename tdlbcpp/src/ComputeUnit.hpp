@@ -159,7 +159,44 @@ Velocity<T> ComputeUnit<T, QVecSize>::getVelocitySparseF(tNi i, tNi j, tNi k, Fo
 };
 
 
+template <typename T, int QVecSize>
+T ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j){
 
+
+    T *Vort = new T[size];
+
+    for (tNi i = 1;  i <= xg1; i++) {
+
+        for (tNi k = 1; k <= zg1; k++) {
+
+
+//              T uxx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().x - Q[dirnQ2(i, j, k)].velocity().x);
+                T uxy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().x - Q[dirnQ6(i, j, k)].velocity().x);
+                T uxz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().x - Q[dirnQ4(i, j, k)].velocity().x);
+
+                T uyx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().y - Q[dirnQ2(i, j, k)].velocity().y);
+//              T uyy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().y - Q[dirnQ6(i, j, k)].velocity().y);
+                T uyz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().y - Q[dirnQ4(i, j, k)].velocity().y);
+
+
+                T uzx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().z - Q[dirnQ2(i, j, k)].velocity().z);
+                T uzy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().z - Q[dirnQ6(i, j, k)].velocity().z);
+//              T uzz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().z - Q[dirnQ4(i, j, k)].velocity().z);
+
+
+                T uxyuyx = uxy - uyx;
+                T uyzuzy = uyz - uzy;
+                T uzxuxz = uzx - uxz;
+
+                Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
+            }
+        }
+
+
+    //TODO Save Vorticity to grayscale bitmap/jpeg
+
+
+}
 
 
 
