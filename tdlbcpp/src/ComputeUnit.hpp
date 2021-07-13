@@ -163,7 +163,7 @@ Velocity<T> ComputeUnit<T, QVecSize>::getVelocitySparseF(tNi i, tNi j, tNi k, Fo
 
 
 template <typename T, int QVecSize>
-T ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j, RunningParams runParam){
+void ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j, RunningParams runParam){
 
 
     T *Vort = new T[size];
