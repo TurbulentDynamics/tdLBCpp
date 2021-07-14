@@ -30,8 +30,8 @@
 
 
 
-#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
-#include "../../tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
+#include "Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
+#include "Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 #include "ComputeUnit.h"
 
 //TODO: Temporary, different ComputeUnits could have different precision
@@ -58,6 +58,7 @@ int main(int argc, char* argv[]){
     std::string inputJsonPath = "";
     std::string geomJsonPath = "";
     std::string checkpointPath = "";
+    std::string streaming = "";
 
 
     try {
@@ -71,6 +72,7 @@ int main(int argc, char* argv[]){
         ("j,json", "Load input json file", cxxopts::value<std::string>(inputJsonPath))
         ("g,geom", "Load geometry input json file", cxxopts::value<std::string>(geomJsonPath))
         ("c,checkpoint_dir", "Load from Checkpoint directory", cxxopts::value<std::string>(checkpointPath))
+        ("s,streaming", "Streaming simple or esoteric", cxxopts::value<std::string>(streaming)->default_value("simple"))
         ("h,help", "Help")
         ;
 
@@ -226,15 +228,21 @@ int main(int argc, char* argv[]){
         geomRotating = geom.returnRotatingGeometry();
         main_time = mainTimer.check(0, 0, main_time, "updateRotatingGeometry");
 
+        
+        
+        if (streaming == "simple") {
+            lb.collision<Simple>(EgglesSomers);
+            main_time = mainTimer.check(0, 1, main_time, "Collision");
 
+            lb.streaming(Simple);
+            main_time = mainTimer.check(0, 2, main_time, "Streaming");
+        } else {
+            lb.collision<Esotwist>(EgglesSomers);
+            main_time = mainTimer.check(0, 1, main_time, "Collision");
 
-
-        lb.collision(EgglesSomers);
-        main_time = mainTimer.check(0, 1, main_time, "Collision");
-
-        lb.streaming(Simple);
-        main_time = mainTimer.check(0, 2, main_time, "Streaming");
-
+            lb.streaming(Esotwist);
+            main_time = mainTimer.check(0, 2, main_time, "Streaming");
+        }
 
         lb.moments();
 
@@ -259,12 +267,15 @@ int main(int argc, char* argv[]){
 
         for (auto xz: output.XZ_planes){
 
-            if (running.step % xz.repeat == 0) {
+            if ((running.step == xz.start_at_step) ||
+                   (running.step > xz.start_at_step 
+                && xz.repeat > 0 
+                && (running.step - xz.start_at_step) % xz.repeat == 0)) {
 
                 lb.template savePlaneXZ<float, 4>(xz, binFormat, running);
                 main_time = mainTimer.check(0, 4, main_time, "savePlaneXZ");
 
-                lb.calcVorticityXZ(xz.cutAt);
+                lb.calcVorticityXZ(xz.cutAt, running);
             }
         }
 

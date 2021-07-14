@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <iostream>
+#include "Tools/toojpeg.h"
+
 #include "ComputeUnit.h"
 #include "DiskOutputTree.h"
 
@@ -19,6 +22,7 @@
 template <typename T, int QVecSize>
 ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
 
+    evenStep = true;
     
     idi = cuParams.idi;
     idj = cuParams.idj;
@@ -115,11 +119,12 @@ ComputeUnit<T, QVecSize>::~ComputeUnit()
 
 
 template <typename T, int QVecSize>
+template <Streaming streamingKind>
 void ComputeUnit<T, QVecSize>::collision(Collision scheme){
     switch( scheme ) {
 
         case Collision(EgglesSomers):
-            collision_EgglesSomers(); break;
+            collision_EgglesSomers<streamingKind>(); break;
 
         case Collision(EgglesSomersLES):
             collision_EgglesSomers_LES(); break;
@@ -158,10 +163,12 @@ Velocity<T> ComputeUnit<T, QVecSize>::getVelocitySparseF(tNi i, tNi j, tNi k, Fo
 
 
 template <typename T, int QVecSize>
-T ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j){
+void ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j, RunningParams runParam){
 
 
     T *Vort = new T[size];
+    bool boundsInitialized = false;
+    T max = 0, min = 0;
 
     for (tNi i = 1;  i <= xg1; i++) {
 
@@ -187,12 +194,37 @@ T ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j){
                 T uzxuxz = uzx - uxz;
 
                 Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
+                if (!boundsInitialized)  {
+                    boundsInitialized = true;
+                    max = Vort[index(i,j,k)];
+                    min = Vort[index(i,j,k)];
+                }  else {
+                    if (Vort[index(i,j,k)] < min) {
+                        min = Vort[index(i,j,k)];
+                    } 
+                    if (Vort[index(i,j,k)] > max) {
+                        max = Vort[index(i,j,k)];
+                    }
+                }
             }
         }
 
+    // Saving JPEG
+    auto *pict = new unsigned char[xg1 * zg1];
 
-    //TODO Save Vorticity to grayscale bitmap/jpeg
+    for (tNi i = 1;  i <= xg1; i++) {
+        for (tNi k = 1; k <= zg1; k++) {
+            pict[zg1 * (i - 1)+ (k - 1)] = floor(256 * ((Vort[index(i,j,k)] - min) / (max - min)));
+        }
+    }
+    std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, j);
+    outputTree.createDir(plotDir);
+    std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
 
+    TooJpeg::openJpeg(jpegPath);
+    TooJpeg::writeJpeg(pict, xg1, zg1,
+               false, 90, false, "Debug");
+    TooJpeg::closeJpeg();
 
 }
 

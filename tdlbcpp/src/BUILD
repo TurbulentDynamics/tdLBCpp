@@ -13,8 +13,8 @@ cc_library(
 cc_binary(
     name = "tdlbcpp",
     srcs = ["main.cpp", "timer.cpp"],
-    deps = [":cxxopts", "//tdlbcpp/src/Params:params", ":computeUnit",
-            "//tdLBGeometryRushtonTurbineLib/Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib"],
+    deps = [":cxxopts", "//tdlbcpp/src/Params:params", ":computeUnit", "//tdlbcpp/src/Tools:toojpeg",
+            "@tdLBGeometryRushtonTurbineLib//Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib"],
 )
 
 
