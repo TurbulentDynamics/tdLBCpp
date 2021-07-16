@@ -263,9 +263,8 @@ int main(int argc, char* argv[]){
         binFormat.QDataType = "float";
         binFormat.QOutputLength = 4;
 
-
-
         for (auto xz: output.XZ_planes){
+            lb.template savePlaneXZ<float, QLen::D3Q19>(xz, binFormat, running);
 
             if ((running.step == xz.start_at_step) ||
                    (running.step > xz.start_at_step 

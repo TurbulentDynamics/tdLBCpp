@@ -120,7 +120,7 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alf
 //                if (k2 > nz) k2 = k2 - nz;
                 
                 
-                T rho = Q[index(i2,j2,k2)].q[RHOQ];
+                T rho = flow.initialRho;//Q[index(i2,j2,k2)].q[RHOQ];
                 
                 
                 Velocity<T> u = Q[index(i2,j2,k2)].velocity(flow.initialRho);

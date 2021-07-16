@@ -131,7 +131,22 @@ template <typename T>
 struct QVec<T,QLen::D3Q27>:public QVecBase<T,QLen::D3Q27> {
 
     using QVecBase<T, QLen::D3Q27>::velocity;
-    
+
+    Velocity<T> velocity(Force<T> f, T rho){
+
+        Velocity<T> u;
+        T *q = this->q;
+
+        u.x = (1.0 / rho) * (q[Q1] - q[Q2] + q[Q7] - q[Q8] + q[Q9] - q[Q10] + q[Q13] - q[Q14] + q[Q15] - q[Q16]
+            + q[Q19] - q[Q20] + q[Q21] - q[Q22] + q[Q23] - q[Q24] + q[Q26] - q[Q25] + 0.5 * f.x);
+        u.y = (1.0 / rho) * (q[Q3] - q[Q4] + q[Q7] - q[Q8] + q[Q11] - q[Q12] + q[Q14] - q[Q13] + q[Q17] - q[Q18]
+            + q[Q19] - q[Q20] + q[Q21] - q[Q22] + q[Q24] - q[Q23] + q[Q25] - q[Q26] + 0.5 * f.y);
+        u.z = (1.0 / rho) * (q[Q5] - q[Q6] + q[Q9] - q[Q10] + q[Q11] - q[Q12] + q[Q16] - q[Q15] + q[Q18] - q[Q17]
+            + q[Q19] - q[Q20] + q[Q22] - q[Q21] + q[Q23] - q[Q24] + q[Q25] - q[Q26] + 0.5 * f.z);
+
+        return u;
+    };
+
     Velocity<T> velocity(T rho){
         
         Velocity<T> u;
@@ -152,6 +167,18 @@ template <typename T>
 struct QVec<T,QLen::D3Q19>:public QVecBase<T,QLen::D3Q19> {
 
     using QVecBase<T, QLen::D3Q19>::velocity;
+
+    Velocity<T> velocity(Force<T> f, T rho){
+
+        Velocity<T> u;
+        T *q = this->q;
+        
+        u.x = (1.0 / rho) * (q[Q1] - q[Q2] + q[Q7] - q[Q8] + q[Q9] - q[Q10] + q[Q13] - q[Q14] + q[Q15] - q[Q16] + 0.5 * f.x);
+        u.y = (1.0 / rho) * (q[Q3] - q[Q4] + q[Q7] - q[Q8] + q[Q11] - q[Q12] + q[Q14] - q[Q13] + q[Q17] - q[Q18] + 0.5 * f.y);
+        u.z = (1.0 / rho) * (q[Q5] - q[Q6] + q[Q9] - q[Q10] + q[Q11] - q[Q12] + q[Q16] - q[Q15] + q[Q18] - q[Q17] + 0.5 * f.z);
+
+        return u;
+    };
 
     Velocity<T> velocity(T rho){
         

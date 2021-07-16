@@ -174,18 +174,18 @@ void ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j, RunningParams runParam){
 
         for (tNi k = 1; k <= zg1; k++) {
 
-
+                T rho = flow.initialRho;
 //              T uxx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().x - Q[dirnQ2(i, j, k)].velocity().x);
-                T uxy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().x - Q[dirnQ6(i, j, k)].velocity().x);
-                T uxz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().x - Q[dirnQ4(i, j, k)].velocity().x);
+                T uxy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity(rho).x - Q[dirnQ6(i, j, k)].velocity(rho).x);
+                T uxz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity(rho).x - Q[dirnQ4(i, j, k)].velocity(rho).x);
 
-                T uyx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().y - Q[dirnQ2(i, j, k)].velocity().y);
+                T uyx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity(rho).y - Q[dirnQ2(i, j, k)].velocity(rho).y);
 //              T uyy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().y - Q[dirnQ6(i, j, k)].velocity().y);
-                T uyz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().y - Q[dirnQ4(i, j, k)].velocity().y);
+                T uyz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity(rho).y - Q[dirnQ4(i, j, k)].velocity(rho).y);
 
 
-                T uzx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().z - Q[dirnQ2(i, j, k)].velocity().z);
-                T uzy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().z - Q[dirnQ6(i, j, k)].velocity().z);
+                T uzx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity(rho).z - Q[dirnQ2(i, j, k)].velocity(rho).z);
+                T uzy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity(rho).z - Q[dirnQ6(i, j, k)].velocity(rho).z);
 //              T uzz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().z - Q[dirnQ4(i, j, k)].velocity().z);
 
 

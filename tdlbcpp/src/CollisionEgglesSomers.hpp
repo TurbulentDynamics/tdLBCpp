@@ -42,7 +42,7 @@ void ComputeUnit<T, QVecSize>::collision_EgglesSomers(){
 
 				QVec<T, QVecSize> q = AccessField<T, QVecSize, streamingKind>::read(*this, i, j, k);
 
-				Velocity<T> u = q.velocity(f);
+				Velocity<T> u = q.velocity(f, flow.initialRho);
 
                 QVec<T, QVecSize> alf2;
 
