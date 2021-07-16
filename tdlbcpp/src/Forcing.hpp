@@ -54,7 +54,14 @@ void inline smoothedDeltaFunction(T i_cart_fraction, T k_cart_fraction, T ppp[][
     }
 }
 
-
+template <typename T>
+Pos3d<T> inline rotationForce(tNi iCenter, tNi kCenter, tNi radius, PosPolar<tNi, T> g) {
+    Pos3d<T> res;
+    res.i = g.iCartFraction;
+    res.j = g.jCartFraction;
+    res.k = g.kCartFraction;
+    return res;
+}
 
 template <typename T, int QVecSize>
 void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius){
@@ -86,6 +93,7 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alf
 //        Pos3d<T> fraction = rotationForce<T>(iCenter, kCenter, radius, g);
 
 //        smoothedDeltaFunction(fraction.i, fraction.k, ppp);
+        smoothedDeltaFunction(g.iCartFraction, g.kCartFraction, ppp);
         
         
         tNi i = g.i;
@@ -115,7 +123,7 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alf
                 T rho = Q[index(i2,j2,k2)].q[RHOQ];
                 
                 
-                Velocity<T> u = Q[index(i2,j2,k2)].velocity();
+                Velocity<T> u = Q[index(i2,j2,k2)].velocity(flow.initialRho);
                 
                 
                 //adding the density of a nearby point using a weight (in ppp)
@@ -154,7 +162,7 @@ void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alf
 //                if (k2 > nz) k2 = k2-nz;
                 
             
-                Velocity<T> u = Q[index(i2,j2,k2)].velocity();
+                Velocity<T> u = Q[index(i2,j2,k2)].velocity(flow.initialRho);
 
                 F[index(i2,j2,k2)].x = alfa * u.x - beta * ppp[i1+1][k1+1] * xs;
                 F[index(i2,j2,k2)].y = alfa * u.y - beta * ppp[i1+1][k1+1] * ys;
