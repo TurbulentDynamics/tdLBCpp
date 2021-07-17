@@ -166,7 +166,7 @@ template <typename T, int QVecSize>
 void ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j, RunningParams runParam){
 
 
-    T *Vort = new T[size];
+    std::vector<T> Vort(size);
     T mean = 0;
 
     for (tNi i = 1;  i <= xg1; i++) {
@@ -212,7 +212,7 @@ void ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j, RunningParams runParam){
     std::cout << "mean = " << mean << ", sigma = " << sigma << std::endl;
 
     // Saving JPEG
-    auto *pict = new unsigned char[xg1 * zg1];
+    std::vector<unsigned char> pict(xg1 * zg1);
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi k = 1; k <= zg1; k++) {
@@ -235,7 +235,7 @@ void ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j, RunningParams runParam){
     std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
 
     TooJpeg::openJpeg(jpegPath);
-    TooJpeg::writeJpeg(pict, xg1, zg1,
+    TooJpeg::writeJpeg(pict.data(), xg1, zg1,
                false, 90, false, "Debug");
     TooJpeg::closeJpeg();
 
