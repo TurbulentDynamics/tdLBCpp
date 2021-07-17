@@ -167,8 +167,7 @@ void ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j, RunningParams runParam){
 
 
     T *Vort = new T[size];
-    bool boundsInitialized = false;
-    T max = 0, min = 0;
+    T mean = 0;
 
     for (tNi i = 1;  i <= xg1; i++) {
 
@@ -194,27 +193,41 @@ void ComputeUnit<T, QVecSize>::calcVorticityXZ(tNi j, RunningParams runParam){
                 T uzxuxz = uzx - uxz;
 
                 Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
-                if (!boundsInitialized)  {
-                    boundsInitialized = true;
-                    max = Vort[index(i,j,k)];
-                    min = Vort[index(i,j,k)];
-                }  else {
-                    if (Vort[index(i,j,k)] < min) {
-                        min = Vort[index(i,j,k)];
-                    } 
-                    if (Vort[index(i,j,k)] > max) {
-                        max = Vort[index(i,j,k)];
-                    }
+                if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)])) {
+                    tNi n1 = (i-1) * zg + k;
+                    mean = mean * (((T)n1 - 1) / (T)n1) + Vort[index(i,j,k)] / (T)n1;
                 }
             }
         }
+    T sigma = 0;
+    for (tNi i = 1;  i <= xg1; i++) {
+        for (tNi k = 1; k <= zg1; k++) {
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)])) {
+                tNi n1 = (i-1) * zg + k;
+                sigma = sigma * (((T)n1 - 1) / (T)n1) + std::pow(Vort[index(i,j,k)] - mean, (T)2.0) / (T)n1;
+            }
+        }
+    }
+    sigma = std::sqrt(sigma);
+    std::cout << "mean = " << mean << ", sigma = " << sigma << std::endl;
 
     // Saving JPEG
     auto *pict = new unsigned char[xg1 * zg1];
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi k = 1; k <= zg1; k++) {
-            pict[zg1 * (i - 1)+ (k - 1)] = floor(256 * ((Vort[index(i,j,k)] - min) / (max - min)));
+            T color = (T)0.0;
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)])) {
+                T diff = Vort[index(i,j,k)] - mean;
+                color = (((diff + (T)1.5*sigma) / ((T)3 * sigma)) + (T)0.5) * (T)128;
+                if (color < (T)0.0) {
+                    color = (T)0.0;
+                }
+                if (color >= (T)255.0) {
+                    color = (T)255.0;
+                }
+            }
+            pict[zg1 * (i - 1)+ (k - 1)] = (unsigned char)color;
         }
     }
     std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, j);
