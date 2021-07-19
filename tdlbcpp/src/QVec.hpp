@@ -59,19 +59,27 @@ struct Force {
 
 
 template <typename T, int size=QLen::D3Q19>
-struct QVec {
+struct QVecBase {
     T q[size];
     
-    QVec() {
+    QVecBase() {
     }
 
-    ~QVec() {
+    QVecBase(const T* qFrom) {
+        copy(qFrom);
+    }
+
+    QVecBase(const T* qFrom, size_t step) {
+        copy(qFrom, step);
+    }
+
+    ~QVecBase() {
         freeMem();
     }
-    QVec(const QVec<T, size>& other) {
+    QVecBase(const QVecBase<T, size>& other) {
         copy(other);
     }
-    QVec<T, size>& operator=(const QVec<T, size>& other) {
+    QVecBase<T, size>& operator=(const QVecBase<T, size>& other) {
         copy(other);
         return *this;
     }
@@ -82,6 +90,44 @@ struct QVec {
         }
     };
     
+#ifndef RELEASE
+	T& operator[](int i) {
+		assert(i >=0 && i < size);
+		return q[i];
+	}
+#endif
+    
+    
+private:
+    void freeMem() {
+    }
+
+    inline void copy(const T* qFrom) {
+        for (int l = 0; l < size; l++) {
+            q[l] = qFrom[l];
+        }
+    }
+
+    inline void copy(const T* qFrom, size_t step) {
+        for (int l = 0; l < size; l++) {
+            q[l] = qFrom + l * step;
+        }
+    }
+    
+    inline void copy(const QVecBase<T, size> &other) {
+        if (this != &other) {
+            freeMem();
+            copy(other.q);
+        }
+    }
+};
+
+template<typename Base, typename T>
+struct VelocityCalculation : public Base {
+    using Base::q;
+    using Base::Base;
+    using Base::operator=;
+
     Velocity<T> velocity(Force<T> f){
         
         Velocity<T> u;
@@ -101,30 +147,10 @@ struct QVec {
       
         return u;
     };
-    
-#ifndef RELEASE
-	T& operator[](int i) {
-		assert(i >=0 && i < size);
-		return q[i];
-	}
-#endif
-    
-    
-private:
-    void freeMem() {
-    }
-    
-    void copy(const QVec<T, size> &other) {
-        if (this != &other) {
-            freeMem();
-            for (int l = 0; l < size; l++) {
-                q[l] = other.q[l];
-            }
-        }
-    }
 };
 
-
+template<typename T, int size=QLen::D3Q19>
+using QVec=VelocityCalculation<QVecBase<T,size>,T>;
 
 
 

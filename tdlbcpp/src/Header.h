@@ -19,6 +19,7 @@ struct MPI_Barrier{};
 enum QLen {D3Q19 = 18, D3Q27 = 26};
 enum Collision {EgglesSomers, EgglesSomersLES, Entropic};
 enum Streaming {Simple, Esotwist};
+enum MemoryLayoutType {MemoryLayoutIJKL, MemoryLayoutLIJK};
 
 
 using tNi = long int;

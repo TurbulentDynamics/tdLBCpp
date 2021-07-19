@@ -27,6 +27,7 @@
 #include "Params/OutputParams.hpp"
 
 
+#include "Field.hpp"
 #include "QVec.hpp"
 #include "DiskOutputTree.h"
 #include "Output.hpp"
@@ -44,8 +45,9 @@
 
 
 
-template <typename T, int QVecSize>
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 class ComputeUnit {
+    using Fld = Field<T, QVecSize, MemoryLayout>;
 public:
     
     //Position in the grid
@@ -73,7 +75,7 @@ public:
     FlowParams<T> flow;
     
     
-    QVec<T, QVecSize> *Q;
+    Fld Q;
 
     bool evenStep;
     
@@ -274,18 +276,18 @@ public:
     
 };
 
-template<typename T, int QVecSize, Streaming streaming>
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streaming>
 struct AccessField {
-    inline static QVec<T, QVecSize> read(ComputeUnit<T, QVecSize> cu, tNi i, tNi j, tNi k);
-    inline static void write(ComputeUnit<T, QVecSize> cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k);
+    inline static QVec<T, QVecSize> read(ComputeUnit<T, QVecSize, MemoryLayout> cu, tNi i, tNi j, tNi k);
+    inline static void write(ComputeUnit<T, QVecSize, MemoryLayout> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k);
 };
 
-template<typename T, int QVecSize>
-struct AccessField<T, QVecSize, Simple> {
-    inline static QVec<T, QVecSize> read(ComputeUnit<T, QVecSize> cu, tNi i, tNi j, tNi k) {
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+struct AccessField<T, QVecSize, MemoryLayout, Simple> {
+    inline static QVec<T, QVecSize> read(ComputeUnit<T, QVecSize, MemoryLayout> &cu, tNi i, tNi j, tNi k) {
         return cu.Q[cu.index(i,j,k)];
     }
-    inline static void write(ComputeUnit<T, QVecSize> cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+    inline static void write(ComputeUnit<T, QVecSize, MemoryLayout> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
         cu.Q[cu.index(i,j,k)] = q;
     }
 };

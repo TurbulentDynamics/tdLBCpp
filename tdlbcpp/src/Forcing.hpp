@@ -56,8 +56,8 @@ void inline smoothedDeltaFunction(T i_cart_fraction, T k_cart_fraction, T ppp[][
 
 
 
-template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::forcing(std::vector<PosPolar<tNi, T>> geom, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnit<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tNi, T>> geom, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius){
     
     
     //        T alfa = 0.97;
