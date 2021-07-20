@@ -11,16 +11,16 @@
 
 
 
-template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::streaming_esotwist() {
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnit<T, QVecSize, MemoryLayout>::streaming_esotwist() {
 	//TODO
 	evenStep = !evenStep;
 }
 
 
-template<typename T, int QVecSize>
-struct AccessField<T, QVecSize, Esotwist> {
-    inline static QVec<T, QVecSize> read(ComputeUnit<T, QVecSize> cu, tNi i, tNi j, tNi k) {
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+struct AccessField<T, QVecSize, MemoryLayout, Esotwist> {
+    inline static QVec<T, QVecSize> read(ComputeUnit<T, QVecSize, MemoryLayout> &cu, tNi i, tNi j, tNi k) {
         if (cu.evenStep) {
             QVec<T, QVecSize> qVec;
             tNi ind0 = cu.index(i,j,k);
@@ -73,7 +73,7 @@ struct AccessField<T, QVecSize, Esotwist> {
             return qVec;
         }
     }
-    inline static void write(ComputeUnit<T, QVecSize> cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+    inline static void write(ComputeUnit<T, QVecSize, MemoryLayout> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
         if (cu.evenStep) {
             tNi ind0 = cu.index(i,j,k);
             cu.Q[ind0].q[ Q1] = q[ Q2]; 

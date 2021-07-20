@@ -197,7 +197,7 @@ int main(int argc, char* argv[]){
 
 
 
-    ComputeUnit<useQVecPrecision, QLen::D3Q19> lb = ComputeUnit<useQVecPrecision, QLen::D3Q19>(cu, flow, outputTree);
+    auto lb = ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL>(cu, flow, outputTree);
 
     if (checkpointPath != ""){
         lb.checkpoint_read(checkpointPath, "Device");

@@ -20,8 +20,8 @@
 #include "tdlbcpp/tests/Params/ParamsCommon.hpp"
 #include "StreamingNieveTest.hpp"
 
-template <typename T, int QVecSize>
-void fillForTest(ComputeUnit<T, QVecSize> cu)
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void fillForTest(ComputeUnit<T, QVecSize, MemoryLayout> &cu)
 {
 
     if (cu.xg > 99 || cu.yg > 99 || cu.zg > 99)
@@ -59,8 +59,8 @@ void fillForTest(ComputeUnit<T, QVecSize> cu)
 #endif
 };
 
-template <typename T, int QVecSize>
-void generateTestData(ComputeUnit<T, QVecSize> cu, std::string headerPath)
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void generateTestData(ComputeUnit<T, QVecSize, MemoryLayout> &cu, std::string headerPath)
 {
     std::ofstream hdr(headerPath);
     hdr << "namespace TestUtils {\n";
@@ -93,10 +93,10 @@ void generateTestData(ComputeUnit<T, QVecSize> cu, std::string headerPath)
     hdr.close();
 }
 
-template <typename T, int QVecSize>
-void testStream(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, ComputeUnit<T, QVecSize> actual)
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void testStream(std::string tag, ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, ComputeUnit<T, QVecSize, MemoryLayout> &actual)
 {
-    ComputeUnit<T, QVecSize> expected = ComputeUnit<T, QVecSize>(cuParams, flow, outputTree);
+    auto expected = ComputeUnit<T, QVecSize, MemoryLayout>(cuParams, flow, outputTree);
     TestUtils::fillExpectedComputeUnitValues(expected);
     for (tNi i = 0; i < actual.xg; i++)
     {
@@ -106,8 +106,10 @@ void testStream(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree o
             {
                 for (unsigned long int l = 0; l < QVecSize; l++)
                 {
+                    //std::cerr << "ind: i,j,k,l = " << i << ", " << j << ", " << k << ", " << l << std::endl;
+                    //std::cerr << "act: " << actual.Q[actual.index(i, j, k)].q[l] << ", exp: " << expected.Q[expected.index(i, j, k)].q[l] << std::endl;
                     ASSERT_EQ(actual.Q[actual.index(i, j, k)].q[l], expected.Q[expected.index(i, j, k)].q[l])
-                        << "value for Q doesn't match at " << i << ", " << j << ", " << k << ", " << l << " index, actual: "
+                        << tag << " : value for Q doesn't match at " << i << ", " << j << ", " << k << ", " << l << " index, actual: "
                         << actual.Q[actual.index(i, j, k)].q[l]
                         << " != expected " << expected.Q[expected.index(i, j, k)].q[l];
                 }
@@ -134,7 +136,8 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
     cuParams.z = 3;
     cuParams.ghost = 1;
 
-    ComputeUnit<unsigned long, QLen::D3Q19> lb2 = ComputeUnit<unsigned long, QLen::D3Q19>(cuParams, flow, diskOutputTree);
+    auto lb2 = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutIJKL>(cuParams, flow, diskOutputTree);
+    auto lb2lijk = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK>(cuParams, flow, diskOutputTree);
 
     fillForTest(lb2);
     lb2.streamingNieve();
@@ -143,5 +146,9 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
         std::string headerPath = std::getenv("GENERATE_STREAMING_NIEVE_TEST_HPP");
         generateTestData(lb2, headerPath);
     }
-    testStream(cuParams, flow, diskOutputTree, lb2);
+    testStream("IJKL", cuParams, flow, diskOutputTree, lb2);
+
+    fillForTest(lb2lijk);
+    lb2lijk.streamingNieve();
+    testStream("LIJK", cuParams, flow, diskOutputTree, lb2lijk);
 }

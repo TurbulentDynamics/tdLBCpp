@@ -15,18 +15,18 @@
 
 
 
-template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::collision_EgglesSomers_LES(){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnit<T, QVecSize, MemoryLayout>::collision_EgglesSomers_LES(){
 
 //    alf2[ 5] = (2.0 * (q[2] + 0.5 * f.x) * u.x - q[ 5]*c)*b * Nu.getNu(i,j,k);
 
 }
 
 
-template <typename T, int QVecSize>
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 template <Streaming streamingKind>
-void ComputeUnit<T, QVecSize>::collision_EgglesSomers(){
-  
+void ComputeUnit<T, QVecSize, MemoryLayout>::collision_EgglesSomers(){
+    using AF = AccessField<T, QVecSize, MemoryLayout, streamingKind>;
 
     //kinematic viscosity.
     T b = 1.0 / (1.0 + 6 * flow.nu);
@@ -40,7 +40,7 @@ void ComputeUnit<T, QVecSize>::collision_EgglesSomers(){
 
                 Force<T> f = F[index(i,j,k)];
 
-				QVec<T, QVecSize> q = AccessField<T, QVecSize, streamingKind>::read(*this, i, j, k);
+				QVec<T, QVecSize> q = AF::read(*this, i, j, k);
 
 				Velocity<T> u = q.velocity(f);
 
@@ -125,7 +125,7 @@ void ComputeUnit<T, QVecSize>::collision_EgglesSomers(){
                 q[Q18] = alf2[Q1] + 2*alf2[Q3] - 2*alf2[Q4] - 1.5*alf2[Q5] + 1.5*alf2[Q7] - 6*alf2[Q9] + 1.5*alf2[Q10] - alf2[Q12] + alf2[Q14] - alf2[Q15] - alf2[Q16] + alf2[Q17] + alf2[Q18];
 
 
-                AccessField<T, QVecSize, streamingKind>::write(*this, q, i, j, k);
+                AF::write(*this, q, i, j, k);
 
             }
         }
@@ -134,10 +134,10 @@ void ComputeUnit<T, QVecSize>::collision_EgglesSomers(){
 
 
 
-template <typename T, int QVecSize>
-void ComputeUnit<T, QVecSize>::moments(){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnit<T, QVecSize, MemoryLayout>::moments(){
 
-
+    using QVecAcc = QVecAccess<T, QVecSize, MemoryLayout>;
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi j = 1; j <= yg1; j++) {
@@ -145,7 +145,7 @@ void ComputeUnit<T, QVecSize>::moments(){
             for (tNi k = 1; k <= zg1; k++) {
                 
                 
-                QVec<T, QVecSize> qVec = Q[index(i, j, k)];
+                QVecAcc qVec = Q[index(i, j, k)];
 
     
                 QVec<T, QVecSize> alf1 = Q[index(i, j, k)];
