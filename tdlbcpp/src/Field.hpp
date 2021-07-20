@@ -2,37 +2,29 @@
 #include "Header.h"
 #include "QVec.hpp"
 
-template <typename T, int QVecSize>
-struct QVecAccessCommon
-{
-    T *q;
-    QVecAccessCommon(T *q) : q(q) {}
-};
-
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 struct QVecAccessBase
 {
 };
 
 template <typename T, int QVecSize>
-struct QVecAccessBase<T, QVecSize, MemoryLayoutIJKL> : public QVecAccessCommon<T, QVecSize>
+struct QVecAccessBase<T, QVecSize, MemoryLayoutIJKL>
 {
-    using Base = QVecAccessCommon<T, QVecSize>;
-    using Base::q;
+    T *q;
 
-    QVecAccessBase(T *Q, tNi index) : Base(Q + index * QVecSize) {}
+    QVecAccessBase(T *Q, tNi index) : q(Q + index * QVecSize) {}
 
-    T &operator[](int l)
+    inline T &operator[](int l)
     {
         return q[l];
     }
 
-    operator QVec<T, QVecSize>()
+    inline operator QVec<T, QVecSize>()
     {
         return QVec<T, QVecSize>(q);
     }
 
-    QVecAccessBase<T, QVecSize, MemoryLayoutIJKL> &operator=(const QVec<T, QVecSize> &v)
+    inline QVecAccessBase<T, QVecSize, MemoryLayoutIJKL> &operator=(const QVec<T, QVecSize> &v)
     {
         for (int i = 0; i < QVecSize; i++)
         {
@@ -42,28 +34,38 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutIJKL> : public QVecAccessCommon<T
     }
 };
 
-template <typename T, int QVecSize>
-struct QVecAccessBase<T, QVecSize, MemoryLayoutLIJK> : public QVecAccessCommon<T, QVecSize>
+template <typename T>
+struct SparseArray
 {
-    using Base = QVecAccessCommon<T, QVecSize>;
-    using Base::operator=;
-    using Base::q;
+    T *q;
+    size_t step;
+    SparseArray(T *q, size_t step) : q(q), step(step) {}
+    inline T &operator[](int l)
+    {
+        return q[l * step];
+    }
+};
+
+template <typename T, int QVecSize>
+struct QVecAccessBase<T, QVecSize, MemoryLayoutLIJK>
+{
+    SparseArray<T> q;
 
     tNi ijkSize;
 
-    QVecAccessBase(T *Q, tNi index, tNi ijkSize) : Base(Q + index), ijkSize(ijkSize) {}
+    QVecAccessBase(T *Q, tNi index, tNi ijkSize) : q(Q + index, ijkSize), ijkSize(ijkSize) {}
 
-    T &operator[](int l)
+    inline T &operator[](int l)
     {
-        return q[l * ijkSize];
+        return q[l];
     }
 
-    operator QVec<T, QVecSize>()
+    inline operator QVec<T, QVecSize>()
     {
         return QVec<T, QVecSize>(q, ijkSize);
     }
 
-    QVecAccessBase<T, QVecSize, MemoryLayoutLIJK> &operator=(const QVec<T, QVecSize> &v)
+    inline QVecAccessBase<T, QVecSize, MemoryLayoutLIJK> &operator=(const QVec<T, QVecSize> &v)
     {
         for (int i = 0; i < QVecSize; i++)
         {
@@ -101,18 +103,14 @@ struct FieldBase
         q = new T[qSize];
     }
 
-    QVecAcc operator[](int index)
+    inline QVecAcc operator[](int index)
     {
         return QVecAcc(q, index);
     }
 
-    operator void *()
+    inline operator void *()
     {
         return q;
-    }
-
-    operator QVec<T, QVecSize>()
-    {
     }
 
     ~FieldBase()
@@ -139,7 +137,7 @@ struct Field<T, QVecSize, MemoryLayoutLIJK> : public FieldBase<T, QVecSize, Memo
     using Base::q;
     using Base::qVectorNumber;
 
-    QVecAcc operator[](int index)
+    inline QVecAcc operator[](int index)
     {
         return QVecAcc(q, index, qVectorNumber);
     }

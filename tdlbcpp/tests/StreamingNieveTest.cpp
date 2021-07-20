@@ -106,6 +106,8 @@ void testStream(std::string tag, ComputeUnitParams cuParams, FlowParams<T> flow,
             {
                 for (unsigned long int l = 0; l < QVecSize; l++)
                 {
+                    //std::cerr << "ind: i,j,k,l = " << i << ", " << j << ", " << k << ", " << l << std::endl;
+                    //std::cerr << "act: " << actual.Q[actual.index(i, j, k)].q[l] << ", exp: " << expected.Q[expected.index(i, j, k)].q[l] << std::endl;
                     ASSERT_EQ(actual.Q[actual.index(i, j, k)].q[l], expected.Q[expected.index(i, j, k)].q[l])
                         << tag << " : value for Q doesn't match at " << i << ", " << j << ", " << k << ", " << l << " index, actual: "
                         << actual.Q[actual.index(i, j, k)].q[l]
