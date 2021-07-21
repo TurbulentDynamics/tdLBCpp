@@ -32,6 +32,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3C3CFE1C26A4084D002B7FD4 /* Field.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Field.hpp; sourceTree = "<group>"; };
 		3C71D861269E2E1D00C37F3D /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		3C71D862269E2E1D00C37F3D /* toojpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = toojpeg.h; sourceTree = "<group>"; };
 		3C71D863269E2E1D00C37F3D /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
@@ -206,6 +207,7 @@
 		D6E5C72525EE184B0067FDE1 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				3C3CFE1C26A4084D002B7FD4 /* Field.hpp */,
 				3C71D860269E2E1D00C37F3D /* Tools */,
 				D6F5335D2615E78B00A715C9 /* BUILD */,
 				D6F533492615815D00A715C9 /* Params */,

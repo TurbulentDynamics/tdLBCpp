@@ -14,7 +14,7 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutIJKL>
 
     QVecAccessBase(T *Q, tNi index) : q(Q + index * QVecSize) {}
 
-    inline T &operator[](int l)
+    inline T &operator[](tNi l)
     {
         return q[l];
     }
@@ -40,7 +40,7 @@ struct SparseArray
     T *q;
     size_t step;
     SparseArray(T *q, size_t step) : q(q), step(step) {}
-    inline T &operator[](int l)
+    inline T &operator[](tNi l)
     {
         return q[l * step];
     }
@@ -55,7 +55,7 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutLIJK>
 
     QVecAccessBase(T *Q, tNi index, tNi ijkSize) : q(Q + index, ijkSize), ijkSize(ijkSize) {}
 
-    inline T &operator[](int l)
+    inline T &operator[](tNi l)
     {
         return q[l];
     }
@@ -103,7 +103,7 @@ struct FieldBase
         q = new T[qSize];
     }
 
-    inline QVecAcc operator[](int index)
+    inline QVecAcc operator[](tNi index)
     {
         return QVecAcc(q, index);
     }
@@ -137,7 +137,7 @@ struct Field<T, QVecSize, MemoryLayoutLIJK> : public FieldBase<T, QVecSize, Memo
     using Base::q;
     using Base::qVectorNumber;
 
-    inline QVecAcc operator[](int index)
+    inline QVecAcc operator[](tNi index)
     {
         return QVecAcc(q, index, qVectorNumber);
     }
