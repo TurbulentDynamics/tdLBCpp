@@ -15,8 +15,8 @@
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::collision_Entropic() {
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::collision() {
     //TODO
 }
 

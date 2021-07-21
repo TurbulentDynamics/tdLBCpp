@@ -1,6 +1,6 @@
 namespace TestUtils {
     template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-    void fillExpectedComputeUnitValues(ComputeUnit<T, QVecSize, MemoryLayout> &cu) {
+    void fillExpectedComputeUnitValues(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu) {
         QVec<T, QVecSize> qTmp;
         qTmp.q[0] = 0; qTmp.q[1] = 1; qTmp.q[2] = 2; qTmp.q[3] = 3; qTmp.q[4] = 4; qTmp.q[5] = 5; qTmp.q[6] = 6; qTmp.q[7] = 7;
         qTmp.q[8] = 8; qTmp.q[9] = 9; qTmp.q[10] = 10; qTmp.q[11] = 11; qTmp.q[12] = 12; qTmp.q[13] = 13; qTmp.q[14] = 14; qTmp.q[15] = 15;

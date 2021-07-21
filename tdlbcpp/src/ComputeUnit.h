@@ -46,7 +46,7 @@
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-class ComputeUnit {
+class ComputeUnitBase {
     using Fld = Field<T, QVecSize, MemoryLayout>;
 public:
     
@@ -88,10 +88,10 @@ public:
     
     DiskOutputTree outputTree;
 
-    ComputeUnit();
-    ComputeUnit(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
+    ComputeUnitBase();
+    ComputeUnitBase(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
     
-    ~ComputeUnit();
+    ~ComputeUnitBase();
     
     
     tNi inline index(tNi i, tNi j, tNi k);
@@ -100,21 +100,7 @@ public:
 
     void setToZero();
     
-    
-    void streaming(Streaming scheme);
-    void streamingNieve();
-    void streamingNieve2();
-    void streaming_esotwist();
-    
-    template <Streaming streamingKind>
-    void collision(Collision scheme);
-    void collision_Entropic();
-    template <Streaming streamingKind>
-    void collision_EgglesSomers();
-    void collision_EgglesSomers_LES();
-    
-    void moments();
-    
+        
     void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius);
     
     
@@ -276,18 +262,67 @@ public:
     
 };
 
-template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streaming>
-struct AccessField {
-    inline static QVec<T, QVecSize> read(ComputeUnit<T, QVecSize, MemoryLayout> cu, tNi i, tNi j, tNi k);
-    inline static void write(ComputeUnit<T, QVecSize, MemoryLayout> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k);
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+class ComputeUnitCollision {};
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+class ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>: public ComputeUnitBase<T, QVecSize, MemoryLayout> {
+public:
+    using Base=ComputeUnitBase<T, QVecSize, MemoryLayout>;
+    using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1;
+    using Base::F; using Base::index; using Base::Q;
+    using Base::Base;
+    void collision();
+    void moments();
 };
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+class ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomersLES, streamingType>: public ComputeUnitBase<T, QVecSize, MemoryLayout> {
+    void collision();
+};
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+class ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>: public ComputeUnitBase<T, QVecSize, MemoryLayout> {
+    void collision();
+};
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+class ComputeUnitStreaming {};
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+class ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>: public ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Simple> {
+public:
+    using Base=ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Simple>;
+    using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1; using Base::index; using Base::Q;
+    using Base::dirnQ1; using Base::dirnQ2; using Base::dirnQ3; using Base::dirnQ4; using Base::dirnQ5;
+    using Base::dirnQ6; using Base::dirnQ7; using Base::dirnQ8; using Base::dirnQ9; using Base::dirnQ10;
+    using Base::dirnQ11; using Base::dirnQ12; using Base::dirnQ13; using Base::dirnQ14; using Base::dirnQ15;
+    using Base::dirnQ16; using Base::dirnQ17; using Base::dirnQ18;
+    using Base::Base;
+    void streaming();
+    void streaming2();
+};
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+class ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Esotwist>: public ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Esotwist> {
+public:
+    using Base=ComputeUnitBase<T, QVecSize, MemoryLayout>;
+    using Base::evenStep;
+    void streaming();
+};
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+using ComputeUnit=ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+struct AccessField {};
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 struct AccessField<T, QVecSize, MemoryLayout, Simple> {
-    inline static QVec<T, QVecSize> read(ComputeUnit<T, QVecSize, MemoryLayout> &cu, tNi i, tNi j, tNi k) {
+    inline static QVec<T, QVecSize> read(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, tNi i, tNi j, tNi k) {
         return cu.Q[cu.index(i,j,k)];
     }
-    inline static void write(ComputeUnit<T, QVecSize, MemoryLayout> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+    inline static void write(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
         cu.Q[cu.index(i,j,k)] = q;
     }
 };
