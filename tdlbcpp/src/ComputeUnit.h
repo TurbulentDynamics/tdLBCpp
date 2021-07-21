@@ -29,6 +29,8 @@
 
 #include "Field.hpp"
 #include "QVec.hpp"
+#include "Params/Checkpoint.hpp"
+#include "Params/Running.hpp"
 #include "DiskOutputTree.h"
 #include "Output.hpp"
 
