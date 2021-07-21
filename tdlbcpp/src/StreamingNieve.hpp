@@ -15,8 +15,8 @@
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::streamingNieve(){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>::streaming(){
     for (tNi i=1; i<=xg1; i++){
         for (tNi j=1; j<=yg1; j++){
             for (tNi k=1; k<=zg1; k++){
@@ -63,11 +63,8 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::streamingNieve(){
 }
 
 
-
-
-
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::streamingNieve2(){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>::streaming2(){
     for (tNi i=1; i<=xg1; i++){
         for (tNi j=1; j<=yg1; j++){
             for (tNi k=1; k<=zg1; k++){

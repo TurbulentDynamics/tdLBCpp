@@ -197,7 +197,7 @@ int main(int argc, char* argv[]){
 
 
 
-    auto lb = ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL>(cu, flow, outputTree);
+    auto lb = ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cu, flow, outputTree);
 
     if (checkpointPath != ""){
         lb.checkpoint_read(checkpointPath, "Device");
@@ -230,19 +230,11 @@ int main(int argc, char* argv[]){
 
         
         
-        if (streaming == "simple") {
-            lb.collision<Simple>(EgglesSomers);
-            main_time = mainTimer.check(0, 1, main_time, "Collision");
+        lb.collision();
+        main_time = mainTimer.check(0, 1, main_time, "Collision");
 
-            lb.streaming(Simple);
-            main_time = mainTimer.check(0, 2, main_time, "Streaming");
-        } else {
-            lb.collision<Esotwist>(EgglesSomers);
-            main_time = mainTimer.check(0, 1, main_time, "Collision");
-
-            lb.streaming(Esotwist);
-            main_time = mainTimer.check(0, 2, main_time, "Streaming");
-        }
+        lb.streaming();
+        main_time = mainTimer.check(0, 2, main_time, "Streaming");
 
         lb.moments();
 

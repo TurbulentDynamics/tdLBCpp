@@ -21,7 +21,7 @@
 #include "StreamingNieveTest.hpp"
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void fillForTest(ComputeUnit<T, QVecSize, MemoryLayout> &cu)
+void fillForTest(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu)
 {
 
     if (cu.xg > 99 || cu.yg > 99 || cu.zg > 99)
@@ -60,7 +60,7 @@ void fillForTest(ComputeUnit<T, QVecSize, MemoryLayout> &cu)
 };
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void generateTestData(ComputeUnit<T, QVecSize, MemoryLayout> &cu, std::string headerPath)
+void generateTestData(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, std::string headerPath)
 {
     std::ofstream hdr(headerPath);
     hdr << "namespace TestUtils {\n";
@@ -94,9 +94,9 @@ void generateTestData(ComputeUnit<T, QVecSize, MemoryLayout> &cu, std::string he
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void testStream(std::string tag, ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, ComputeUnit<T, QVecSize, MemoryLayout> &actual)
+void testStream(std::string tag, ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, ComputeUnitBase<T, QVecSize, MemoryLayout> &actual)
 {
-    auto expected = ComputeUnit<T, QVecSize, MemoryLayout>(cuParams, flow, outputTree);
+    auto expected = ComputeUnit<T, QVecSize, MemoryLayout, EgglesSomers, Simple>(cuParams, flow, outputTree);
     TestUtils::fillExpectedComputeUnitValues(expected);
     for (tNi i = 0; i < actual.xg; i++)
     {
@@ -136,11 +136,11 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
     cuParams.z = 3;
     cuParams.ghost = 1;
 
-    auto lb2 = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutIJKL>(cuParams, flow, diskOutputTree);
-    auto lb2lijk = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK>(cuParams, flow, diskOutputTree);
+    auto lb2 = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cuParams, flow, diskOutputTree);
+    auto lb2lijk = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK, EgglesSomers, Simple>(cuParams, flow, diskOutputTree);
 
     fillForTest(lb2);
-    lb2.streamingNieve();
+    lb2.streaming();
     if (std::getenv("GENERATE_STREAMING_NIEVE_TEST_HPP"))
     {
         std::string headerPath = std::getenv("GENERATE_STREAMING_NIEVE_TEST_HPP");
@@ -149,6 +149,6 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
     testStream("IJKL", cuParams, flow, diskOutputTree, lb2);
 
     fillForTest(lb2lijk);
-    lb2lijk.streamingNieve();
+    lb2lijk.streaming();
     testStream("LIJK", cuParams, flow, diskOutputTree, lb2lijk);
 }

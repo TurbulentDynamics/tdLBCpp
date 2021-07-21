@@ -20,7 +20,7 @@
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundary(){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::bounceBackBoundary(){
     
     //Takes the vector from the active cell, reverses it, and places it in the
     //ghost cell (the streaming function can then operate on the ghost cell to
@@ -41,7 +41,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundary(){
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryRight(){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::bounceBackBoundaryRight(){
 
     //dest = source
     
@@ -65,7 +65,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryRight(){
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryLeft(){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::bounceBackBoundaryLeft(){
     
     for (tNi j = 1; j<=yg1; j++){
         for (tNi k = 1; k<=zg1; k++){
@@ -87,7 +87,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryLeft(){
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryUp(){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::bounceBackBoundaryUp(){
     
     
     
@@ -112,7 +112,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryUp(){
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryDown(){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::bounceBackBoundaryDown(){
     
     
     for (tNi i = 1; i<=xg1; i++){
@@ -135,7 +135,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryDown(){
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryBackward(){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::bounceBackBoundaryBackward(){
     
     
     for (tNi i = 1; i<=xg1; i++){
@@ -158,7 +158,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryBackward(){
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::bounceBackBoundaryForward(){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::bounceBackBoundaryForward(){
     
     
     for (tNi i = 1; i<=xg1; i++){

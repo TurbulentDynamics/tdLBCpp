@@ -15,18 +15,17 @@
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::collision_EgglesSomers_LES(){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomersLES, streamingType>::collision(){
 
 //    alf2[ 5] = (2.0 * (q[2] + 0.5 * f.x) * u.x - q[ 5]*c)*b * Nu.getNu(i,j,k);
 
 }
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-template <Streaming streamingKind>
-void ComputeUnit<T, QVecSize, MemoryLayout>::collision_EgglesSomers(){
-    using AF = AccessField<T, QVecSize, MemoryLayout, streamingKind>;
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>::collision(){
+    using AF = AccessField<T, QVecSize, MemoryLayout, streamingType>;
 
     //kinematic viscosity.
     T b = 1.0 / (1.0 + 6 * flow.nu);
@@ -134,8 +133,8 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::collision_EgglesSomers(){
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::moments(){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>::moments(){
 
     using QVecAcc = QVecAccess<T, QVecSize, MemoryLayout>;
 

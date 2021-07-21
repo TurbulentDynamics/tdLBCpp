@@ -20,7 +20,7 @@
 
     
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-ComputeUnit<T, QVecSize, MemoryLayout>::ComputeUnit(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
+ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
 
     evenStep = true;
     
@@ -105,7 +105,7 @@ ComputeUnit<T, QVecSize, MemoryLayout>::ComputeUnit(ComputeUnitParams cuParams, 
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-ComputeUnit<T, QVecSize, MemoryLayout>::~ComputeUnit()
+ComputeUnitBase<T, QVecSize, MemoryLayout>::~ComputeUnitBase()
 {
 #if WITH_GPU == 1
     checkCudaErrors(cudaSetDevice(0));
@@ -118,9 +118,9 @@ ComputeUnit<T, QVecSize, MemoryLayout>::~ComputeUnit()
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+/*template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 template <Streaming streamingKind>
-void ComputeUnit<T, QVecSize, MemoryLayout>::collision(Collision scheme){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::collision(){
     switch( scheme ) {
 
         case Collision(EgglesSomers):
@@ -132,11 +132,11 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::collision(Collision scheme){
         case Collision(Entropic):
             collision_Entropic(); break;
     }
-};
+};*/
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::streaming(Streaming scheme) {
+/*template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::streaming(Streaming scheme) {
 
     switch( scheme ) {
     case Streaming(Simple):
@@ -144,7 +144,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::streaming(Streaming scheme) {
     case Streaming(Esotwist):
         streaming_esotwist(); break;
     }
-}
+}*/
 
 
 
@@ -152,18 +152,18 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::streaming(Streaming scheme) {
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-Velocity<T> ComputeUnit<T, QVecSize, MemoryLayout>::getVelocity(tNi i, tNi j, tNi k){
+Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocity(tNi i, tNi j, tNi k){
     return Q[index(i, j, k)].velocity();
 };
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-Velocity<T> ComputeUnit<T, QVecSize, MemoryLayout>::getVelocitySparseF(tNi i, tNi j, tNi k, Force<T> f){
+Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocitySparseF(tNi i, tNi j, tNi k, Force<T> f){
     return Q[index(i, j, k)].velocity(f);
 };
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningParams runParam){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningParams runParam){
 
 
     T *Vort = new T[size];
@@ -233,7 +233,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningParam
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::setToZero(){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::setToZero(){
 #if WITH_GPU == 1
     setToZero<<<numBlocks, threadsPerBlock>>>(devN, devF, xg, yg, zg, QVecSize);
 #else
@@ -249,7 +249,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::setToZero(){
 };
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-FILE* ComputeUnit<T, QVecSize, MemoryLayout>::fopen_read(std::string filePath){
+FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_read(std::string filePath){
 
     std::cout << "Node " << mpiRank << " Load " << filePath << std::endl;
 
@@ -257,7 +257,7 @@ FILE* ComputeUnit<T, QVecSize, MemoryLayout>::fopen_read(std::string filePath){
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-FILE* ComputeUnit<T, QVecSize, MemoryLayout>::fopen_write(std::string filePath){
+FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_write(std::string filePath){
 
     std::cout << "Node " << mpiRank << " Save " << filePath << std::endl;
 
@@ -269,7 +269,7 @@ FILE* ComputeUnit<T, QVecSize, MemoryLayout>::fopen_write(std::string filePath){
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dirname, std::string unit_name){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dirname, std::string unit_name){
     
     
     std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
@@ -293,7 +293,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dirname
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnit<T, QVecSize, MemoryLayout>::checkpoint_write(std::string unit_name, RunningParams run){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_write(std::string unit_name, RunningParams run){
     
 
     std::string dirname = outputTree.getCheckpointDirName(run);
@@ -344,7 +344,7 @@ void ComputeUnit<T, QVecSize, MemoryLayout>::checkpoint_write(std::string unit_n
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::index(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::index(tNi i, tNi j, tNi k)
 {
 #ifdef DEBUG
     if ((i>=xg) || (j>=yg) || (k>=zg)) {
@@ -360,7 +360,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::index(tNi i, tNi j, tNi k)
 //NO DIRECTION
 // 0  0  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ000(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ000(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + k;
 }
@@ -369,7 +369,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ000(tNi i, tNi j, tNi k)
 //RIGHT DIRECTION
 // +1  0  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ1(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ1(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + (j * zg) + k;
 }
@@ -378,7 +378,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ1(tNi i, tNi j, tNi k)
 //LEFT DIRECTION
 // -1  0  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ2(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ2(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + (j * zg) + k;
 }
@@ -387,7 +387,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ2(tNi i, tNi j, tNi k)
 //UP DIRECTION
 //  0 +1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ3(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ3(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j + 1) * zg) + k;
 }
@@ -396,7 +396,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ3(tNi i, tNi j, tNi k)
 //DOWN DIRECTION
 //  0 -1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ4(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ4(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j - 1) * zg) + k;
 }
@@ -405,7 +405,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ4(tNi i, tNi j, tNi k)
 //BACKWARD DIRECTION
 //  0  0 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ5(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ5(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + (k + 1);
 }
@@ -414,7 +414,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ5(tNi i, tNi j, tNi k)
 //FORWARD DIRECTION
 //  0  0 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ6(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ6(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + (k - 1);
 }
@@ -423,7 +423,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ6(tNi i, tNi j, tNi k)
 //RIGHT_UP DIRECTION
 // +1 +1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ7(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ7(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j + 1) * zg) + k;
 }
@@ -432,7 +432,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ7(tNi i, tNi j, tNi k)
 //LEFT_DOWN DIRECTION
 // -1 -1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ8(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ8(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j - 1) * zg) + k;
 }
@@ -441,7 +441,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ8(tNi i, tNi j, tNi k)
 //RIGHT_BACKWARD DIRECTION
 // +1  0 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ9(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ9(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + (j * zg) + (k + 1);
 }
@@ -450,7 +450,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ9(tNi i, tNi j, tNi k)
 //LEFT_FORWARD DIRECTION
 // -1  0 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ10(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ10(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + (j * zg) + (k - 1);
 }
@@ -459,7 +459,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ10(tNi i, tNi j, tNi k)
 //UP_BACKWARD DIRECTION
 //  0 +1 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ11(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ11(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j + 1) * zg) + (k + 1);
 }
@@ -468,7 +468,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ11(tNi i, tNi j, tNi k)
 //DOWN_FORWARD DIRECTION
 //  0 -1 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ12(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ12(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j - 1) * zg) + (k - 1);
 }
@@ -477,7 +477,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ12(tNi i, tNi j, tNi k)
 //RIGHT_DOWN DIRECTION
 // +1 -1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ13(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ13(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j - 1) * zg) + k;
 }
@@ -486,7 +486,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ13(tNi i, tNi j, tNi k)
 //LEFT_UP DIRECTION
 // -1 +1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ14(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ14(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j + 1) * zg) + k;
 }
@@ -495,7 +495,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ14(tNi i, tNi j, tNi k)
 //RIGHT_FORWARD DIRECTION
 // +1  0 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ15(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ15(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + (j * zg) + (k - 1);
 }
@@ -504,7 +504,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ15(tNi i, tNi j, tNi k)
 //LEFT_BACKWARD DIRECTION
 // -1  0 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ16(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ16(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + (j * zg) + (k + 1);
 }
@@ -513,7 +513,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ16(tNi i, tNi j, tNi k)
 //UP_FORWARD DIRECTION
 //  0 +1 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ17(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ17(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j + 1) * zg) + (k - 1);
 }
@@ -522,7 +522,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ17(tNi i, tNi j, tNi k)
 //DOWN_BACKWARD DIRECTION
 //  0 -1 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ18(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ18(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j - 1) * zg) + (k + 1);
 }
@@ -531,7 +531,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ18(tNi i, tNi j, tNi k)
 //RIGHT_UP_BACKWARD DIRECTION
 // +1 +1 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ19(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ19(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j + 1) * zg) + (k + 1);
 }
@@ -540,7 +540,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ19(tNi i, tNi j, tNi k)
 //LEFT_DOWN_FORWARD DIRECTION
 // -1 -1 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ20(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ20(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j - 1) * zg) + (k - 1);
 }
@@ -549,7 +549,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ20(tNi i, tNi j, tNi k)
 //RIGHT_UP_FORWARD DIRECTION
 // +1 +1 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ21(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ21(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j + 1) * zg) + (k - 1);
 }
@@ -558,7 +558,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ21(tNi i, tNi j, tNi k)
 //LEFT_DOWN_BACKWARD DIRECTION
 // -1 -1 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ22(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ22(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j - 1) * zg) + (k + 1);
 }
@@ -567,7 +567,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ22(tNi i, tNi j, tNi k)
 //RIGHT_DOWN_BACKWARD DIRECTION
 // +1 -1 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ23(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ23(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j - 1) * zg) + (k + 1);
 }
@@ -576,7 +576,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ23(tNi i, tNi j, tNi k)
 //LEFT_UP_FORWARD DIRECTION
 // -1 +1 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ24(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ24(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j + 1) * zg) + (k - 1);
 }
@@ -585,7 +585,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ24(tNi i, tNi j, tNi k)
 //LEFT_UP_BACKWARD DIRECTION
 // -1 +1 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ25(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ25(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j + 1) * zg) + (k + 1);
 }
@@ -594,7 +594,7 @@ tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ25(tNi i, tNi j, tNi k)
 //RIGHT_DOWN_FORWARD DIRECTION
 // +1 -1 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnit<T, QVecSize, MemoryLayout>::dirnQ26(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ26(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j - 1) * zg) + (k - 1);
 }
