@@ -4,6 +4,8 @@ cc_library(
     srcs = ["ParamsCommon.cpp"],
     visibility = ["//tdlbcpp/tests/Params:__pkg__", "//tdlbcpp/tests:__pkg__"],
     deps = ["//tdlbcpp/src/Params:params",
+            "//tdlbcpp/src/Tools:toojpeg",
+            "@tdLBGeometryRushtonTurbineLib//Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib",
             "//tdlbcpp/src:computeUnit",
             "//tdlbcpp/tests:utils", 
             "@googletest//:gtest_main"],

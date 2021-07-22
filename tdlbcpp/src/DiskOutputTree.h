@@ -362,7 +362,17 @@ public:
         return 0;
         
     }
+
+    template <typename T>
+    FlowParams<T> getFlowParams() {
+        FlowParams<T> flowParams;
+        flowParams.getParamsFromJson(flow);
+        return flowParams;
+    }
     
+    ComputeUnitParams getComputeUnitParams() {
+        return cu;
+    }
     
     //===================================
     
