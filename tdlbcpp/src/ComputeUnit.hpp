@@ -22,8 +22,6 @@
     
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
-
-    evenStep = true;
     
     idi = cuParams.idi;
     idj = cuParams.idj;
