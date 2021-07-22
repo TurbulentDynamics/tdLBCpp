@@ -18,13 +18,8 @@
 //
 //template <typename T, int QVecSize>
 //ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
-
-    
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
-
-    evenStep = true;
-    
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams, bool reallocate) {
     idi = cuParams.idi;
     idj = cuParams.idj;
     idk = cuParams.idk;
@@ -54,11 +49,19 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cu
     yg1 = yg - 2;
     zg1 = zg - 2;
 
-
-    size = size_t(xg) * yg * zg;
+    size_t new_size = size_t(xg) * yg * zg;
+    if (reallocate && (new_size == size)) {
+        reallocate = false;
+    }
+    size = new_size;
     
     
     Q.allocate(size);
+    if (reallocate) {
+        delete[] F;
+        delete[] Nu;
+        delete[] O;
+    }
     F = new Force<T>[size];
     Nu = new T[size];
     O = new bool[size];
@@ -99,6 +102,11 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cu
     std::cout << "threads_per_block" << threadsPerBlock.x << ", " << threadsPerBlock.y << ", " << threadsPerBlock.z << std::endl;
     std::cout << "numBlocks" << numBlocks.x << ", " << numBlocks.y << ", " << numBlocks.z << std::endl;
 #endif
+}
+    
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
+    init(cuParams, false);
 };
 
 
@@ -272,6 +280,21 @@ FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_write(std::string filePa
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dirname, std::string unit_name){
     
+    BinFileParams binFormat;
+    binFormat.filePath = dirname + "/AllParams";
+    binFormat.structName = "checkpoint";
+    binFormat.binFileSizeInStructs = (Json::UInt64)size;
+    binFormat.coordsType = "none";
+    binFormat.hasGridtCoords = 0;
+    binFormat.hasColRowtCoords = 0;
+    binFormat.QDataType = "none";
+    binFormat.QOutputLength = QVecSize;
+
+    RunningParams running;
+
+    outputTree.readAllParamsJson(dirname + "/AllParams.json", binFormat, running);
+    flow = outputTree.getFlowParams<T>();
+    init(outputTree.getComputeUnitParams(), true);
     
     std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
     FILE *fpQ = fopen_read(filePath);

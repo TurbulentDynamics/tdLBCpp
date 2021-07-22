@@ -78,8 +78,6 @@ public:
     
     
     Fld Q;
-
-    bool evenStep;
     
     Force<T> *F;
     //    std::vector<Force<T>> sparseF;
@@ -95,7 +93,7 @@ public:
     
     ~ComputeUnitBase();
     
-    
+    void init(ComputeUnitParams, bool);    
     tNi inline index(tNi i, tNi j, tNi k);
     Velocity<T> inline getVelocity(tNi i, tNi j, tNi k);
     Velocity<T> inline getVelocitySparseF(tNi i, tNi j, tNi k, Force<T> f);
@@ -309,7 +307,7 @@ template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision coll
 class ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Esotwist>: public ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Esotwist> {
 public:
     using Base=ComputeUnitBase<T, QVecSize, MemoryLayout>;
-    using Base::evenStep;
+    bool evenStep;
     void streaming();
 };
 
