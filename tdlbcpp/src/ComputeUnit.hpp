@@ -8,6 +8,7 @@
 #pragma once
 
 #include <iostream>
+#include <cerrno>
 #include "Tools/toojpeg.h"
 
 #include "ComputeUnit.h"
@@ -274,20 +275,32 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
     
     std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
     FILE *fpQ = fopen_read(filePath);
-    fread(Q, sizeof(QVec<T, QVecSize>), size, fpQ);
-    fclose(fpQ);
+    if (fpQ) {
+        fread(Q, sizeof(QVec<T, QVecSize>), size, fpQ);
+        fclose(fpQ);
+    } else {
+        std::cerr << "File " << filePath << " couldn't be read. " << std::strerror(errno) << std::endl;
+    }
 
     
     filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "F");
     FILE *fpF = fopen_read(filePath);
-    fread(F, sizeof(Force<T>), size, fpF);
-    fclose(fpF);
+    if (fpF) {
+        fread(F, sizeof(Force<T>), size, fpF);
+        fclose(fpF);
+    } else {
+        std::cerr << "File " << filePath << " couldn't be read. " << std::strerror(errno) << std::endl;
+    }
 
     
     filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Nu");
     FILE *fpNu = fopen_read(filePath);
-    fread(Nu, sizeof(T), size, fpNu);
-    fclose(fpNu);
+    if (fpNu) {
+        fread(Nu, sizeof(T), size, fpNu);
+        fclose(fpNu);
+    } else {
+        std::cerr << "File " << filePath << " couldn't be read. " << std::strerror(errno) << std::endl;
+    }
 
 }
 
