@@ -176,7 +176,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningP
 
 
     T *Vort = new T[size];
-    bool boundsInitialized = false;
+    bool minInitialized = false, maxInitialized = false;
     T max = 0, min = 0;
 
     for (tNi i = 1;  i <= xg1; i++) {
@@ -203,27 +203,25 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningP
                 T uzxuxz = uzx - uxz;
 
                 Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
-                if (!boundsInitialized)  {
-                    boundsInitialized = true;
-                    max = Vort[index(i,j,k)];
+                
+                if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!minInitialized || Vort[index(i,j,k)] < min)) {
                     min = Vort[index(i,j,k)];
-                }  else {
-                    if (Vort[index(i,j,k)] < min) {
-                        min = Vort[index(i,j,k)];
-                    } 
-                    if (Vort[index(i,j,k)] > max) {
-                        max = Vort[index(i,j,k)];
-                    }
+                    minInitialized = true;
+                } 
+                if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!maxInitialized || Vort[index(i,j,k)] > max)) {
+                    max = Vort[index(i,j,k)];
+                    maxInitialized = true;
                 }
             }
         }
 
     // Saving JPEG
     auto *pict = new unsigned char[xg1 * zg1];
+    std::cerr << "min: " << min << ", max: " << max << std::endl;
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi k = 1; k <= zg1; k++) {
-            pict[zg1 * (i - 1)+ (k - 1)] = floor(256 * ((Vort[index(i,j,k)] - min) / (max - min)));
+            pict[zg1 * (i - 1)+ (k - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
         }
     }
     std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, j);
