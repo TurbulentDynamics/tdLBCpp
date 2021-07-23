@@ -116,7 +116,7 @@ private:
     }
 };
 
-template<typename Base, typename T>
+template<typename Base, typename T, int size>
 struct CommonOperations : public Base {
     using Base::q;
     using Base::Base;
@@ -157,7 +157,7 @@ struct CommonOperations : public Base {
 };
 
 template<typename T, int size=QLen::D3Q19>
-using QVec=CommonOperations<QVecBase<T,size>,T>;
+using QVec=CommonOperations<QVecBase<T,size>,T,size>;
 
 
 
