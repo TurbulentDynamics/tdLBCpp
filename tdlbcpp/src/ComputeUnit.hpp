@@ -242,19 +242,35 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningP
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::setToZero(){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
 #if WITH_GPU == 1
     setToZero<<<numBlocks, threadsPerBlock>>>(devN, devF, xg, yg, zg, QVecSize);
 #else
-    for (tNi i=0; i<xg; i++){
-        for (tNi j=0; j<yg; j++){
-            for (tNi k=0; k<zg; k++){
+    for (tNi i=0; i<=xg0; i++){
+        for (tNi j=0; j<=yg0; j++){
+            for (tNi k=0; k<=zg0; k++){
             
                 Q[index(i, j, k)].setToZero();
             }
         }
     }
 #endif
+};
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
+
+    for (tNi i=0; i<=xg0; i++){
+        for (tNi j=0; j<=yg0; j++){
+            for (tNi k=0; k<=zg0; k++){
+
+                Q[index(i, j, k)].initialise(initialRho);
+                F[index(i, j, k)].setToZero();
+                Nu[index(i, j, k)] = 0.0;
+                O[index(i, j, k)] = false;
+            }
+        }
+    }
 };
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>

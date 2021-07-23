@@ -89,6 +89,13 @@ struct QVecBase {
             q[l] = 0.0;
         }
     };
+
+    void initialise(T initialRho){
+        q[0] = initialRho;
+        for (int l = 1; l < size; l++) {
+            q[l] = 0.0;
+        }
+    };
     
 #ifndef RELEASE
 	T& operator[](int i) {
