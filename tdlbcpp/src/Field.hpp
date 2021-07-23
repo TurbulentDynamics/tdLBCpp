@@ -76,7 +76,7 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutLIJK>
 };
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-using QVecAccess = VelocityCalculation<QVecAccessBase<T, QVecSize, MemoryLayout>, T>;
+using QVecAccess = CommonOperations<QVecAccessBase<T, QVecSize, MemoryLayout>, T>;
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 struct FieldBase
