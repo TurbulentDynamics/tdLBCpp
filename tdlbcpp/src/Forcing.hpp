@@ -78,19 +78,14 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tN
     for (auto &g: geom){
         
         T ppp[3][3];
-        
-        
-        T j_cart_fraction = 0;
-        T k_cart_fraction = 0;
-        
-//        Pos3d<T> fraction = rotationForce<T>(iCenter, kCenter, radius, g);
 
-//        smoothedDeltaFunction(fraction.i, fraction.k, ppp);
-        
-        
         tNi i = g.i;
         tNi j = g.j;
         tNi k = g.k;
+
+        
+        smoothedDeltaFunction(g.iCartFraction, g.kCartFraction, ppp);
+        
     
         T rhos = 0.0;
         T xs = 0.0;
@@ -105,13 +100,14 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tN
                 tNi i2 = i + i1;
                 tNi j2 = j;
                 tNi k2 = k + k1;
-                
-//                if (j2 < 1)  j2 = j2 + ny;
-//                if (j2 > ny) j2 = j2 - ny;
-//                if (k2 < 1)  k2 = k2 + nz;
-//                if (k2 > nz) k2 = k2 - nz;
-                
-                
+
+                //TODO Check this is correct.
+                if (i2 == 0)   i2 = xg1;
+                if (i2 == xg0) i2 = 1;
+                if (k2 == 0)   k2 = zg1;
+                if (k2 == zg0) k2 = 1;
+
+
                 T rho = Q[index(i2,j2,k2)].q[RHOQ];
                 
                 
@@ -148,10 +144,12 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tN
                 tNi j2 = j;
                 tNi k2 = k + k1;
 
-//                if (j2 < 1)  j2 = j2+ny;
-//                if (j2 > ny) j2 = j2-ny;
-//                if (k2 < 1)  k2 = k2+nz;
-//                if (k2 > nz) k2 = k2-nz;
+
+                //TODO Check this is correct.
+                if (i2 == 0)   i2 = xg1;
+                if (i2 == xg0) i2 = 1;
+                if (k2 == 0)   k2 = zg1;
+                if (k2 == zg0) k2 = 1;
                 
             
                 Velocity<T> u = Q[index(i2,j2,k2)].velocity();

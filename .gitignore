@@ -9,4 +9,7 @@ build/
 
 checkpoint_debug
 output_debug
+timer_tmp
 
+
+*.jpeg

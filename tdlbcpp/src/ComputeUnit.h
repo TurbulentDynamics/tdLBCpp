@@ -98,8 +98,8 @@ public:
     Velocity<T> inline getVelocity(tNi i, tNi j, tNi k);
     Velocity<T> inline getVelocitySparseF(tNi i, tNi j, tNi k, Force<T> f);
 
-    void setToZero();
-    
+    void setQToZero();
+    void initialise(T rho);
         
     void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius);
     
@@ -111,6 +111,7 @@ public:
     void bounceBackBoundaryDown();
     void bounceBackBoundaryBackward();
     void bounceBackBoundaryForward();
+    void bounceBackEdges();
     
 
     void calcVorticityXZ(tNi j, RunningParams runParam);
@@ -301,6 +302,7 @@ public:
     using Base::Base;
     void streaming();
     void streaming2();
+    void streamingDEBUG();
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>

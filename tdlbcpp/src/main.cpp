@@ -198,11 +198,14 @@ int main(int argc, char* argv[]){
 
 
     auto lb = ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cu, flow, outputTree);
-
     if (checkpointPath != ""){
         lb.checkpoint_read(checkpointPath, "Device");
+    } else {
+        lb.initialise(flow.initialRho);
+
     }
 
+    
     lb.forcing(geomFixed, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
     lb.forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
 
@@ -233,14 +236,19 @@ int main(int argc, char* argv[]){
         lb.collision();
         main_time = mainTimer.check(0, 1, main_time, "Collision");
 
-        lb.streaming();
-        main_time = mainTimer.check(0, 2, main_time, "Streaming");
+
+        lb.bounceBackBoundary();
+        main_time = mainTimer.check(0, 2, main_time, "BounceBack");
+
+
+        lb.streamingDEBUG();
+        main_time = mainTimer.check(0, 3, main_time, "Streaming");
 
         lb.moments();
 
 
         lb.forcing(geomRotating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
-        main_time = mainTimer.check(0, 3, main_time, "Forcing");
+        main_time = mainTimer.check(0, 4, main_time, "Forcing");
 
 
 
@@ -265,7 +273,7 @@ int main(int argc, char* argv[]){
                 && (running.step - xz.start_at_step) % xz.repeat == 0)) {
 
                 lb.template savePlaneXZ<float, 4>(xz, binFormat, running);
-                main_time = mainTimer.check(0, 4, main_time, "savePlaneXZ");
+                main_time = mainTimer.check(0, 5, main_time, "savePlaneXZ");
 
                 lb.calcVorticityXZ(xz.cutAt, running);
             }
@@ -276,7 +284,7 @@ int main(int argc, char* argv[]){
         if (checkpoint.checkpoint_repeat && (running.step % checkpoint.checkpoint_repeat == 0)) {
 
             lb.checkpoint_write("Device", running);
-            main_time = mainTimer.check(0, 5, main_time, "Checkpoint");
+            main_time = mainTimer.check(0, 6, main_time, "Checkpoint");
         }
 
 

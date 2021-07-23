@@ -114,3 +114,51 @@ void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>::str
 }
 
 
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>::streamingDEBUG(){
+
+    for (tNi i=1; i<=xg1; i++){
+        for (tNi j=1; j<=yg1; j++){
+            for (tNi k=1; k<=zg1; k++){
+                //DST    =  SRC
+                Q[index(i, j, k)].q[ Q3] = Q[index(i+1, j,   k  )].q[ Q3];
+                Q[index(i, j, k)].q[ Q4] = Q[index(i,   j+1, k  )].q[ Q4];
+                Q[index(i, j, k)].q[ Q6] = Q[index(i,   j,   k+1)].q[ Q6];
+
+                Q[index(i, j, k)].q[ Q8] = Q[index(i+1, j-1, k  )].q[ Q8];
+                Q[index(i, j, k)].q[ Q9] = Q[index(i+1, j+1, k  )].q[ Q9];
+
+                Q[index(i, j, k)].q[Q12] = Q[index(i+1, j,   k-1)].q[Q12];
+                Q[index(i, j, k)].q[Q13] = Q[index(i+1, j,   k+1)].q[Q13];
+
+                Q[index(i, j, k)].q[Q16] = Q[index(i,   j+1, k-1)].q[Q16];
+                Q[index(i, j, k)].q[Q17] = Q[index(i,   j+1, k+1)].q[Q17];
+            }
+        }
+    }
+
+
+    for (tNi i=xg1;  i>=1; i--) {
+        for (tNi j=yg1;  j>=1; j--) {
+            for (tNi k=zg1;  k>=1; k--) {
+                //DST   =   SRC
+
+                Q[index(i, j, k)].q[ Q1] = Q[index(i-1, j,   k  )].q[ Q1];
+                Q[index(i, j, k)].q[ Q2] = Q[index(i,   j-1, k  )].q[ Q2];
+                Q[index(i, j, k)].q[ Q5] = Q[index(i,   j,   k-1)].q[ Q5];
+
+                Q[index(i, j, k)].q[ Q7] = Q[index(i-1, j-1, k  )].q[ Q7];
+                Q[index(i, j, k)].q[Q10] = Q[index(i-1, j+1, k  )].q[Q10];
+
+                Q[index(i, j, k)].q[Q11] = Q[index(i-1, j,   k-1)].q[Q11];
+                Q[index(i, j, k)].q[Q14] = Q[index(i-1, j,   k+1)].q[Q14];
+
+                Q[index(i, j, k)].q[Q15] = Q[index(i,   j-1, k-1)].q[Q15];
+                Q[index(i, j, k)].q[Q18] = Q[index(i,   j-1, k+1)].q[Q18];
+            }
+        }
+    }
+}
+
