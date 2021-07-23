@@ -84,19 +84,6 @@ struct QVecBase {
         return *this;
     }
     
-    void setToZero(){
-        for (int l = 0; l < size; l++) {
-            q[l] = 0.0;
-        }
-    };
-
-    void initialise(T initialRho){
-        q[0] = initialRho;
-        for (int l = 1; l < size; l++) {
-            q[l] = 0.0;
-        }
-    };
-    
 #ifndef RELEASE
 	T& operator[](int i) {
 		assert(i >=0 && i < size);
@@ -129,8 +116,8 @@ private:
     }
 };
 
-template<typename Base, typename T>
-struct VelocityCalculation : public Base {
+template<typename Base, typename T, int size>
+struct CommonOperations : public Base {
     using Base::q;
     using Base::Base;
     using Base::operator=;
@@ -154,10 +141,23 @@ struct VelocityCalculation : public Base {
       
         return u;
     };
+
+    void initialise(T initialRho){
+        q[0] = initialRho;
+        for (int l = 1; l < size; l++) {
+            q[l] = 0.0;
+        }
+    };
+
+    void setToZero(){
+        for (int l = 0; l < size; l++) {
+            q[l] = 0.0;
+        }
+    };
 };
 
 template<typename T, int size=QLen::D3Q19>
-using QVec=VelocityCalculation<QVecBase<T,size>,T>;
+using QVec=CommonOperations<QVecBase<T,size>,T,size>;
 
 
 
