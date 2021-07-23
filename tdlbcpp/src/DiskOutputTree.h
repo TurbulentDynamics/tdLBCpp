@@ -70,12 +70,15 @@ public:
     std::string checkpointRootDir = "checkpoint_dir";
 
     
-    DiskOutputTree(CheckpointParams checkpoint, OutputParams output){
-        outputRootDir = output.rootDir;
+    DiskOutputTree(CheckpointParams checkpoint1, OutputParams output1){
+        outputRootDir = output1.rootDir;
         createDir(outputRootDir);
 
-        checkpointRootDir = checkpoint.checkpoint_root_dir;
+        checkpointRootDir = checkpoint1.checkpoint_root_dir;
         createDir(checkpointRootDir);
+
+        output = output1.getJson();
+        checkpoint = checkpoint1.getJson();
     };
 
     
@@ -125,8 +128,23 @@ public:
         
     };
         
-    
+    void setComputeUnitParams(ComputeUnitParams cu1) {
+        cu = cu1;
+        cuJson = cu1.getJson();
+    }
 
+    void setGridParams(GridParams grid1){
+        grid = grid1.getJson();
+    };
+
+    template <typename T>
+    void setFlowParams(FlowParams<T> flow1) {
+        flow =  flow1.getJson();
+    }
+    
+    void setRunningParams(RunningParams running1){
+        running = running1.getJson();
+    };
     
 
     

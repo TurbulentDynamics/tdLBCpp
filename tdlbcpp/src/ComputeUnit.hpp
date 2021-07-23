@@ -292,7 +292,8 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
 
     RunningParams running;
 
-    outputTree.readAllParamsJson(dirname + "/AllParams.json", binFormat, running);
+    std::cout << "Node " << mpiRank << " Load " << (dirname + "/AllParams." + unit_name + ".json") << std::endl;
+    outputTree.readAllParamsJson(dirname + "/AllParams." + unit_name + ".json", binFormat, running);
     flow = outputTree.getFlowParams<T>();
     init(outputTree.getComputeUnitParams(), true);
     
@@ -336,7 +337,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_write(std::string un
     
     
     BinFileParams binFormat;
-    binFormat.filePath = dirname + "/AllParams";
+    binFormat.filePath = dirname + "/AllParams." + unit_name;
     binFormat.structName = "checkpoint";
     binFormat.binFileSizeInStructs = (Json::UInt64)size;
     binFormat.coordsType = "none";
@@ -345,7 +346,8 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_write(std::string un
     binFormat.QDataType = "none";
     binFormat.QOutputLength = QVecSize;
 
-    
+    std::cout << "Node " << mpiRank << " Save " << (binFormat.filePath + ".json") << std::endl;
+    outputTree.setRunningParams(run);
     outputTree.writeAllParamsJson(binFormat, run);
     
     std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
