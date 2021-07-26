@@ -156,7 +156,8 @@ int main(int argc, char* argv[]){
 
 
     RushtonTurbine rt = RushtonTurbine(int(grid.x));
-
+    flow.calc_nu(rt.impellers[0].blades.outerRadius);
+    flow.printParams();
 
     Extents<tNi> e = Extents<tNi>(0, grid.x, 0, grid.y, 0, grid.z);
 
