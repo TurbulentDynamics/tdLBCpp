@@ -46,6 +46,7 @@ public:
 
 TEST_F(ComputeUnitCheckpointTests, ComputeUnitCheckpointWriteReadValid)
 {
+    using ComputeUnitT = ComputeUnit<double, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>;
     std::string unitName = TestUtils::random_string(10);
     CheckpointParams checkpointParams = ParamsCommon::createCheckpointParamsFixed();
     checkpointParams.checkpoint_root_dir = checkpointTestsFolderCheckpointFull;
@@ -63,11 +64,11 @@ TEST_F(ComputeUnitCheckpointTests, ComputeUnitCheckpointWriteReadValid)
 
     ComputeUnitParams cuParams = ParamsCommon::createComputeUnitParamsFixed();
 
-    auto lb2 = ComputeUnit<double, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cuParams, flowParams, diskOutputTree);
+    ComputeUnitT lb2(cuParams, flowParams, diskOutputTree);
 
     lb2.checkpoint_write(unitName, runningParams);
 
-    auto lb2read = ComputeUnit<double, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cuParams, flowParams, diskOutputTree);
+    ComputeUnitT lb2read(cuParams, flowParams, diskOutputTree);
 
     lb2read.checkpoint_read(diskOutputTree.getCheckpointDirName(runningParams), unitName);
 

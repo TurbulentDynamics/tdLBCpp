@@ -96,7 +96,7 @@ void generateTestData(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, std::strin
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void testStream(std::string tag, ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, ComputeUnitBase<T, QVecSize, MemoryLayout> &actual)
 {
-    auto expected = ComputeUnit<T, QVecSize, MemoryLayout, EgglesSomers, Simple>(cuParams, flow, outputTree);
+    ComputeUnit<T, QVecSize, MemoryLayout, EgglesSomers, Simple> expected(cuParams, flow, outputTree);
     TestUtils::fillExpectedComputeUnitValues(expected);
     for (tNi i = 0; i < actual.xg; i++)
     {
@@ -136,8 +136,8 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
     cuParams.z = 3;
     cuParams.ghost = 1;
 
-    auto lb2 = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cuParams, flow, diskOutputTree);
-    auto lb2lijk = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK, EgglesSomers, Simple>(cuParams, flow, diskOutputTree);
+    ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple> lb2(cuParams, flow, diskOutputTree);
+    ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK, EgglesSomers, Simple> lb2lijk(cuParams, flow, diskOutputTree);
 
     fillForTest(lb2);
     lb2.streaming();

@@ -94,10 +94,10 @@ bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams ou
 
     for (auto xy: output.XY_planes){
 
-        if ((running.step == xy.start_at_step) ||
-            (running.step > xy.start_at_step
+        if ((step == xy.start_at_step) ||
+            (step > xy.start_at_step
              && xy.repeat > 0
-             && (running.step - xy.start_at_step) % xy.repeat == 0)) {
+             && (step - xy.start_at_step) % xy.repeat == 0)) {
             hasOutput = true;
         }
     }
@@ -105,10 +105,10 @@ bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams ou
 
     for (auto xz: output.XZ_planes){
 
-        if ((running.step == xz.start_at_step) ||
-            (running.step > xz.start_at_step
+        if ((step == xz.start_at_step) ||
+            (step > xz.start_at_step
              && xz.repeat > 0
-             && (running.step - xz.start_at_step) % xz.repeat == 0)) {
+             && (step - xz.start_at_step) % xz.repeat == 0)) {
             hasOutput = true;
 
         }
@@ -116,28 +116,28 @@ bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams ou
 
     for (auto yz: output.YZ_planes){
 
-        if ((running.step == yz.start_at_step) ||
-            (running.step > yz.start_at_step
+        if ((step == yz.start_at_step) ||
+            (step > yz.start_at_step
              && yz.repeat > 0
-             && (running.step - yz.start_at_step) % yz.repeat == 0)) {
+             && (step - yz.start_at_step) % yz.repeat == 0)) {
             hasOutput = true;
         }
     }
 
-    return true;
+    return hasOutput;
 }
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileFormat binFormat, RunningParams running)
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams running)
 {
 
-    if (!output.hasOutputAtStep(output, running.step)) continue;
+    if (!hasOutputAtStep(output, running.step)) return;
 
 
     std::vector<Pos3d<int>> excludeRotating = geom.getRotatingExcludePoints(running.angle);
 
-    for (auto p: &excludeRotating){
+    for (auto &p: excludeRotating){
         excludeGeomPoints[index(p.i, p.j, p.k)] = 1;
     }
 
@@ -161,7 +161,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
              && xz.repeat > 0
              && (running.step - xz.start_at_step) % xz.repeat == 0)) {
 
-            lb.template savePlaneXZ<float, 4>(xz, binFormat, running);
+            savePlaneXZ<float, 4>(xz, binFormat, running);
 
             //FOR DEBUGGING
             calcVorticityXZ(xz.cutAt, running);
@@ -187,7 +187,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
 
     //REMOVE THE ROTATING POINTS.
     //TODO TOFIX, this might remove points from the hub!!!
-    for (auto p: &excludeRotating){
+    for (auto &p: excludeRotating){
         excludeGeomPoints[index(p.i, p.j, p.k)] = 0;
     }
 

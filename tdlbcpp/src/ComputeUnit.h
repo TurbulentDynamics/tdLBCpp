@@ -346,6 +346,7 @@ struct AccessField<T, QVecSize, MemoryLayout, Simple> {
 };
 
 #include "ComputeUnit.hpp"
+#include "ComputeUnitOutput.hpp"
 #include "CollisionEgglesSomers.hpp"
 #include "CollisionEntropic.hpp"
 #include "StreamingNieve.hpp"
