@@ -27,7 +27,7 @@ struct Velocity {
         u.y = T2(y);
         u.z = T2(z);
         return u;
-    };
+    }
 };
 
 
@@ -42,7 +42,7 @@ struct Force {
         f.y = T2(y);
         f.z = T2(z);
         return f;
-    };
+    }
     
     void setToZero(){
         x = 0.0;
@@ -130,7 +130,7 @@ struct CommonOperations : public Base {
         u.z = (1.0 / q[ Q1]) * (q[ Q4] + 0.5 * f.z);
 
         return u;
-    };
+    }
     
     Velocity<T> velocity(){
         
@@ -147,13 +147,13 @@ struct CommonOperations : public Base {
         for (int l = 1; l < size; l++) {
             q[l] = 0.0;
         }
-    };
+    }
 
     void setToZero(){
         for (int l = 0; l < size; l++) {
             q[l] = 0.0;
         }
-    };
+    }
 };
 
 template<typename T, int size=QLen::D3Q19>

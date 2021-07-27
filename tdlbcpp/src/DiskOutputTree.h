@@ -79,6 +79,10 @@ public:
 
         output = output1.getJson();
         checkpoint = checkpoint1.getJson();
+
+        grid = Json::Value::nullSingleton();
+        flow = Json::Value::nullSingleton();
+        running = Json::Value::nullSingleton();
     };
 
     
@@ -285,10 +289,12 @@ public:
     }
     
     
+    inline std::string formatId(){
+        return patch::to_string(cu.idi) + "." + patch::to_string(cu.idj) + "." + patch::to_string(cu.idk);
+    }
     
-    
-    std::string formatCUid(){
-        return "CUid." + patch::to_string(cu.idi) + "." + patch::to_string(cu.idj) + "." + patch::to_string(cu.idk);
+    inline std::string formatCUid(){
+        return "CUid." + formatId();
     }
     
     
@@ -384,7 +390,9 @@ public:
     template <typename T>
     FlowParams<T> getFlowParams() {
         FlowParams<T> flowParams;
-        flowParams.getParamsFromJson(flow);
+        if (!flow.empty()) {
+            flowParams.getParamsFromJson(flow);
+        }
         return flowParams;
     }
     
@@ -414,13 +422,22 @@ public:
     std::string getCheckpointFilePath(std::string dirName, std::string unit_name, std::string matrix){
 
         
-        std::string path = dirName + "/checkpoint_grid." + std::to_string(cu.idi) + "." + std::to_string(cu.idj) + "." + std::to_string(cu.idk) + ".";
+        std::string path = dirName + "/checkpoint_grid." + formatId() + ".";
 
         path += unit_name + "." + matrix;
 
         return path;
     }
     
+    std::string getAllParamsFilePath(std::string dirName, std::string unit_name){
+
+        
+        std::string path = dirName + "/AllParams." + formatId() + ".";
+
+        path += unit_name;
+
+        return path;
+    }
 
 
     

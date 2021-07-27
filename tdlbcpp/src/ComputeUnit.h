@@ -90,6 +90,10 @@ public:
 
     ComputeUnitBase();
     ComputeUnitBase(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
+    ComputeUnitBase(const ComputeUnitBase &) = delete;
+    ComputeUnitBase(ComputeUnitBase &&) noexcept = delete;
+    ComputeUnitBase& operator=(const ComputeUnitBase &) = delete;
+    ComputeUnitBase& operator=(ComputeUnitBase &&) noexcept = delete;
     
     ~ComputeUnitBase();
     
