@@ -65,6 +65,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
     F = new Force<T>[size];
     Nu = new T[size];
     O = new bool[size];
+    excludeGeomPoints = new bool[size];
 
 
 #if WITH_GPU == 1
@@ -126,6 +127,50 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::~ComputeUnitBase()
 
 
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
+#if WITH_GPU == 1
+    setToZero<<<numBlocks, threadsPerBlock>>>(devN, devF, xg, yg, zg, QVecSize);
+#else
+    for (tNi i=0; i<=xg0; i++){
+        for (tNi j=0; j<=yg0; j++){
+            for (tNi k=0; k<=zg0; k++){
+
+                Q[index(i, j, k)].setToZero();
+            }
+        }
+    }
+#endif
+};
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
+
+    for (tNi i=0; i<=xg0; i++){
+        for (tNi j=0; j<=yg0; j++){
+            for (tNi k=0; k<=zg0; k++){
+
+                Q[index(i, j, k)].initialise(initialRho);
+                F[index(i, j, k)].setToZero();
+                Nu[index(i, j, k)] = 0.0;
+                O[index(i, j, k)] = false;
+
+                excludeGeomPoints[index(i,j,k)] = false;
+            }
+        }
+    }
+};
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialiseExcludePoints(std::vector<Pos3d<int>> exclude){
+
+    for(auto p: exclude){
+        excludeGeomPoints[index(p.i, p.j, p.k)] = true;
+    }
+};
+
+
 
 /*template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 template <Streaming streamingKind>
@@ -171,105 +216,8 @@ Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocitySparseF(tNi i
 };
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningParams runParam){
 
 
-    T *Vort = new T[size];
-    bool minInitialized = false, maxInitialized = false;
-    T max = 0, min = 0;
-
-    for (tNi i = 1;  i <= xg1; i++) {
-
-        for (tNi k = 1; k <= zg1; k++) {
-
-
-//              T uxx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().x - Q[dirnQ2(i, j, k)].velocity().x);
-                T uxy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().x - Q[dirnQ6(i, j, k)].velocity().x);
-                T uxz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().x - Q[dirnQ4(i, j, k)].velocity().x);
-
-                T uyx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().y - Q[dirnQ2(i, j, k)].velocity().y);
-//              T uyy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().y - Q[dirnQ6(i, j, k)].velocity().y);
-                T uyz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().y - Q[dirnQ4(i, j, k)].velocity().y);
-
-
-                T uzx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().z - Q[dirnQ2(i, j, k)].velocity().z);
-                T uzy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().z - Q[dirnQ6(i, j, k)].velocity().z);
-//              T uzz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().z - Q[dirnQ4(i, j, k)].velocity().z);
-
-
-                T uxyuyx = uxy - uyx;
-                T uyzuzy = uyz - uzy;
-                T uzxuxz = uzx - uxz;
-
-                Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
-                
-                if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!minInitialized || Vort[index(i,j,k)] < min)) {
-                    min = Vort[index(i,j,k)];
-                    minInitialized = true;
-                } 
-                if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!maxInitialized || Vort[index(i,j,k)] > max)) {
-                    max = Vort[index(i,j,k)];
-                    maxInitialized = true;
-                }
-            }
-        }
-
-    // Saving JPEG
-    auto *pict = new unsigned char[xg1 * zg1];
-    std::cerr << "min: " << min << ", max: " << max << std::endl;
-
-    for (tNi i = 1;  i <= xg1; i++) {
-        for (tNi k = 1; k <= zg1; k++) {
-            pict[zg1 * (i - 1)+ (k - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
-        }
-    }
-    std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, j);
-    outputTree.createDir(plotDir);
-    std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
-
-    TooJpeg::openJpeg(jpegPath);
-    TooJpeg::writeJpeg(pict, xg1, zg1,
-               false, 90, false, "Debug");
-    TooJpeg::closeJpeg();
-
-}
-
-
-
-
-
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
-#if WITH_GPU == 1
-    setToZero<<<numBlocks, threadsPerBlock>>>(devN, devF, xg, yg, zg, QVecSize);
-#else
-    for (tNi i=0; i<=xg0; i++){
-        for (tNi j=0; j<=yg0; j++){
-            for (tNi k=0; k<=zg0; k++){
-            
-                Q[index(i, j, k)].setToZero();
-            }
-        }
-    }
-#endif
-};
-
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
-
-    for (tNi i=0; i<=xg0; i++){
-        for (tNi j=0; j<=yg0; j++){
-            for (tNi k=0; k<=zg0; k++){
-
-                Q[index(i, j, k)].initialise(initialRho);
-                F[index(i, j, k)].setToZero();
-                Nu[index(i, j, k)] = 0.0;
-                O[index(i, j, k)] = false;
-            }
-        }
-    }
-};
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_read(std::string filePath){
@@ -405,6 +353,12 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::index(tNi i, tNi j, tNi k
     }
 #endif
     return i * (yg * zg) + (j * zg) + k;
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::index(int i, int j, int k)
+{
+    return index(tNi(i), tNi(j), tNi(k));
 }
 
 

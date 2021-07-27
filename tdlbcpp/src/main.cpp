@@ -156,7 +156,8 @@ int main(int argc, char* argv[]){
 
 
     RushtonTurbine rt = RushtonTurbine(int(grid.x));
-
+    flow.calc_nu(rt.impellers[0].blades.outerRadius);
+    flow.printParams();
 
     Extents<tNi> e = Extents<tNi>(0, grid.x, 0, grid.y, 0, grid.z);
 
@@ -202,8 +203,9 @@ int main(int argc, char* argv[]){
         lb.checkpoint_read(checkpointPath, "Device");
     } else {
         lb.initialise(flow.initialRho);
-
     }
+    std::vector<Pos3d<int>> exclude = geom.getFixedExcludePoints();
+    lb.initialiseExcludePoints(exclude);
 
     
     lb.forcing(geomFixed, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
@@ -263,21 +265,10 @@ int main(int argc, char* argv[]){
         binFormat.QDataType = "float";
         binFormat.QOutputLength = 4;
 
+        lb.writeAllOutput(geom, output, binFormat, running);
+        main_time = mainTimer.check(0, 5, main_time, "writeAllOutput");
 
 
-        for (auto xz: output.XZ_planes){
-
-            if ((running.step == xz.start_at_step) ||
-                   (running.step > xz.start_at_step 
-                && xz.repeat > 0 
-                && (running.step - xz.start_at_step) % xz.repeat == 0)) {
-
-                lb.template savePlaneXZ<float, 4>(xz, binFormat, running);
-                main_time = mainTimer.check(0, 5, main_time, "savePlaneXZ");
-
-                lb.calcVorticityXZ(xz.cutAt, running);
-            }
-        }
 
 
 

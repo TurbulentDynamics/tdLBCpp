@@ -19,32 +19,47 @@
 
 template <typename T>
 struct FlowParams {
-    
+
     T initialRho = (T)8.0;
-    T reMNonDimensional = (T)07000.0;
-    
+    T reMNonDimensional = (T)7300.0;
+
     T uav = (T)0.1;
- 
-    T cs0 = 0.0;
+
+    //ratio mixing length / lattice spacing delta (Smagorinsky)
+    T cs0 = 0.12;
+
+    //compensation of third order terms
     T g3 = (T)0.8;
-    
+
+    //kinematic viscosity
     T nu = 0.0;
-    
+
+    //forcing in x-direction
     T fx0 = 0.0;
-    
+
+    //Reynolds number based on mean or tip velocity
     T Re_m = 0.0;
+
+    //Reynolds number based on the friction velocity uf
     T Re_f = 0.0;
+
+    //friction velocity
     T uf = 0.0;
-    
+
     T alpha = (T)0.97;
     T beta = (T)1.9;
 
     bool useLES = 0;
-    
+
     std::string collision = "EgglesSomers";
     std::string streaming = "Nieve";
-    
-    
+
+    void calc_nu(int impellerBladeOuterRadius){
+
+        Re_m = reMNonDimensional * M_PI / 2.0;
+
+        nu  = uav * (T)impellerBladeOuterRadius / Re_m;
+    }
     
     FlowParams<double> asDouble(){
         FlowParams<double> f;

@@ -37,6 +37,7 @@
 		3C71D862269E2E1D00C37F3D /* toojpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = toojpeg.h; sourceTree = "<group>"; };
 		3C71D863269E2E1D00C37F3D /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
 		3C71D864269E2E1D00C37F3D /* toojpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = toojpeg.cpp; sourceTree = "<group>"; };
+		D652A6A226AECDB900028C5D /* ComputeUnitOutput.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnitOutput.hpp; sourceTree = "<group>"; };
 		D66D0F86269C49E50079FCAC /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		D66D0F88269C4A200079FCAC /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
 		D689CD6126010D0600DF4E61 /* testComputeUnit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testComputeUnit.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -229,6 +230,7 @@
 				D6ACCEF325F60FEA00705722 /* GlobalStructures.hpp */,
 				D6E5C73325EE184B0067FDE1 /* ComputeUnit.h */,
 				D6E5C74125EE184B0067FDE1 /* ComputeUnit.hpp */,
+				D652A6A226AECDB900028C5D /* ComputeUnitOutput.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";

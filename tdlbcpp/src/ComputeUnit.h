@@ -85,6 +85,9 @@ public:
     T *Nu;
     
     bool *O;
+
+    bool *excludeGeomPoints;
+
     
     DiskOutputTree outputTree;
 
@@ -99,12 +102,15 @@ public:
     
     void init(ComputeUnitParams, bool);    
     tNi inline index(tNi i, tNi j, tNi k);
+    tNi inline index(int i, int j, int k);
+
     Velocity<T> inline getVelocity(tNi i, tNi j, tNi k);
     Velocity<T> inline getVelocitySparseF(tNi i, tNi j, tNi k, Force<T> f);
 
     void setQToZero();
     void initialise(T rho);
-        
+    void initialiseExcludePoints(std::vector<Pos3d<int>> excludeFixedPoints);
+
     void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius);
     
     
@@ -116,9 +122,6 @@ public:
     void bounceBackBoundaryBackward();
     void bounceBackBoundaryForward();
     void bounceBackEdges();
-    
-
-    void calcVorticityXZ(tNi j, RunningParams runParam);
 
     void setGhostSizes();
     void getParamsFromJson(const std::string filePath);
@@ -131,7 +134,13 @@ public:
     void checkpoint_read(std::string dirname, std::string unit_name);
     void checkpoint_write(std::string unit_name, RunningParams run);
     
-    
+
+
+    void writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams runParam);
+    void calcVorticityXZ(tNi j, RunningParams runParam);
+    bool hasOutputAtStep(OutputParams output, tStep step);
+
+
     template <typename tDiskPrecision, int tDiskSize>
     void savePlaneXZ(OrthoPlane plane, BinFileParams binFormat, RunningParams runParam){
         
@@ -146,12 +155,15 @@ public:
         for (tNi i=1; i<=xg1; i++){
             tNi j = plane.cutAt;
             for (tNi k=1; k<=zg1; k++){
-                
+
+                if (excludeGeomPoints[index(i,j,k)] == true) continue;
+
+
                 tDiskGrid<tDiskPrecision, tDiskSize> tmp;
                 
                 //Set position with absolute value
                 tmp.iGrid = uint16_t(i0 + i - 1);
-                tmp.jGrid = uint16_t(j);
+                tmp.jGrid = uint16_t(j      - 1);
                 tmp.kGrid = uint16_t(k0 + k - 1);
                 
 #pragma unroll
