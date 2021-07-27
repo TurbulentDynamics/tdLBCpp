@@ -79,10 +79,6 @@ public:
 
         output = output1.getJson();
         checkpoint = checkpoint1.getJson();
-
-        grid = Json::Value::nullSingleton();
-        flow = Json::Value::nullSingleton();
-        running = Json::Value::nullSingleton();
     };
 
     

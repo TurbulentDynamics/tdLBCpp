@@ -110,7 +110,18 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cu
     init(cuParams, false);
 }
 
-
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rhs) noexcept: 
+    idi(rhs.idi), idj(rhs.idj), idk(rhs.idk), mpiRank(rhs.mpiRank),
+    x(rhs.x), y(rhs.y), z(rhs.z), i0(rhs.i0), j0(rhs.j0), k0(rhs.k0), xg(rhs.xg), yg(rhs.yg), zg(rhs.zg), xg0(rhs.xg0), yg0(rhs.yg0), zg0(rhs.zg0), xg1(rhs.xg1), yg1(rhs.yg1), zg1(rhs.zg1),
+    ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(rhs.Q), F(rhs.F), Nu(rhs.Nu), O(rhs.O), excludeGeomPoints(rhs.excludeGeomPoints),
+    outputTree(rhs.outputTree)
+{
+    rhs.O = nullptr;
+    rhs.Nu = nullptr;
+    rhs.F = nullptr;
+    rhs.excludeGeomPoints = nullptr;
+}
 
 
 
