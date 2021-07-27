@@ -93,6 +93,10 @@ public:
 
     ComputeUnitBase();
     ComputeUnitBase(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
+    ComputeUnitBase(const ComputeUnitBase &) = delete;
+    ComputeUnitBase(ComputeUnitBase &&) noexcept;
+    ComputeUnitBase& operator=(const ComputeUnitBase &) = delete;
+    ComputeUnitBase& operator=(ComputeUnitBase &&) noexcept = delete;
     
     ~ComputeUnitBase();
     
@@ -342,6 +346,7 @@ struct AccessField<T, QVecSize, MemoryLayout, Simple> {
 };
 
 #include "ComputeUnit.hpp"
+#include "ComputeUnitOutput.hpp"
 #include "CollisionEgglesSomers.hpp"
 #include "CollisionEntropic.hpp"
 #include "StreamingNieve.hpp"

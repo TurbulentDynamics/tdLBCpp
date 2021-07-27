@@ -92,6 +92,11 @@ struct FieldBase
         q = 0;
     }
 
+    FieldBase(FieldBase&) = delete;
+    FieldBase(FieldBase&& rhs) noexcept : q(rhs.q), qVectorNumber(rhs.qVectorNumber), qSize(rhs.qSize) {
+        rhs.q = nullptr;
+    }
+
     void allocate(size_t vectorNumber)
     {
         if (q != 0)
@@ -136,6 +141,8 @@ struct Field<T, QVecSize, MemoryLayoutLIJK> : public FieldBase<T, QVecSize, Memo
 
     using Base::q;
     using Base::qVectorNumber;
+
+    using Base::Base;
 
     inline QVecAcc operator[](tNi index)
     {
