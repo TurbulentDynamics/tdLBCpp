@@ -6,7 +6,7 @@ cc_library(
 
 cc_library(
     name = "computeUnit",
-    hdrs = ["ComputeUnit.h", "Header.h", "Output.hpp", "DiskOutputTree.h", "Boundary.hpp", "CollisionEntropic.hpp", "GlobalStructures.hpp", "StreamingEsoteric.hpp", "cxxopts.hpp", "CollisionEgglesSomers.hpp", "ComputeUnit.hpp", "Forcing.hpp", "QVec.hpp", "StreamingNieve.hpp", "timer.h", "Field.hpp"],
+    hdrs = ["ComputeUnit.h", "Header.h", "Output.hpp", "DiskOutputTree.h", "Boundary.hpp", "CollisionEntropic.hpp", "GlobalStructures.hpp", "StreamingEsoteric.hpp", "cxxopts.hpp", "CollisionEgglesSomers.hpp", "ComputeUnit.hpp", "ComputeUnitOutput.hpp", "Forcing.hpp", "QVec.hpp", "StreamingNieve.hpp", "timer.h", "Field.hpp"],
     visibility = ["//visibility:public"],
     strip_include_prefix="",
 )
