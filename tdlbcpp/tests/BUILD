@@ -8,7 +8,7 @@ cc_library(
 
 cc_test(
   name = "tests",
-  srcs = ["DiskOutputTreeTest.cpp", "StreamingNieveTest.cpp", "StreamingNieveTest.hpp", "ComputeUnitCheckpointTest.cpp"],
+  srcs = ["DiskOutputTreeTest.cpp", "StreamingNieveTest.cpp", "StreamingNieveTest.hpp", "ComputeUnitCheckpointTest.cpp", "ComputeUnitMemoryTest.cpp"],
   deps = [
           "//tdlbcpp/src/Params:params",
           "//tdlbcpp/src/Tools:toojpeg",
