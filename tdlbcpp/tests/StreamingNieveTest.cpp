@@ -21,45 +21,6 @@
 #include "StreamingNieveTest.hpp"
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void fillForTest(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu)
-{
-
-    if (cu.xg > 99 || cu.yg > 99 || cu.zg > 99)
-    {
-        std::cout << "Size too large for testing" << std::endl;
-        exit(1);
-    }
-#if WITH_GPU == 1
-    setToZero<<<numBlocks, threadsPerBlock>>>(devN, devF, xg, yg, zg, QVecSize);
-#else
-    for (tNi i = 0; i < cu.xg; i++)
-    {
-        for (tNi j = 0; j < cu.yg; j++)
-        {
-            for (tNi k = 0; k < cu.zg; k++)
-            {
-
-                QVec<unsigned long int, QVecSize> qTmp;
-
-                for (unsigned long int l = 0; l < QVecSize; l++)
-                {
-                    qTmp.q[l] = i * 1000000 + j * 10000 + k * 100 + l;
-                }
-                cu.Q[cu.index(i, j, k)] = qTmp;
-
-                cu.F[cu.index(i, j, k)].x = 0;
-                cu.F[cu.index(i, j, k)].y = 1;
-                cu.F[cu.index(i, j, k)].z = 2;
-
-                cu.Nu[cu.index(i, j, k)] = 1;
-                cu.O[cu.index(i, j, k)] = true;
-            }
-        }
-    }
-#endif
-};
-
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void generateTestData(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, std::string headerPath)
 {
     std::ofstream hdr(headerPath);
@@ -139,7 +100,7 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
     ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple> lb2(cuParams, flow, diskOutputTree);
     ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK, EgglesSomers, Simple> lb2lijk(cuParams, flow, diskOutputTree);
 
-    fillForTest(lb2);
+    ParamsCommon::fillForTest(lb2);
     lb2.streaming();
     if (std::getenv("GENERATE_STREAMING_NIEVE_TEST_HPP"))
     {
@@ -148,7 +109,7 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
     }
     testStream("IJKL", cuParams, flow, diskOutputTree, lb2);
 
-    fillForTest(lb2lijk);
+    ParamsCommon::fillForTest(lb2lijk);
     lb2lijk.streaming();
     testStream("LIJK", cuParams, flow, diskOutputTree, lb2lijk);
 }

@@ -133,4 +133,42 @@ namespace ParamsCommon
             ASSERT_EQ(expected.Nu[i], actual.Nu[i]) << "Nu[" << i << "] field has a wrong value after being written to a file and then read";
         }
     }
+    template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+    void fillForTest(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu)
+    {
+
+        if (cu.xg > 99 || cu.yg > 99 || cu.zg > 99)
+        {
+            std::cout << "Size too large for testing" << std::endl;
+            exit(1);
+        }
+#if WITH_GPU == 1
+        setToZero<<<numBlocks, threadsPerBlock>>>(devN, devF, xg, yg, zg, QVecSize);
+#else
+        for (tNi i = 0; i < cu.xg; i++)
+        {
+            for (tNi j = 0; j < cu.yg; j++)
+            {
+                for (tNi k = 0; k < cu.zg; k++)
+                {
+
+                    QVec<unsigned long int, QVecSize> qTmp;
+
+                    for (unsigned long int l = 0; l < QVecSize; l++)
+                    {
+                        qTmp.q[l] = i * 1000000 + j * 10000 + k * 100 + l;
+                    }
+                    cu.Q[cu.index(i, j, k)] = qTmp;
+
+                    cu.F[cu.index(i, j, k)].x = 0;
+                    cu.F[cu.index(i, j, k)].y = 1;
+                    cu.F[cu.index(i, j, k)].z = 2;
+
+                    cu.Nu[cu.index(i, j, k)] = 1;
+                    cu.O[cu.index(i, j, k)] = true;
+                }
+            }
+        }
+#endif
+    }
 }
