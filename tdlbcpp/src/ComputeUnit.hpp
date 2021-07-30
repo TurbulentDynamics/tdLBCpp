@@ -93,13 +93,13 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
     int ythreads_per_block = 8;
     int zthreads_per_block = 8;
 
-    dim3 threadsPerBlock(xthreads_per_block, ythreads_per_block, zthreads_per_block);
+    threadsPerBlock = dim3(xthreads_per_block, ythreads_per_block, zthreads_per_block);
 
     int block_in_x_dirn = xg / threadsPerBlock.x + (xg % xthreads_per_block != 0);
     int block_in_y_dirn = zg / threadsPerBlock.y + (yg % ythreads_per_block != 0);
     int block_in_z_dirn = zg / threadsPerBlock.z + (zg % zthreads_per_block != 0);
 
-    dim3 numBlocks(block_in_x_dirn, block_in_y_dirn, block_in_z_dirn);
+    numBlocks = dim3(block_in_x_dirn, block_in_y_dirn, block_in_z_dirn);
 
     std::cout << "threads_per_block" << threadsPerBlock.x << ", " << threadsPerBlock.y << ", " << threadsPerBlock.z << std::endl;
     std::cout << "numBlocks" << numBlocks.x << ", " << numBlocks.y << ", " << numBlocks.z << std::endl;
@@ -117,11 +117,19 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rh
     x(rhs.x), y(rhs.y), z(rhs.z), i0(rhs.i0), j0(rhs.j0), k0(rhs.k0), xg(rhs.xg), yg(rhs.yg), zg(rhs.zg), xg0(rhs.xg0), yg0(rhs.yg0), zg0(rhs.zg0), xg1(rhs.xg1), yg1(rhs.yg1), zg1(rhs.zg1),
     ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), excludeGeomPoints(rhs.excludeGeomPoints),
     outputTree(rhs.outputTree)
+#if WITH_GPU == 1
+    , devF(rhs.devF), devN(rhs.devN), devNu(rhs.debNu), threadsPerBlock(rhs.threadsPerBlock), numBlocks(rhs.numBlocks)
+#endif
 {
     rhs.O = nullptr;
     rhs.Nu = nullptr;
     rhs.F = nullptr;
     rhs.excludeGeomPoints = nullptr;
+#if WITH_GPU == 1
+    rhs.devN = nullptr;
+    rhs.devNu = nullptr;
+    rhs.devF = nullptr;
+#endif
 }
 
 
@@ -130,10 +138,12 @@ template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::~ComputeUnitBase()
 {
 #if WITH_GPU == 1
-    checkCudaErrors(cudaSetDevice(0));
-    checkCudaErrors(cudaFree(devN));
-    checkCudaErrors(cudaFree(devF));
-    checkCudaErrors(cudaFree(devNu));
+    if (devN != nullptr) {
+        checkCudaErrors(cudaSetDevice(0));
+        checkCudaErrors(cudaFree(devN));
+        checkCudaErrors(cudaFree(devF));
+        checkCudaErrors(cudaFree(devNu));
+    }
 #endif
 }
 
@@ -181,41 +191,6 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialiseExcludePoints(std::ve
         excludeGeomPoints[index(p.i, p.j, p.k)] = true;
     }
 };
-
-
-
-/*template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-template <Streaming streamingKind>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::collision(){
-    switch( scheme ) {
-
-        case Collision(EgglesSomers):
-            collision_EgglesSomers<streamingKind>(); break;
-
-        case Collision(EgglesSomersLES):
-            collision_EgglesSomers_LES(); break;
-
-        case Collision(Entropic):
-            collision_Entropic(); break;
-    }
-};*/
-
-
-/*template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::streaming(Streaming scheme) {
-
-    switch( scheme ) {
-    case Streaming(Simple):
-        streamingNieve(); break;
-    case Streaming(Esotwist):
-        streaming_esotwist(); break;
-    }
-}*/
-
-
-
-
-
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocity(tNi i, tNi j, tNi k){
