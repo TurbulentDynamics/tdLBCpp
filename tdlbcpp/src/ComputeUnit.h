@@ -87,6 +87,14 @@ public:
     bool *O;
 
     bool *excludeGeomPoints;
+#if WITH_GPU == 1
+    Force<T> *devF;
+    T *devNu;
+    void *devN;
+
+    dim3 threadsPerBlock;
+    dim3 numBlocks;
+#endif
 
     
     DiskOutputTree outputTree;

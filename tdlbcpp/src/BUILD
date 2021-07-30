@@ -3,6 +3,13 @@ cc_library(
     hdrs = ["cxxopts.hpp"]
 )
 
+cc_library(
+    name = "timer",
+    srcs = ["timer.cpp"],
+    hdrs = ["timer.h"],
+    deps = [":computeUnit"],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "computeUnit",
@@ -13,8 +20,8 @@ cc_library(
 
 cc_binary(
     name = "tdlbcpp",
-    srcs = ["main.cpp", "timer.cpp"],
-    deps = [":cxxopts", "//tdlbcpp/src/Params:params", ":computeUnit", "//tdlbcpp/src/Tools:toojpeg",
+    srcs = ["main.cpp"],
+    deps = [":cxxopts", ":timer", "//tdlbcpp/src/Params:params", ":computeUnit", "//tdlbcpp/src/Tools:toojpeg",
             "@tdLBGeometryRushtonTurbineLib//Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib"],
 )
 
