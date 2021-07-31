@@ -118,7 +118,7 @@ int main(int argc, char* argv[]){
         grid.z = grid.x;
 
         flow.initialRho = 8.0;
-        flow.reMNonDimensional = 7000.0;
+        flow.reMNonDimensional = 7300.0;
         flow.uav = 0.1;
 
         flow.useLES = 0;
@@ -189,12 +189,9 @@ int main(int argc, char* argv[]){
 
 
 
-    DiskOutputTree outputTree = DiskOutputTree(checkpoint, output);
-
     FlowParams<double> flowAsDouble = flow.asDouble();
+    DiskOutputTree outputTree = DiskOutputTree(checkpoint, output);
     outputTree.setParams(cu, grid, flowAsDouble, running, output, checkpoint);
-
-
 
 
 
@@ -204,7 +201,7 @@ int main(int argc, char* argv[]){
     } else {
         lb.initialise(flow.initialRho);
     }
-    std::vector<Pos3d<int>> exclude = geom.getFixedExcludePoints();
+    std::vector<Pos3d<tNi>> exclude = geom.getFixedExcludePoints();
     lb.initialiseExcludePoints(exclude);
 
     
@@ -265,6 +262,7 @@ int main(int argc, char* argv[]){
         binFormat.QDataType = "float";
         binFormat.QOutputLength = 4;
 
+        
         lb.writeAllOutput(geom, output, binFormat, running);
         main_time = mainTimer.check(0, 5, main_time, "writeAllOutput");
 

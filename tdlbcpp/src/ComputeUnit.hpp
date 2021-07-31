@@ -183,15 +183,6 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
     }
 };
 
-
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialiseExcludePoints(std::vector<Pos3d<int>> exclude){
-
-    for(auto p: exclude){
-        excludeGeomPoints[index(p.i, p.j, p.k)] = true;
-    }
-};
-
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocity(tNi i, tNi j, tNi k){
     return Q[index(i, j, k)].velocity();

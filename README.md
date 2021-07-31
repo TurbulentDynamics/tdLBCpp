@@ -7,5 +7,5 @@ This is a basic version of the multi-node heterogeneous HPC code to run billions
 
 ## Building
 ```
-bazel run --verbose_failures //tdlbcpp/src:tdlbcpp
+BAZEL_CXXOPTS="-std=c++14" bazel run --verbose_failures //tdlbcpp/src:tdlbcpp
 ```

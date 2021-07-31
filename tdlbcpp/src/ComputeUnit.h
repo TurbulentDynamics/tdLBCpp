@@ -117,7 +117,9 @@ public:
 
     void setQToZero();
     void initialise(T rho);
-    void initialiseExcludePoints(std::vector<Pos3d<int>> excludeFixedPoints);
+
+
+
 
     void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius);
     
@@ -144,106 +146,14 @@ public:
     
 
 
+
+    bool hasOutputAtStep(OutputParams output, RunningParams running);
+    void initialiseExcludePoints(RushtonTurbinePolarCPP<tNi, T> geom);
     void writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams runParam);
+
+    //Debug
     void calcVorticityXZ(tNi j, RunningParams runParam);
-    bool hasOutputAtStep(OutputParams output, tStep step);
 
-
-    template <typename tDiskPrecision, int tDiskSize>
-    void savePlaneXZ(OrthoPlane plane, BinFileParams binFormat, RunningParams runParam){
-        
-       
-        tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg * zg];
-        
-        tDiskGrid<tDiskPrecision, 3> *F3outputBuffer = new tDiskGrid<tDiskPrecision, 3>[xg*zg];
-        
-        
-        long int qVecBufferLen = 0;
-        long int F3BufferLen = 0;
-        for (tNi i=1; i<=xg1; i++){
-            tNi j = plane.cutAt;
-            for (tNi k=1; k<=zg1; k++){
-
-                if (excludeGeomPoints[index(i,j,k)] == true) continue;
-
-
-                tDiskGrid<tDiskPrecision, tDiskSize> tmp;
-                
-                //Set position with absolute value
-                tmp.iGrid = uint16_t(i0 + i - 1);
-                tmp.jGrid = uint16_t(j      - 1);
-                tmp.kGrid = uint16_t(k0 + k - 1);
-                
-#pragma unroll
-                for (int l=0; l<tDiskSize; l++){
-                    tmp.q[l] = Q[index(i,j,k)].q[l];
-                }
-                outputBuffer[qVecBufferLen] = tmp;
-                qVecBufferLen++;
-                
-                
-                if (F[index(i,j,k)].isNotZero()) {
-                
-                    tDiskGrid<tDiskPrecision, 3> tmp;
-                    
-                    //Set position with absolute value
-                    tmp.iGrid = uint16_t(i0 + i - 1);
-                    tmp.jGrid = uint16_t(j);
-                    tmp.kGrid = uint16_t(k0 + k - 1);
-                    
-                    tmp.q[0] = F[index(i,j,k)].x;
-                    tmp.q[1] = F[index(i,j,k)].y;
-                    tmp.q[2] = F[index(i,j,k)].z;
-                    
-                    F3outputBuffer[F3BufferLen] = tmp;
-                    F3BufferLen++;
-                }
-                
-                
-            }
-        }
-        
-        
-        std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, plane.cutAt);
-        outputTree.createDir(plotDir);
-
-
-        binFormat.filePath = outputTree.formatQVecBinFileNamePath(plotDir);
-        binFormat.binFileSizeInStructs = qVecBufferLen;
-        
-        
-        
-
-        std::cout<< "Writing output to: " << binFormat.filePath <<std::endl;
-
-
-        outputTree.writeAllParamsJson(binFormat, runParam);
-
-
-        FILE *fp = fopen(binFormat.filePath.c_str(), "wb");
-        fwrite(outputBuffer, sizeof(tDiskGrid<tDiskPrecision, tDiskSize>), qVecBufferLen, fp);
-        fclose(fp);
-
-        
-        
-        //======================
-        binFormat.QOutputLength = 3;
-        binFormat.binFileSizeInStructs = F3BufferLen;
-        binFormat.filePath = outputTree.formatF3BinFileNamePath(plotDir);
-        outputTree.writeAllParamsJson(binFormat, runParam);
-
-        
-        FILE *fpF3 = fopen(binFormat.filePath.c_str(), "wb");
-        fwrite(F3outputBuffer, sizeof(tDiskGrid<tDiskPrecision, 3>), F3BufferLen, fpF3);
-        fclose(fpF3);
-
-        
-        delete[] outputBuffer;
-        delete[] F3outputBuffer;
-        
-    }
-    
-    
     
     
     

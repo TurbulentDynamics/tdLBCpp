@@ -37,6 +37,7 @@
 		3C71D862269E2E1D00C37F3D /* toojpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = toojpeg.h; sourceTree = "<group>"; };
 		3C71D863269E2E1D00C37F3D /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
 		3C71D864269E2E1D00C37F3D /* toojpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = toojpeg.cpp; sourceTree = "<group>"; };
+		D60B522126B1B00400963282 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D652A6A226AECDB900028C5D /* ComputeUnitOutput.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnitOutput.hpp; sourceTree = "<group>"; };
 		D66D0F86269C49E50079FCAC /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		D66D0F88269C4A200079FCAC /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
@@ -129,6 +130,7 @@
 		D698D74C257D036500A3BFD2 = {
 			isa = PBXGroup;
 			children = (
+				D60B522126B1B00400963282 /* README.md */,
 				D6E5C72125EE184B0067FDE1 /* tdlbcpp */,
 				D6E5C5A925DBEC0A0067FDE1 /* tdLBGeometryRushtonTurbineLib */,
 				D689CD6226010D0600DF4E61 /* testComputeUnit */,
