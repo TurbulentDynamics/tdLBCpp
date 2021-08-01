@@ -201,8 +201,7 @@ int main(int argc, char* argv[]){
     } else {
         lb.initialise(flow.initialRho);
     }
-    std::vector<Pos3d<tNi>> exclude = geom.getFixedExcludePoints();
-    lb.initialiseExcludePoints(exclude);
+    lb.initialiseExcludePoints(geom);
 
     
     lb.forcing(geomFixed, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);

@@ -26,6 +26,8 @@
 #include "Params/BinFile.hpp"
 #include "Params/OutputParams.hpp"
 
+#include "Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
+#include "Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 
 #include "Field.hpp"
 #include "QVec.hpp"
@@ -33,19 +35,6 @@
 #include "Params/Running.hpp"
 #include "DiskOutputTree.h"
 #include "Output.hpp"
-
-#include "Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
-#include "Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
-
-
-
-
-
-
-
-
-
-
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 class ComputeUnitBase {
@@ -149,6 +138,10 @@ public:
 
     bool hasOutputAtStep(OutputParams output, RunningParams running);
     void initialiseExcludePoints(RushtonTurbinePolarCPP<tNi, T> geom);
+
+    template <typename tDiskPrecision, int tDiskSize>
+    void savePlaneXZ(OrthoPlane plane, BinFileParams binFormat, RunningParams runParam);
+
     void writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams runParam);
 
     //Debug

@@ -229,15 +229,8 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
 
 }
 
-
-
-
-
-
-
-
-
-template <typename tDiskPrecision, int tDiskSize, MemoryLayoutType MemoryLayout>
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+template <typename tDiskPrecision, int tDiskSize>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::savePlaneXZ(OrthoPlane plane, BinFileParams binFormat, RunningParams runParam){
 
 
