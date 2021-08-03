@@ -126,7 +126,7 @@ public:
         output = output1.getJson();
         checkpoint = checkpoint1.getJson();
         
-    };
+    }
         
     void setComputeUnitParams(ComputeUnitParams cu1) {
         cu = cu1;
@@ -135,7 +135,7 @@ public:
 
     void setGridParams(GridParams grid1){
         grid = grid1.getJson();
-    };
+    }
 
     template <typename T>
     void setFlowParams(FlowParams<T> flow1) {

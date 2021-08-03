@@ -98,21 +98,29 @@ int main(int argc, char* argv[]){
 
     std::cout << "Debug: inputJsonPath, checkpointPath" << inputJsonPath << checkpointPath << std::endl;
 
+    bool parametersLoadedFromJson = false;
     if (inputJsonPath != "") {
-        std::cout << "Loading " << inputJsonPath << std::endl;
+        try {
+            std::cout << "Loading " << inputJsonPath << std::endl;
 
-        std::ifstream in(inputJsonPath.c_str());
-        Json::Value jsonParams;
-        in >> jsonParams;
-        in.close();
+            std::ifstream in(inputJsonPath.c_str());
+            Json::Value jsonParams;
+            in >> jsonParams;
+            in.close();
 
-        grid.getParamsFromJson(jsonParams["GridParams"]);
-        flow.getParamsFromJson(jsonParams["FlowParams"]);
-        running.getParamsFromJson(jsonParams["RunningParams"]);
-        output.getParamsFromJson(jsonParams["OutputParams"]);
-        checkpoint.getParamsFromJson(jsonParams["CheckpointParams"]);
+            grid.getParamsFromJson(jsonParams["GridParams"]);
+            flow.getParamsFromJson(jsonParams["FlowParams"]);
+            running.getParamsFromJson(jsonParams["RunningParams"]);
+            output.getParamsFromJson(jsonParams["OutputParams"]);
+            checkpoint.getParamsFromJson(jsonParams["CheckpointParams"]);
+            parametersLoadedFromJson = true;
+        } catch (std::exception &e) {
+            std::cerr << "Exception reached parsing input json: "
+                        << e.what() << ", will use default parameters" << std::endl;
+        }
+    }
 
-    } else {
+    if (!parametersLoadedFromJson) {
 
         grid.y = grid.x;
         grid.z = grid.x;

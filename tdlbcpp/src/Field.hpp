@@ -1,4 +1,3 @@
-
 #include "Header.h"
 #include "QVec.hpp"
 
@@ -62,7 +61,7 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutLIJK>
 
     inline operator QVec<T, QVecSize>()
     {
-        return QVec<T, QVecSize>(q, ijkSize);
+        return QVec<T, QVecSize>(q.q, ijkSize);
     }
 
     inline QVecAccessBase<T, QVecSize, MemoryLayoutLIJK> &operator=(const QVec<T, QVecSize> &v)
