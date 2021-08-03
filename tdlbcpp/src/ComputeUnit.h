@@ -49,8 +49,8 @@
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 class ComputeUnitBase {
-    using Fld = Field<T, QVecSize, MemoryLayout>;
 public:
+    using Fld = Field<T, QVecSize, MemoryLayout>;
     
     //Position in the grid
     int idi, idj, idk;

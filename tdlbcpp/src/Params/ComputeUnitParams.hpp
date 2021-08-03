@@ -30,8 +30,11 @@ struct ComputeUnitParams
     tNi j0 = 0;
     tNi k0 = 0;
     tNi ghost = 0;
-    
 
+    ComputeUnitParams() {}
+
+    ComputeUnitParams(int idi, int idj, int idk, tNi x, tNi y, tNi z, tNi i0, tNi j0, tNi k0, tNi ghost)
+     : idi(idi), idj(idj), idk(idk), x(x), y(y), z(z), i0(i0), j0(j0), k0(k0), ghost(ghost) {}
         
     void getParamsFromJson(Json::Value jsonParams) {
         

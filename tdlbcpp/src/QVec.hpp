@@ -104,7 +104,7 @@ private:
 
     inline void copy(const T* qFrom, size_t step) {
         for (int l = 0; l < size; l++) {
-            q[l] = qFrom + l * step;
+            q[l] = *(qFrom + l * step);
         }
     }
     
