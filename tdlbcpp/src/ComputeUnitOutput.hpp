@@ -17,6 +17,79 @@
 
 
 
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialiseExcludePoints(RushtonTurbinePolarCPP<tNi, T> geom){
+
+    std::vector<Pos3d<tNi>> excludeFixed = geom.getFixedExcludePoints();
+    std::vector<Pos3d<tNi>> excludeRotatingNonUpdating = geom.getRotatingNonUpdatingExcludePoints();
+
+    for(auto &p: excludeFixed){
+        excludeGeomPoints[index(p.i + 1, p.j + 1, p.k + 1)] = true;
+    }
+    for(auto &p: excludeRotatingNonUpdating){
+        excludeGeomPoints[index(p.i + 1, p.j + 1, p.k + 1)] = true;
+    }
+
+
+    std::vector<PosPolar<tNi, T>> geomSurfaceFixed = geom.returnRotatingGeometry();
+    std::vector<PosPolar<tNi, T>> geomSurfaceRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+
+    for(auto &p: geomSurfaceFixed){
+        excludeGeomPoints[index(p.i + 1, p.j + 1, p.k + 1)] = true;
+    }
+    for(auto &p: geomSurfaceRotatingNonUpdating){
+        excludeGeomPoints[index(p.i + 1, p.j + 1, p.k + 1)] = true;
+    }
+
+
+
+};
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams output, RunningParams running)
+{
+    bool hasOutput = false;
+    tStep step = running.step;
+
+
+    for (auto xy: output.XY_planes){
+
+        if ((step == xy.start_at_step) ||
+            (step > xy.start_at_step
+             && xy.repeat > 0
+             && (step - xy.start_at_step) % xy.repeat == 0)) {
+            hasOutput = true;
+        }
+    }
+
+
+    for (auto xz: output.XZ_planes){
+
+        if ((step == xz.start_at_step) ||
+            (step > xz.start_at_step
+             && xz.repeat > 0
+             && (step - xz.start_at_step) % xz.repeat == 0)) {
+            hasOutput = true;
+
+        }
+    }
+
+    for (auto yz: output.YZ_planes){
+
+        if ((step == yz.start_at_step) ||
+            (step > yz.start_at_step
+             && yz.repeat > 0
+             && (step - yz.start_at_step) % yz.repeat == 0)) {
+            hasOutput = true;
+        }
+    }
+
+    return hasOutput;
+}
+
+
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningParams runParam){
 
@@ -87,55 +160,16 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningP
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams output, tStep step)
-{
-    bool hasOutput = false;
-
-    for (auto xy: output.XY_planes){
-
-        if ((step == xy.start_at_step) ||
-            (step > xy.start_at_step
-             && xy.repeat > 0
-             && (step - xy.start_at_step) % xy.repeat == 0)) {
-            hasOutput = true;
-        }
-    }
-
-
-    for (auto xz: output.XZ_planes){
-
-        if ((step == xz.start_at_step) ||
-            (step > xz.start_at_step
-             && xz.repeat > 0
-             && (step - xz.start_at_step) % xz.repeat == 0)) {
-            hasOutput = true;
-
-        }
-    }
-
-    for (auto yz: output.YZ_planes){
-
-        if ((step == yz.start_at_step) ||
-            (step > yz.start_at_step
-             && yz.repeat > 0
-             && (step - yz.start_at_step) % yz.repeat == 0)) {
-            hasOutput = true;
-        }
-    }
-
-    return hasOutput;
-}
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams running)
 {
 
-    if (!hasOutputAtStep(output, running.step)) return;
+    if (!hasOutputAtStep(output, running)) return;
 
 
-    std::vector<Pos3d<int>> excludeRotating = geom.getRotatingExcludePoints(running.angle);
+    std::vector<Pos3d<tNi>> excludeRotating = geom.getRotatingExcludePoints(running.angle);
 
     for (auto &p: excludeRotating){
         excludeGeomPoints[index(p.i, p.j, p.k)] = 1;
@@ -192,6 +226,101 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
     }
 
 
+
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+template <typename tDiskPrecision, int tDiskSize>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::savePlaneXZ(OrthoPlane plane, BinFileParams binFormat, RunningParams runParam){
+
+
+    tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg * zg];
+
+    tDiskGrid<tDiskPrecision, 3> *F3outputBuffer = new tDiskGrid<tDiskPrecision, 3>[xg*zg];
+
+
+    long int qVecBufferLen = 0;
+    long int F3BufferLen = 0;
+    for (tNi i=1; i<=xg1; i++){
+        tNi j = plane.cutAt;
+        for (tNi k=1; k<=zg1; k++){
+
+            if (excludeGeomPoints[index(i,j,k)] == true) continue;
+
+
+            tDiskGrid<tDiskPrecision, tDiskSize> tmp;
+
+            //Set position with absolute value
+            tmp.iGrid = uint16_t(i0 + i - 1);
+            tmp.jGrid = uint16_t(j      - 1);
+            tmp.kGrid = uint16_t(k0 + k - 1);
+
+#pragma unroll
+            for (int l=0; l<tDiskSize; l++){
+                tmp.q[l] = Q[index(i,j,k)].q[l];
+            }
+            outputBuffer[qVecBufferLen] = tmp;
+            qVecBufferLen++;
+
+
+            if (F[index(i,j,k)].isNotZero()) {
+
+                tDiskGrid<tDiskPrecision, 3> tmp;
+
+                //Set position with absolute value
+                tmp.iGrid = uint16_t(i0 + i - 1);
+                tmp.jGrid = uint16_t(j);
+                tmp.kGrid = uint16_t(k0 + k - 1);
+
+                tmp.q[0] = F[index(i,j,k)].x;
+                tmp.q[1] = F[index(i,j,k)].y;
+                tmp.q[2] = F[index(i,j,k)].z;
+
+                F3outputBuffer[F3BufferLen] = tmp;
+                F3BufferLen++;
+            }
+
+
+        }
+    }
+
+
+    std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, plane.cutAt);
+    outputTree.createDir(plotDir);
+
+
+    binFormat.filePath = outputTree.formatQVecBinFileNamePath(plotDir);
+    binFormat.binFileSizeInStructs = qVecBufferLen;
+
+
+
+
+    std::cout<< "Writing output to: " << binFormat.filePath <<std::endl;
+
+
+    outputTree.writeAllParamsJson(binFormat, runParam);
+
+
+    FILE *fp = fopen(binFormat.filePath.c_str(), "wb");
+    fwrite(outputBuffer, sizeof(tDiskGrid<tDiskPrecision, tDiskSize>), qVecBufferLen, fp);
+    fclose(fp);
+
+
+
+    //======================
+    binFormat.QOutputLength = 3;
+    binFormat.binFileSizeInStructs = F3BufferLen;
+    binFormat.filePath = outputTree.formatF3BinFileNamePath(plotDir);
+    outputTree.writeAllParamsJson(binFormat, runParam);
+
+
+    FILE *fpF3 = fopen(binFormat.filePath.c_str(), "wb");
+    fwrite(F3outputBuffer, sizeof(tDiskGrid<tDiskPrecision, 3>), F3BufferLen, fpF3);
+    fclose(fpF3);
+
+
+    delete[] outputBuffer;
+    delete[] F3outputBuffer;
 
 }
 
