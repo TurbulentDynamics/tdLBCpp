@@ -134,7 +134,7 @@ namespace ParamsCommon
         }
     }
     template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-    void fillForTest(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu)
+    void fillForTest(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, unsigned long offset = 0)
     {
 
         if (cu.xg > 99 || cu.yg > 99 || cu.zg > 99)
@@ -156,19 +156,84 @@ namespace ParamsCommon
 
                     for (unsigned long int l = 0; l < QVecSize; l++)
                     {
-                        qTmp.q[l] = i * 1000000 + j * 10000 + k * 100 + l;
+                        qTmp.q[l] = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + l;
                     }
                     cu.Q[cu.index(i, j, k)] = qTmp;
 
-                    cu.F[cu.index(i, j, k)].x = 0;
-                    cu.F[cu.index(i, j, k)].y = 1;
-                    cu.F[cu.index(i, j, k)].z = 2;
+                    cu.F[cu.index(i, j, k)].x = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100;
+                    cu.F[cu.index(i, j, k)].y = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 1;
+                    cu.F[cu.index(i, j, k)].z = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 2;
 
-                    cu.Nu[cu.index(i, j, k)] = 1;
+                    cu.Nu[cu.index(i, j, k)] = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 1;
                     cu.O[cu.index(i, j, k)] = true;
                 }
             }
         }
 #endif
+    }
+
+    template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+    void generateTestData(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, std::string headerPath, std::string suffix, 
+        bool append = false, unsigned long offset = 0, bool markChanged = false)
+    {
+        std::ios_base::openmode mode = std::ios_base::out;
+        if (append) {
+            mode |= std::ios_base::app;
+        }
+        std::ofstream hdr(headerPath, mode);
+        hdr << "namespace TestUtils {\n";
+        hdr << "    template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>\n";
+        hdr << "    void fillExpectedComputeUnitValues" << suffix << "(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu) {\n";
+        hdr << "        QVec<T, QVecSize> qTmp;\n";
+        std::string ind47(47, ' ');
+        std::string ind19(19, ' ');
+        std::string ind36(36, ' ');
+        std::string ind23(23, ' ');
+        std::string ind13(13, ' ');
+        std::string ind8(8, ' ');
+        auto m =[&](T v, tNi i, tNi j, tNi k, int l) {
+            std::stringstream ss;
+            ss << std::setw(7) << v << "ul";
+            if ((markChanged) && (offset*100000000ul+i*1000000+j*10000+k*100+l != v)) {
+                ss << "/*C*/";
+            }
+            return ss.str();
+        };
+        for (tNi i = 0; i < cu.xg; i++)
+        {
+            for (tNi j = 0; j < cu.yg; j++)
+            {
+                for (tNi k = 0; k < cu.zg; k++)
+                {
+                    hdr << ind47 << " qTmp.q[Q15] = " << m(cu.Q[cu.index(i, j, k)].q[Q15], i, j, k, Q15) << ";\n";
+                    hdr << ind19 << " qTmp.q[ Q8] = " << m(cu.Q[cu.index(i, j, k)].q[Q8], i, j, k, Q8) << ";";
+                    hdr << " qTmp.q[ Q2] = " << m(cu.Q[cu.index(i, j, k)].q[Q2], i, j, k, Q2) << ";";
+                    hdr << " qTmp.q[ Q7] = " << m(cu.Q[cu.index(i, j, k)].q[Q7], i, j, k, Q7) << ";\n";
+                    hdr << ind36 << " qTmp.q[Q18] = " << m(cu.Q[cu.index(i, j, k)].q[Q18], i, j, k, Q18) << ";\n";
+
+                    hdr << ind23 << " qTmp.q[Q12] = " << m(cu.Q[cu.index(i, j, k)].q[Q12], i, j, k, Q12) << ";";
+                    hdr << " qTmp.q[ Q5] = " << m(cu.Q[cu.index(i, j, k)].q[Q5], i, j, k, Q5) << ";";
+                    hdr << " qTmp.q[Q11] = " << m(cu.Q[cu.index(i, j, k)].q[Q11], i, j, k, Q11) << ";\n";
+                    hdr << ind19 << " qTmp.q[ Q3] = " << m(cu.Q[cu.index(i, j, k)].q[Q3], i, j, k, Q3) << ";" << ind23;
+                    hdr << " qTmp.q[ Q1] = " << m(cu.Q[cu.index(i, j, k)].q[Q1], i, j, k, Q1) << ";\n";
+                    hdr << ind13 << " qTmp.q[Q13] = " << m(cu.Q[cu.index(i, j, k)].q[Q13], i, j, k, Q13) << ";";
+                    hdr << " qTmp.q[ Q6] = " << m(cu.Q[cu.index(i, j, k)].q[Q6], i, j, k, Q6) << ";";
+                    hdr << " qTmp.q[Q14] = " << m(cu.Q[cu.index(i, j, k)].q[Q14], i, j, k, Q14) << ";\n";
+
+                    hdr << ind47 << " qTmp.q[Q16] = " << m(cu.Q[cu.index(i, j, k)].q[Q16], i, j, k, Q16) << ";\n";
+                    hdr << ind19 << " qTmp.q[ Q9] = " << m(cu.Q[cu.index(i, j, k)].q[Q9], i, j, k, Q9) << ";";
+                    hdr << " qTmp.q[ Q4] = " << m(cu.Q[cu.index(i, j, k)].q[Q4], i, j, k, Q4) << ";";
+                    hdr << " qTmp.q[Q10] = " << m(cu.Q[cu.index(i, j, k)].q[Q10], i, j, k, Q10) << ";\n";
+                    hdr << ind36 << " qTmp.q[Q17] = " << m(cu.Q[cu.index(i, j, k)].q[Q17], i, j, k, Q17) << ";\n";
+                    
+                    hdr << "\n        cu.Q[cu.index(" << i << ", " << j << ", " << k << ")] = qTmp;\n";
+                    hdr << ind8 << "cu.F[cu.index(" << i << ", " << j << ", " << k << ")].x = " << cu.F[cu.index(i, j, k)].x << ";\n";
+                    hdr << ind8 << "cu.F[cu.index(" << i << ", " << j << ", " << k << ")].y = " << cu.F[cu.index(i, j, k)].y << ";\n";
+                    hdr << ind8 << "cu.F[cu.index(" << i << ", " << j << ", " << k << ")].z = " << cu.F[cu.index(i, j, k)].z << ";\n";
+                }
+            }
+        }
+        hdr << "    }\n}\n";
+        hdr.close();
     }
 }
