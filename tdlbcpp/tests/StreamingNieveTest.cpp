@@ -21,44 +21,10 @@
 #include "StreamingNieveTest.hpp"
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void generateTestData(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, std::string headerPath)
-{
-    std::ofstream hdr(headerPath);
-    hdr << "namespace TestUtils {\n";
-    hdr << "    template <typename T, int QVecSize>\n";
-    hdr << "    void fillExpectedComputeUnitValues(ComputeUnit<T, QVecSize> cu) {\n";
-    hdr << "        QVec<T, QVecSize> qTmp;\n";
-    for (tNi i = 0; i < cu.xg; i++)
-    {
-        for (tNi j = 0; j < cu.yg; j++)
-        {
-            for (tNi k = 0; k < cu.zg; k++)
-            {
-                for (unsigned long int l = 0; l < QVecSize; l++)
-                {
-                    if ((l > 0) && (l % 8 == 0))
-                    {
-                        hdr << "\n       ";
-                    }
-                    if (l == 0)
-                    {
-                        hdr << "       ";
-                    }
-                    hdr << " qTmp.q[" << l << "] = " << cu.Q[cu.index(i, j, k)].q[l] << ";";
-                }
-                hdr << "\n        cu.Q[cu.index(" << i << ", " << j << ", " << k << ")] = qTmp;\n";
-            }
-        }
-    }
-    hdr << "    }\n};\n";
-    hdr.close();
-}
-
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void testStream(std::string tag, ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, ComputeUnitBase<T, QVecSize, MemoryLayout> &actual)
 {
     ComputeUnit<T, QVecSize, MemoryLayout, EgglesSomers, Simple> expected(cuParams, flow, outputTree);
-    TestUtils::fillExpectedComputeUnitValues(expected);
+    TestUtils::fillExpectedComputeUnitValuesTestStreamingNieve(expected);
     for (tNi i = 0; i < actual.xg; i++)
     {
         for (tNi j = 0; j < actual.yg; j++)
@@ -105,7 +71,8 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
     if (std::getenv("GENERATE_STREAMING_NIEVE_TEST_HPP"))
     {
         std::string headerPath = std::getenv("GENERATE_STREAMING_NIEVE_TEST_HPP");
-        generateTestData(lb2, headerPath);
+        std::cerr << "Writing to headerPath: " << headerPath << std::endl;
+        ParamsCommon::generateTestData(lb2, headerPath, "TestStreamingNieve");
     }
     testStream("IJKL", cuParams, flow, diskOutputTree, lb2);
 

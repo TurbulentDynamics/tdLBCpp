@@ -241,7 +241,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
 
     RunningParams running;
 
-    std::cout << "Node " << mpiRank << " Load " << (dirname + "/AllParams." + unit_name + ".json") << std::endl;
+    std::cout << "Node " << mpiRank << " Load " << (outputTree.getAllParamsFilePath(dirname, unit_name) + ".json") << std::endl;
     outputTree.readAllParamsJson(outputTree.getAllParamsFilePath(dirname, unit_name) + ".json", binFormat, running);
     flow = outputTree.getFlowParams<T>();
     init(outputTree.getComputeUnitParams(), true);
