@@ -24,6 +24,8 @@ struct RunningParams
 
     tStep num_steps = 1;
 
+    tStep impellerStartupStepsUntilNormalSpeed = 30;
+
     void update(tStep _step, double _angle){
                 
         step = (tStep)_step;
@@ -46,7 +48,8 @@ struct RunningParams
             
             step = (Json::UInt64)jsonParams["step"].asUInt64();
             num_steps = (tStep)jsonParams["num_steps"].asUInt64();
-            
+            impellerStartupStepsUntilNormalSpeed = (tStep)jsonParams["impellerStartupStepsUntilNormalSpeed"].asUInt64();
+
             
         }
         catch(std::exception& e)
@@ -72,8 +75,10 @@ struct RunningParams
             jsonParams["name"] = "Running";
             
             jsonParams["step"] = (Json::UInt64)step;
-            jsonParams["num_steps"] = (Json::UInt64)num_steps;
             jsonParams["angle"] = (double)angle;
+
+            jsonParams["num_steps"] = (Json::UInt64)num_steps;
+            jsonParams["impellerStartupStepsUntilNormalSpeed"] = (Json::UInt64)impellerStartupStepsUntilNormalSpeed;
 
             
             return jsonParams;

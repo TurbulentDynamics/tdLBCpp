@@ -57,12 +57,9 @@ void inline smoothedDeltaFunction(T i_cart_fraction, T k_cart_fraction, T ppp[][
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tNi, T>> geom, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tNi, T>> geom, T alfa, T beta){
     
-    
-    //        T alfa = 0.97;
-    //        T beta = 1.9;
-    
+
     for (tNi i=1; i<=xg1; i++) {
         for (tNi j = 1; j<=yg1; j++){
             for (tNi k = 1; k<=zg1; k++){
@@ -79,18 +76,18 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tN
         
         T ppp[3][3];
 
-        tNi i = g.i;
-        tNi j = g.j;
-        tNi k = g.k;
+        tNi i = g.i + ghost;
+        tNi j = g.j + ghost;
+        tNi k = g.k + ghost;
 
         
         smoothedDeltaFunction(g.iCartFraction, g.kCartFraction, ppp);
         
     
-        T rhos = 0.0;
-        T xs = 0.0;
-        T ys = 0.0;
-        T zs = 0.0;
+        T rhoSum = 0.0;
+        T xSum = 0.0;
+        T ySum = 0.0;
+        T zSum = 0.0;
         
         
         
@@ -101,7 +98,6 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tN
                 tNi j2 = j;
                 tNi k2 = k + k1;
 
-                //TODO Check this is correct.
                 if (i2 == 0)   i2 = xg1;
                 if (i2 == xg0) i2 = 1;
                 if (k2 == 0)   k2 = zg1;
@@ -110,29 +106,30 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tN
 
                 T rho = Q[index(i2,j2,k2)].q[RHOQ];
                 
-                
-                Velocity<T> u = Q[index(i2,j2,k2)].velocity();
-                
-                
+                Force<T> localForce = F[index(i2,j2,k2)];
+
+                T x = Q[index(i2,j2,k2)].q[Q2] + 0.5 * localForce.x;
+                T y = Q[index(i2,j2,k2)].q[Q3] + 0.5 * localForce.y;
+                T z = Q[index(i2,j2,k2)].q[Q4] + 0.5 * localForce.z;
+
+
+
                 //adding the density of a nearby point using a weight (in ppp)
-                rhos += ppp[i1+1][k1+1] * rho;
-                
-                //printf("  %f %f   %f  \n", rho, rhos, ppp[j1+1][k1+1] );
-                
-                
+                rhoSum += ppp[i1+1][k1+1] * rho;
+
                 //adding the velocity of a nearby point using a weight (in ppp)
-                xs += ppp[i1+1][k1+1] * u.x;
-                ys += ppp[i1+1][k1+1] * u.y;
-                zs += ppp[i1+1][k1+1] * u.z;
+                xSum += ppp[i1+1][k1+1] * x;
+                ySum += ppp[i1+1][k1+1] * y;
+                zSum += ppp[i1+1][k1+1] * z;
             }
         }//endfor  j1, k1
         
         
         //calculating the difference between the actual (weighted) speed and
         //the required (no-slip) velocity
-        xs -= rhos * g.uDelta;
-        ys -= rhos * g.vDelta;
-        zs -= rhos * g.wDelta;
+        xSum -= rhoSum * g.uDelta;
+        ySum -= rhoSum * g.vDelta;
+        zSum -= rhoSum * g.wDelta;
         
         
         for (tNi k1 = -1; k1<=1; k1++){
@@ -145,18 +142,18 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tN
                 tNi k2 = k + k1;
 
 
-                //TODO Check this is correct.
                 if (i2 == 0)   i2 = xg1;
                 if (i2 == xg0) i2 = 1;
                 if (k2 == 0)   k2 = zg1;
                 if (k2 == zg0) k2 = 1;
                 
             
-                Velocity<T> u = Q[index(i2,j2,k2)].velocity();
 
-                F[index(i2,j2,k2)].x = alfa * u.x - beta * ppp[i1+1][k1+1] * xs;
-                F[index(i2,j2,k2)].y = alfa * u.y - beta * ppp[i1+1][k1+1] * ys;
-                F[index(i2,j2,k2)].z = alfa * u.z - beta * ppp[i1+1][k1+1] * zs;
+                Force<T> localForce = F[index(i2,j2,k2)];
+
+                F[index(i2,j2,k2)].x = alfa * localForce.x - beta * ppp[i1+1][k1+1] * xSum;
+                F[index(i2,j2,k2)].y = alfa * localForce.y - beta * ppp[i1+1][k1+1] * ySum;
+                F[index(i2,j2,k2)].z = alfa * localForce.z - beta * ppp[i1+1][k1+1] * zSum;
                 
                 
                 O[index(i2,j2,k2)] = 1;

@@ -13,6 +13,9 @@
 
 #include "ComputeUnit.h"
 #include "DiskOutputTree.h"
+#include "Params/BinFile.hpp"
+
+
 
 
 
@@ -21,28 +24,26 @@
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialiseExcludePoints(RushtonTurbinePolarCPP<tNi, T> geom){
 
-    std::vector<Pos3d<tNi>> excludeFixed = geom.getFixedExcludePoints();
-    std::vector<Pos3d<tNi>> excludeRotatingNonUpdating = geom.getRotatingNonUpdatingExcludePoints();
-
-    for(auto &p: excludeFixed){
-        excludeGeomPoints[index(p.i + 1, p.j + 1, p.k + 1)] = true;
+    for(auto &p: geom.getExternalPoints()){
+        excludeGeomPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
     }
-    for(auto &p: excludeRotatingNonUpdating){
-        excludeGeomPoints[index(p.i + 1, p.j + 1, p.k + 1)] = true;
+    for(auto &p: geom.getBaffles(surfaceAndInternal)){
+        excludeGeomPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
     }
 
 
-    std::vector<PosPolar<tNi, T>> geomSurfaceFixed = geom.returnRotatingGeometry();
-    std::vector<PosPolar<tNi, T>> geomSurfaceRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+    //increment only metters for {u,v,w}Delta
+    float increment = 0.0;
 
-    for(auto &p: geomSurfaceFixed){
-        excludeGeomPoints[index(p.i + 1, p.j + 1, p.k + 1)] = true;
+    for(auto &p: geom.getImpellerHub(increment, surfaceAndInternal)){
+        excludeGeomPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
     }
-    for(auto &p: geomSurfaceRotatingNonUpdating){
-        excludeGeomPoints[index(p.i + 1, p.j + 1, p.k + 1)] = true;
+    for(auto &p: geom.getImpellerDisk(increment, surfaceAndInternal)){
+        excludeGeomPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
     }
-
-
+    for(auto &p: geom.getImpellerShaft(increment, surfaceAndInternal)){
+        excludeGeomPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
+    }
 
 };
 
@@ -88,6 +89,21 @@ bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams ou
 
     return hasOutput;
 }
+
+
+
+
+std::string formatStep(tStep step){
+
+    std::stringstream sstream;
+
+    sstream << std::setw(8) << std::setfill('0') << patch::to_string(step);
+
+    return sstream.str();
+}
+
+
+
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
@@ -139,16 +155,25 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningP
 
     // Saving JPEG
     auto *pict = new unsigned char[xg1 * zg1];
-    std::cerr << "min: " << min << ", max: " << max << std::endl;
+
+
+    //Set at min max on step 74, for nx=80, slowstart=200
+    //TOFIX DEBUG TODO
+//    min = -25.5539;
+//    max = -0.681309;
+
+
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi k = 1; k <= zg1; k++) {
-            pict[zg1 * (i - 1)+ (k - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+            pict[zg1 * (i - 1) + (k - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
         }
     }
     std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, j);
     outputTree.createDir(plotDir);
-    std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
+//    std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
+    std::string jpegPath = "vort.xz." + formatStep(runParam.step) + ".jpeg";
+
 
     TooJpeg::openJpeg(jpegPath);
     TooJpeg::writeJpeg(pict, xg1, zg1,
@@ -161,6 +186,85 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningP
 
 
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXY(tNi k, RunningParams runParam){
+
+
+    T *Vort = new T[size];
+    bool minInitialized = false, maxInitialized = false;
+    T max = 0, min = 0;
+
+
+    for (tNi i = 1; i <= xg1; i++) {
+        for (tNi j = 1;  j <= yg1; j++) {
+
+
+            if (excludeGeomPoints[index(i,j,k)] == true) continue;
+
+
+            //              T uxx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().x - Q[dirnQ2(i, j, k)].velocity().x);
+            T uxy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().x - Q[dirnQ6(i, j, k)].velocity().x);
+            T uxz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().x - Q[dirnQ4(i, j, k)].velocity().x);
+
+            T uyx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().y - Q[dirnQ2(i, j, k)].velocity().y);
+            //              T uyy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().y - Q[dirnQ6(i, j, k)].velocity().y);
+            T uyz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().y - Q[dirnQ4(i, j, k)].velocity().y);
+
+
+            T uzx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().z - Q[dirnQ2(i, j, k)].velocity().z);
+            T uzy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().z - Q[dirnQ6(i, j, k)].velocity().z);
+            //              T uzz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().z - Q[dirnQ4(i, j, k)].velocity().z);
+
+
+
+            T uxyuyx = uxy - uyx;
+            T uyzuzy = uyz - uzy;
+            T uzxuxz = uzx - uxz;
+
+            Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
+
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!minInitialized || Vort[index(i,j,k)] < min)) {
+                min = Vort[index(i,j,k)];
+                minInitialized = true;
+            }
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!maxInitialized || Vort[index(i,j,k)] > max)) {
+                max = Vort[index(i,j,k)];
+                maxInitialized = true;
+            }
+        }
+    }
+
+    // Saving JPEG
+    auto *pict = new unsigned char[xg1 * zg1];
+
+    //Set at min max on step 74, for nx=80, slowstart=200
+    //TOFIX DEBUG TODO
+    //    min = -25.5539;
+    //    max = -0.681309;
+
+
+
+    for (tNi i = 1;  i <= xg1; i++) {
+        for (tNi j = 1; j <= yg1; j++) {
+            pict[yg1 * (j - 1) + (i - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+        }
+    }
+//    std::string plotDir = outputTree.formatXYPlaneDir(runParam.step, k);
+//    outputTree.createDir(plotDir);
+    //    std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
+    std::string jpegPath = "vort.xy." + formatStep(runParam.step) + ".jpeg";
+
+
+    TooJpeg::openJpeg(jpegPath);
+    TooJpeg::writeJpeg(pict, xg1, yg1,
+                       false, 90, false, "Debug");
+    TooJpeg::closeJpeg();
+
+}
+
+
+
+
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams running)
@@ -169,11 +273,10 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
     if (!hasOutputAtStep(output, running)) return;
 
 
-    std::vector<Pos3d<tNi>> excludeRotating = geom.getRotatingExcludePoints(running.angle);
+//    for (auto &p: excludeRotating){
+//        excludeGeomPoints[index(p.i, p.j, p.k)] = 1;
+//    }
 
-    for (auto &p: excludeRotating){
-        excludeGeomPoints[index(p.i, p.j, p.k)] = 1;
-    }
 
 
 //    for (auto xy: output.XY_planes){
@@ -216,14 +319,14 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
 
 
 
-
-
-
-    //REMOVE THE ROTATING POINTS.
-    //TODO TOFIX, this might remove points from the hub!!!
-    for (auto &p: excludeRotating){
-        excludeGeomPoints[index(p.i, p.j, p.k)] = 0;
-    }
+//
+//
+//
+//    //REMOVE THE ROTATING POINTS.
+//    //TODO TOFIX, this might remove points from the hub!!!
+//    for (auto &p: excludeRotating){
+//        excludeGeomPoints[index(p.i, p.j, p.k)] = 0;
+//    }
 
 
 
