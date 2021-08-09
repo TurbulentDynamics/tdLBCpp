@@ -99,7 +99,8 @@ public:
     
     void init(ComputeUnitParams, bool);    
     tNi inline index(tNi i, tNi j, tNi k);
-    tNi inline index(int i, int j, int k);
+    tNi inline indexPlusGhost(tNi i, tNi j, tNi k);
+
 
     Velocity<T> inline getVelocity(tNi i, tNi j, tNi k);
     Velocity<T> inline getVelocitySparseF(tNi i, tNi j, tNi k, Force<T> f);
@@ -108,9 +109,7 @@ public:
     void initialise(T rho);
 
 
-
-
-    void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta, tNi iCenter, tNi kCenter, tNi radius);
+    void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta);
     
     
     void bounceBackBoundary();
@@ -139,6 +138,7 @@ public:
     bool hasOutputAtStep(OutputParams output, RunningParams running);
     void initialiseExcludePoints(RushtonTurbinePolarCPP<tNi, T> geom);
 
+
     template <typename tDiskPrecision, int tDiskSize>
     void savePlaneXZ(OrthoPlane plane, BinFileParams binFormat, RunningParams runParam);
 
@@ -146,6 +146,7 @@ public:
 
     //Debug
     void calcVorticityXZ(tNi j, RunningParams runParam);
+    void calcVorticityXY(tNi k, RunningParams runParam);
 
     
     

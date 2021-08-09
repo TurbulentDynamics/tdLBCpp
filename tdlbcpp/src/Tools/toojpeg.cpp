@@ -5,7 +5,7 @@
 //
 
 #include <fstream>
-#include "toojpeg.h"
+#include "Tools/toojpeg.h"
 
 // - the "official" specifications: https://www.w3.org/Graphics/JPEG/itu-t81.pdf and https://www.w3.org/Graphics/JPEG/jfif3.pdf
 // - Wikipedia has a short description of the JFIF/JPEG file format: https://en.wikipedia.org/wiki/JPEG_File_Interchange_Format
