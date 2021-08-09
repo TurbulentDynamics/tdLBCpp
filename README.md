@@ -9,3 +9,7 @@ This is a basic version of the multi-node heterogeneous HPC code to run billions
 ```
 BAZEL_CXXOPTS="-std=c++14" bazel run --verbose_failures //tdlbcpp/src:tdlbcpp
 ```
+
+
+
+

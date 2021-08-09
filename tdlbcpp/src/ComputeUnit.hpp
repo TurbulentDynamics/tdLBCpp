@@ -361,7 +361,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexPlusGhost(tNi i, tNi
 //NO DIRECTION
 // 0  0  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ000(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ00(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + k;
 }
@@ -370,7 +370,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ000(tNi i, tNi j, tN
 //RIGHT DIRECTION
 // +1  0  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ1(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ01(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + (j * zg) + k;
 }
@@ -379,7 +379,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ1(tNi i, tNi j, tNi 
 //LEFT DIRECTION
 // -1  0  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ2(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ02(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + (j * zg) + k;
 }
@@ -388,7 +388,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ2(tNi i, tNi j, tNi 
 //UP DIRECTION
 //  0 +1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ3(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ03(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j + 1) * zg) + k;
 }
@@ -397,7 +397,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ3(tNi i, tNi j, tNi 
 //DOWN DIRECTION
 //  0 -1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ4(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ04(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j - 1) * zg) + k;
 }
@@ -406,7 +406,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ4(tNi i, tNi j, tNi 
 //BACKWARD DIRECTION
 //  0  0 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ5(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ05(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + (k + 1);
 }
@@ -415,7 +415,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ5(tNi i, tNi j, tNi 
 //FORWARD DIRECTION
 //  0  0 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ6(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ06(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + (k - 1);
 }
@@ -424,7 +424,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ6(tNi i, tNi j, tNi 
 //RIGHT_UP DIRECTION
 // +1 +1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ7(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ07(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j + 1) * zg) + k;
 }
@@ -433,7 +433,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ7(tNi i, tNi j, tNi 
 //LEFT_DOWN DIRECTION
 // -1 -1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ8(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ08(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j - 1) * zg) + k;
 }
@@ -442,7 +442,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ8(tNi i, tNi j, tNi 
 //RIGHT_BACKWARD DIRECTION
 // +1  0 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ9(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ09(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + (j * zg) + (k + 1);
 }

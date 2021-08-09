@@ -158,16 +158,16 @@ private:
 
 public:    
     
-    tNi inline dirnQ000(tNi i, tNi j, tNi k);
-    tNi inline dirnQ1(tNi i, tNi j, tNi k);
-    tNi inline dirnQ2(tNi i, tNi j, tNi k);
-    tNi inline dirnQ3(tNi i, tNi j, tNi k);
-    tNi inline dirnQ4(tNi i, tNi j, tNi k);
-    tNi inline dirnQ5(tNi i, tNi j, tNi k);
-    tNi inline dirnQ6(tNi i, tNi j, tNi k);
-    tNi inline dirnQ7(tNi i, tNi j, tNi k);
-    tNi inline dirnQ8(tNi i, tNi j, tNi k);
-    tNi inline dirnQ9(tNi i, tNi j, tNi k);
+    tNi inline dirnQ00(tNi i, tNi j, tNi k);
+    tNi inline dirnQ01(tNi i, tNi j, tNi k);
+    tNi inline dirnQ02(tNi i, tNi j, tNi k);
+    tNi inline dirnQ03(tNi i, tNi j, tNi k);
+    tNi inline dirnQ04(tNi i, tNi j, tNi k);
+    tNi inline dirnQ05(tNi i, tNi j, tNi k);
+    tNi inline dirnQ06(tNi i, tNi j, tNi k);
+    tNi inline dirnQ07(tNi i, tNi j, tNi k);
+    tNi inline dirnQ08(tNi i, tNi j, tNi k);
+    tNi inline dirnQ09(tNi i, tNi j, tNi k);
     tNi inline dirnQ10(tNi i, tNi j, tNi k);
     tNi inline dirnQ11(tNi i, tNi j, tNi k);
     tNi inline dirnQ12(tNi i, tNi j, tNi k);
@@ -223,14 +223,13 @@ class ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>: pu
 public:
     using Base=ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Simple>;
     using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1; using Base::index; using Base::Q;
-    using Base::dirnQ1; using Base::dirnQ2; using Base::dirnQ3; using Base::dirnQ4; using Base::dirnQ5;
-    using Base::dirnQ6; using Base::dirnQ7; using Base::dirnQ8; using Base::dirnQ9; using Base::dirnQ10;
+    using Base::dirnQ01; using Base::dirnQ02; using Base::dirnQ03; using Base::dirnQ04; using Base::dirnQ05;
+    using Base::dirnQ06; using Base::dirnQ07; using Base::dirnQ08; using Base::dirnQ09; using Base::dirnQ10;
     using Base::dirnQ11; using Base::dirnQ12; using Base::dirnQ13; using Base::dirnQ14; using Base::dirnQ15;
     using Base::dirnQ16; using Base::dirnQ17; using Base::dirnQ18;
     using Base::Base;
-    void streaming();
-    void streaming2();
-    void streamingDEBUG();
+    void streamingPull();
+    void streamingPush();
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>

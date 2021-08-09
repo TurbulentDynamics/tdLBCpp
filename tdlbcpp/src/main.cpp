@@ -122,7 +122,7 @@ int main(int argc, char* argv[]){
 
     if (!parametersLoadedFromJson) {
 
-        grid.x = 140;
+        grid.x = 120;
         grid.y = grid.x;
         grid.z = grid.x;
 
@@ -133,8 +133,8 @@ int main(int argc, char* argv[]){
         flow.useLES = 0;
         flow.cs0 = 0.12;
 
-        running.num_steps = 20000;
-        running.impellerStartupStepsUntilNormalSpeed = 50;
+        running.num_steps = 100;
+        running.impellerStartupStepsUntilNormalSpeed = 20;
     }
 
 
@@ -166,7 +166,7 @@ int main(int argc, char* argv[]){
 
         
         //        output.add_XZ_plane("plot_slice", 10, rt.impellers[0].impellerPosition-1);
-        output.add_XZ_plane("plot_slice", 1, rt.impellers[0].impellerPosition  );
+        output.add_XZ_plane("plot_slice", 2, rt.impellers[0].impellerPosition);
         //        output.add_XZ_plane("plot_slice", 10, rt.impellers[0].impellerPosition+1);
         //        output.add_YZ_plane("plot", 10, grid.x/2);
 
@@ -202,6 +202,7 @@ int main(int argc, char* argv[]){
     FlowParams<double> flowAsDouble = flow.asDouble();
     DiskOutputTree outputTree = DiskOutputTree(checkpoint, output);
     outputTree.setParams(cu, grid, flowAsDouble, running, output, checkpoint);
+
 
 
 
@@ -297,7 +298,7 @@ int main(int argc, char* argv[]){
         main_time = mainTimer.check(0, 2, main_time, "BounceBack");
 
 
-        lb.streamingDEBUG();
+        lb.streamingPush();
         main_time = mainTimer.check(0, 3, main_time, "Streaming");
 
         lb.moments();
@@ -331,7 +332,7 @@ int main(int argc, char* argv[]){
         for (auto xy: output.XY_planes){
             if (running.step % xy.repeat == 0) {
 //                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
-                lb.calcVorticityXY(xy.cutAt, running);
+//                lb.calcVorticityXY(xy.cutAt, running);
             }
         }
 

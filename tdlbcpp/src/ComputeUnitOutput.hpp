@@ -122,18 +122,18 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningP
             if (excludeGeomPoints[index(i,j,k)] == true) continue;
 
 
-            //              T uxx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().x - Q[dirnQ2(i, j, k)].velocity().x);
-            T uxy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().x - Q[dirnQ6(i, j, k)].velocity().x);
-            T uxz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().x - Q[dirnQ4(i, j, k)].velocity().x);
+            //              T uxx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().x - Q[dirnQ02(i, j, k)].velocity().x);
+            T uxy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().x - Q[dirnQ06(i, j, k)].velocity().x);
+            T uxz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().x - Q[dirnQ04(i, j, k)].velocity().x);
 
-            T uyx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().y - Q[dirnQ2(i, j, k)].velocity().y);
-            //              T uyy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().y - Q[dirnQ6(i, j, k)].velocity().y);
-            T uyz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().y - Q[dirnQ4(i, j, k)].velocity().y);
+            T uyx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().y - Q[dirnQ02(i, j, k)].velocity().y);
+            //              T uyy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().y - Q[dirnQ06(i, j, k)].velocity().y);
+            T uyz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().y - Q[dirnQ04(i, j, k)].velocity().y);
 
 
-            T uzx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().z - Q[dirnQ2(i, j, k)].velocity().z);
-            T uzy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().z - Q[dirnQ6(i, j, k)].velocity().z);
-            //              T uzz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().z - Q[dirnQ4(i, j, k)].velocity().z);
+            T uzx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().z - Q[dirnQ02(i, j, k)].velocity().z);
+            T uzy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().z - Q[dirnQ06(i, j, k)].velocity().z);
+            //              T uzz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().z - Q[dirnQ04(i, j, k)].velocity().z);
 
 
             T uxyuyx = uxy - uyx;
@@ -202,18 +202,18 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXY(tNi k, RunningP
             if (excludeGeomPoints[index(i,j,k)] == true) continue;
 
 
-            //              T uxx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().x - Q[dirnQ2(i, j, k)].velocity().x);
-            T uxy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().x - Q[dirnQ6(i, j, k)].velocity().x);
-            T uxz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().x - Q[dirnQ4(i, j, k)].velocity().x);
+            //              T uxx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().x - Q[dirnQ02(i, j, k)].velocity().x);
+            T uxy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().x - Q[dirnQ06(i, j, k)].velocity().x);
+            T uxz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().x - Q[dirnQ04(i, j, k)].velocity().x);
 
-            T uyx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().y - Q[dirnQ2(i, j, k)].velocity().y);
-            //              T uyy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().y - Q[dirnQ6(i, j, k)].velocity().y);
-            T uyz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().y - Q[dirnQ4(i, j, k)].velocity().y);
+            T uyx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().y - Q[dirnQ02(i, j, k)].velocity().y);
+            //              T uyy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().y - Q[dirnQ06(i, j, k)].velocity().y);
+            T uyz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().y - Q[dirnQ04(i, j, k)].velocity().y);
 
 
-            T uzx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().z - Q[dirnQ2(i, j, k)].velocity().z);
-            T uzy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().z - Q[dirnQ6(i, j, k)].velocity().z);
-            //              T uzz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().z - Q[dirnQ4(i, j, k)].velocity().z);
+            T uzx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().z - Q[dirnQ02(i, j, k)].velocity().z);
+            T uzy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().z - Q[dirnQ06(i, j, k)].velocity().z);
+            //              T uzz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().z - Q[dirnQ04(i, j, k)].velocity().z);
 
 
 

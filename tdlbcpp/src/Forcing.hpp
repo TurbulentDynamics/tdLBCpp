@@ -104,14 +104,13 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tN
                 if (k2 == zg0) k2 = 1;
 
 
-                T rho = Q[index(i2,j2,k2)].q[RHOQ];
+                T rho = Q[index(i2,j2,k2)].q[M01];
                 
                 Force<T> localForce = F[index(i2,j2,k2)];
 
-                T x = Q[index(i2,j2,k2)].q[Q2] + 0.5 * localForce.x;
-                T y = Q[index(i2,j2,k2)].q[Q3] + 0.5 * localForce.y;
-                T z = Q[index(i2,j2,k2)].q[Q4] + 0.5 * localForce.z;
-
+                T x = Q[index(i2,j2,k2)].q[M02] + 0.5 * localForce.x;
+                T y = Q[index(i2,j2,k2)].q[M03] + 0.5 * localForce.y;
+                T z = Q[index(i2,j2,k2)].q[M04] + 0.5 * localForce.z;
 
 
                 //adding the density of a nearby point using a weight (in ppp)
