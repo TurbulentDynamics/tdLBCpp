@@ -70,7 +70,7 @@ int main(int argc, char* argv[]){
         options.add_options()
         ("x,snx", "Number of Cells in x direction ie snx", cxxopts::value<tNi>(grid.x))
         ("j,json", "Load input json file", cxxopts::value<std::string>(inputJsonPath))
-        ("g,geom", "Load geometry input json file", cxxopts::value<std::string>(geomJsonPath))
+        //        ("g,geom", "Load geometry input json file", cxxopts::value<std::string>(geomJsonPath))
         ("c,checkpoint_dir", "Load from Checkpoint directory", cxxopts::value<std::string>(checkpointPath))
         ("s,streaming", "Streaming simple or esoteric", cxxopts::value<std::string>(streaming)->default_value("simple"))
         ("h,help", "Help")
@@ -116,12 +116,13 @@ int main(int argc, char* argv[]){
             parametersLoadedFromJson = true;
         } catch (std::exception &e) {
             std::cerr << "Exception reached parsing input json: "
-                        << e.what() << ", will use default parameters" << std::endl;
+            << e.what() << ", will use default parameters" << std::endl;
         }
     }
 
     if (!parametersLoadedFromJson) {
 
+        grid.x = 140;
         grid.y = grid.x;
         grid.z = grid.x;
 
@@ -130,15 +131,46 @@ int main(int argc, char* argv[]){
         flow.uav = 0.1;
 
         flow.useLES = 0;
+        flow.cs0 = 0.12;
 
-        running.num_steps = 20;
+        running.num_steps = 20000;
+        running.impellerStartupStepsUntilNormalSpeed = 50;
+    }
 
-        //        output.add_XY_plane("plot", 10, grid.x/2);
-        output.add_XZ_plane("plot_slice", 10, grid.y/3-1);
-        output.add_XZ_plane("plot_slice", 10, grid.y/3);
-        output.add_XZ_plane("plot_slice", 10, grid.y/3+1);
+
+
+
+
+    //======== Set up Geometry
+
+    RushtonTurbine rt = RushtonTurbine(int(grid.x));
+    flow.calc_nu(rt.impellers[0].blades.outerRadius);
+    flow.printParams();
+
+
+    Extents<tNi> e = Extents<tNi>(0, grid.x, 0, grid.y, 0, grid.z);
+
+
+    //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
+    RushtonTurbinePolarCPP<tNi, useQVecPrecision> geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
+    geom.impellerStartupStepsUntilNormalSpeed = running.impellerStartupStepsUntilNormalSpeed;
+    useQVecPrecision increment = geom.calcThisStepImpellerIncrement(running.step);
+    std::cout << increment<<std::endl;
+
+
+
+    // =================== Set Up Output
+    if (!parametersLoadedFromJson) {
+
+        output.add_XY_plane("plot_axis", (tStep)1, (tNi)geom.kCenter);
+
+        
+        //        output.add_XZ_plane("plot_slice", 10, rt.impellers[0].impellerPosition-1);
+        output.add_XZ_plane("plot_slice", 1, rt.impellers[0].impellerPosition  );
+        //        output.add_XZ_plane("plot_slice", 10, rt.impellers[0].impellerPosition+1);
         //        output.add_YZ_plane("plot", 10, grid.x/2);
 
+        
         //        output.add_volume("volume", 20);
         //        output.add_XZ_plane("ml_slice", 0, grid.y/3-1);
         //        output.add_XZ_plane("ml_slice", 0, grid.y/3+1);
@@ -150,36 +182,6 @@ int main(int argc, char* argv[]){
         //    std::string dir = output.getRunDirWithTimeAndParams("run_", grid.x, flow.reMNonDimensional, flow.useLES, flow.uav);
 
     }
-
-    if (grid.x < 14 || grid.y < 14 || grid.z < 14) {
-        std::cout << "The grid should be larger than 14 cells in every direction" << std::endl;
-        exit(1);
-    }
-
-
-
-
-
-
-
-
-    RushtonTurbine rt = RushtonTurbine(int(grid.x));
-    flow.calc_nu(rt.impellers[0].blades.outerRadius);
-    flow.printParams();
-
-    Extents<tNi> e = Extents<tNi>(0, grid.x, 0, grid.y, 0, grid.z);
-
-    //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
-    RushtonTurbinePolarCPP<tNi, useQVecPrecision> geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
-
-
-    geom.generateFixedGeometry();
-    geom.generateRotatingGeometry(running.angle);
-    geom.generateRotatingNonUpdatingGeometry();
-
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
 
 
 
@@ -211,9 +213,34 @@ int main(int argc, char* argv[]){
     }
     lb.initialiseExcludePoints(geom);
 
-    
-    lb.forcing(geomFixed, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
-    lb.forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
+
+
+
+
+
+    std::vector<PosPolar<tNi, useQVecPrecision>> wall = geom.getTankWall();
+    std::vector<PosPolar<tNi, useQVecPrecision>> baffles = geom.getBaffles(surfaceAndInternal);
+
+    std::vector<PosPolar<tNi, useQVecPrecision>> hub = geom.getImpellerHub(increment, surfaceAndInternal);
+    std::vector<PosPolar<tNi, useQVecPrecision>> shaft = geom.getImpellerShaft(increment, surfaceAndInternal);
+    std::vector<PosPolar<tNi, useQVecPrecision>> disc = geom.getImpellerDisk(increment, surfaceAndInternal);
+
+    std::vector<PosPolar<tNi, useQVecPrecision>> blades = geom.getImpellerBlades(running.angle, increment, surfaceAndInternal);
+
+
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = wall;
+    geomFORCING.insert( geomFORCING.end(), baffles.begin(), baffles.end() );
+    geomFORCING.insert( geomFORCING.end(), hub.begin(), hub.end() );
+    geomFORCING.insert( geomFORCING.end(), shaft.begin(), shaft.end() );
+    geomFORCING.insert( geomFORCING.end(), disc.begin(), disc.end() );
+    geomFORCING.insert( geomFORCING.end(), blades.begin(), blades.end() );
+
+    lb.forcing(geomFORCING, flow.alpha, flow.beta);
+
+
+
+
+
 
 
     int rank = 0;
@@ -229,16 +256,39 @@ int main(int argc, char* argv[]){
         double total_time = mainTimer.time_now();
 
 
+
+
+        //=========================================
+
         running.incrementStep();
-        running.angle += geom.calcThisStepImpellerIncrement(running.step);
+        useQVecPrecision increment = geom.calcThisStepImpellerIncrement(running.step);
+        running.angle += increment;
+
+        std::cout << "angle " << running.angle << "  increment " << increment << std::endl;
 
 
-        geom.updateRotatingGeometry(running.angle);
-        geomRotating = geom.returnRotatingGeometry();
+
+        std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geom.getImpellerBlades(running.angle, increment, surfaceAndInternal);
+
+
+        if (running.step < geom.impellerStartupStepsUntilNormalSpeed){
+            std::vector<PosPolar<tNi, useQVecPrecision>> shaft = geom.getImpellerDisk(increment, surfaceAndInternal);
+            std::vector<PosPolar<tNi, useQVecPrecision>> disc = geom.getImpellerDisk(increment, surfaceAndInternal);
+            std::vector<PosPolar<tNi, useQVecPrecision>> hub = geom.getImpellerDisk(increment, surfaceAndInternal);
+            geomFORCING.insert( geomFORCING.end(), shaft.begin(), shaft.end() );
+            geomFORCING.insert( geomFORCING.end(), disc.begin(), disc.end() );
+            geomFORCING.insert( geomFORCING.end(), hub.begin(), hub.end() );
+        }
+
         main_time = mainTimer.check(0, 0, main_time, "updateRotatingGeometry");
 
-        
-        
+
+
+
+        //=========================================
+
+
+
         lb.collision();
         main_time = mainTimer.check(0, 1, main_time, "Collision");
 
@@ -253,7 +303,7 @@ int main(int argc, char* argv[]){
         lb.moments();
 
 
-        lb.forcing(geomRotating, flow.alpha, flow.beta, geom.iCenter, geom.kCenter, geom.turbine.tankDiameter/2);
+        lb.forcing(geomFORCING, flow.alpha, flow.beta);
         main_time = mainTimer.check(0, 4, main_time, "Forcing");
 
 
@@ -269,10 +319,38 @@ int main(int argc, char* argv[]){
         binFormat.QDataType = "float";
         binFormat.QOutputLength = 4;
 
-        
-        lb.writeAllOutput(geom, output, binFormat, running);
-        main_time = mainTimer.check(0, 5, main_time, "writeAllOutput");
 
+
+
+        //====================
+
+        for (auto &p: geomFORCING){
+            lb.excludeGeomPoints[lb.indexPlusGhost(p.i, p.j, p.k)] = 1;
+        }
+
+        for (auto xy: output.XY_planes){
+            if (running.step % xy.repeat == 0) {
+//                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
+                lb.calcVorticityXY(xy.cutAt, running);
+            }
+        }
+
+
+        for (auto xz: output.XZ_planes){
+            if (running.step % xz.repeat == 0) {
+//                lb.template savePlaneXZ<float, 4>(xz, binFormat, running);
+                lb.calcVorticityXZ(xz.cutAt, running);
+            }
+        }
+
+        //REMOVE THE ROTATING POINTS.
+        for (auto &p: geomFORCING){
+            lb.excludeGeomPoints[lb.indexPlusGhost(p.i, p.j, p.k)] = 0;
+        }
+
+        //=====================
+        //        lb.writeAllOutput(geom, output, binFormat, running);
+        main_time = mainTimer.check(0, 5, main_time, "writeAllOutput");
 
 
 

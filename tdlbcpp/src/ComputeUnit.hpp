@@ -183,6 +183,8 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
     }
 };
 
+
+
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocity(tNi i, tNi j, tNi k){
     return Q[index(i, j, k)].velocity();
@@ -333,11 +335,26 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::index(tNi i, tNi j, tNi k
     return i * (yg * zg) + (j * zg) + k;
 }
 
+
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::index(int i, int j, int k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexPlusGhost(tNi i, tNi j, tNi k)
 {
-    return index(tNi(i), tNi(j), tNi(k));
+#ifdef DEBUG
+    if (((i + ghost)>=xg) || ((j + ghost)>=yg) || ((k + ghost)>=zg)) {
+        std::cout << "Index Error  " << i <<" "<< xg <<" "<< j <<" "<< yg <<" "<< k <<" "<< zg << std::endl;
+        exit(1);
+    }
+#endif
+    return (i + ghost) * (yg * zg) + ((j + ghost) * zg) + (k + ghost);
 }
+
+
+
+
+
+
+
+
 
 
 

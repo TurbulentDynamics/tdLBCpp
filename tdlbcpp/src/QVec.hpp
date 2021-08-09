@@ -125,19 +125,19 @@ struct CommonOperations : public Base {
     Velocity<T> velocity(Force<T> f){
         
         Velocity<T> u;
-        u.x = (1.0 / q[ Q1]) * (q[ Q2] + 0.5 * f.x);
-        u.y = (1.0 / q[ Q1]) * (q[ Q3] + 0.5 * f.y);
-        u.z = (1.0 / q[ Q1]) * (q[ Q4] + 0.5 * f.z);
+        u.x = (1.0 / q[ RHOQ]) * (q[ Q2] + 0.5 * f.x);
+        u.y = (1.0 / q[ RHOQ]) * (q[ Q3] + 0.5 * f.y);
+        u.z = (1.0 / q[ RHOQ]) * (q[ Q4] + 0.5 * f.z);
 
         return u;
     }
-    
+
     Velocity<T> velocity(){
         
         Velocity<T> u;
-        u.x = q[Q2] / q[Q1];
-        u.y = q[Q3] / q[Q1];
-        u.z = q[Q4] / q[Q1];
+        u.x = q[Q2] / q[RHOQ];
+        u.y = q[Q3] / q[RHOQ];
+        u.z = q[Q4] / q[RHOQ];
       
         return u;
     };
