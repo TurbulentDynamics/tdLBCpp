@@ -19,7 +19,7 @@
 //template <typename T, int QVecSize>
 //ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams, bool reallocate) {
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams, bool allocateMemory = true) {
     idi = cuParams.idi;
     idj = cuParams.idj;
     idk = cuParams.idk;
@@ -49,25 +49,25 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
     yg1 = yg - 2;
     zg1 = zg - 2;
 
+    
     size_t new_size = size_t(xg) * yg * zg;
-    if (reallocate && (new_size == size)) {
-        reallocate = false;
-    }
-    size = new_size;
+    bool sizeChanged = (new_size != size);
     
-    
-    Q.allocate(size);
-    if (reallocate) {
+    if (allocateMemory && sizeChanged) {
+        size = new_size;
+
+        Q.allocate(size);
+
         delete[] F;
         delete[] Nu;
         delete[] O;
         delete[] excludeGeomPoints;
-    }
-    F = new Force<T>[size];
-    Nu = new T[size];
-    O = new bool[size];
-    excludeGeomPoints = new bool[size];
 
+        F = new Force<T>[size];
+        Nu = new T[size];
+        O = new bool[size];
+        excludeGeomPoints = new bool[size];
+    }
 
 #if WITH_GPU == 1
     checkCudaErrors(cudaSetDevice(0));
@@ -107,8 +107,9 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
-    init(cuParams, false);
+ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, bool allocateMemory):
+        flow(flow), outputTree(outputTree), size(0) {
+    init(cuParams, allocateMemory);
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
@@ -244,7 +245,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
     std::cout << "Node " << mpiRank << " Load " << (outputTree.getAllParamsFilePath(dirname, unit_name) + ".json") << std::endl;
     outputTree.readAllParamsJson(outputTree.getAllParamsFilePath(dirname, unit_name) + ".json", binFormat, running);
     flow = outputTree.getFlowParams<T>();
-    init(outputTree.getComputeUnitParams(), true);
+    init(outputTree.getComputeUnitParams());
     
     std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
     FILE *fpQ = fopen_read(filePath);
