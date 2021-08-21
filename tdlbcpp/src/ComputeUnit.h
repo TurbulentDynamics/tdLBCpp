@@ -108,7 +108,7 @@ public:
     
     ~ComputeUnitBase();
     
-    void init(ComputeUnitParams, bool);    
+    void init(ComputeUnitParams, bool = true);
     tNi inline index(tNi i, tNi j, tNi k);
     tNi inline index(int i, int j, int k);
 
