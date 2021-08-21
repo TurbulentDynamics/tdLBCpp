@@ -82,6 +82,7 @@ struct FieldBase
 {
     using QVecAcc = QVecAccess<T, QVecSize, MemoryLayout>;
 
+    bool allocated;
     T *q;
     size_t qVectorNumber;
     size_t qSize;
@@ -92,7 +93,7 @@ struct FieldBase
     }
 
     FieldBase(FieldBase&) = delete;
-    FieldBase(FieldBase&& rhs) noexcept : q(rhs.q), qVectorNumber(rhs.qVectorNumber), qSize(rhs.qSize) {
+    FieldBase(FieldBase&& rhs) noexcept : allocated(false), q(rhs.q), qVectorNumber(rhs.qVectorNumber), qSize(rhs.qSize) {
         rhs.q = nullptr;
     }
 
@@ -105,6 +106,7 @@ struct FieldBase
         qVectorNumber = vectorNumber;
         qSize = vectorNumber * QVecSize;
         q = new T[qSize];
+        allocated = true;
     }
 
     inline QVecAcc operator[](tNi index)
@@ -119,7 +121,7 @@ struct FieldBase
 
     ~FieldBase()
     {
-        if (q != 0)
+        if (allocated && (q != 0))
         {
             delete[] q;
             q = 0;
