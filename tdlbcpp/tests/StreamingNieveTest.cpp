@@ -67,7 +67,7 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
     ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK, EgglesSomers, Simple> lb2lijk(cuParams, flow, diskOutputTree);
 
     ParamsCommon::fillForTest(lb2);
-    lb2.streaming();
+    lb2.streamingPull();
     if (std::getenv("GENERATE_STREAMING_NIEVE_TEST_HPP"))
     {
         std::string headerPath = std::getenv("GENERATE_STREAMING_NIEVE_TEST_HPP");
@@ -77,6 +77,6 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
     testStream("IJKL", cuParams, flow, diskOutputTree, lb2);
 
     ParamsCommon::fillForTest(lb2lijk);
-    lb2lijk.streaming();
+    lb2lijk.streamingPull();
     testStream("LIJK", cuParams, flow, diskOutputTree, lb2lijk);
 }

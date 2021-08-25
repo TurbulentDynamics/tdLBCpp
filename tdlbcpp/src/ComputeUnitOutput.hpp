@@ -93,7 +93,7 @@ bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams ou
 
 
 
-std::string formatStep(tStep step){
+static inline std::string formatStep(tStep step){
 
     std::stringstream sstream;
 
