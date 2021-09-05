@@ -10,11 +10,12 @@
 #include "ComputeUnit.h"
 
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Esotwist>::bounceBackBoundary(){}
 
 
-
-template <typename T, int NVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, NVecSize, MemoryLayout>::bounceBackBoundary(){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>::bounceBackBoundary(){
 
     //Takes the vector from the active cell, reverses it, and places it in the
     //ghost cell (the streaming function can then operate on the ghost cell to

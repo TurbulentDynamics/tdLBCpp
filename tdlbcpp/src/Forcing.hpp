@@ -56,9 +56,9 @@ void inline smoothedDeltaFunction(T i_cart_fraction, T k_cart_fraction, T ppp[][
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tNi, T>> geom, T alfa, T beta){
-    
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcing(std::vector<PosPolar<tNi, T>> geom, T alfa, T beta){
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     for (tNi i=1; i<=xg1; i++) {
         for (tNi j = 1; j<=yg1; j++){
@@ -103,14 +103,14 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::forcing(std::vector<PosPolar<tN
                 if (k2 == 0)   k2 = zg1;
                 if (k2 == zg0) k2 = 1;
 
-
-                T rho = Q[index(i2,j2,k2)].q[M01];
+                QVec<T, QVecSize> q = AF::read(*this, i2, j2, k2);
+                T rho = q[M01];
                 
                 Force<T> localForce = F[index(i2,j2,k2)];
 
-                T x = Q[index(i2,j2,k2)].q[M02] + 0.5 * localForce.x;
-                T y = Q[index(i2,j2,k2)].q[M03] + 0.5 * localForce.y;
-                T z = Q[index(i2,j2,k2)].q[M04] + 0.5 * localForce.z;
+                T x = q[M02] + 0.5 * localForce.x;
+                T y = q[M03] + 0.5 * localForce.y;
+                T z = q[M04] + 0.5 * localForce.z;
 
 
                 //adding the density of a nearby point using a weight (in ppp)

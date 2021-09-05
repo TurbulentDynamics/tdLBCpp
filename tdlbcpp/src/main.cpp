@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
+#include <memory>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -204,15 +205,18 @@ int main(int argc, char* argv[]){
     outputTree.setParams(cu, grid, flowAsDouble, running, output, checkpoint);
 
 
-
-
-    ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple> lb(cu, flow, outputTree);
-    if (checkpointPath != ""){
-        lb.checkpoint_read(checkpointPath, "Device");
+    ComputeUnitBase<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL> *lb;
+    if (streaming == "simple") {
+      lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cu, flow, outputTree);
     } else {
-        lb.initialise(flow.initialRho);
+      lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist>(cu, flow, outputTree);
     }
-    lb.initialiseExcludePoints(geom);
+    if (checkpointPath != ""){
+        lb->checkpoint_read(checkpointPath, "Device");
+    } else {
+        lb->initialise(flow.initialRho);
+    }
+    lb->initialiseExcludePoints(geom);
 
 
 
@@ -236,7 +240,7 @@ int main(int argc, char* argv[]){
     geomFORCING.insert( geomFORCING.end(), disc.begin(), disc.end() );
     geomFORCING.insert( geomFORCING.end(), blades.begin(), blades.end() );
 
-    lb.forcing(geomFORCING, flow.alpha, flow.beta);
+    lb->forcing(geomFORCING, flow.alpha, flow.beta);
 
 
 
@@ -290,21 +294,21 @@ int main(int argc, char* argv[]){
 
 
 
-        lb.collision();
+        lb->collision();
         main_time = mainTimer.check(0, 1, main_time, "Collision");
 
 
-        lb.bounceBackBoundary();
+        lb->bounceBackBoundary();
         main_time = mainTimer.check(0, 2, main_time, "BounceBack");
 
 
-        lb.streamingPush();
+        lb->streamingPush();
         main_time = mainTimer.check(0, 3, main_time, "Streaming");
 
-        lb.moments();
+        lb->moments();
 
 
-        lb.forcing(geomFORCING, flow.alpha, flow.beta);
+        lb->forcing(geomFORCING, flow.alpha, flow.beta);
         main_time = mainTimer.check(0, 4, main_time, "Forcing");
 
 
@@ -326,31 +330,43 @@ int main(int argc, char* argv[]){
         //====================
 
         for (auto &p: geomFORCING){
-            lb.excludeGeomPoints[lb.indexPlusGhost(p.i, p.j, p.k)] = 1;
+            lb->excludeGeomPoints[lb->indexPlusGhost(p.i, p.j, p.k)] = 1;
         }
 
         for (auto xy: output.XY_planes){
             if (running.step % xy.repeat == 0) {
-//                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
-//                lb.calcVorticityXY(xy.cutAt, running);
+//                lb->template savePlaneXY<float, 4>(xy, binFormat, running);
+//                lb->calcVorticityXY(xy.cutAt, running);
             }
         }
 
 
+
         for (auto xz: output.XZ_planes){
+          /*            for (int i = lb->xg - 2; i < lb->xg; i++) {
+                for (int k = lb->zg / 2 - 1; k <= lb->zg / 2 + 1; k++) {
+                    int j = xz.cutAt;
+                    printf("Q[%d,%d,%d] ", i, j, k);
+                    for (int l = 0; l < QLen::D3Q19; l++) {
+                        printf ("Q%d = %f, ", l+1, lb->Q[lb->index(i, j, k)][l]);
+                    }
+                    printf("\nF = %f, %f, %f", lb->F[lb->index(i, j, k)].x, lb->F[lb->index(i, j, k)].y, lb->F[lb->index(i, j, k)].z);
+                    printf("\n");
+                }
+                }*/
             if (running.step % xz.repeat == 0) {
-//                lb.template savePlaneXZ<float, 4>(xz, binFormat, running);
-                lb.calcVorticityXZ(xz.cutAt, running);
+//                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
+                lb->calcVorticityXZ(xz.cutAt, running);
             }
         }
 
         //REMOVE THE ROTATING POINTS.
         for (auto &p: geomFORCING){
-            lb.excludeGeomPoints[lb.indexPlusGhost(p.i, p.j, p.k)] = 0;
+            lb->excludeGeomPoints[lb->indexPlusGhost(p.i, p.j, p.k)] = 0;
         }
 
         //=====================
-        //        lb.writeAllOutput(geom, output, binFormat, running);
+        //        lb->writeAllOutput(geom, output, binFormat, running);
         main_time = mainTimer.check(0, 5, main_time, "writeAllOutput");
 
 
@@ -358,7 +374,7 @@ int main(int argc, char* argv[]){
 
         if (checkpoint.checkpoint_repeat && (running.step % checkpoint.checkpoint_repeat == 0)) {
 
-            lb.checkpoint_write("Device", running);
+            lb->checkpoint_write("Device", running);
             main_time = mainTimer.check(0, 6, main_time, "Checkpoint");
         }
 

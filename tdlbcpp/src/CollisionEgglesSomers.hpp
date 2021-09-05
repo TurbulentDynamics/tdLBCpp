@@ -25,7 +25,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomersLES, streamingT
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>::collision(){
-    using AF = AccessField<T, QVecSize, MemoryLayout, streamingType>;
+    using AF = AccessField<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>;
 
     //kinematic viscosity.
     T b = 1.0 / (1.0 + 6 * flow.nu);
@@ -41,6 +41,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 
 
                 //TODO Change this to m, but write to q, notation only
+                //QVec<T, QVecSize> q = Q[index(i,j,k)];
                 QVec<T, QVecSize> q = AF::read(*this, i, j, k);
 
 
@@ -138,6 +139,10 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 
 
                 q[Q01] = 2*alpha[M01] + 4*alpha[M02] + 3*alpha[Q05] - 3*alpha[Q07] - 3*alpha[Q10] - 2*alpha[Q11] - 2*alpha[Q13] + 2*alpha[Q17] + 2*alpha[Q18];
+                /*                if ((k >= zg1 / 2 - 1) && (k <= zg1 / 2 + 1)
+                    && (i >= xg1 - 1) && (j >= 80 - 1) && (j <= 80 + 1)) {
+                  printf("collision M:(%ld, %ld, %ld): q01 = %f a = %f %f %f %f %f %f %f %f %f\n", i, j, k, q[Q01], alpha[M01], alpha[M02], alpha[Q05], alpha[Q07], alpha[Q10], alpha[Q11], alpha[Q13], alpha[Q17], alpha[Q18]);
+                  }*/
 
                 q[Q02] = 2*alpha[M01] - 4*alpha[M02] + 3*alpha[Q05] - 3*alpha[Q07] - 3*alpha[Q10] + 2*alpha[Q11] + 2*alpha[Q13] + 2*alpha[Q17] + 2*alpha[Q18];
 
@@ -185,20 +190,28 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
-void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>::moments(){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::moments(){
 
     using QVecAcc = QVecAccess<T, QVecSize, MemoryLayout>;
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi j = 1; j <= yg1; j++) {
             for (tNi k = 1; k <= zg1; k++) {
 
 
-                QVecAcc q = Q[index(i, j, k)];
+                //QVecAcc q = Q[index(i, j, k)];
+                QVec<T, QVecSize> q = AF::read(*this, i, j, k);
 
 
-                QVec<T, QVecSize> m = Q[index(i, j, k)];
+                //QVec<T, QVecSize> m = Q[index(i, j, k)];
+                QVec<T, QVecSize> m = AF::read(*this, i, j, k);
+
+                /*                if ((k >= zg1 / 2 - 1) && (k <= zg1 / 2 + 1)
+                    && (i >= xg1 - 1) && (j >= 80 - 1) && (j <= 80 + 1)) {
+                  printf("moments read Q:(%ld, %ld, %ld): q01 = %f a = %f %f %f %f %f %f %f %f %f\n", i, j, k, q.q[Q01], q.q[Q02], q.q[Q03], q.q[Q05], q.q[Q07], q.q[Q10], q.q[Q11], q.q[Q13], q.q[Q17], q.q[Q18]);
+                  }*/
 
 
                 //the first position is simply the entire mass-vector (Q summed up)
@@ -251,9 +264,10 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 
 
 
-                for (int l=0; l<QVecSize; l++){
-                    Q[index(i,j,k)].q[l] = m[ l ];
-                }
+                //for (int l=0; l<QVecSize; l++){
+                //    Q[index(i,j,k)].q[l] = m[ l ];
+                //}
+                AF::writeMoments(*this, m, i, j, k);
 
 
                 /*
