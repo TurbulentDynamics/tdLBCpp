@@ -191,6 +191,7 @@ public:
     virtual void moments() = 0;
     virtual void streamingPull() = 0;
     virtual void streamingPush() = 0;
+    virtual void printDebug(int fi, int ti, int fj, int tj, int fk, int tk) = 0;
 
 
 };
@@ -211,6 +212,7 @@ public:
     virtual void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta);
     virtual void calcVorticityXZ(tNi j, RunningParams runParam);
     virtual void calcVorticityXY(tNi k, RunningParams runParam);
+    virtual void printDebug(int fi, int ti, int fj, int tj, int fk, int tk);
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
@@ -287,7 +289,28 @@ struct AccessField<T, QVecSize, MemoryLayout, collisionType, Simple> {
     inline static void writeMoments(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
         write(cu, q, i, j, k);
     }
-};
+ };
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::printDebug(int fi, int ti, int fj, int tj, int fk, int tk) {
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+    for (int i = fi; i <= fi; i++) {
+        for (int j = fj; j <= tj; j++) {
+            for (int k = fk; k <= tk; k++) {
+                QVec<T, QVecSize> q = AF::read(*this, i, j, k);
+                printf("index(%d, %d, %d):\n", i, j, k);
+                for (int l = 0; l < QVecSize; l++) {
+                    printf("Q[%d] = %f, ", l, Q[index(i,j,k)][l]);
+                }
+                printf("\n read: ");
+                for (int l = 0; l < QVecSize; l++) {
+                    printf("q[%d] = %f, ", l, q[l]);
+                }
+                printf("\n");
+            }
+        }
+    }
+}
 
 #include "ComputeUnit.hpp"
 #include "ComputeUnitOutput.hpp"
