@@ -121,9 +121,6 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
             if (excludeGeomPoints[index(i,j,k)] == true) continue;
 
 
-            //              T uxx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().x - Q[dirnQ02(i, j, k)].velocity().x);
-            // T uxy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().x - Q[dirnQ06(i, j, k)].velocity().x);
-            // T uxz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().x - Q[dirnQ04(i, j, k)].velocity().x);
             QVec<T, QVecSize> qDirnQ05 = AF::read(*this, i, j, k + 1);
             QVec<T, QVecSize> qDirnQ06 = AF::read(*this, i, j, k - 1);
             T uxy = T(0.5) * (qDirnQ05.velocity().x - qDirnQ06.velocity().x);
@@ -131,20 +128,14 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
             QVec<T, QVecSize> qDirnQ04 = AF::read(*this, i, j - 1, k);
             T uxz = T(0.5) * (qDirnQ03.velocity().x - qDirnQ04.velocity().x);
 
-            //T uyx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().y - Q[dirnQ02(i, j, k)].velocity().y);
             QVec<T, QVecSize> qDirnQ01 = AF::read(*this, i + 1, j, k);
             QVec<T, QVecSize> qDirnQ02 = AF::read(*this, i - 1, j, k);
             T uyx = T(0.5) * (qDirnQ01.velocity().y - qDirnQ02.velocity().y);
-            //              T uyy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().y - Q[dirnQ06(i, j, k)].velocity().y);
-            //T uyz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().y - Q[dirnQ04(i, j, k)].velocity().y);
             T uyz = T(0.5) * (qDirnQ03.velocity().y - qDirnQ04.velocity().y);
 
 
-            //T uzx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().z - Q[dirnQ02(i, j, k)].velocity().z);
-            //T uzy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().z - Q[dirnQ06(i, j, k)].velocity().z);
             T uzx = T(0.5) * (qDirnQ01.velocity().z - qDirnQ02.velocity().z);
             T uzy = T(0.5) * (qDirnQ05.velocity().z - qDirnQ06.velocity().z);
-            //              T uzz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().z - Q[dirnQ04(i, j, k)].velocity().z);
 
 
             T uxyuyx = uxy - uyx;
@@ -152,10 +143,6 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
             T uzxuxz = uzx - uxz;
 
             Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
-            /*            if ((i >= xg1 / 2 - 1) && (i <= xg1 / 2 + 1)
-                && (k >= zg1 - 1)) {
-              printf("(%ld, %ld, %ld): %f %f %f %f %f %f uzy=0.5 * (%f - %f) %f %f %f %f\n", i, j, k, uxy, uyx, uyz, uzy, uzx, uxz, qDirnQ05.velocity().z, qDirnQ06.velocity().z, qDirnQ05.q[M04], qDirnQ05.q[M01], qDirnQ06.q[M04], qDirnQ06.q[M01]);
-              }*/
 
             if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!minInitialized || Vort[index(i,j,k)] < min)) {
                 min = Vort[index(i,j,k)];
@@ -217,9 +204,6 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
             if (excludeGeomPoints[index(i,j,k)] == true) continue;
 
 
-            //              T uxx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().x - Q[dirnQ02(i, j, k)].velocity().x);
-            //T uxy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().x - Q[dirnQ06(i, j, k)].velocity().x);
-            //T uxz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().x - Q[dirnQ04(i, j, k)].velocity().x);
             QVec<T, QVecSize> qDirnQ05 = AF::read(*this, i, j, k + 1);
             QVec<T, QVecSize> qDirnQ06 = AF::read(*this, i, j, k - 1);
             T uxy = T(0.5) * (qDirnQ05.velocity().x - qDirnQ06.velocity().x);
@@ -227,20 +211,14 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
             QVec<T, QVecSize> qDirnQ04 = AF::read(*this, i, j - 1, k);
             T uxz = T(0.5) * (qDirnQ03.velocity().x - qDirnQ04.velocity().x);
 
-            //T uyx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().y - Q[dirnQ02(i, j, k)].velocity().y);
             QVec<T, QVecSize> qDirnQ01 = AF::read(*this, i + 1, j, k);
             QVec<T, QVecSize> qDirnQ02 = AF::read(*this, i - 1, j, k);
             T uyx = T(0.5) * (qDirnQ01.velocity().y - qDirnQ02.velocity().y);
-            //              T uyy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().y - Q[dirnQ06(i, j, k)].velocity().y);
-            //T uyz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().y - Q[dirnQ04(i, j, k)].velocity().y);
             T uyz = T(0.5) * (qDirnQ03.velocity().y - qDirnQ04.velocity().y);
 
 
-            //T uzx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().z - Q[dirnQ02(i, j, k)].velocity().z);
-            //T uzy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().z - Q[dirnQ06(i, j, k)].velocity().z);
             T uzx = T(0.5) * (qDirnQ01.velocity().z - qDirnQ02.velocity().z);
             T uzy = T(0.5) * (qDirnQ05.velocity().z - qDirnQ06.velocity().z);
-            //              T uzz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().z - Q[dirnQ04(i, j, k)].velocity().z);
 
 
 

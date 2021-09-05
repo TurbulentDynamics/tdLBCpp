@@ -343,17 +343,6 @@ int main(int argc, char* argv[]){
 
 
         for (auto xz: output.XZ_planes){
-          /*            for (int i = lb->xg - 2; i < lb->xg; i++) {
-                for (int k = lb->zg / 2 - 1; k <= lb->zg / 2 + 1; k++) {
-                    int j = xz.cutAt;
-                    printf("Q[%d,%d,%d] ", i, j, k);
-                    for (int l = 0; l < QLen::D3Q19; l++) {
-                        printf ("Q%d = %f, ", l+1, lb->Q[lb->index(i, j, k)][l]);
-                    }
-                    printf("\nF = %f, %f, %f", lb->F[lb->index(i, j, k)].x, lb->F[lb->index(i, j, k)].y, lb->F[lb->index(i, j, k)].z);
-                    printf("\n");
-                }
-                }*/
             if (running.step % xz.repeat == 0) {
 //                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
                 lb->calcVorticityXZ(xz.cutAt, running);
