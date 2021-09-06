@@ -61,12 +61,12 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
         delete[] F;
         delete[] Nu;
         delete[] O;
-        delete[] excludeGeomPoints;
+        delete[] excludeOutputPoints;
     }
     F = new Force<T>[size];
     Nu = new T[size];
     O = new bool[size];
-    excludeGeomPoints = new bool[size];
+    excludeOutputPoints = new bool[size];
 
 
 #if WITH_GPU == 1
@@ -115,7 +115,7 @@ template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rhs) noexcept: 
     idi(rhs.idi), idj(rhs.idj), idk(rhs.idk), mpiRank(rhs.mpiRank),
     x(rhs.x), y(rhs.y), z(rhs.z), i0(rhs.i0), j0(rhs.j0), k0(rhs.k0), xg(rhs.xg), yg(rhs.yg), zg(rhs.zg), xg0(rhs.xg0), yg0(rhs.yg0), zg0(rhs.zg0), xg1(rhs.xg1), yg1(rhs.yg1), zg1(rhs.zg1),
-    ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), excludeGeomPoints(rhs.excludeGeomPoints),
+    ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), excludeOutputPoints(rhs.excludeOutputPoints),
     outputTree(rhs.outputTree)
 #if WITH_GPU == 1
     , devF(rhs.devF), devN(rhs.devN), devNu(rhs.debNu), threadsPerBlock(rhs.threadsPerBlock), numBlocks(rhs.numBlocks)
@@ -124,7 +124,7 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rh
     rhs.O = nullptr;
     rhs.Nu = nullptr;
     rhs.F = nullptr;
-    rhs.excludeGeomPoints = nullptr;
+    rhs.excludeOutputPoints = nullptr;
 #if WITH_GPU == 1
     rhs.devN = nullptr;
     rhs.devNu = nullptr;
@@ -177,7 +177,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
                 Nu[index(i, j, k)] = 0.0;
                 O[index(i, j, k)] = false;
 
-                excludeGeomPoints[index(i,j,k)] = false;
+                excludeOutputPoints[index(i,j,k)] = false;
             }
         }
     }

@@ -17,35 +17,40 @@
 
 
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints){
 
+    for (auto &p: geomPoints){
+        excludeOutputPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
+    }
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints){
+
+    for (auto &p: geomPoints){
+        excludeOutputPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
+    }
+}
 
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialiseExcludePoints(RushtonTurbinePolarCPP<tNi, T> geom){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::unsetOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints){
 
-    for(auto &p: geom.getExternalPoints()){
-        excludeGeomPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
+    for (auto &p: geomPoints){
+        excludeOutputPoints[indexPlusGhost(p.i, p.j, p.k)] = false;
     }
-    for(auto &p: geom.getBaffles(surfaceAndInternal)){
-        excludeGeomPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
-    }
+}
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::unsetOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints){
 
-    //increment only metters for {u,v,w}Delta
-    float increment = 0.0;
+    for (auto &p: geomPoints){
+        excludeOutputPoints[indexPlusGhost(p.i, p.j, p.k)] = false;
+    }
+}
 
-    for(auto &p: geom.getImpellerHub(increment, surfaceAndInternal)){
-        excludeGeomPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
-    }
-    for(auto &p: geom.getImpellerDisk(increment, surfaceAndInternal)){
-        excludeGeomPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
-    }
-    for(auto &p: geom.getImpellerShaft(increment, surfaceAndInternal)){
-        excludeGeomPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
-    }
-
-};
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
@@ -119,7 +124,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningP
         for (tNi k = 1; k <= zg1; k++) {
 
 
-            if (excludeGeomPoints[index(i,j,k)] == true) continue;
+            if (excludeOutputPoints[index(i,j,k)] == true) continue;
 
 
             //              T uxx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().x - Q[dirnQ02(i, j, k)].velocity().x);
@@ -199,7 +204,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXY(tNi k, RunningP
         for (tNi j = 1;  j <= yg1; j++) {
 
 
-            if (excludeGeomPoints[index(i,j,k)] == true) continue;
+            if (excludeOutputPoints[index(i,j,k)] == true) continue;
 
 
             //              T uxx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().x - Q[dirnQ02(i, j, k)].velocity().x);
@@ -274,7 +279,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
 
 
 //    for (auto &p: excludeRotating){
-//        excludeGeomPoints[index(p.i, p.j, p.k)] = 1;
+//        excludeOutputPoints[index(p.i, p.j, p.k)] = 1;
 //    }
 
 
@@ -325,7 +330,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
 //    //REMOVE THE ROTATING POINTS.
 //    //TODO TOFIX, this might remove points from the hub!!!
 //    for (auto &p: excludeRotating){
-//        excludeGeomPoints[index(p.i, p.j, p.k)] = 0;
+//        excludeOutputPoints[index(p.i, p.j, p.k)] = 0;
 //    }
 
 
@@ -348,7 +353,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::savePlaneXZ(OrthoPlane plane, B
         tNi j = plane.cutAt;
         for (tNi k=1; k<=zg1; k++){
 
-            if (excludeGeomPoints[index(i,j,k)] == true) continue;
+            if (excludeOutputPoints[index(i,j,k)] == true) continue;
 
 
             tDiskGrid<tDiskPrecision, tDiskSize> tmp;

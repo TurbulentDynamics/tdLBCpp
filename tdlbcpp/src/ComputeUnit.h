@@ -75,7 +75,7 @@ public:
     
     bool *O;
 
-    bool *excludeGeomPoints;
+    bool *excludeOutputPoints;
 #if WITH_GPU == 1
     Force<T> *devF;
     T *devNu;
@@ -136,7 +136,12 @@ public:
 
 
     bool hasOutputAtStep(OutputParams output, RunningParams running);
-    void initialiseExcludePoints(RushtonTurbinePolarCPP<tNi, T> geom);
+    
+    void setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
+    void setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
+
+    void unsetOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
+    void unsetOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
 
 
     template <typename tDiskPrecision, int tDiskSize>
