@@ -207,9 +207,11 @@ int main(int argc, char* argv[]){
 
     ComputeUnitBase<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL> *lb;
     if (streaming == "simple") {
-      lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cu, flow, outputTree);
+        std::cout << "Streaming = Nieve" << std::endl;
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cu, flow, outputTree);
     } else {
-      lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist>(cu, flow, outputTree);
+        std::cout << "Streaming = Esoteric" << std::endl;
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist>(cu, flow, outputTree);
     }
     if (checkpointPath != ""){
         lb->checkpoint_read(checkpointPath, "Device");
