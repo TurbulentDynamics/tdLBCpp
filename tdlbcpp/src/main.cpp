@@ -130,7 +130,7 @@ int main(int argc, char* argv[]){
         flow.reMNonDimensional = 7300.0;
         flow.uav = 0.1;
 
-        flow.useLES = 0;
+        flow.useLES = 1;
         flow.cs0 = 0.12;
 
         running.num_steps = 100;

@@ -33,8 +33,8 @@ using let_tStep = const unsigned long int;
 
 //Coordinate system
 //x positive to right
-//y
-//z
+//y positive up
+//z positive backwards
 
 
 //Classical Q27 vector names, x, y, z
@@ -50,11 +50,11 @@ using let_tStep = const unsigned long int;
 
 
 //Faces
-#define Q01  0         //+1,  0,  0
+#define Q01  0         //+1,  0,  0  //RIGHT
 #define Q02  1         //-1,  0,  0
-#define Q03  2         // 0, +1,  0  //UP VECTOR
-#define Q04  3         // 0, -1,  0  //DOWN VECTOR
-#define Q05  4         // 0,  0, +1
+#define Q03  2         // 0, +1,  0  //UP
+#define Q04  3         // 0, -1,  0
+#define Q05  4         // 0,  0, +1  //BACK
 #define Q06  5         // 0,  0, -1
 
 //Edges
@@ -115,14 +115,7 @@ using let_tStep = const unsigned long int;
 
 
 
-
-
-
-
-
-
-//#define CENTER Unused
-
+#define CENTER UNDEFINED
 
 //Faces
 #define RIGHT Q01
@@ -133,71 +126,93 @@ using let_tStep = const unsigned long int;
 #define FORWARD Q06
 
 //Edges
-#define RIGHTDOWN Q07
-#define LEFTUP Q08
+#define RIGHTUP Q07
+#define LEFTDOWN Q08
 #define RIGHTBACK Q09
 #define LEFTFORWARD Q10
-#define DOWNBACK Q11
-#define UPFORWARD Q12
-#define RIGHTUP Q13
-#define LEFTDOWN Q14
+#define UPBACK Q11
+#define DOWNFORWARD Q12
+#define RIGHTDOWN Q13
+#define LEFTUP Q14
 #define RIGHTFORWARD Q15
 #define LEFTBACK Q16
-#define DOWNFORWARD Q17
-#define UPBACK Q18
+#define UPFORWARD Q17
+#define DOWNBACK Q18
 
 //Corners
-#define RIGHTDOWNBACK Q19
-#define LEFTUPFORWARD Q20
-#define RIGHTDOWNFORWARD Q21
-#define LEFTUPBACK Q22
-#define RIGHTUPBACK Q23
-#define LEFTDOWNFORWARD Q24
-#define LEFTDOWNBACK Q25
-#define RIGHTUPFORWARD Q26
+#define RIGHTUPBACK Q19
+#define LEFTDOWNFORWARD Q20
+#define RIGHTUPFORWARD Q21
+#define LEFTDOWNBACK Q22
+#define RIGHTDOWNBACK Q23
+#define LEFTUPFORWARD Q24
+#define LEFTUPBACK Q25
+#define RIGHTDOWNFORWARD Q26
 
 
 
 //Ortho Q27 names, counting from top to the right then backwards
-//TODO TOFIX
-//#define O0 Q20
-//#define O1 Q12
-//#define O2 Q26
-//#define O3 Q10
-//#define O4 Q06
-//#define O5 Q15
-//#define O6 Q24
-//#define O7 Q17
-//#define O8 Q21
-//
-//#define O9 Q08
-//#define O10 Q03
-//#define O11 Q13
-//#define O12 Q02
-////#define O13 Q0
-//#define O14 Q01
-//#define O15 Q14
-//#define O16 Q04
-//#define O17 Q07
-//
-//#define O18 Q22
-//#define O19 Q18
-//#define O20 Q23
-//#define O21 Q16
-//#define O22 Q05
-//#define O23 Q09
-//#define O24 Q25
-//#define O25 Q11
-//#define O26 Q19
+#define O00 Q24
+#define O01 Q17
+#define O02 Q21
 
+#define O03 Q10
+#define O04 Q06
+#define O05 Q15
+
+#define O06 Q20
+#define O07 Q12
+#define O08 Q26
+
+#define O09 Q14
+#define O10 Q03
+#define O11 Q07
+#define O12 Q02
+#define O13 CENTER
+#define O14 Q01
+#define O15 Q08
+#define O16 Q04
+#define O17 Q13
+
+#define O18 Q19
+#define O19 Q11
+#define O20 Q19
+
+#define O21 Q16
+#define O22 Q05
+#define O23 Q09
+
+#define O24 Q22
+#define O25 Q18
+#define O26 Q23
+
+
+//Collections of Vectors
 #define nFACES 6
-#define FACES [O04, O10, O12, O14, O16, O22]
+#define FACES [Q01, Q02, Q03, Q04, Q05, Q06]
 
 #define nEDGES 12
-#define EDGES [O01, O03, O05, O07,   O09, O11, O15, O17,   O19, O21, O23, O25]
+#define EDGES [Q07, Q08, Q09, Q10,   Q11, Q12, Q13, Q14,   Q15, Q16, Q17, Q18]
 
 #define nCORNERS 8
-#define CORNERS [O00, O02, O06, O8, O18, O20, O24, O26]
+#define CORNERS [Q19, Q20, Q21, Q22, Q23, Q24, Q25, Q26]
 
-#define nTOP 9
-#define TOP [O00, O01, O02, O09, O10, O11, O18, O19, O20]
+
+
+#define nRIGHT 9
+#define RIGHTS [O02, O05, O08, O11, O14, O17, O20, O23, Q26]
+
+#define nLEFT 9
+#define LEFTS [O00, O03, O06, O09, O12, O15, O18, O21, Q24]
+
+#define nUP 9
+#define UPS [O00, O01, O02, O09, O10, O11, O18, O19, O20]
+
+#define nDOWN 9
+#define DOWNS [O06, O07, O08, O15, O16, O17, O24, O25, O26]
+
+#define nBACK 9
+#define BACKS [O18, O19, O20, O21, O22, O23, O24, O25, O26]
+
+#define nFORWARD 9
+#define FORWARDS [O01, O02, O03, O04, O05, O06, O07, O08, O09]
