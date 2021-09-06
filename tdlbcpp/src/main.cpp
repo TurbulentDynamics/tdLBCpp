@@ -17,6 +17,16 @@
 //For the overflow error checking. (didnt work with pg compiler)
 #include <cfenv>
 
+
+#if WITH_GPU == 1
+#include <cuda_runtime.h>
+
+// Utilities and system includes
+#include <helper_cuda.h>  // helper function CUDA error checking and initialization
+#include <helper_functions.h>  // helper for shared functions common to CUDA Samples
+#endif
+
+
 #include "cxxopts.hpp"
 
 #include "Header.h"
@@ -34,8 +44,20 @@
 #include "Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 #include "ComputeUnit.h"
 
-//TODO: Temporary, different ComputeUnits could have different precision
+// TODO: : Temporary, different ComputeUnits could have different precision
 using useQVecPrecision = float;
+
+// FIXME: Should be an input parameter
+#define GHOST 1
+
+
+
+
+
+#define WITH_CPU 1
+#define WITH_GPU 0
+#define WITH_GPU_MEMSHARED 0
+
 
 
 
@@ -140,8 +162,46 @@ int main(int argc, char* argv[]){
 
 
 
+// MARK: Validate All Input Params
 
-    //======== Set up Geometry
+int gpuDeviceID = -1;
+#if WITH_GPU == 1
+
+    unsigned long long size = (grid.x + (GHOST) + grid.y + (GHOST) + grid.z + (GHOST));
+    unsigned long long memRequired = size * (sizeof(useQVecPrecision) * (QLen::D3Q19 + 3 + 1) + sizeof(bool) * (1 + 1));
+
+    int numGpus = 0;
+    checkCudaErrors(cudaGetDeviceCount(&numGpus));
+
+
+    for (int i = 0; i < numGpus; i++) {
+        cudaDeviceProp deviceProp;
+        checkCudaErrors(cudaGetDeviceProperties(&deviceProp, i));
+
+        printf("GPU Device %d: \"%s\" totalGlobalMem: %d, managedMemory: %d, with compute capability %d.%d\n\n", i, deviceProp.name,  deviceProp.totalGlobalMem, deviceProp.managedMemory, deviceProp.major, deviceProp.minor);
+
+        if (memRequired < deviceProp.totalGlobalMem) {
+            if (WITH_GPU_SHARED && !deviceProp.managedMemory) continue;
+
+            gpuDeviceID = i;
+        }
+    }
+
+    if (gpuDeviceID == -1){
+        std::cout << "Cannot find acceptable GPU device, exiting.  Please check log." << std::endl;
+        exit(EXIT_WAIVED);
+    }
+
+#endif
+
+
+
+
+
+
+
+
+    // MARK: Set up Geometry
 
     RushtonTurbine rt = RushtonTurbine(int(grid.x));
     flow.calc_nu(rt.impellers[0].blades.outerRadius);
@@ -158,7 +218,7 @@ int main(int argc, char* argv[]){
 
 
 
-    // =================== Set Up Output
+    // MARK: Set Up Output and Checkpoint
     if (!parametersLoadedFromJson) {
 
         output.add_XY_plane("plot_axis", (tStep)5, (tNi)geom.kCenter);
@@ -184,7 +244,11 @@ int main(int argc, char* argv[]){
 
 
 
+    // MARK: Initialise ComputeUnit
+
     ComputeUnitParams cu;
+    cu.nodeID = 0;
+    cu.deviceID = gpuDeviceID;
     cu.idi = 0;
     cu.idj = 0;
     cu.idk = 0;
@@ -194,14 +258,13 @@ int main(int argc, char* argv[]){
     cu.i0 = 0;
     cu.j0 = 0;
     cu.k0 = 0;
-    cu.ghost = 1;
+    cu.ghost = GHOST;
 
 
 
     FlowParams<double> flowAsDouble = flow.asDouble();
     DiskOutputTree outputTree = DiskOutputTree(checkpoint, output);
     outputTree.setParams(cu, grid, flowAsDouble, running, output, checkpoint);
-
 
 
 
@@ -241,6 +304,8 @@ int main(int argc, char* argv[]){
 
 
 
+    // MARK: MAIN LOOP
+
     int rank = 0;
     Multi_Timer mainTimer(rank);
     mainTimer.set_average_steps(10);
@@ -256,7 +321,7 @@ int main(int argc, char* argv[]){
 
 
 
-        //=========================================
+        // MARK: GEOMETRY UPDATE
 
         running.incrementStep();
         useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
@@ -298,7 +363,7 @@ int main(int argc, char* argv[]){
 
 
 
-        //=========================================
+        // MARK: COLLISION AND STREAMING
 
 
 
@@ -321,6 +386,12 @@ int main(int argc, char* argv[]){
 
 
 
+
+
+
+        // MARK: OUTPUT
+
+
         //SetUp OutputFormat
         BinFileParams binFormat;
         //format.filePath = plotPath; //Set in savePlane* method
@@ -334,8 +405,6 @@ int main(int argc, char* argv[]){
 
 
 
-
-        //====================
 
         lb.setOutputExcludePoints(geomFORCING);
 
@@ -361,10 +430,12 @@ int main(int argc, char* argv[]){
         //        lb.writeAllOutput(geom, output, binFormat, running);
         main_time = mainTimer.check(0, 5, main_time, "writeAllOutput");
 
-        //=====================
 
 
 
+
+
+        // MARK: CHECKPOINT
 
         if (checkpoint.checkpoint_repeat && (running.step % checkpoint.checkpoint_repeat == 0)) {
 
@@ -392,7 +463,10 @@ int main(int argc, char* argv[]){
 
 
 
-    }//end of main for loop  end of main for loop
+    }//end of main loop  end of main loop
+
+
+
 
 
     return 0;

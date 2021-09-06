@@ -19,30 +19,36 @@
 
 struct ComputeUnitParams
 {
-    
+    int nodeID = 0;
+    int deviceID = 0;
+
     int idi = 0;
     int idj = 0;
     int idk = 0;
+
     tNi x = 0;
     tNi y = 0;
     tNi z = 0;
+
     tNi i0 = 0;
     tNi j0 = 0;
     tNi k0 = 0;
+
     tNi ghost = 0;
 
     ComputeUnitParams() {}
 
-    ComputeUnitParams(int idi, int idj, int idk, tNi x, tNi y, tNi z, tNi i0, tNi j0, tNi k0, tNi ghost)
-     : idi(idi), idj(idj), idk(idk), x(x), y(y), z(z), i0(i0), j0(j0), k0(k0), ghost(ghost) {}
+    ComputeUnitParams(int nodeID, int deviceID, int idi, int idj, int idk, tNi x, tNi y, tNi z, tNi i0, tNi j0, tNi k0, tNi ghost)
+     : nodeID(nodeID), deviceID(deviceID), idi(idi), idj(idj), idk(idk), x(x), y(y), z(z), i0(i0), j0(j0), k0(k0), ghost(ghost) {}
         
     void getParamsFromJson(Json::Value jsonParams) {
         
         try
         {
             
-//            mpiRank = jsonParams["mpiRank"].asInt();
-            
+            nodeID = jsonParams["nodeID"].asInt();
+            deviceID = jsonParams["deviceID"].asInt();
+
             idi = jsonParams["idi"].asInt();
             idj = jsonParams["idj"].asInt();
             idk = jsonParams["idk"].asInt();
@@ -75,7 +81,10 @@ struct ComputeUnitParams
             
             Json::Value jsonParams;
 
-//            jsonParams["mpiRank"] = mpiRank;
+            jsonParams["nodeID"] = nodeID;
+            jsonParams["deviceID"] = deviceID;
+
+
             jsonParams["idi"] = (int)idi;
             jsonParams["idj"] = (int)idj;
             jsonParams["idk"] = (int)idk;

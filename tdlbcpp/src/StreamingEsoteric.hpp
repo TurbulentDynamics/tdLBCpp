@@ -13,7 +13,7 @@
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
 void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Esotwist>::streaming() {
-	//TODO
+	// TODO: 
 	evenStep = !evenStep;
 }
 

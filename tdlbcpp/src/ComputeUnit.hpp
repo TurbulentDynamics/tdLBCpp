@@ -9,6 +9,13 @@
 
 #include <iostream>
 #include <cerrno>
+
+#if WITH_GPU == 1
+#include <cuda_runtime.h>
+#include <helper_cuda.h>
+#include <helper_functions.h>
+#endif
+
 #include "Tools/toojpeg.h"
 
 #include "ComputeUnit.h"
@@ -20,6 +27,10 @@
 //ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams, bool reallocate) {
+
+    nodeID = cuParams.nodeID;
+    deviceID = cuParams.deviceID;
+
     idi = cuParams.idi;
     idj = cuParams.idj;
     idk = cuParams.idk;
@@ -57,35 +68,77 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
     
     
     Q.allocate(size);
+
+    
     if (reallocate) {
+#if WITH_CPU == 1
         delete[] F;
         delete[] Nu;
         delete[] O;
-        delete[] excludeOutputPoints;
-    }
-    F = new Force<T>[size];
-    Nu = new T[size];
-    O = new bool[size];
-    excludeOutputPoints = new bool[size];
-
-
+        delete[] ExcludeOutputPoints;
+#endif
 #if WITH_GPU == 1
-    checkCudaErrors(cudaSetDevice(0));
+        delete[] F;
+        checkCudaErrors(cudaFree(devF));
+        checkCudaErrors(cudaFree(Nu));
+        checkCudaErrors(cudaFree(O));
+        delete[] ExcludeOutputPoints;
+#endif
+#if WITH_GPU_MEMSHARED == 1
+        checkCudaErrors(cudaFree(F));
+        checkCudaErrors(cudaFree(Nu));
+        checkCudaErrors(cudaFree(O));
+        delete[] ExcludeOutputPoints;
+#endif
+    }
+
+
+#if WITH_GPU == 1 || WITH_GPU_MEMSHARED == 1
+    checkCudaErrors(cudaSetDevice(deviceID));
 
     cudaDeviceProp prop;
-    cudaGetDeviceProperties(&prop, 0);
+    cudaGetDeviceProperties(&prop, deviceID);
 
-    unsigned long long GPUmem = prop.totalGlobalMem;
+    unsigned long long memRequired = size * (sizeof(T) * QVecSize + sizeof(Force<T>) + sizeof(T) + sizeof(bool) + sizeof(bool));
 
-    if (((sizeof(QVec<T, QVecSize>) + sizeof(Force<T>) + sizeof(T)) * size) > GPUmem){
+    if (memRequired > prop.totalGlobalMem){
         std::cout << "Cannot allocate device on GPU." << std::endl;
         exit(1);
     }
+#endif
 
-    checkCudaErrors(cudaMalloc((void **)&devN, sizeof(QVec<T, QVecSize>) * size));
+
+#if WITH_CPU == 1
+    F = new Force<T>[size];
+    Nu = new T[size];
+    O = new bool[size];
+    ExcludeOutputPoints = new bool[size];
+#endif
+#if WITH_GPU == 1
+    F = new Force<T>[size];
     checkCudaErrors(cudaMalloc((void **)&devF, sizeof(Force<T>) * size));
-    checkCudaErrors(cudaMalloc((void **)&devNu, sizeof(T) * size));
+    checkCudaErrors(cudaMalloc((void **)&Nu, sizeof(T) * size));
+    checkCudaErrors(cudaMalloc((void **)&O, sizeof(T) * size));
+    ExcludeOutputPoints = new bool[size];
+#endif
+#if WITH_GPU_MEMSHARED == 1
+    F = new Force<T>[size];
 
+    checkCudaErrors(cudaHostAlloc((void **)&devF, sizeof(T) * size, cudaHostAllocMapped));
+    checkCudaErrors(cudaHostGetDevicePointer((void **)&devF, (void *)F, 0));
+
+    checkCudaErrors(cudaHostAlloc((void **)&O, sizeof(T) * size, cudaHostAllocMapped));
+    checkCudaErrors(cudaHostGetDevicePointer((void **)&O, (void *)F, 0));
+
+    checkCudaErrors(cudaHostAlloc((void **)&Nu, sizeof(T) * size, cudaHostAllocMapped));
+    checkCudaErrors(cudaHostGetDevicePointer((void **)&Nu, (void *)F, 0));
+
+    ExcludeOutputPoints = new bool[size];
+#endif
+
+
+
+#if WITH_GPU == 1 || WITH_GPU_MEMSHARED == 1
     int threads_per_warp = 32;
     int max_threads_per_block = 512;
 
@@ -106,6 +159,10 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
 #endif
 }
 
+
+
+
+
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
     init(cuParams, false);
@@ -113,9 +170,9 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cu
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rhs) noexcept: 
-    idi(rhs.idi), idj(rhs.idj), idk(rhs.idk), mpiRank(rhs.mpiRank),
+    idi(rhs.idi), idj(rhs.idj), idk(rhs.idk), nodeID(rhs.nodeID),
     x(rhs.x), y(rhs.y), z(rhs.z), i0(rhs.i0), j0(rhs.j0), k0(rhs.k0), xg(rhs.xg), yg(rhs.yg), zg(rhs.zg), xg0(rhs.xg0), yg0(rhs.yg0), zg0(rhs.zg0), xg1(rhs.xg1), yg1(rhs.yg1), zg1(rhs.zg1),
-    ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), excludeOutputPoints(rhs.excludeOutputPoints),
+    ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), ExcludeOutputPoints(rhs.ExcludeOutputPoints),
     outputTree(rhs.outputTree)
 #if WITH_GPU == 1
     , devF(rhs.devF), devN(rhs.devN), devNu(rhs.debNu), threadsPerBlock(rhs.threadsPerBlock), numBlocks(rhs.numBlocks)
@@ -124,7 +181,7 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rh
     rhs.O = nullptr;
     rhs.Nu = nullptr;
     rhs.F = nullptr;
-    rhs.excludeOutputPoints = nullptr;
+    rhs.ExcludeOutputPoints = nullptr;
 #if WITH_GPU == 1
     rhs.devN = nullptr;
     rhs.devNu = nullptr;
@@ -177,7 +234,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
                 Nu[index(i, j, k)] = 0.0;
                 O[index(i, j, k)] = false;
 
-                excludeOutputPoints[index(i,j,k)] = false;
+                ExcludeOutputPoints[index(i,j,k)] = false;
             }
         }
     }
@@ -202,7 +259,7 @@ Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocitySparseF(tNi i
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_read(std::string filePath){
 
-    std::cout << "Node " << mpiRank << " Load " << filePath << std::endl;
+    std::cout << "Node " << nodeID << " Load " << filePath << std::endl;
 
     return fopen(filePath.c_str(), "r");
 }
@@ -210,7 +267,7 @@ FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_read(std::string filePat
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_write(std::string filePath){
 
-    std::cout << "Node " << mpiRank << " Save " << filePath << std::endl;
+    std::cout << "Node " << nodeID << " Save " << filePath << std::endl;
 
     return fopen(filePath.c_str(), "w");
 }
@@ -234,7 +291,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
 
     RunningParams running;
 
-    std::cout << "Node " << mpiRank << " Load " << (outputTree.getAllParamsFilePath(dirname, unit_name) + ".json") << std::endl;
+    std::cout << "Node " << nodeID << " Load " << (outputTree.getAllParamsFilePath(dirname, unit_name) + ".json") << std::endl;
     outputTree.readAllParamsJson(outputTree.getAllParamsFilePath(dirname, unit_name) + ".json", binFormat, running);
     flow = outputTree.getFlowParams<T>();
     init(outputTree.getComputeUnitParams(), true);
@@ -288,7 +345,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_write(std::string un
     binFormat.QDataType = "none";
     binFormat.QOutputLength = QVecSize;
 
-    std::cout << "Node " << mpiRank << " Save " << (binFormat.filePath + ".json") << std::endl;
+    std::cout << "Node " << nodeID << " Save " << (binFormat.filePath + ".json") << std::endl;
     outputTree.setRunningParams(run);
     outputTree.writeAllParamsJson(binFormat, run);
     

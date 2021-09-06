@@ -249,7 +249,7 @@ public:
     //Formally Axis
     std::string formatXZPlaneDir(tStep step, tNi atJ, const std::string prefix="plot"){
         
-        //TOFIX TODO
+        // FIXME: 
         
         return formatDir(prefix, "xzPlane", step) + ".cut_" + patch::to_string(atJ);
     }
@@ -353,7 +353,7 @@ public:
             in.close();
 
             
-            //TODO
+            // TODO: 
 
 
             cuJson = jsonParams["ComputeUnitParams"];
