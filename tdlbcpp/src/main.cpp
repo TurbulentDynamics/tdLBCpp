@@ -18,12 +18,10 @@
 #include <cfenv>
 
 
-#if WITH_GPU == 1
+#if WITH_GPU
 #include <cuda_runtime.h>
-
-// Utilities and system includes
-#include <helper_cuda.h>  // helper function CUDA error checking and initialization
-#include <helper_functions.h>  // helper for shared functions common to CUDA Samples
+#include <helper_cuda.h>
+#include <helper_functions.h>
 #endif
 
 
@@ -49,16 +47,6 @@ using useQVecPrecision = float;
 
 // FIXME: Should be an input parameter
 #define GHOST 1
-
-
-
-
-
-#define WITH_CPU 1
-#define WITH_GPU 0
-#define WITH_GPU_MEMSHARED 0
-
-
 
 
 
@@ -165,8 +153,8 @@ int main(int argc, char* argv[]){
 // MARK: Validate All Input Params
 
 int gpuDeviceID = -1;
-#if WITH_GPU == 1
 
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
     unsigned long long size = (grid.x + (GHOST) + grid.y + (GHOST) + grid.z + (GHOST));
     unsigned long long memRequired = size * (sizeof(useQVecPrecision) * (QLen::D3Q19 + 3 + 1) + sizeof(bool) * (1 + 1));
 

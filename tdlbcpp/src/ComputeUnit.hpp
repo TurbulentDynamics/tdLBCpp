@@ -10,7 +10,7 @@
 #include <iostream>
 #include <cerrno>
 
-#if WITH_GPU == 1
+#if WITH_GPU
 #include <cuda_runtime.h>
 #include <helper_cuda.h>
 #include <helper_functions.h>
@@ -71,13 +71,13 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
 
     
     if (reallocate) {
-#if WITH_CPU == 1
+#ifdef WITH_CPU
         delete[] F;
         delete[] Nu;
         delete[] O;
         delete[] ExcludeOutputPoints;
 #endif
-#if WITH_GPU == 1
+#if WITH_GPU
         delete[] F;
         checkCudaErrors(cudaFree(devF));
         checkCudaErrors(cudaFree(Nu));
@@ -93,7 +93,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
     }
 
 
-#if WITH_GPU == 1 || WITH_GPU_MEMSHARED == 1
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
     checkCudaErrors(cudaSetDevice(deviceID));
 
     cudaDeviceProp prop;
@@ -108,19 +108,21 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
 #endif
 
 
-#if WITH_CPU == 1
+#ifdef WITH_CPU
     F = new Force<T>[size];
     Nu = new T[size];
     O = new bool[size];
     ExcludeOutputPoints = new bool[size];
 #endif
-#if WITH_GPU == 1
+
+#if WITH_GPU
     F = new Force<T>[size];
     checkCudaErrors(cudaMalloc((void **)&devF, sizeof(Force<T>) * size));
     checkCudaErrors(cudaMalloc((void **)&Nu, sizeof(T) * size));
     checkCudaErrors(cudaMalloc((void **)&O, sizeof(T) * size));
     ExcludeOutputPoints = new bool[size];
 #endif
+
 #if WITH_GPU_MEMSHARED == 1
     F = new Force<T>[size];
 
@@ -138,7 +140,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
 
 
 
-#if WITH_GPU == 1 || WITH_GPU_MEMSHARED == 1
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
     int threads_per_warp = 32;
     int max_threads_per_block = 512;
 
@@ -170,21 +172,19 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cu
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rhs) noexcept: 
-    idi(rhs.idi), idj(rhs.idj), idk(rhs.idk), nodeID(rhs.nodeID),
+    idi(rhs.idi), idj(rhs.idj), idk(rhs.idk), nodeID(rhs.nodeID), deviceID(rhs.deviceID),
     x(rhs.x), y(rhs.y), z(rhs.z), i0(rhs.i0), j0(rhs.j0), k0(rhs.k0), xg(rhs.xg), yg(rhs.yg), zg(rhs.zg), xg0(rhs.xg0), yg0(rhs.yg0), zg0(rhs.zg0), xg1(rhs.xg1), yg1(rhs.yg1), zg1(rhs.zg1),
     ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), ExcludeOutputPoints(rhs.ExcludeOutputPoints),
     outputTree(rhs.outputTree)
-#if WITH_GPU == 1
-    , devF(rhs.devF), devN(rhs.devN), devNu(rhs.debNu), threadsPerBlock(rhs.threadsPerBlock), numBlocks(rhs.numBlocks)
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
+    , devF(rhs.devF), threadsPerBlock(rhs.threadsPerBlock), numBlocks(rhs.numBlocks)
 #endif
 {
     rhs.O = nullptr;
     rhs.Nu = nullptr;
     rhs.F = nullptr;
     rhs.ExcludeOutputPoints = nullptr;
-#if WITH_GPU == 1
-    rhs.devN = nullptr;
-    rhs.devNu = nullptr;
+#if WITH_GPU
     rhs.devF = nullptr;
 #endif
 }
@@ -194,13 +194,18 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rh
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::~ComputeUnitBase()
 {
-#if WITH_GPU == 1
-    if (devN != nullptr) {
-        checkCudaErrors(cudaSetDevice(0));
-        checkCudaErrors(cudaFree(devN));
-        checkCudaErrors(cudaFree(devF));
-        checkCudaErrors(cudaFree(devNu));
-    }
+#if WITH_GPU
+    checkCudaErrors(cudaSetDevice(deviceID));
+    checkCudaErrors(cudaFree(F));
+    checkCudaErrors(cudaFree(devF));
+    checkCudaErrors(cudaFree(Nu));
+    checkCudaErrors(cudaFree(O));
+#endif
+#if WITH_GPU_MEMSHARED == 1
+        checkCudaErrors(cudaSetDevice(deviceID));
+        checkCudaErrors(cudaFree(F));
+        checkCudaErrors(cudaFree(Nu));
+        checkCudaErrors(cudaFree(O));
 #endif
 }
 
@@ -208,9 +213,7 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::~ComputeUnitBase()
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
-#if WITH_GPU == 1
-    setToZero<<<numBlocks, threadsPerBlock>>>(devN, devF, xg, yg, zg, QVecSize);
-#else
+
     for (tNi i=0; i<=xg0; i++){
         for (tNi j=0; j<=yg0; j++){
             for (tNi k=0; k<=zg0; k++){
@@ -219,17 +222,20 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
             }
         }
     }
-#endif
 };
+
+
+
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
 
+#ifdef WITH_CPU
     for (tNi i=0; i<=xg0; i++){
         for (tNi j=0; j<=yg0; j++){
             for (tNi k=0; k<=zg0; k++){
 
-                Q[index(i, j, k)].initialise(initialRho);
+                Q[index(i, j, k)].initialiseRho(initialRho, 0.0);
                 F[index(i, j, k)].setToZero();
                 Nu[index(i, j, k)] = 0.0;
                 O[index(i, j, k)] = false;
@@ -238,6 +244,20 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
             }
         }
     }
+#endif
+#if WITH_GPU || WITH_GPU_SHAREDMEM == 1
+
+    setQToZero<<< numBlocks, threadsPerBlock >>>();
+    setRhoTo(flow.initialRho)<<< numBlocks, threadsPerBlock >>>();
+    setForceToZero<<< numBlocks, threadsPerBlock >>>();
+    if (flow.useLES){
+        setNuToZero<<< numBlocks, threadsPerBlock >>>();
+    }
+    setOToZero<<< numBlocks, threadsPerBlock >>>();
+
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+#endif
 };
 
 

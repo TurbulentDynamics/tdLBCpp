@@ -1,4 +1,4 @@
-#if WITH_GPU == 1
+#if WITH_GPU
 #include <cuda_runtime.h>
 
 // Utilities and system includes
@@ -114,7 +114,7 @@ struct FieldBase
         qSize = vectorNumber * QVecSize;
         q = new T[qSize];
 
-#if WITH_GPU == 1
+#if WITH_GPU
         checkCudaErrors(cudaMalloc((void **)&q, sizeof(T) * qSize);
 #endif
     }

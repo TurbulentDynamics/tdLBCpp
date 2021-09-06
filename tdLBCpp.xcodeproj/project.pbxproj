@@ -39,6 +39,7 @@
 		3C71D864269E2E1D00C37F3D /* toojpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = toojpeg.cpp; sourceTree = "<group>"; };
 		D6008AA226E61495003CE0E2 /* CollisionEgglesSomers.cuh */ = {isa = PBXFileReference; lastKnownFileType = text; path = CollisionEgglesSomers.cuh; sourceTree = "<group>"; };
 		D6008AA326E614F1003CE0E2 /* StreamingEsoTwist.cuh */ = {isa = PBXFileReference; lastKnownFileType = text; path = StreamingEsoTwist.cuh; sourceTree = "<group>"; };
+		D6008AA426E62F78003CE0E2 /* ComputeUnit.cu */ = {isa = PBXFileReference; lastKnownFileType = text; path = ComputeUnit.cu; sourceTree = "<group>"; };
 		D60B522126B1B00400963282 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D652A6A226AECDB900028C5D /* ComputeUnitOutput.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnitOutput.hpp; sourceTree = "<group>"; };
 		D66D0F86269C49E50079FCAC /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
@@ -236,6 +237,7 @@
 				D6ACCEF325F60FEA00705722 /* GlobalStructures.hpp */,
 				D6E5C73325EE184B0067FDE1 /* ComputeUnit.h */,
 				D6E5C74125EE184B0067FDE1 /* ComputeUnit.hpp */,
+				D6008AA426E62F78003CE0E2 /* ComputeUnit.cu */,
 				D652A6A226AECDB900028C5D /* ComputeUnitOutput.hpp */,
 			);
 			path = src;
