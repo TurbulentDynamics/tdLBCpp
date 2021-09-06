@@ -17,7 +17,7 @@
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::collision() {
-    //TODO
+    // TODO: 
 }
 
 

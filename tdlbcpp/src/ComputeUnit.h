@@ -10,11 +10,11 @@
 #include <stdio.h>
 #include <vector>
 
-#ifdef DEBUG
+#ifndef DEBUG
 #include <iostream>
 #endif
 
-#if WITH_GPU == 1
+#if WITH_GPU
 #include <cuda_runtime.h>
 #include "helper_cuda.h"
 #endif
@@ -43,8 +43,8 @@ public:
     
     //Position in the grid
     int idi, idj, idk;
-    int mpiRank;
-
+    int nodeID;
+    int deviceID;
     
     //Size of this ComputeUnit
     tNi x, y, z;
@@ -68,24 +68,24 @@ public:
     
     Fld Q;
     
-    Force<T> *F;
+    Force<T> * __restrict__ F;
     //    std::vector<Force<T>> sparseF;
         
-    T *Nu;
+    T * __restrict__ Nu;
     
-    bool *O;
+    bool * __restrict__ O;
 
-    bool *excludeGeomPoints;
-#if WITH_GPU == 1
-    Force<T> *devF;
-    T *devNu;
-    void *devN;
+    bool * __restrict__ ExcludeOutputPoints;
 
-    dim3 threadsPerBlock;
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
     dim3 numBlocks;
+    dim3 threadsPerBlock;
+#endif
+#if WITH_GPU
+    Force<T> *devF;
 #endif
 
-    
+
     DiskOutputTree outputTree;
     bool evenStep;
 
@@ -137,7 +137,12 @@ public:
 
 
     bool hasOutputAtStep(OutputParams output, RunningParams running);
-    void initialiseExcludePoints(RushtonTurbinePolarCPP<tNi, T> geom);
+    
+    void setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
+    void setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
+
+    void unsetOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
+    void unsetOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
 
 
     template <typename tDiskPrecision, int tDiskSize>
@@ -206,7 +211,7 @@ public:
     using Base::Base;
     using Base::evenStep;
     using Base::size;
-    using Base::excludeGeomPoints;
+    using Base::ExcludeOutputPoints;
     using Base::outputTree;
     virtual void moments();
     virtual void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta);
@@ -223,7 +228,7 @@ class ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingTyp
 public:
     using Base=ComputeUnitForcing<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>;
     using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1;
-    using Base::F; using Base::index; using Base::Q;
+    using Base::F; using Base::index; using Base::Q; using Base::Nu;
     using Base::Base;
     using Base::evenStep;
     virtual void collision();

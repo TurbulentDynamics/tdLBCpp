@@ -143,10 +143,10 @@ struct CommonOperations : public Base {
         return u;
     };
 
-    void initialise(T initialRho){
-        q[0] = initialRho;
+    void initialiseRho(T initialRho, T other){
+        q[MRHO] = initialRho;
         for (int l = 1; l < size; l++) {
-            q[l] = 0.0;
+            q[l] = other;
         }
     }
 

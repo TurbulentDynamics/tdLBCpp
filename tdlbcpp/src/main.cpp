@@ -18,6 +18,14 @@
 //For the overflow error checking. (didnt work with pg compiler)
 #include <cfenv>
 
+
+#if WITH_GPU
+#include <cuda_runtime.h>
+#include <helper_cuda.h>
+#include <helper_functions.h>
+#endif
+
+
 #include "cxxopts.hpp"
 
 #include "Header.h"
@@ -35,9 +43,11 @@
 #include "Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 #include "ComputeUnit.h"
 
-//TODO: Temporary, different ComputeUnits could have different precision
+// TODO: : Temporary, different ComputeUnits could have different precision
 using useQVecPrecision = float;
 
+// FIXME: Should be an input parameter
+#define GHOST 1
 
 
 
@@ -123,7 +133,7 @@ int main(int argc, char* argv[]){
 
     if (!parametersLoadedFromJson) {
 
-        grid.x = 120;
+        grid.x = 100;
         grid.y = grid.x;
         grid.z = grid.x;
 
@@ -131,18 +141,56 @@ int main(int argc, char* argv[]){
         flow.reMNonDimensional = 7300.0;
         flow.uav = 0.1;
 
-        flow.useLES = 0;
+        flow.useLES = 1;
         flow.cs0 = 0.12;
 
         running.num_steps = 100;
-        running.impellerStartupStepsUntilNormalSpeed = 20;
+        running.impellerStartupStepsUntilNormalSpeed = (tStep)(grid.x * 0.2);
     }
 
 
 
 
+// MARK: Validate All Input Params
 
-    //======== Set up Geometry
+int gpuDeviceID = -1;
+
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
+    unsigned long long size = (grid.x + (GHOST) + grid.y + (GHOST) + grid.z + (GHOST));
+    unsigned long long memRequired = size * (sizeof(useQVecPrecision) * (QLen::D3Q19 + 3 + 1) + sizeof(bool) * (1 + 1));
+
+    int numGpus = 0;
+    checkCudaErrors(cudaGetDeviceCount(&numGpus));
+
+
+    for (int i = 0; i < numGpus; i++) {
+        cudaDeviceProp deviceProp;
+        checkCudaErrors(cudaGetDeviceProperties(&deviceProp, i));
+
+        printf("GPU Device %d: \"%s\" totalGlobalMem: %d, managedMemory: %d, with compute capability %d.%d\n\n", i, deviceProp.name,  deviceProp.totalGlobalMem, deviceProp.managedMemory, deviceProp.major, deviceProp.minor);
+
+        if (memRequired < deviceProp.totalGlobalMem) {
+            if (WITH_GPU_SHARED && !deviceProp.managedMemory) continue;
+
+            gpuDeviceID = i;
+        }
+    }
+
+    if (gpuDeviceID == -1){
+        std::cout << "Cannot find acceptable GPU device, exiting.  Please check log." << std::endl;
+        exit(EXIT_WAIVED);
+    }
+
+#endif
+
+
+
+
+
+
+
+
+    // MARK: Set up Geometry
 
     RushtonTurbine rt = RushtonTurbine(int(grid.x));
     flow.calc_nu(rt.impellers[0].blades.outerRadius);
@@ -155,26 +203,25 @@ int main(int argc, char* argv[]){
     //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
     RushtonTurbinePolarCPP<tNi, useQVecPrecision> geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
     geom.impellerStartupStepsUntilNormalSpeed = running.impellerStartupStepsUntilNormalSpeed;
-    useQVecPrecision increment = geom.calcThisStepImpellerIncrement(running.step);
-    std::cout << increment<<std::endl;
+    useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
 
 
 
-    // =================== Set Up Output
+    // MARK: Set Up Output and Checkpoint
     if (!parametersLoadedFromJson) {
 
-        output.add_XY_plane("plot_axis", (tStep)1, (tNi)geom.kCenter);
+        output.add_XY_plane("plot_axis", (tStep)5, (tNi)geom.kCenter);
 
         
         //        output.add_XZ_plane("plot_slice", 10, rt.impellers[0].impellerPosition-1);
-        output.add_XZ_plane("plot_slice", 2, rt.impellers[0].impellerPosition);
+        output.add_XZ_plane("plot_slice", (tStep)5, (tNi)rt.impellers[0].impellerPosition);
         //        output.add_XZ_plane("plot_slice", 10, rt.impellers[0].impellerPosition+1);
         //        output.add_YZ_plane("plot", 10, grid.x/2);
 
         
         //        output.add_volume("volume", 20);
-        //        output.add_XZ_plane("ml_slice", 0, grid.y/3-1);
-        //        output.add_XZ_plane("ml_slice", 0, grid.y/3+1);
+        //        output.add_XZ_plane("ml_slice", 0, grid.y/3 - 1);
+        //        output.add_XZ_plane("ml_slice", 0, grid.y/3 + 1);
 
         checkpoint.start_with_checkpoint = 0;
 
@@ -186,7 +233,11 @@ int main(int argc, char* argv[]){
 
 
 
+    // MARK: Initialise ComputeUnit
+
     ComputeUnitParams cu;
+    cu.nodeID = 0;
+    cu.deviceID = gpuDeviceID;
     cu.idi = 0;
     cu.idj = 0;
     cu.idk = 0;
@@ -196,14 +247,11 @@ int main(int argc, char* argv[]){
     cu.i0 = 0;
     cu.j0 = 0;
     cu.k0 = 0;
-    cu.ghost = 1;
-
-
+    cu.ghost = GHOST;
 
     FlowParams<double> flowAsDouble = flow.asDouble();
     DiskOutputTree outputTree = DiskOutputTree(checkpoint, output);
     outputTree.setParams(cu, grid, flowAsDouble, running, output, checkpoint);
-
 
     ComputeUnitBase<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL> *lb;
     if (streaming == "simple") {
@@ -213,42 +261,42 @@ int main(int argc, char* argv[]){
         std::cout << "Streaming = Esoteric" << std::endl;
         lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist>(cu, flow, outputTree);
     }
+
     if (checkpointPath != ""){
         lb->checkpoint_read(checkpointPath, "Device");
     } else {
         lb->initialise(flow.initialRho);
     }
-    lb->initialiseExcludePoints(geom);
 
 
+    geom.generateFixedGeometry(surface);
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
 
 
+    geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, surfaceAndInternal);
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
 
 
-    std::vector<PosPolar<tNi, useQVecPrecision>> wall = geom.getTankWall();
-    std::vector<PosPolar<tNi, useQVecPrecision>> baffles = geom.getBaffles(surfaceAndInternal);
-
-    std::vector<PosPolar<tNi, useQVecPrecision>> hub = geom.getImpellerHub(increment, surfaceAndInternal);
-    std::vector<PosPolar<tNi, useQVecPrecision>> shaft = geom.getImpellerShaft(increment, surfaceAndInternal);
-    std::vector<PosPolar<tNi, useQVecPrecision>> disc = geom.getImpellerDisk(increment, surfaceAndInternal);
-
-    std::vector<PosPolar<tNi, useQVecPrecision>> blades = geom.getImpellerBlades(running.angle, increment, surfaceAndInternal);
+    geom.generateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
 
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = wall;
-    geomFORCING.insert( geomFORCING.end(), baffles.begin(), baffles.end() );
-    geomFORCING.insert( geomFORCING.end(), hub.begin(), hub.end() );
-    geomFORCING.insert( geomFORCING.end(), shaft.begin(), shaft.end() );
-    geomFORCING.insert( geomFORCING.end(), disc.begin(), disc.end() );
-    geomFORCING.insert( geomFORCING.end(), blades.begin(), blades.end() );
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geomFixed;
+    geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
+    geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );
 
     lb->forcing(geomFORCING, flow.alpha, flow.beta);
 
 
 
+    lb->setOutputExcludePoints(geomFixed);
+    std::vector<Pos3d<tNi>> externalPoints = geom.getExternalPoints();
+    lb->setOutputExcludePoints(externalPoints);
 
 
 
+
+    // MARK: MAIN LOOP
 
     int rank = 0;
     Multi_Timer mainTimer(rank);
@@ -265,34 +313,49 @@ int main(int argc, char* argv[]){
 
 
 
-        //=========================================
+        // MARK: GEOMETRY UPDATE
 
         running.incrementStep();
-        useQVecPrecision increment = geom.calcThisStepImpellerIncrement(running.step);
-        running.angle += increment;
+        useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
+        running.angle += deltaRunningAngle;
 
-        std::cout << "angle " << running.angle << "  increment " << increment << std::endl;
+        std::cout << "angle " << running.angle << "  deltaRunningAngle " << deltaRunningAngle << std::endl;
 
 
 
-        std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geom.getImpellerBlades(running.angle, increment, surfaceAndInternal);
+        std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geom.getImpellerBlades(running.angle, deltaRunningAngle, surfaceAndInternal);
 
 
         if (running.step < geom.impellerStartupStepsUntilNormalSpeed){
-            std::vector<PosPolar<tNi, useQVecPrecision>> shaft = geom.getImpellerDisk(increment, surfaceAndInternal);
-            std::vector<PosPolar<tNi, useQVecPrecision>> disc = geom.getImpellerDisk(increment, surfaceAndInternal);
-            std::vector<PosPolar<tNi, useQVecPrecision>> hub = geom.getImpellerDisk(increment, surfaceAndInternal);
-            geomFORCING.insert( geomFORCING.end(), shaft.begin(), shaft.end() );
-            geomFORCING.insert( geomFORCING.end(), disc.begin(), disc.end() );
-            geomFORCING.insert( geomFORCING.end(), hub.begin(), hub.end() );
+
+            geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, surfaceAndInternal);
+
+            std::vector<PosPolar<tNi, useQVecPrecision>> rotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+
+            geomFORCING.insert( geomFORCING.end(), rotatingNonUpdating.begin(), rotatingNonUpdating.end() );
+
+
+        } else {
+
+            geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, surfaceAndInternal);
+
+            std::vector<PosPolar<tNi, useQVecPrecision>> rotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+
+            geomFORCING.insert( geomFORCING.end(), rotatingNonUpdating.begin(), rotatingNonUpdating.end() );
+
         }
+
+
+
+
+
 
         main_time = mainTimer.check(0, 0, main_time, "updateRotatingGeometry");
 
 
 
 
-        //=========================================
+        // MARK: COLLISION AND STREAMING
 
 
 
@@ -315,6 +378,12 @@ int main(int argc, char* argv[]){
 
 
 
+
+
+
+        // MARK: OUTPUT
+
+
         //SetUp OutputFormat
         BinFileParams binFormat;
         //format.filePath = plotPath; //Set in savePlane* method
@@ -329,16 +398,12 @@ int main(int argc, char* argv[]){
 
 
 
-        //====================
-
-        for (auto &p: geomFORCING){
-            lb->excludeGeomPoints[lb->indexPlusGhost(p.i, p.j, p.k)] = 1;
-        }
+        lb->setOutputExcludePoints(geomFORCING);
 
         for (auto xy: output.XY_planes){
             if (running.step % xy.repeat == 0) {
-//                lb->template savePlaneXY<float, 4>(xy, binFormat, running);
-//                lb->calcVorticityXY(xy.cutAt, running);
+//                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
+                lb->calcVorticityXY(xy.cutAt, running);
             }
         }
 
@@ -352,16 +417,18 @@ int main(int argc, char* argv[]){
         }
 
         //REMOVE THE ROTATING POINTS.
-        for (auto &p: geomFORCING){
-            lb->excludeGeomPoints[lb->indexPlusGhost(p.i, p.j, p.k)] = 0;
-        }
+        lb->unsetOutputExcludePoints(geomFORCING);
 
-        //=====================
-        //        lb->writeAllOutput(geom, output, binFormat, running);
+
+        //        lb.writeAllOutput(geom, output, binFormat, running);
         main_time = mainTimer.check(0, 5, main_time, "writeAllOutput");
 
 
 
+
+
+
+        // MARK: CHECKPOINT
 
         if (checkpoint.checkpoint_repeat && (running.step % checkpoint.checkpoint_repeat == 0)) {
 
@@ -373,11 +440,12 @@ int main(int argc, char* argv[]){
 
 
 
-
         mainTimer.check(1, 0, total_time, "TOTAL STEP");
+
 
         //MAINLY FOR FOR TESTING
         mainTimer.print_timer_all_nodes_to_files(step, "timer_tmp");
+
 
         tGeomShapeRT revs = running.angle * ((180.0/M_PI)/360);
         printf("Node %2i Step %lu/%lu, Angle: % 1.4E (%.1f revs)    ",  rank, step, running.num_steps, running.angle, revs);
@@ -388,7 +456,10 @@ int main(int argc, char* argv[]){
 
 
 
-    }//end of main for loop  end of main for loop
+    }//end of main loop  end of main loop
+
+
+
 
 
     return 0;
