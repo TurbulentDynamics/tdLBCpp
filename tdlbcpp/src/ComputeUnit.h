@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <vector>
 
-#ifdef DEBUG
+#ifndef DEBUG
 #include <iostream>
 #endif
 
@@ -43,8 +43,8 @@ public:
     
     //Position in the grid
     int idi, idj, idk;
-    int mpiRank;
-
+    int nodeID;
+    int deviceID;
     
     //Size of this ComputeUnit
     tNi x, y, z;
@@ -76,16 +76,17 @@ public:
     bool * __restrict__ O;
 
     bool * __restrict__ excludeOutputPoints;
-#if WITH_GPU == 1
-    Force<T> *devF;
-    T *devNu;
-    void *devN;
 
-    dim3 threadsPerBlock;
+#if WITH_GPU == 1
     dim3 numBlocks;
+    dim3 threadsPerBlock;
+
+    Force<T> *devF;
+//    bool *devExcludeOutputPoints;
+
 #endif
 
-    
+
     DiskOutputTree outputTree;
 
     ComputeUnitBase();

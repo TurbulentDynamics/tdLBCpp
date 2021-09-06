@@ -40,7 +40,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
                 Force<T> f = F[index(i,j,k)];
 
 
-                //TODO Change this to m, but write to q, notation only
+                // TODO:  Change this to m, but write to q, notation only
                 QVec<T, QVecSize> q = AF::read(*this, i, j, k);
 
 

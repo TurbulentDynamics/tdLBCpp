@@ -175,7 +175,7 @@ void ComputeUnitBase<T, NVecSize, MemoryLayout>::bounceBackBoundaryUp(){
 
 
 
-    //TODO Check xg1 here
+    // TODO:  Check xg1 here
     for (tNi i = 1; i<=xg1; i++){
         for (tNi k = 1; k<=zg1; k++){
             tNi j = 0;

@@ -121,45 +121,45 @@ using let_tStep = const unsigned long int;
 
 
 
-//#define CENTER Unused
+#define CENTER Unused
 
 
 //Faces
-#define RIGHT Q01
-#define LEFT Q02
-#define UP Q03
-#define DOWN Q04
-#define BACK Q05
-#define FORWARD Q06
-
-//Edges
-#define RIGHTDOWN Q07
-#define LEFTUP Q08
-#define RIGHTBACK Q09
-#define LEFTFORWARD Q10
-#define DOWNBACK Q11
-#define UPFORWARD Q12
-#define RIGHTUP Q13
-#define LEFTDOWN Q14
-#define RIGHTFORWARD Q15
-#define LEFTBACK Q16
-#define DOWNFORWARD Q17
-#define UPBACK Q18
-
-//Corners
-#define RIGHTDOWNBACK Q19
-#define LEFTUPFORWARD Q20
-#define RIGHTDOWNFORWARD Q21
-#define LEFTUPBACK Q22
-#define RIGHTUPBACK Q23
-#define LEFTDOWNFORWARD Q24
-#define LEFTDOWNBACK Q25
-#define RIGHTUPFORWARD Q26
+//#define RIGHT Q01
+//#define LEFT Q02
+//#define UP Q03
+//#define DOWN Q04
+//#define BACK Q05
+//#define FORWARD Q06
+//
+////Edges
+//#define RIGHTDOWN Q07
+//#define LEFTUP Q08
+//#define RIGHTBACK Q09
+//#define LEFTFORWARD Q10
+//#define DOWNBACK Q11
+//#define UPFORWARD Q12
+//#define RIGHTUP Q13
+//#define LEFTDOWN Q14
+//#define RIGHTFORWARD Q15
+//#define LEFTBACK Q16
+//#define DOWNFORWARD Q17
+//#define UPBACK Q18
+//
+////Corners
+//#define RIGHTDOWNBACK Q19
+//#define LEFTUPFORWARD Q20
+//#define RIGHTDOWNFORWARD Q21
+//#define LEFTUPBACK Q22
+//#define RIGHTUPBACK Q23
+//#define LEFTDOWNFORWARD Q24
+//#define LEFTDOWNBACK Q25
+//#define RIGHTUPFORWARD Q26
 
 
 
 //Ortho Q27 names, counting from top to the right then backwards
-//TODO TOFIX
+// FIXME :
 //#define O0 Q20
 //#define O1 Q12
 //#define O2 Q26
@@ -189,15 +189,15 @@ using let_tStep = const unsigned long int;
 //#define O24 Q25
 //#define O25 Q11
 //#define O26 Q19
-
-#define nFACES 6
-#define FACES [O04, O10, O12, O14, O16, O22]
-
-#define nEDGES 12
-#define EDGES [O01, O03, O05, O07,   O09, O11, O15, O17,   O19, O21, O23, O25]
-
-#define nCORNERS 8
-#define CORNERS [O00, O02, O06, O8, O18, O20, O24, O26]
-
-#define nTOP 9
-#define TOP [O00, O01, O02, O09, O10, O11, O18, O19, O20]
+//
+//#define nFACES 6
+//#define FACES [O04, O10, O12, O14, O16, O22]
+//
+//#define nEDGES 12
+//#define EDGES [O01, O03, O05, O07,   O09, O11, O15, O17,   O19, O21, O23, O25]
+//
+//#define nCORNERS 8
+//#define CORNERS [O00, O02, O06, O8, O18, O20, O24, O26]
+//
+//#define nTOP 9
+//#define TOP [O00, O01, O02, O09, O10, O11, O18, O19, O20]
