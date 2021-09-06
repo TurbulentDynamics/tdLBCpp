@@ -14,7 +14,7 @@
 #include <iostream>
 #endif
 
-#if WITH_GPU == 1
+#if WITH_GPU
 #include <cuda_runtime.h>
 #include "helper_cuda.h"
 #endif
@@ -75,15 +75,14 @@ public:
     
     bool * __restrict__ O;
 
-    bool * __restrict__ excludeOutputPoints;
+    bool * __restrict__ ExcludeOutputPoints;
 
-#if WITH_GPU == 1
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
     dim3 numBlocks;
     dim3 threadsPerBlock;
-
+#endif
+#if WITH_GPU
     Force<T> *devF;
-//    bool *devExcludeOutputPoints;
-
 #endif
 
 

@@ -6,14 +6,16 @@ This is a basic version of the multi-node heterogeneous HPC code to run billions
 
 
 ## Building
-```
-BAZEL_CXXOPTS="-std=c++14" bazel run --verbose_failures //tdlbcpp/src:tdlbcpp
-```
 
-
+### Generic build
 ```
-WITH_GPU [1|0] depending on if GPU present
-WTIH_GPU_SHARED [1|0] if useing shared Memory on GPU
+bazel build //src:tdLBcpp --verbose_failures -s
+```
+### GPU build
+uses `nvcc` compiler for cu files and main.cpp and sets WITH_GPU || WITH_GPU_MEMSHARED define
+```
+bazel build --config gpu //src:tdLBcpp
+bazel build --config gpu_shared //src:tdLBcpp
 ```
 
 

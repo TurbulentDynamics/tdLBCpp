@@ -1,11 +1,15 @@
 //
 //  Header.h
-//  tdLB
+//  tdLBcpp
 //
 //  Created by Niall Ó Broin on 08/12/2020.
 //
 
 #pragma once
+
+
+#define WITH_CPU
+
 
 //Dummies when there is no mpi.h included
 #if WITH_MPI == 0
