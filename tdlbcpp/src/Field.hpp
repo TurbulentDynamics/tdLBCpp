@@ -82,7 +82,7 @@ struct FieldBase
 {
     using QVecAcc = QVecAccess<T, QVecSize, MemoryLayout>;
 
-    T *q;
+    T * __restrict__ q;
     size_t qVectorNumber;
     size_t qSize;
 

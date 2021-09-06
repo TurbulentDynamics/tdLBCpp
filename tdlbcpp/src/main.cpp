@@ -122,7 +122,7 @@ int main(int argc, char* argv[]){
 
     if (!parametersLoadedFromJson) {
 
-        grid.x = 200;
+        grid.x = 100;
         grid.y = grid.x;
         grid.z = grid.x;
 
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]){
         flow.useLES = 0;
         flow.cs0 = 0.12;
 
-        running.num_steps = 400;
+        running.num_steps = 100;
         running.impellerStartupStepsUntilNormalSpeed = (tStep)(grid.x * 0.2);
     }
 

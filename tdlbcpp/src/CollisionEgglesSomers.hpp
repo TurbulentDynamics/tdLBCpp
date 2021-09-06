@@ -49,8 +49,6 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
                 QVec<T, QVecSize> alpha;
 
 
-
-
                 if (flow.useLES == 1){
                     T fct = 3.0 / (q.q[M01] * (1.0 + 6.0 * (Nu[index(i,j,k)] + flow.nu)));
 
@@ -94,7 +92,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
                 }//end of LES
 
 
-                
+
                 //0th order term
                 alpha[M01] = q[M01];
 
@@ -249,25 +247,24 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
                 m[M18] = 1.5*q.q[Q01] - 1.5*q.q[Q03] + 1.5*q.q[Q02] - 1.5*q.q[Q04] - 1.5*q.q[Q09] - 1.5* q.q[Q16] - 1.5* q.q[Q10] - 1.5* q.q[Q15] + 1.5*q.q[Q11] + 1.5*q.q[Q18] + 1.5*q.q[Q12] + 1.5*q.q[Q17];
 
 
+                Q[index(i,j,k)] = m;
 
 
-                for (int l=0; l<QVecSize; l++){
-                    Q[index(i,j,k)].q[l] = m[ l ];
-                }
+//                if (i==2 && j==1 && k==1){
+//                    if (q.q[ 1] < 0.00001) {
+//                        printf("Moments %li %li %li     ", i, j, k);
+//                        for (int l=0; l<N; l++){
+//                            printf("% 1.4E ", qVec.q[l]);
+//                        }
+//                        printf("\n");
+//                    }
+//                }
 
 
-                /*
-                 if (i==2 && j==1 && k==1]{
-                 //if (qVec.q[ 1] < 0.00001] {
-                 printf("Moments %li %li %li     ", i,j,k];
-                 for (int l=0; l<N; l++]{
-                 printf("% 1.4E ", qVec.q[l]];
-                 }
-                 printf("\n"];
-                 }
-                 */
 
-            }}}//endfor i,j,k
+            }
+        }
+    }
 
 
 

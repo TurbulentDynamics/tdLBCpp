@@ -68,14 +68,14 @@ public:
     
     Fld Q;
     
-    Force<T> *F;
+    Force<T> * __restrict__ F;
     //    std::vector<Force<T>> sparseF;
         
-    T *Nu;
+    T * __restrict__ Nu;
     
-    bool *O;
+    bool * __restrict__ O;
 
-    bool *excludeOutputPoints;
+    bool * __restrict__ excludeOutputPoints;
 #if WITH_GPU == 1
     Force<T> *devF;
     T *devNu;
@@ -204,7 +204,7 @@ class ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingTyp
 public:
     using Base=ComputeUnitBase<T, QVecSize, MemoryLayout>;
     using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1;
-    using Base::F; using Base::index; using Base::Q;
+    using Base::F; using Base::index; using Base::Q; using Base::Nu;
     using Base::Base;
     void collision();
     void moments();
