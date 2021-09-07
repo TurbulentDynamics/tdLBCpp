@@ -87,6 +87,7 @@ public:
 
 
     DiskOutputTree outputTree;
+    bool evenStep;
 
     ComputeUnitBase();
     ComputeUnitBase(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
@@ -109,10 +110,10 @@ public:
     void initialise(T rho);
 
 
-    void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta);
+    virtual void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta) = 0;
     
     
-    void bounceBackBoundary();
+    virtual void bounceBackBoundary() = 0;
     void bounceBackBoundaryRight();
     void bounceBackBoundaryLeft();
     void bounceBackBoundaryUp();
@@ -150,8 +151,8 @@ public:
     void writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams runParam);
 
     //Debug
-    void calcVorticityXZ(tNi j, RunningParams runParam);
-    void calcVorticityXY(tNi k, RunningParams runParam);
+    virtual void calcVorticityXZ(tNi j, RunningParams runParam) = 0;
+    virtual void calcVorticityXY(tNi k, RunningParams runParam) = 0;
 
     
     
@@ -190,34 +191,57 @@ public:
     tNi inline dirnQ24(tNi i, tNi j, tNi k);
     tNi inline dirnQ25(tNi i, tNi j, tNi k);
     tNi inline dirnQ26(tNi i, tNi j, tNi k);
-    
-    
-    
-    
+
+    virtual void collision() = 0;
+    virtual void moments() = 0;
+    virtual void streamingPull() = 0;
+    virtual void streamingPush() = 0;
+    virtual void printDebug(int fi, int ti, int fj, int tj, int fk, int tk) = 0;
+
+
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-class ComputeUnitCollision {};
-
-template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
-class ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>: public ComputeUnitBase<T, QVecSize, MemoryLayout> {
+class ComputeUnitForcing : public ComputeUnitBase<T, QVecSize, MemoryLayout> {
 public:
     using Base=ComputeUnitBase<T, QVecSize, MemoryLayout>;
     using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1;
+    using Base::ghost; using Base::xg0; using Base::yg0; using Base::zg0;
+    using Base::F; using Base::index; using Base::Q; using Base::O;
+    using Base::Base;
+    using Base::evenStep;
+    using Base::size;
+    using Base::ExcludeOutputPoints;
+    using Base::outputTree;
+    virtual void moments();
+    virtual void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta);
+    virtual void calcVorticityXZ(tNi j, RunningParams runParam);
+    virtual void calcVorticityXY(tNi k, RunningParams runParam);
+    virtual void printDebug(int fi, int ti, int fj, int tj, int fk, int tk);
+};
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+class ComputeUnitCollision : public ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType> {};
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+class ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>: public ComputeUnitForcing<T, QVecSize, MemoryLayout, EgglesSomers, streamingType> {
+public:
+    using Base=ComputeUnitForcing<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>;
+    using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1;
     using Base::F; using Base::index; using Base::Q; using Base::Nu;
     using Base::Base;
-    void collision();
-    void moments();
+    using Base::evenStep;
+    virtual void collision();
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 class ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomersLES, streamingType>: public ComputeUnitBase<T, QVecSize, MemoryLayout> {
-    void collision();
+    virtual void collision();
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 class ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>: public ComputeUnitBase<T, QVecSize, MemoryLayout> {
-    void collision();
+    virtual void collision();
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
@@ -232,34 +256,66 @@ public:
     using Base::dirnQ06; using Base::dirnQ07; using Base::dirnQ08; using Base::dirnQ09; using Base::dirnQ10;
     using Base::dirnQ11; using Base::dirnQ12; using Base::dirnQ13; using Base::dirnQ14; using Base::dirnQ15;
     using Base::dirnQ16; using Base::dirnQ17; using Base::dirnQ18;
+    using Base::bounceBackBoundaryRight; using Base::bounceBackBoundaryLeft;
+    using Base::bounceBackBoundaryUp; using Base::bounceBackBoundaryDown;
+    using Base::bounceBackBoundaryForward; using Base::bounceBackBoundaryBackward;
+    using Base::bounceBackEdges;
     using Base::Base;
-    void streamingPull();
-    void streamingPush();
+    virtual void streamingPull();
+    virtual void streamingPush();
+    virtual void bounceBackBoundary();
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
 class ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Esotwist>: public ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Esotwist> {
 public:
-    using Base=ComputeUnitBase<T, QVecSize, MemoryLayout>;
-    bool evenStep;
-    void streaming();
+    using Base=ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Esotwist>;
+    using Base::Base;
+    using Base::evenStep;
+    virtual void streamingPush();
+    virtual void streamingPull();
+    virtual void bounceBackBoundary();
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 using ComputeUnit=ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
-template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 struct AccessField {};
 
-template<typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-struct AccessField<T, QVecSize, MemoryLayout, Simple> {
-    inline static QVec<T, QVecSize> read(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, tNi i, tNi j, tNi k) {
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+struct AccessField<T, QVecSize, MemoryLayout, collisionType, Simple> {
+    inline static QVec<T, QVecSize> read(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, tNi i, tNi j, tNi k) {
         return cu.Q[cu.index(i,j,k)];
     }
-    inline static void write(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+    inline static void write(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
         cu.Q[cu.index(i,j,k)] = q;
     }
-};
+    inline static void writeMoments(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+        write(cu, q, i, j, k);
+    }
+ };
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::printDebug(int fi, int ti, int fj, int tj, int fk, int tk) {
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+    for (int i = fi; i <= fi; i++) {
+        for (int j = fj; j <= tj; j++) {
+            for (int k = fk; k <= tk; k++) {
+                QVec<T, QVecSize> q = AF::read(*this, i, j, k);
+                printf("index(%d, %d, %d):\n", i, j, k);
+                for (int l = 0; l < QVecSize; l++) {
+                    printf("Q[%d] = %f, ", l, Q[index(i,j,k)][l]);
+                }
+                printf("\n read: ");
+                for (int l = 0; l < QVecSize; l++) {
+                    printf("q[%d] = %f, ", l, q[l]);
+                }
+                printf("\n");
+            }
+        }
+    }
+}
 
 #include "ComputeUnit.hpp"
 #include "ComputeUnitOutput.hpp"

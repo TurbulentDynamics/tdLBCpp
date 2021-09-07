@@ -98,7 +98,7 @@ bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams ou
 
 
 
-std::string formatStep(tStep step){
+static inline std::string formatStep(tStep step){
 
     std::stringstream sstream;
 
@@ -110,10 +110,9 @@ std::string formatStep(tStep step){
 
 
 
-
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningParams runParam){
-
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXZ(tNi j, RunningParams runParam){
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     T *Vort = new T[size];
     bool minInitialized = false, maxInitialized = false;
@@ -127,18 +126,21 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningP
             if (ExcludeOutputPoints[index(i,j,k)] == true) continue;
 
 
-            //              T uxx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().x - Q[dirnQ02(i, j, k)].velocity().x);
-            T uxy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().x - Q[dirnQ06(i, j, k)].velocity().x);
-            T uxz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().x - Q[dirnQ04(i, j, k)].velocity().x);
+            QVec<T, QVecSize> qDirnQ05 = AF::read(*this, i, j, k + 1);
+            QVec<T, QVecSize> qDirnQ06 = AF::read(*this, i, j, k - 1);
+            T uxy = T(0.5) * (qDirnQ05.velocity().x - qDirnQ06.velocity().x);
+            QVec<T, QVecSize> qDirnQ03 = AF::read(*this, i, j + 1, k);
+            QVec<T, QVecSize> qDirnQ04 = AF::read(*this, i, j - 1, k);
+            T uxz = T(0.5) * (qDirnQ03.velocity().x - qDirnQ04.velocity().x);
 
-            T uyx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().y - Q[dirnQ02(i, j, k)].velocity().y);
-            //              T uyy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().y - Q[dirnQ06(i, j, k)].velocity().y);
-            T uyz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().y - Q[dirnQ04(i, j, k)].velocity().y);
+            QVec<T, QVecSize> qDirnQ01 = AF::read(*this, i + 1, j, k);
+            QVec<T, QVecSize> qDirnQ02 = AF::read(*this, i - 1, j, k);
+            T uyx = T(0.5) * (qDirnQ01.velocity().y - qDirnQ02.velocity().y);
+            T uyz = T(0.5) * (qDirnQ03.velocity().y - qDirnQ04.velocity().y);
 
 
-            T uzx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().z - Q[dirnQ02(i, j, k)].velocity().z);
-            T uzy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().z - Q[dirnQ06(i, j, k)].velocity().z);
-            //              T uzz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().z - Q[dirnQ04(i, j, k)].velocity().z);
+            T uzx = T(0.5) * (qDirnQ01.velocity().z - qDirnQ02.velocity().z);
+            T uzy = T(0.5) * (qDirnQ05.velocity().z - qDirnQ06.velocity().z);
 
 
             T uxyuyx = uxy - uyx;
@@ -191,9 +193,9 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningP
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXY(tNi k, RunningParams runParam){
-
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXY(tNi k, RunningParams runParam){
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     T *Vort = new T[size];
     bool minInitialized = false, maxInitialized = false;
@@ -207,18 +209,21 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXY(tNi k, RunningP
             if (ExcludeOutputPoints[index(i,j,k)] == true) continue;
 
 
-            //              T uxx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().x - Q[dirnQ02(i, j, k)].velocity().x);
-            T uxy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().x - Q[dirnQ06(i, j, k)].velocity().x);
-            T uxz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().x - Q[dirnQ04(i, j, k)].velocity().x);
+            QVec<T, QVecSize> qDirnQ05 = AF::read(*this, i, j, k + 1);
+            QVec<T, QVecSize> qDirnQ06 = AF::read(*this, i, j, k - 1);
+            T uxy = T(0.5) * (qDirnQ05.velocity().x - qDirnQ06.velocity().x);
+            QVec<T, QVecSize> qDirnQ03 = AF::read(*this, i, j + 1, k);
+            QVec<T, QVecSize> qDirnQ04 = AF::read(*this, i, j - 1, k);
+            T uxz = T(0.5) * (qDirnQ03.velocity().x - qDirnQ04.velocity().x);
 
-            T uyx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().y - Q[dirnQ02(i, j, k)].velocity().y);
-            //              T uyy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().y - Q[dirnQ06(i, j, k)].velocity().y);
-            T uyz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().y - Q[dirnQ04(i, j, k)].velocity().y);
+            QVec<T, QVecSize> qDirnQ01 = AF::read(*this, i + 1, j, k);
+            QVec<T, QVecSize> qDirnQ02 = AF::read(*this, i - 1, j, k);
+            T uyx = T(0.5) * (qDirnQ01.velocity().y - qDirnQ02.velocity().y);
+            T uyz = T(0.5) * (qDirnQ03.velocity().y - qDirnQ04.velocity().y);
 
 
-            T uzx = T(0.5) * (Q[dirnQ01(i, j, k)].velocity().z - Q[dirnQ02(i, j, k)].velocity().z);
-            T uzy = T(0.5) * (Q[dirnQ05(i, j, k)].velocity().z - Q[dirnQ06(i, j, k)].velocity().z);
-            //              T uzz = T(0.5) * (Q[dirnQ03(i, j, k)].velocity().z - Q[dirnQ04(i, j, k)].velocity().z);
+            T uzx = T(0.5) * (qDirnQ01.velocity().z - qDirnQ02.velocity().z);
+            T uzy = T(0.5) * (qDirnQ05.velocity().z - qDirnQ06.velocity().z);
 
 
 

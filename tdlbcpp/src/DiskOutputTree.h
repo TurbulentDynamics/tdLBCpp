@@ -227,7 +227,7 @@ public:
     
     
     
-    std::string formatStep(tStep step){
+    inline std::string formatStep(tStep step){
         
         std::stringstream sstream;
         

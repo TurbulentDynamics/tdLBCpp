@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
+#include <memory>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -248,20 +249,23 @@ int gpuDeviceID = -1;
     cu.k0 = 0;
     cu.ghost = GHOST;
 
-
-
     FlowParams<double> flowAsDouble = flow.asDouble();
     DiskOutputTree outputTree = DiskOutputTree(checkpoint, output);
     outputTree.setParams(cu, grid, flowAsDouble, running, output, checkpoint);
 
-
-
-    ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple> lb(cu, flow, outputTree);
+    ComputeUnitBase<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL> *lb;
+    if (streaming == "simple") {
+        std::cout << "Streaming = Nieve" << std::endl;
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cu, flow, outputTree);
+    } else {
+        std::cout << "Streaming = Esoteric" << std::endl;
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist>(cu, flow, outputTree);
+    }
 
     if (checkpointPath != ""){
-        lb.checkpoint_read(checkpointPath, "Device");
+        lb->checkpoint_read(checkpointPath, "Device");
     } else {
-        lb.initialise(flow.initialRho);
+        lb->initialise(flow.initialRho);
     }
 
 
@@ -281,13 +285,13 @@ int gpuDeviceID = -1;
     geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
     geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );
 
-    lb.forcing(geomFORCING, flow.alpha, flow.beta);
+    lb->forcing(geomFORCING, flow.alpha, flow.beta);
 
 
 
-    lb.setOutputExcludePoints(geomFixed);
+    lb->setOutputExcludePoints(geomFixed);
     std::vector<Pos3d<tNi>> externalPoints = geom.getExternalPoints();
-    lb.setOutputExcludePoints(externalPoints);
+    lb->setOutputExcludePoints(externalPoints);
 
 
 
@@ -355,21 +359,21 @@ int gpuDeviceID = -1;
 
 
 
-        lb.collision();
+        lb->collision();
         main_time = mainTimer.check(0, 1, main_time, "Collision");
 
 
-        lb.bounceBackBoundary();
+        lb->bounceBackBoundary();
         main_time = mainTimer.check(0, 2, main_time, "BounceBack");
 
 
-        lb.streamingPush();
+        lb->streamingPush();
         main_time = mainTimer.check(0, 3, main_time, "Streaming");
 
-        lb.moments();
+        lb->moments();
 
 
-        lb.forcing(geomFORCING, flow.alpha, flow.beta);
+        lb->forcing(geomFORCING, flow.alpha, flow.beta);
         main_time = mainTimer.check(0, 4, main_time, "Forcing");
 
 
@@ -394,25 +398,26 @@ int gpuDeviceID = -1;
 
 
 
-        lb.setOutputExcludePoints(geomFORCING);
+        lb->setOutputExcludePoints(geomFORCING);
 
         for (auto xy: output.XY_planes){
             if (running.step % xy.repeat == 0) {
 //                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
-                lb.calcVorticityXY(xy.cutAt, running);
+                lb->calcVorticityXY(xy.cutAt, running);
             }
         }
+
 
 
         for (auto xz: output.XZ_planes){
             if (running.step % xz.repeat == 0) {
-//                lb.template savePlaneXZ<float, 4>(xz, binFormat, running);
-                lb.calcVorticityXZ(xz.cutAt, running);
+//                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
+                lb->calcVorticityXZ(xz.cutAt, running);
             }
         }
 
         //REMOVE THE ROTATING POINTS.
-        lb.unsetOutputExcludePoints(geomFORCING);
+        lb->unsetOutputExcludePoints(geomFORCING);
 
 
         //        lb.writeAllOutput(geom, output, binFormat, running);
@@ -427,7 +432,7 @@ int gpuDeviceID = -1;
 
         if (checkpoint.checkpoint_repeat && (running.step % checkpoint.checkpoint_repeat == 0)) {
 
-            lb.checkpoint_write("Device", running);
+            lb->checkpoint_write("Device", running);
             main_time = mainTimer.check(0, 6, main_time, "Checkpoint");
         }
 

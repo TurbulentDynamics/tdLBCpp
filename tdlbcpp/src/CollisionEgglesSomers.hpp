@@ -25,7 +25,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomersLES, streamingT
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>::collision(){
-    using AF = AccessField<T, QVecSize, MemoryLayout, streamingType>;
+    using AF = AccessField<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>;
 
     //kinematic viscosity.
     T b = 1.0 / (1.0 + 6 * flow.nu);
@@ -183,21 +183,21 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
-void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>::moments(){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::moments(){
 
     using QVecAcc = QVecAccess<T, QVecSize, MemoryLayout>;
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi j = 1; j <= yg1; j++) {
             for (tNi k = 1; k <= zg1; k++) {
 
 
-                QVecAcc q = Q[index(i, j, k)];
+                QVec<T, QVecSize> q = AF::read(*this, i, j, k);
 
 
-                QVec<T, QVecSize> m = Q[index(i, j, k)];
-
+                QVec<T, QVecSize> m;
 
                 //the first position is simply the entire mass-vector (Q summed up)
                 m[M01] = q.q[Q01] + q.q[Q03] + q.q[Q02] + q.q[Q04] + q.q[Q05] + q.q[Q06] + q.q[Q07] + q.q[Q14] + q.q[Q08] + q.q[Q13] + q.q[Q09] + q.q[Q16] + q.q[Q10] + q.q[Q15] + q.q[Q11] + q.q[Q18] + q.q[Q12] + q.q[Q17];
@@ -246,10 +246,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 
                 m[M18] = 1.5*q.q[Q01] - 1.5*q.q[Q03] + 1.5*q.q[Q02] - 1.5*q.q[Q04] - 1.5*q.q[Q09] - 1.5* q.q[Q16] - 1.5* q.q[Q10] - 1.5* q.q[Q15] + 1.5*q.q[Q11] + 1.5*q.q[Q18] + 1.5*q.q[Q12] + 1.5*q.q[Q17];
 
-
-                Q[index(i,j,k)] = m;
-
-
+                AF::writeMoments(*this, m, i, j, k);
 //                if (i==2 && j==1 && k==1){
 //                    if (q.q[ 1] < 0.00001) {
 //                        printf("Moments %li %li %li     ", i, j, k);
@@ -259,9 +256,6 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 //                        printf("\n");
 //                    }
 //                }
-
-
-
             }
         }
     }
