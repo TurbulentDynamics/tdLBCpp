@@ -6,6 +6,17 @@ This is a basic version of the multi-node heterogeneous HPC code to run billions
 
 
 ## Building
+
+### Generic build
 ```
-bazel run --verbose_failures //tdlbcpp/src:tdlbcpp
+bazel build //src:tdLBcpp --verbose_failures -s
 ```
+### GPU build
+uses `nvcc` compiler for cu files and main.cpp and sets WITH_GPU || WITH_GPU_MEMSHARED define
+```
+bazel build --config gpu //src:tdLBcpp
+bazel build --config gpu_shared //src:tdLBcpp
+```
+
+
+

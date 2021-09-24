@@ -123,29 +123,30 @@ struct CommonOperations : public Base {
     using Base::operator=;
 
     Velocity<T> velocity(Force<T> f){
-        
+
+
         Velocity<T> u;
-        u.x = (1.0 / q[ Q1]) * (q[ Q2] + 0.5 * f.x);
-        u.y = (1.0 / q[ Q1]) * (q[ Q3] + 0.5 * f.y);
-        u.z = (1.0 / q[ Q1]) * (q[ Q4] + 0.5 * f.z);
+        u.x = (1.0 / q[M01]) * (q[M02] + 0.5 * f.x);
+        u.y = (1.0 / q[M01]) * (q[M03] + 0.5 * f.y);
+        u.z = (1.0 / q[M01]) * (q[M04] + 0.5 * f.z);
 
         return u;
     }
-    
+
     Velocity<T> velocity(){
         
         Velocity<T> u;
-        u.x = q[Q2] / q[Q1];
-        u.y = q[Q3] / q[Q1];
-        u.z = q[Q4] / q[Q1];
+        u.x = q[M02] / q[M01];
+        u.y = q[M03] / q[M01];
+        u.z = q[M04] / q[M01];
       
         return u;
     };
 
-    void initialise(T initialRho){
-        q[0] = initialRho;
+    void initialiseRho(T initialRho, T other){
+        q[MRHO] = initialRho;
         for (int l = 1; l < size; l++) {
-            q[l] = 0.0;
+            q[l] = other;
         }
     }
 

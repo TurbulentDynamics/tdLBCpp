@@ -205,27 +205,27 @@ namespace ParamsCommon
             {
                 for (tNi k = 0; k < cu.zg; k++)
                 {
-                    hdr << ind47 << " qTmp.q[Q15] = " << m(cu.Q[cu.index(i, j, k)].q[Q15], i, j, k, Q15) << ";\n";
-                    hdr << ind19 << " qTmp.q[ Q8] = " << m(cu.Q[cu.index(i, j, k)].q[Q8], i, j, k, Q8) << ";";
-                    hdr << " qTmp.q[ Q2] = " << m(cu.Q[cu.index(i, j, k)].q[Q2], i, j, k, Q2) << ";";
-                    hdr << " qTmp.q[ Q7] = " << m(cu.Q[cu.index(i, j, k)].q[Q7], i, j, k, Q7) << ";\n";
-                    hdr << ind36 << " qTmp.q[Q18] = " << m(cu.Q[cu.index(i, j, k)].q[Q18], i, j, k, Q18) << ";\n";
-
-                    hdr << ind23 << " qTmp.q[Q12] = " << m(cu.Q[cu.index(i, j, k)].q[Q12], i, j, k, Q12) << ";";
-                    hdr << " qTmp.q[ Q5] = " << m(cu.Q[cu.index(i, j, k)].q[Q5], i, j, k, Q5) << ";";
-                    hdr << " qTmp.q[Q11] = " << m(cu.Q[cu.index(i, j, k)].q[Q11], i, j, k, Q11) << ";\n";
-                    hdr << ind19 << " qTmp.q[ Q3] = " << m(cu.Q[cu.index(i, j, k)].q[Q3], i, j, k, Q3) << ";" << ind23;
-                    hdr << " qTmp.q[ Q1] = " << m(cu.Q[cu.index(i, j, k)].q[Q1], i, j, k, Q1) << ";\n";
-                    hdr << ind13 << " qTmp.q[Q13] = " << m(cu.Q[cu.index(i, j, k)].q[Q13], i, j, k, Q13) << ";";
-                    hdr << " qTmp.q[ Q6] = " << m(cu.Q[cu.index(i, j, k)].q[Q6], i, j, k, Q6) << ";";
-                    hdr << " qTmp.q[Q14] = " << m(cu.Q[cu.index(i, j, k)].q[Q14], i, j, k, Q14) << ";\n";
-
-                    hdr << ind47 << " qTmp.q[Q16] = " << m(cu.Q[cu.index(i, j, k)].q[Q16], i, j, k, Q16) << ";\n";
-                    hdr << ind19 << " qTmp.q[ Q9] = " << m(cu.Q[cu.index(i, j, k)].q[Q9], i, j, k, Q9) << ";";
-                    hdr << " qTmp.q[ Q4] = " << m(cu.Q[cu.index(i, j, k)].q[Q4], i, j, k, Q4) << ";";
-                    hdr << " qTmp.q[Q10] = " << m(cu.Q[cu.index(i, j, k)].q[Q10], i, j, k, Q10) << ";\n";
+                    hdr << ind47 << " qTmp.q[Q11] = " << m(cu.Q[cu.index(i, j, k)].q[Q11], i, j, k, Q11) << ";\n";
+                    hdr << ind19 << " qTmp.q[Q14] = " << m(cu.Q[cu.index(i, j, k)].q[Q14], i, j, k, Q14) << ";";
+                    hdr << " qTmp.q[Q03] = " << m(cu.Q[cu.index(i, j, k)].q[Q03], i, j, k, Q03) << ";";
+                    hdr << " qTmp.q[Q07] = " << m(cu.Q[cu.index(i, j, k)].q[Q07], i, j, k, Q07) << ";\n";
                     hdr << ind36 << " qTmp.q[Q17] = " << m(cu.Q[cu.index(i, j, k)].q[Q17], i, j, k, Q17) << ";\n";
-                    
+
+                    hdr << ind23 << " qTmp.q[Q16] = " << m(cu.Q[cu.index(i, j, k)].q[Q16], i, j, k, Q16) << ";";
+                    hdr << " qTmp.q[Q05] = " << m(cu.Q[cu.index(i, j, k)].q[Q05], i, j, k, Q05) << ";";
+                    hdr << " qTmp.q[Q09] = " << m(cu.Q[cu.index(i, j, k)].q[Q09], i, j, k, Q09) << ";\n";
+                    hdr << ind19 << " qTmp.q[Q02] = " << m(cu.Q[cu.index(i, j, k)].q[Q02], i, j, k, Q02) << ";" << ind23;
+                    hdr << " qTmp.q[Q01] = " << m(cu.Q[cu.index(i, j, k)].q[Q01], i, j, k, Q01) << ";\n";
+                    hdr << ind13 << " qTmp.q[Q10] = " << m(cu.Q[cu.index(i, j, k)].q[Q10], i, j, k, Q10) << ";";
+                    hdr << " qTmp.q[Q06] = " << m(cu.Q[cu.index(i, j, k)].q[Q06], i, j, k, Q06) << ";";
+                    hdr << " qTmp.q[Q15] = " << m(cu.Q[cu.index(i, j, k)].q[Q15], i, j, k, Q15) << ";\n";
+
+                    hdr << ind47 << " qTmp.q[Q18] = " << m(cu.Q[cu.index(i, j, k)].q[Q18], i, j, k, Q18) << ";\n";
+                    hdr << ind19 << " qTmp.q[Q08] = " << m(cu.Q[cu.index(i, j, k)].q[Q08], i, j, k, Q08) << ";";
+                    hdr << " qTmp.q[Q04] = " << m(cu.Q[cu.index(i, j, k)].q[Q04], i, j, k, Q04) << ";";
+                    hdr << " qTmp.q[Q13] = " << m(cu.Q[cu.index(i, j, k)].q[Q13], i, j, k, Q13) << ";\n";
+                    hdr << ind36 << " qTmp.q[Q12] = " << m(cu.Q[cu.index(i, j, k)].q[Q12], i, j, k, Q12) << ";\n";
+
                     hdr << "\n        cu.Q[cu.index(" << i << ", " << j << ", " << k << ")] = qTmp;\n";
                     hdr << ind8 << "cu.F[cu.index(" << i << ", " << j << ", " << k << ")].x = " << cu.F[cu.index(i, j, k)].x << ";\n";
                     hdr << ind8 << "cu.F[cu.index(" << i << ", " << j << ", " << k << ")].y = " << cu.F[cu.index(i, j, k)].y << ";\n";

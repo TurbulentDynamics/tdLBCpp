@@ -18,20 +18,20 @@
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomersLES, streamingType>::collision(){
 
-//    alf2[ 5] = (2.0 * (q[2] + 0.5 * f.x) * u.x - q[ 5]*c)*b * Nu.getNu(i,j,k);
+    //    alpha[ 5] = (2.0*(q[2] + 0.5*f.x)*u.x - q[ 5]*c)*b * Nu.getNu(i,j,k);
 
 }
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>::collision(){
-    using AF = AccessField<T, QVecSize, MemoryLayout, streamingType>;
+    using AF = AccessField<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>;
 
     //kinematic viscosity.
     T b = 1.0 / (1.0 + 6 * flow.nu);
     T c = 1.0 - 6 * flow.nu;
-        
-    
+
+
     for (tNi i=1; i<=xg1; i++){
         for (tNi j=1; j<=yg1; j++){
             for (tNi k=1; k<=zg1; k++){
@@ -39,92 +39,142 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 
                 Force<T> f = F[index(i,j,k)];
 
-				QVec<T, QVecSize> q = AF::read(*this, i, j, k);
 
-				Velocity<T> u = q.velocity(f);
+                //TODO Change this to m, but write to q, notation only
+                QVec<T, QVecSize> m = AF::read(*this, i, j, k);
 
-                QVec<T, QVecSize> alf2;
+
+                Velocity<T> u = m.velocity(f);
+
+                QVec<T, QVecSize> alpha;
+
+
+                if (flow.useLES == 1){
+                    T fct = 3.0 / (m.q[M01] * (1.0 + 6.0 * (Nu[index(i,j,k)] + flow.nu)));
+
+                    //calculating the derivatives for x, y and z
+                    T dudx = fct * ((m.q[M02] + 0.5 * F[index(i,j,k)].x * u.x - m.q[M05]));
+                    T dvdy = fct * ((m.q[M03] + 0.5 * F[index(i,j,k)].y * u.y - m.q[M07]));
+                    T dwdz = fct * ((m.q[M04] + 0.5 * F[index(i,j,k)].z * u.z - m.q[M10]));
+
+                    T divv = dudx + dvdy + dwdz;
+
+
+                    //calculating the cross terms, used for the shear matrix
+                    T dudypdvdx = 2 * fct * ((m.q[M03]) + 0.5 * F[index(i,j,k)].y * u.x - m.q[M06]);
+                    T dudzpdwdx = 2 * fct * ((m.q[M04]) + 0.5 * F[index(i,j,k)].z * u.x - m.q[M08]);
+                    T dvdzpdwdy = 2 * fct * ((m.q[M04]) + 0.5 * F[index(i,j,k)].z * u.y - m.q[M09]);
+
+
+                    //calculating sh (the resolved deformation rate, S^2)
+                    T sh = 2 * pow(dudx,2) + 2 * pow(dvdy,2) + 2 * pow(dwdz,2) + pow(dudypdvdx,2) + pow(dudzpdwdx,2) + pow(dvdzpdwdy,2) - (2.0/3.0) * pow(divv,2);
+
+
+                    //calculating eddy viscosity:
+                    //nu_t = (lambda_mix)^2 * sqrt(S^2)     (Smagorinsky)
+                    Nu[index(i,j,k)] = flow.cs0 * flow.cs0 * sqrt(fabs(sh));
+
+
+
+                    // Viscosity is adjusted only for LES, because LES uses a
+                    // subgrid-adjustment model for turbulence that's too small to
+                    // be captured in the regular cells. This adjustment is
+                    // performed by adding the eddy viscosity to the viscosity.
+                    // This model is called the Smagorinsky model, however this
+                    // implementation is slightly different, as explained by
+                    // Somers (1993) -> low strain rates do not excite the
+                    // eddy viscosity.
+
+                    T nut = Nu[index(i,j,k)] + flow.nu;
+                    b = 1.0 / (1.0 + 6 * nut);
+                    c = 1.0 - 6 * nut;
+
+                }//end of LES
+
 
 
                 //0th order term
-                alf2[ Q1] = q[Q1];
+                alpha[M01] = m[M01];
 
 
                 //1st order term
-                alf2[ Q2] = q[Q2] + f.x;
-                alf2[ Q3] = q[Q3] + f.y;
-                alf2[ Q4] = q[Q4] + f.z;
+                alpha[M02] = m[M02] + f.x;
+                alpha[M03] = m[M03] + f.y;
+                alpha[M04] = m[M04] + f.z;
 
                 //2nd order terms
-                alf2[ Q5] = (2.0 * (q[Q2] + 0.5 * f.x) * u.x - q[ Q5]*c)*b;
-                alf2[ Q6] = (2.0 * (q[Q2] + 0.5 * f.x) * u.y - q[ Q6]*c)*b;
-                alf2[ Q7] = (2.0 * (q[Q3] + 0.5 * f.y) * u.y - q[ Q7]*c)*b;
-                alf2[ Q8] = (2.0 * (q[Q2] + 0.5 * f.x) * u.z - q[ Q8]*c)*b;
-                alf2[ Q9] = (2.0 * (q[Q3] + 0.5 * f.y) * u.z - q[ Q9]*c)*b;
-                alf2[Q10] = (2.0 * (q[Q4] + 0.5 * f.z) * u.z - q[Q10]*c)*b;
+                alpha[M05] = (2.0 * (m[M02] + 0.5 * f.x) * u.x - m[M05]*c)*b;
+                alpha[M06] = (2.0 * (m[M02] + 0.5 * f.x) * u.y - m[M06]*c)*b;
+                alpha[M07] = (2.0 * (m[M03] + 0.5 * f.y) * u.y - m[M07]*c)*b;
+
+                alpha[M08] = (2.0 * (m[M02] + 0.5 * f.x) * u.z - m[M08]*c)*b;
+                alpha[M09] = (2.0 * (m[M03] + 0.5 * f.y) * u.z - m[M09]*c)*b;
+                alpha[M10] = (2.0 * (m[M04] + 0.5 * f.z) * u.z - m[M10]*c)*b;
 
                 //3rd order terms
-                alf2[Q11] =  -flow.g3 * q[Q11];
-                alf2[Q12] =  -flow.g3 * q[Q12];
-                alf2[Q13] =  -flow.g3 * q[Q13];
-                alf2[Q14] =  -flow.g3 * q[Q14];
-                alf2[Q15] =  -flow.g3 * q[Q15];
-                alf2[Q16] =  -flow.g3 * q[Q16];
+                alpha[M11] =  -flow.g3 * m[M11];
+                alpha[M12] =  -flow.g3 * m[M12];
+                alpha[M13] =  -flow.g3 * m[M13];
+                alpha[M14] =  -flow.g3 * m[M14];
+                alpha[M15] =  -flow.g3 * m[M15];
+                alpha[M16] =  -flow.g3 * m[M16];
 
                 //4th order terms
-                alf2[Q17] = 0.0;
-                alf2[Q18] = 0.0;
+                alpha[M17] = 0.0;
+                alpha[M18] = 0.0;
 
 
                 // Start of invMoments, which is responsible for determining
-                // the N-field (x) from alpha+ (alf2). It does this by using eq.
+                // the N-field (x) from alpha+ (alpha). It does this by using eq.
                 // 12 in the article by Eggels and Somers (1995), which means
                 // it's using the "filter matrix E" (not really present in the
                 // code as matrix, but it's where the coefficients come from).
 
                 for (int l=0;  l<QVecSize; l++) {
-                    alf2[l] /= 24.0;
+                    alpha[l] /= 24.0;
                 }
 
 
-                q[Q1]  = 2 * (alf2[Q1] + 2*alf2[Q2] + 1.5*alf2[Q5] - 1.5*alf2[Q7] - 1.5*alf2[Q10] - alf2[Q11] - alf2[Q13] + alf2[Q17] + alf2[Q18]);
+                m[Q01] = 2*alpha[M01] + 4*alpha[M02] + 3*alpha[M05] - 3*alpha[M07] - 3*alpha[M10] - 2*alpha[M11] - 2*alpha[M13] + 2*alpha[M17] + 2*alpha[M18];
 
-                q[Q2]  = 2 * (alf2[Q1] + 2*alf2[Q3] - 1.5*alf2[Q5] + 1.5*alf2[Q7] - 1.5*alf2[Q10] - alf2[Q12] - alf2[Q14] + alf2[Q17] - alf2[Q18]);
+                m[Q02] = 2*alpha[M01] - 4*alpha[M02] + 3*alpha[M05] - 3*alpha[M07] - 3*alpha[M10] + 2*alpha[M11] + 2*alpha[M13] + 2*alpha[M17] + 2*alpha[M18];
 
-                q[Q3]  = 2 * (alf2[Q1] - 2*alf2[Q2] + 1.5*alf2[Q5] - 1.5*alf2[Q7] - 1.5*alf2[Q10] + alf2[Q11] + alf2[Q13] + alf2[Q17] + alf2[Q18]);
+                m[Q03] = 2*alpha[M01] + 4*alpha[M03] - 3*alpha[M05] + 3*alpha[M07] - 3*alpha[M10] - 2*alpha[M12] - 2*alpha[M14] + 2*alpha[M17] - 2*alpha[M18];
 
-                q[Q4]  = 2 * (alf2[Q1] - 2*alf2[Q3] - 1.5*alf2[Q5] + 1.5*alf2[Q7] - 1.5*alf2[Q10] + alf2[Q12] + alf2[Q14] + alf2[Q17] - alf2[Q18]);
+                m[Q04] = 2*alpha[M01] - 4*alpha[M03] - 3*alpha[M05] + 3*alpha[M07] - 3*alpha[M10] + 2*alpha[M12] + 2*alpha[M14] + 2*alpha[M17] - 2*alpha[M18];
 
-                q[Q5]  = 2 * (alf2[Q1] + 2*alf2[Q4] - 1.5*alf2[Q5] - 1.5*alf2[Q7] + 1.5*alf2[Q10] - 2*alf2[Q15] - 2*alf2[Q17]);
+                m[Q05] = 2*alpha[M01] + 4*alpha[M04] - 3*alpha[M05] - 3*alpha[M07] + 3*alpha[M10] - 4*alpha[M15] - 4*alpha[M17];
 
-                q[Q6]  = 2 * (alf2[Q1] - 2*alf2[Q4] - 1.5*alf2[Q5] - 1.5*alf2[Q7] + 1.5*alf2[Q10] + 2*alf2[Q15] - 2*alf2[Q17]);
+                m[Q06] = 2*alpha[M01] - 4*alpha[M04] - 3*alpha[M05] - 3*alpha[M07] + 3*alpha[M10] + 4*alpha[M15] - 4*alpha[M17];
 
-                q[Q7]  = alf2[Q1] + 2*alf2[Q2] + 2*alf2[Q3] + 1.5*alf2[Q5] + 6*alf2[Q6] + 1.5*alf2[Q7] - 1.5*alf2[Q10] + 2*alf2[Q11] + 2*alf2[Q12] - 2*alf2[Q17];
+                m[Q07] = alpha[M01] + 2*alpha[M02] + 2*alpha[M03] + 1.5*alpha[M05] + 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] + 2*alpha[M11] + 2*alpha[M12] - 2*alpha[M17];
 
-                q[Q8]  = alf2[Q1] - 2*alf2[Q2] + 2*alf2[Q3] + 1.5*alf2[Q5] - 6*alf2[Q6] + 1.5*alf2[Q7] - 1.5*alf2[Q10] - 2*alf2[Q11] + 2*alf2[Q12] - 2*alf2[Q17];
+                m[M14] = alpha[M01] - 2*alpha[M02] + 2*alpha[M03] + 1.5*alpha[M05] - 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] - 2*alpha[M11] + 2*alpha[M12] - 2*alpha[M17];
 
-                q[Q9]  = alf2[Q1] - 2*alf2[Q2] - 2*alf2[Q3] + 1.5*alf2[Q5] + 6*alf2[Q6] + 1.5*alf2[Q7] - 1.5*alf2[Q10] - 2*alf2[Q11] - 2*alf2[Q12] - 2*alf2[Q17];
+                m[M08] = alpha[M01] - 2*alpha[M02] - 2*alpha[M03] + 1.5*alpha[M05] + 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] - 2*alpha[M11] - 2*alpha[M12] - 2*alpha[M17];
 
-                q[Q10] = alf2[Q1] + 2*alf2[Q2] - 2*alf2[Q3] + 1.5*alf2[Q5] - 6*alf2[Q6] + 1.5*alf2[Q7] - 1.5*alf2[Q10] + 2*alf2[Q11] - 2*alf2[Q12] - 2*alf2[Q17];
+                m[M13] = alpha[M01] + 2*alpha[M02] - 2*alpha[M03] + 1.5*alpha[M05] - 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] + 2*alpha[M11] - 2*alpha[M12] - 2*alpha[M17];
 
-                q[Q11] = alf2[Q1] + 2*alf2[Q2] + 2*alf2[Q4] + 1.5*alf2[Q5] - 1.5*alf2[Q7] + 6*alf2[Q8] + 1.5*alf2[Q10] - alf2[Q11] + alf2[Q13] + alf2[Q15] - alf2[Q16] + alf2[Q17] - alf2[Q18];
+                m[M09] = alpha[M01] + 2*alpha[M02] + 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] + 6*alpha[M08] + 1.5*alpha[M10] - alpha[M11] + alpha[M13] + alpha[M15] - alpha[M16] + alpha[M17] - alpha[M18];
 
-                q[Q12] = alf2[Q1] - 2*alf2[Q2] + 2*alf2[Q4] + 1.5*alf2[Q5] - 1.5*alf2[Q7] - 6*alf2[Q8] + 1.5*alf2[Q10] + alf2[Q11] - alf2[Q13] + alf2[Q15] - alf2[Q16] + alf2[Q17] - alf2[Q18];
+                m[M16] = alpha[M01] - 2*alpha[M02] + 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] - 6*alpha[M08] + 1.5*alpha[M10] + alpha[M11] - alpha[M13] + alpha[M15] - alpha[M16] + alpha[M17] - alpha[M18];
 
-                q[Q13] = alf2[Q1] - 2*alf2[Q2] - 2*alf2[Q4] + 1.5*alf2[Q5] - 1.5*alf2[Q7] + 6*alf2[Q8] + 1.5*alf2[Q10] + alf2[Q11] - alf2[Q13] - alf2[Q15] + alf2[Q16] + alf2[Q17] - alf2[Q18];
+                m[M10] = alpha[M01] - 2*alpha[M02] - 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] + 6*alpha[M08] + 1.5*alpha[M10] + alpha[M11] - alpha[M13] - alpha[M15] + alpha[M16] + alpha[M17] - alpha[M18];
 
-                q[Q14] = alf2[Q1] + 2*alf2[Q2] - 2*alf2[Q4] + 1.5*alf2[Q5] - 1.5*alf2[Q7] - 6*alf2[Q8] + 1.5*alf2[Q10] - alf2[Q11] + alf2[Q13] - alf2[Q15] + alf2[Q16] + alf2[Q17] - alf2[Q18];
+                m[M15] = alpha[M01] + 2*alpha[M02] - 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] - 6*alpha[M08] + 1.5*alpha[M10] - alpha[M11] + alpha[M13] - alpha[M15] + alpha[M16] + alpha[M17] - alpha[M18];
 
-                q[Q15] = alf2[Q1] + 2*alf2[Q3] + 2*alf2[Q4] - 1.5*alf2[Q5] + 1.5*alf2[Q7] + 6*alf2[Q9] + 1.5*alf2[Q10] - alf2[Q12] + alf2[Q14] + alf2[Q15] + alf2[Q16] + alf2[Q17] + alf2[Q18];
+                m[M11] = alpha[M01] + 2*alpha[M03] + 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] + 6*alpha[M09] + 1.5*alpha[M10] - alpha[M12] + alpha[M14] + alpha[M15] + alpha[M16] + alpha[M17] + alpha[M18];
 
-                q[Q16] = alf2[Q1] - 2*alf2[Q3] + 2*alf2[Q4] - 1.5*alf2[Q5] + 1.5*alf2[Q7] - 6*alf2[Q9] + 1.5*alf2[Q10] + alf2[Q12] - alf2[Q14] + alf2[Q15] + alf2[Q16] + alf2[Q17] + alf2[Q18];
+                m[M18] = alpha[M01] - 2*alpha[M03] + 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] - 6*alpha[M09] + 1.5*alpha[M10] + alpha[M12] - alpha[M14] + alpha[M15] + alpha[M16] + alpha[M17] + alpha[M18];
 
-                q[Q17] = alf2[Q1] - 2*alf2[Q3] - 2*alf2[Q4] - 1.5*alf2[Q5] + 1.5*alf2[Q7] + 6*alf2[Q9] + 1.5*alf2[Q10] + alf2[Q12] - alf2[Q14] - alf2[Q15] - alf2[Q16] + alf2[Q17] + alf2[Q18];
+                m[M12] = alpha[M01] - 2*alpha[M03] - 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] + 6*alpha[M09] + 1.5*alpha[M10] + alpha[M12] - alpha[M14] - alpha[M15] - alpha[M16] + alpha[M17] + alpha[M18];
 
-                q[Q18] = alf2[Q1] + 2*alf2[Q3] - 2*alf2[Q4] - 1.5*alf2[Q5] + 1.5*alf2[Q7] - 6*alf2[Q9] + 1.5*alf2[Q10] - alf2[Q12] + alf2[Q14] - alf2[Q15] - alf2[Q16] + alf2[Q17] + alf2[Q18];
+                m[M17] = alpha[M01] + 2*alpha[M03] - 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] - 6*alpha[M09] + 1.5*alpha[M10] - alpha[M12] + alpha[M14] - alpha[M15] - alpha[M16] + alpha[M17] + alpha[M18];
 
 
-                AF::write(*this, q, i, j, k);
+
+
+                AF::write(*this, m, i, j, k);
 
             }
         }
@@ -133,152 +183,85 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
-void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>::moments(){
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::moments(){
 
     using QVecAcc = QVecAccess<T, QVecSize, MemoryLayout>;
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi j = 1; j <= yg1; j++) {
-
             for (tNi k = 1; k <= zg1; k++) {
-                
-                
-                QVecAcc qVec = Q[index(i, j, k)];
 
-    
-                QVec<T, QVecSize> alf1 = Q[index(i, j, k)];
 
-    
-            
-                
-                //the first position is simply the entire mass-vector (N] summed up
-                alf1[Q1] = qVec.q[ Q1] + qVec.q[ Q2] + qVec.q[ Q3] + qVec.q[ Q4] +
-                qVec.q[ Q5] + qVec.q[ Q6] + qVec.q[ Q7] + qVec.q[ Q8] +
-                qVec.q[ Q9] + qVec.q[Q10] + qVec.q[Q11] + qVec.q[Q12] +
-                qVec.q[Q13] + qVec.q[Q14] + qVec.q[Q15] + qVec.q[Q16] +
-                qVec.q[Q17] + qVec.q[Q18];
-                
-    //                if (alf1[1]<0.00001]  printf("alf1 %f\n", alf1[1]];
-                
-            
+                QVec<T, QVecSize> q = AF::read(*this, i, j, k);
+
+
+                QVec<T, QVecSize> m;
+
+                //the first position is simply the entire mass-vector (Q summed up)
+                m[M01] = q.q[Q01] + q.q[Q03] + q.q[Q02] + q.q[Q04] + q.q[Q05] + q.q[Q06] + q.q[Q07] + q.q[Q14] + q.q[Q08] + q.q[Q13] + q.q[Q09] + q.q[Q16] + q.q[Q10] + q.q[Q15] + q.q[Q11] + q.q[Q18] + q.q[Q12] + q.q[Q17];
+
+
                 //the second position is everything with an x-component
-                alf1[Q2] = qVec.q[ Q1] - qVec.q[ Q3] +
-                qVec.q[ Q7] - qVec.q[ Q8] -
-                qVec.q[ Q9] + qVec.q[Q10] + qVec.q[Q11] - qVec.q[Q12] -
-                qVec.q[Q13] + qVec.q[Q14];
-                
-                
+                m[M02] = q.q[Q01] - q.q[Q02] + q.q[Q07] - q.q[Q14] - q.q[Q08] + q.q[Q13] + q.q[Q09] - q.q[Q16] - q.q[Q10] + q.q[Q15];
+
+
                 //the third position is everything with an y-component
-                alf1[Q3] = qVec.q[ Q2] - qVec.q[ Q4] +
-                qVec.q[ Q7] + qVec.q[ Q8] -
-                qVec.q[ Q9] - qVec.q[Q10] + qVec.q[Q15] - qVec.q[Q16] -
-                qVec.q[Q17] + qVec.q[Q18];
-                
-                
+                m[M03] = q.q[Q03] - q.q[Q04] + q.q[Q07] + q.q[Q14] - q.q[Q08] - q.q[Q13] + q.q[Q11] - q.q[Q18] - q.q[Q12] + q.q[Q17];
+
+
                 //the fourth position is everything with a z-component
-                alf1[Q4] = qVec.q[ Q5] - qVec.q[ Q6] +
-                qVec.q[Q11] + qVec.q[Q12] -
-                qVec.q[Q13] - qVec.q[Q14] + qVec.q[Q15] + qVec.q[Q16] -
-                qVec.q[Q17] - qVec.q[Q18];
-                
-                
+                m[M04] = q.q[Q05] - q.q[Q06] + q.q[Q09] + q.q[Q16] - q.q[Q10] - q.q[Q15] + q.q[Q11] + q.q[Q18] - q.q[Q12] - q.q[Q17];
+
+
                 //starting from the fifth position, it gets more complicated in
                 //structure, but it still follows the article by Eggels and Somers
-                alf1[Q5] =  - qVec.q[ Q2] - qVec.q[ Q4] -
-                qVec.q[ Q5] - qVec.q[ Q6] + qVec.q[ Q7] + qVec.q[ Q8] +
-                qVec.q[ Q9] + qVec.q[Q10] + qVec.q[Q11] + qVec.q[Q12] +
-                qVec.q[Q13] + qVec.q[Q14];
-                
-                
-                alf1[Q6] = qVec.q[ Q7] - qVec.q[ Q8] +
-                qVec.q[ Q9] - qVec.q[Q10];
-                
-                alf1[Q7] =  - qVec.q[ Q1] - qVec.q[ Q3] -
-                qVec.q[ Q5] - qVec.q[ Q6] + qVec.q[ Q7] + qVec.q[ Q8] +
-                qVec.q[ Q9] + qVec.q[Q10] + qVec.q[Q15] + qVec.q[Q16] +
-                qVec.q[Q17] + qVec.q[Q18];
-                
-                alf1[Q8] = qVec.q[Q11] - qVec.q[Q12] +
-                qVec.q[Q13] - qVec.q[Q14];
-                
-                alf1[Q9] = qVec.q[Q15] - qVec.q[Q16] +
-                qVec.q[Q17] - qVec.q[Q18];
-                
-                alf1[Q10] =  - qVec.q[ Q1] - qVec.q[ Q2] - qVec.q[ Q3] - qVec.q[ Q4] +
-                qVec.q[Q11] + qVec.q[Q12] +
-                qVec.q[Q13] + qVec.q[Q14] + qVec.q[Q15] + qVec.q[Q16] +
-                qVec.q[Q17] + qVec.q[Q18];
-                
-                alf1[Q11] =  - qVec.q[ Q1] + qVec.q[ Q3] +
-                2 * qVec.q[ Q7] - 2 * qVec.q[ Q8] -
-                2 * qVec.q[ Q9] + 2 * qVec.q[Q10] - qVec.q[Q11] + qVec.q[Q12] +
-                qVec.q[Q13] - qVec.q[Q14];
-                
-                alf1[Q12] =  - qVec.q[ Q2] + qVec.q[ Q4] +
-                2 * qVec.q[ Q7] + 2 * qVec.q[ Q8] -
-                2 * qVec.q[ Q9] - 2 * qVec.q[Q10] -
-                qVec.q[Q15] + qVec.q[Q16] +
-                qVec.q[Q17] - qVec.q[Q18];
-                
-                alf1[Q13] =  - 3 * qVec.q[ Q1] + 3 * qVec.q[ Q3] +
-                3 * qVec.q[Q11] - 3 * qVec.q[Q12] -
-                3 * qVec.q[Q13] + 3 * qVec.q[Q14];
-                
-                alf1[Q14] =  - 3 * qVec.q[ Q2] + 3 * qVec.q[ Q4] +
-                3 * qVec.q[Q15] - 3 * qVec.q[Q16] -
-                3 * qVec.q[Q17] + 3 * qVec.q[Q18];
-                
-                alf1[Q15] =  - 2 * qVec.q[ Q5] + 2 * qVec.q[ Q6] +
-                qVec.q[Q11] + qVec.q[Q12] -
-                qVec.q[Q13] - qVec.q[Q14] + qVec.q[Q15] + qVec.q[Q16] -
-                qVec.q[Q17] - qVec.q[Q18];
-                
-                alf1[Q16] =  - 3 * qVec.q[Q11] - 3 * qVec.q[Q12] +
-                3 * qVec.q[Q13] + 3 * qVec.q[Q14] + 3 * qVec.q[Q15] +
-                3 * qVec.q[Q16] -
-                3 * qVec.q[Q17] - 3 * qVec.q[Q18];
-                
-                alf1[Q17] = 0.5 * (qVec.q[ Q1] + qVec.q[ Q2] + qVec.q[ Q3] + qVec.q[ Q4]) -
-                (qVec.q[ Q5] + qVec.q[ Q6] + qVec.q[ Q7] + qVec.q[ Q8] +
-                 qVec.q[ Q9] + qVec.q[Q10]) +
-                0.5 * (qVec.q[Q11] + qVec.q[Q12] +
-                       qVec.q[Q13] + qVec.q[Q14] + qVec.q[Q15] + qVec.q[Q16] +
-                       qVec.q[Q17] + qVec.q[Q18]);
-                
-                alf1[Q18] = 1.5 * (qVec.q[ Q1] - qVec.q[ Q2] + qVec.q[ Q3] - qVec.q[ Q4]) -
-                1.5 * (qVec.q[Q11] + qVec.q[Q12] +
-                       qVec.q[Q13] + qVec.q[Q14]) +
-                1.5 * (qVec.q[Q15] + qVec.q[Q16] +
-                       qVec.q[Q17] + qVec.q[Q18]);
-                
+                m[M05] =  - q.q[Q03] - q.q[Q04] - q.q[Q05] - q.q[Q06] + q.q[Q07] + q.q[Q14] + q.q[Q08] + q.q[Q13] + q.q[Q09] + q.q[Q16] + q.q[Q10] + q.q[Q15];
 
-                for (int l=Q1; l<=Q18; l++){
-                    Q[index(i,j,k)].q[l] = alf1[ l ];
-                }
 
-                
-                
-//                for (int l=1; l<=18; l++){
-//                    Q[index(i,j,k)].q[l] = alf1[ l ];
+                m[M06] = q.q[Q07] - q.q[Q14] + q.q[Q08] - q.q[Q13];
+
+                m[M07] =  - q.q[Q01] - q.q[Q02] - q.q[Q05] - q.q[Q06] + q.q[Q07] + q.q[Q14] + q.q[Q08] + q.q[Q13] + q.q[Q11] + q.q[Q18] + q.q[Q12] + q.q[Q17];
+
+                m[M08] = q.q[Q09] - q.q[Q16] + q.q[Q10] - q.q[Q15];
+
+                m[M09] = q.q[Q11] - q.q[Q18] + q.q[Q12] - q.q[Q17];
+
+                m[M10] =  - q.q[Q01] - q.q[Q03] - q.q[Q02] - q.q[Q04] + q.q[Q09] + q.q[Q16] + q.q[Q10] + q.q[Q15] + q.q[Q11] + q.q[Q18] + q.q[Q12] + q.q[Q17];
+
+                m[M11] =  - q.q[Q01] + q.q[Q02] + 2*q.q[Q07] - 2*q.q[Q14] - 2*q.q[Q08] + 2*q.q[Q13] - q.q[Q09] + q.q[Q16] + q.q[Q10] - q.q[Q15];
+
+                m[M12] =  - q.q[Q03] + q.q[Q04] + 2*q.q[Q07] + 2*q.q[Q14] - 2*q.q[Q08] - 2*q.q[Q13] - q.q[Q11] + q.q[Q18] + q.q[Q12] - q.q[Q17];
+
+                m[M13] =  - 3*q.q[Q01] + 3*q.q[Q02] + 3*q.q[Q09] - 3* q.q[Q16] - 3*q.q[Q10] + 3*q.q[Q15];
+
+                m[M14] =  - 3*q.q[Q03] + 3*q.q[Q04] + 3*q.q[Q11] - 3*q.q[Q18] - 3*q.q[Q12] + 3*q.q[Q17];
+
+                m[M15] =  - 2*q.q[Q05] + 2*q.q[Q06] + q.q[Q09] + q.q[Q16] - q.q[Q10] - q.q[Q15] + q.q[Q11] + q.q[Q18] - q.q[Q12] - q.q[Q17];
+
+                m[M16] =  - 3*q.q[Q09] - 3*q.q[Q16] + 3*q.q[Q10] + 3*q.q[Q15] + 3*q.q[Q11] + 3*q.q[Q18] - 3*q.q[Q12] - 3*q.q[Q17];
+
+                m[M17] = 0.5*q.q[Q01] + 0.5*q.q[Q03] + 0.5*q.q[Q02] + 0.5*q.q[Q04] - q.q[Q05] - q.q[Q06] - q.q[Q07] - q.q[Q14] - q.q[Q08] - q.q[Q13] + 0.5*q.q[Q09] + 0.5*q.q[Q16] + 0.5*q.q[Q10] + 0.5*q.q[Q15] + 0.5*q.q[Q11] + 0.5*q.q[Q18] + 0.5*q.q[Q12] + 0.5*q.q[Q17];
+
+                m[M18] = 1.5*q.q[Q01] - 1.5*q.q[Q03] + 1.5*q.q[Q02] - 1.5*q.q[Q04] - 1.5*q.q[Q09] - 1.5* q.q[Q16] - 1.5* q.q[Q10] - 1.5* q.q[Q15] + 1.5*q.q[Q11] + 1.5*q.q[Q18] + 1.5*q.q[Q12] + 1.5*q.q[Q17];
+
+                AF::writeMoments(*this, m, i, j, k);
+//                if (i==2 && j==1 && k==1){
+//                    if (q.q[ 1] < 0.00001) {
+//                        printf("Moments %li %li %li     ", i, j, k);
+//                        for (int l=0; l<N; l++){
+//                            printf("% 1.4E ", qVec.q[l]);
+//                        }
+//                        printf("\n");
+//                    }
 //                }
-                
-                
-                /*
-                if (i==2 && j==1 && k==1]{
-                    //if (qVec.q[ 1] < 0.00001] {
-                    printf("Moments %li %li %li     ", i,j,k];
-                    for (int l=0; l<Q; l++]{
-                        printf("% 1.4E ", qVec.q[l]];
-                    }
-                    printf("\n"];
-                }
-                */
-                
-            }}}//endfor i,j,k
+            }
+        }
+    }
 
-    
-    
+
+
 }//end of func
 
 

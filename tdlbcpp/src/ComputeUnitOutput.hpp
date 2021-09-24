@@ -13,84 +13,52 @@
 
 #include "ComputeUnit.h"
 #include "DiskOutputTree.h"
-
+#include "Params/BinFile.hpp"
 
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::calcVorticityXZ(tNi j, RunningParams runParam){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints){
 
-
-    T *Vort = new T[size];
-    bool minInitialized = false, maxInitialized = false;
-    T max = 0, min = 0;
-
-    for (tNi i = 1;  i <= xg1; i++) {
-
-        for (tNi k = 1; k <= zg1; k++) {
-
-
-            if (excludeGeomPoints[index(i,j,k)] == true) continue;
-
-
-            //              T uxx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().x - Q[dirnQ2(i, j, k)].velocity().x);
-            T uxy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().x - Q[dirnQ6(i, j, k)].velocity().x);
-            T uxz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().x - Q[dirnQ4(i, j, k)].velocity().x);
-
-            T uyx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().y - Q[dirnQ2(i, j, k)].velocity().y);
-            //              T uyy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().y - Q[dirnQ6(i, j, k)].velocity().y);
-            T uyz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().y - Q[dirnQ4(i, j, k)].velocity().y);
-
-
-            T uzx = T(0.5) * (Q[dirnQ1(i, j, k)].velocity().z - Q[dirnQ2(i, j, k)].velocity().z);
-            T uzy = T(0.5) * (Q[dirnQ5(i, j, k)].velocity().z - Q[dirnQ6(i, j, k)].velocity().z);
-            //              T uzz = T(0.5) * (Q[dirnQ3(i, j, k)].velocity().z - Q[dirnQ4(i, j, k)].velocity().z);
-
-
-            T uxyuyx = uxy - uyx;
-            T uyzuzy = uyz - uzy;
-            T uzxuxz = uzx - uxz;
-
-            Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
-
-            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!minInitialized || Vort[index(i,j,k)] < min)) {
-                min = Vort[index(i,j,k)];
-                minInitialized = true;
-            }
-            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!maxInitialized || Vort[index(i,j,k)] > max)) {
-                max = Vort[index(i,j,k)];
-                maxInitialized = true;
-            }
-        }
+    for (auto &p: geomPoints){
+        ExcludeOutputPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
     }
+}
 
-    // Saving JPEG
-    auto *pict = new unsigned char[xg1 * zg1];
-    std::cerr << "min: " << min << ", max: " << max << std::endl;
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints){
 
-    for (tNi i = 1;  i <= xg1; i++) {
-        for (tNi k = 1; k <= zg1; k++) {
-            pict[zg1 * (i - 1)+ (k - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
-        }
+    for (auto &p: geomPoints){
+        ExcludeOutputPoints[indexPlusGhost(p.i, p.j, p.k)] = true;
     }
-    std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, j);
-    outputTree.createDir(plotDir);
-    std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
-
-    TooJpeg::openJpeg(jpegPath);
-    TooJpeg::writeJpeg(pict, xg1, zg1,
-                       false, 90, false, "Debug");
-    TooJpeg::closeJpeg();
-
 }
 
 
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::unsetOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints){
+
+    for (auto &p: geomPoints){
+        ExcludeOutputPoints[indexPlusGhost(p.i, p.j, p.k)] = false;
+    }
+}
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams output, tStep step)
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::unsetOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints){
+
+    for (auto &p: geomPoints){
+        ExcludeOutputPoints[indexPlusGhost(p.i, p.j, p.k)] = false;
+    }
+}
+
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams output, RunningParams running)
 {
     bool hasOutput = false;
+    tStep step = running.step;
+
 
     for (auto xy: output.XY_planes){
 
@@ -128,18 +96,197 @@ bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams ou
 }
 
 
+
+
+static inline std::string formatStep(tStep step){
+
+    std::stringstream sstream;
+
+    sstream << std::setw(8) << std::setfill('0') << patch::to_string(step);
+
+    return sstream.str();
+}
+
+
+
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXZ(tNi j, RunningParams runParam){
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+
+    T *Vort = new T[size];
+    bool minInitialized = false, maxInitialized = false;
+    T max = 0, min = 0;
+
+    for (tNi i = 1;  i <= xg1; i++) {
+
+        for (tNi k = 1; k <= zg1; k++) {
+
+
+            if (ExcludeOutputPoints[index(i,j,k)] == true) continue;
+
+
+            QVec<T, QVecSize> qDirnQ05 = AF::read(*this, i, j, k + 1);
+            QVec<T, QVecSize> qDirnQ06 = AF::read(*this, i, j, k - 1);
+            T uxy = T(0.5) * (qDirnQ05.velocity().x - qDirnQ06.velocity().x);
+            QVec<T, QVecSize> qDirnQ03 = AF::read(*this, i, j + 1, k);
+            QVec<T, QVecSize> qDirnQ04 = AF::read(*this, i, j - 1, k);
+            T uxz = T(0.5) * (qDirnQ03.velocity().x - qDirnQ04.velocity().x);
+
+            QVec<T, QVecSize> qDirnQ01 = AF::read(*this, i + 1, j, k);
+            QVec<T, QVecSize> qDirnQ02 = AF::read(*this, i - 1, j, k);
+            T uyx = T(0.5) * (qDirnQ01.velocity().y - qDirnQ02.velocity().y);
+            T uyz = T(0.5) * (qDirnQ03.velocity().y - qDirnQ04.velocity().y);
+
+
+            T uzx = T(0.5) * (qDirnQ01.velocity().z - qDirnQ02.velocity().z);
+            T uzy = T(0.5) * (qDirnQ05.velocity().z - qDirnQ06.velocity().z);
+
+
+            T uxyuyx = uxy - uyx;
+            T uyzuzy = uyz - uzy;
+            T uzxuxz = uzx - uxz;
+
+            Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
+
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!minInitialized || Vort[index(i,j,k)] < min)) {
+                min = Vort[index(i,j,k)];
+                minInitialized = true;
+            }
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!maxInitialized || Vort[index(i,j,k)] > max)) {
+                max = Vort[index(i,j,k)];
+                maxInitialized = true;
+            }
+        }
+    }
+
+    // Saving JPEG
+    auto *pict = new unsigned char[xg1 * zg1];
+
+
+    //Set at min max on step 74, for nx=80, slowstart=200
+    //TODO: Fix
+//    min = -25.5539;
+//    max = -0.681309;
+
+
+
+    for (tNi i = 1;  i <= xg1; i++) {
+        for (tNi k = 1; k <= zg1; k++) {
+            pict[zg1 * (i - 1) + (k - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+        }
+    }
+    std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, j);
+    outputTree.createDir(plotDir);
+//    std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
+    std::string jpegPath = "vort.xz." + formatStep(runParam.step) + ".jpeg";
+
+
+    TooJpeg::openJpeg(jpegPath);
+    TooJpeg::writeJpeg(pict, xg1, zg1,
+                       false, 90, false, "Debug");
+    TooJpeg::closeJpeg();
+
+}
+
+
+
+
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXY(tNi k, RunningParams runParam){
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+
+    T *Vort = new T[size];
+    bool minInitialized = false, maxInitialized = false;
+    T max = 0, min = 0;
+
+
+    for (tNi i = 1; i <= xg1; i++) {
+        for (tNi j = 1;  j <= yg1; j++) {
+
+
+            if (ExcludeOutputPoints[index(i,j,k)] == true) continue;
+
+
+            QVec<T, QVecSize> qDirnQ05 = AF::read(*this, i, j, k + 1);
+            QVec<T, QVecSize> qDirnQ06 = AF::read(*this, i, j, k - 1);
+            T uxy = T(0.5) * (qDirnQ05.velocity().x - qDirnQ06.velocity().x);
+            QVec<T, QVecSize> qDirnQ03 = AF::read(*this, i, j + 1, k);
+            QVec<T, QVecSize> qDirnQ04 = AF::read(*this, i, j - 1, k);
+            T uxz = T(0.5) * (qDirnQ03.velocity().x - qDirnQ04.velocity().x);
+
+            QVec<T, QVecSize> qDirnQ01 = AF::read(*this, i + 1, j, k);
+            QVec<T, QVecSize> qDirnQ02 = AF::read(*this, i - 1, j, k);
+            T uyx = T(0.5) * (qDirnQ01.velocity().y - qDirnQ02.velocity().y);
+            T uyz = T(0.5) * (qDirnQ03.velocity().y - qDirnQ04.velocity().y);
+
+
+            T uzx = T(0.5) * (qDirnQ01.velocity().z - qDirnQ02.velocity().z);
+            T uzy = T(0.5) * (qDirnQ05.velocity().z - qDirnQ06.velocity().z);
+
+
+
+            T uxyuyx = uxy - uyx;
+            T uyzuzy = uyz - uzy;
+            T uzxuxz = uzx - uxz;
+
+            Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
+
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!minInitialized || Vort[index(i,j,k)] < min)) {
+                min = Vort[index(i,j,k)];
+                minInitialized = true;
+            }
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!maxInitialized || Vort[index(i,j,k)] > max)) {
+                max = Vort[index(i,j,k)];
+                maxInitialized = true;
+            }
+        }
+    }
+
+    // Saving JPEG
+    auto *pict = new unsigned char[xg1 * zg1];
+
+    //Set at min max on step 74, for nx=80, slowstart=200
+    //TODO: DEBUG
+    //    min = -25.5539;
+    //    max = -0.681309;
+
+
+
+    for (tNi i = 1;  i <= xg1; i++) {
+        for (tNi j = 1; j <= yg1; j++) {
+            pict[yg1 * (j - 1) + (i - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+        }
+    }
+//    std::string plotDir = outputTree.formatXYPlaneDir(runParam.step, k);
+//    outputTree.createDir(plotDir);
+    //    std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
+    std::string jpegPath = "vort.xy." + formatStep(runParam.step) + ".jpeg";
+
+
+    TooJpeg::openJpeg(jpegPath);
+    TooJpeg::writeJpeg(pict, xg1, yg1,
+                       false, 90, false, "Debug");
+    TooJpeg::closeJpeg();
+
+}
+
+
+
+
+
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams running)
 {
 
-    if (!hasOutputAtStep(output, running.step)) return;
+    if (!hasOutputAtStep(output, running)) return;
 
 
-    std::vector<Pos3d<int>> excludeRotating = geom.getRotatingExcludePoints(running.angle);
+//    for (auto &p: excludeRotating){
+//        ExcludeOutputPoints[index(p.i, p.j, p.k)] = 1;
+//    }
 
-    for (auto &p: excludeRotating){
-        excludeGeomPoints[index(p.i, p.j, p.k)] = 1;
-    }
 
 
 //    for (auto xy: output.XY_planes){
@@ -182,16 +329,111 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
 
 
 
+//
+//
+//
+//    //REMOVE THE ROTATING POINTS.
+//    // FIXME: this might remove points from the hub!!!
+//    for (auto &p: excludeRotating){
+//        ExcludeOutputPoints[index(p.i, p.j, p.k)] = 0;
+//    }
 
 
 
-    //REMOVE THE ROTATING POINTS.
-    //TODO TOFIX, this might remove points from the hub!!!
-    for (auto &p: excludeRotating){
-        excludeGeomPoints[index(p.i, p.j, p.k)] = 0;
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+template <typename tDiskPrecision, int tDiskSize>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::savePlaneXZ(OrthoPlane plane, BinFileParams binFormat, RunningParams runParam){
+
+
+    tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg * zg];
+
+    tDiskGrid<tDiskPrecision, 3> *F3outputBuffer = new tDiskGrid<tDiskPrecision, 3>[xg*zg];
+
+
+    long int qVecBufferLen = 0;
+    long int F3BufferLen = 0;
+    for (tNi i=1; i<=xg1; i++){
+        tNi j = plane.cutAt;
+        for (tNi k=1; k<=zg1; k++){
+
+            if (ExcludeOutputPoints[index(i,j,k)] == true) continue;
+
+
+            tDiskGrid<tDiskPrecision, tDiskSize> tmp;
+
+            //Set position with absolute value
+            tmp.iGrid = uint16_t(i0 + i - 1);
+            tmp.jGrid = uint16_t(j      - 1);
+            tmp.kGrid = uint16_t(k0 + k - 1);
+
+#pragma unroll
+            for (int l=0; l<tDiskSize; l++){
+                tmp.q[l] = Q[index(i,j,k)].q[l];
+            }
+            outputBuffer[qVecBufferLen] = tmp;
+            qVecBufferLen++;
+
+
+            if (F[index(i,j,k)].isNotZero()) {
+
+                tDiskGrid<tDiskPrecision, 3> tmp;
+
+                //Set position with absolute value
+                tmp.iGrid = uint16_t(i0 + i - 1);
+                tmp.jGrid = uint16_t(j);
+                tmp.kGrid = uint16_t(k0 + k - 1);
+
+                tmp.q[0] = F[index(i,j,k)].x;
+                tmp.q[1] = F[index(i,j,k)].y;
+                tmp.q[2] = F[index(i,j,k)].z;
+
+                F3outputBuffer[F3BufferLen] = tmp;
+                F3BufferLen++;
+            }
+
+
+        }
     }
 
 
+    std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, plane.cutAt);
+    outputTree.createDir(plotDir);
+
+
+    binFormat.filePath = outputTree.formatQVecBinFileNamePath(plotDir);
+    binFormat.binFileSizeInStructs = qVecBufferLen;
+
+
+
+
+    std::cout<< "Writing output to: " << binFormat.filePath <<std::endl;
+
+
+    outputTree.writeAllParamsJson(binFormat, runParam);
+
+
+    FILE *fp = fopen(binFormat.filePath.c_str(), "wb");
+    fwrite(outputBuffer, sizeof(tDiskGrid<tDiskPrecision, tDiskSize>), qVecBufferLen, fp);
+    fclose(fp);
+
+
+
+    //======================
+    binFormat.QOutputLength = 3;
+    binFormat.binFileSizeInStructs = F3BufferLen;
+    binFormat.filePath = outputTree.formatF3BinFileNamePath(plotDir);
+    outputTree.writeAllParamsJson(binFormat, runParam);
+
+
+    FILE *fpF3 = fopen(binFormat.filePath.c_str(), "wb");
+    fwrite(F3outputBuffer, sizeof(tDiskGrid<tDiskPrecision, 3>), F3BufferLen, fpF3);
+    fclose(fpF3);
+
+
+    delete[] outputBuffer;
+    delete[] F3outputBuffer;
 
 }
 

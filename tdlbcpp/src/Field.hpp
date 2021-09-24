@@ -1,3 +1,11 @@
+#if WITH_GPU
+#include <cuda_runtime.h>
+
+// Utilities and system includes
+#include <helper_cuda.h>  // helper function CUDA error checking and initialization
+#include <helper_functions.h>  // helper for shared functions common to CUDA Samples
+#endif
+
 #include "Header.h"
 #include "QVec.hpp"
 
@@ -83,7 +91,7 @@ struct FieldBase
     using QVecAcc = QVecAccess<T, QVecSize, MemoryLayout>;
 
     bool allocated;
-    T *q;
+    T * __restrict__ q;
     size_t qVectorNumber;
     size_t qSize;
 
@@ -107,6 +115,10 @@ struct FieldBase
         qSize = vectorNumber * QVecSize;
         q = new T[qSize];
         allocated = true;
+
+#if WITH_GPU
+        checkCudaErrors(cudaMalloc((void **)&q, sizeof(T) * qSize);
+#endif
     }
 
     inline QVecAcc operator[](tNi index)

@@ -9,6 +9,13 @@
 
 #include <iostream>
 #include <cerrno>
+
+#if WITH_GPU
+#include <cuda_runtime.h>
+#include <helper_cuda.h>
+#include <helper_functions.h>
+#endif
+
 #include "Tools/toojpeg.h"
 
 #include "ComputeUnit.h"
@@ -20,6 +27,10 @@
 //ComputeUnit<T, QVecSize>::ComputeUnit(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams, bool allocateMemory) {
+
+    nodeID = cuParams.nodeID;
+    deviceID = cuParams.deviceID;
+
     idi = cuParams.idi;
     idj = cuParams.idj;
     idk = cuParams.idk;
@@ -58,53 +69,99 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
 
         Q.allocate(size);
 
+#ifdef WITH_CPU
         delete[] F;
         delete[] Nu;
         delete[] O;
-        delete[] excludeGeomPoints;
+        delete[] ExcludeOutputPoints;
+#endif
+#if WITH_GPU
+        delete[] F;
+        checkCudaErrors(cudaFree(devF));
+        checkCudaErrors(cudaFree(Nu));
+        checkCudaErrors(cudaFree(O));
+        delete[] ExcludeOutputPoints;
+#endif
+#if WITH_GPU_MEMSHARED == 1
+        checkCudaErrors(cudaFree(F));
+        checkCudaErrors(cudaFree(Nu));
+        checkCudaErrors(cudaFree(O));
+        delete[] ExcludeOutputPoints;
+#endif
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
+        checkCudaErrors(cudaSetDevice(deviceID));
 
+        cudaDeviceProp prop;
+        cudaGetDeviceProperties(&prop, deviceID);
+
+        unsigned long long memRequired = size * (sizeof(T) * QVecSize + sizeof(Force<T>) + sizeof(T) + sizeof(bool) + sizeof(bool));
+
+        if (memRequired > prop.totalGlobalMem){
+            std::cout << "Cannot allocate device on GPU." << std::endl;
+            exit(1);
+        }
+#endif
+
+#ifdef WITH_CPU
         F = new Force<T>[size];
         Nu = new T[size];
         O = new bool[size];
-        excludeGeomPoints = new bool[size];
-    }
-
-#if WITH_GPU == 1
-    checkCudaErrors(cudaSetDevice(0));
-
-    cudaDeviceProp prop;
-    cudaGetDeviceProperties(&prop, 0);
-
-    unsigned long long GPUmem = prop.totalGlobalMem;
-
-    if (((sizeof(QVec<T, QVecSize>) + sizeof(Force<T>) + sizeof(T)) * size) > GPUmem){
-        std::cout << "Cannot allocate device on GPU." << std::endl;
-        exit(1);
-    }
-
-    checkCudaErrors(cudaMalloc((void **)&devN, sizeof(QVec<T, QVecSize>) * size));
-    checkCudaErrors(cudaMalloc((void **)&devF, sizeof(Force<T>) * size));
-    checkCudaErrors(cudaMalloc((void **)&devNu, sizeof(T) * size));
-
-    int threads_per_warp = 32;
-    int max_threads_per_block = 512;
-
-    int xthreads_per_block = 8;
-    int ythreads_per_block = 8;
-    int zthreads_per_block = 8;
-
-    threadsPerBlock = dim3(xthreads_per_block, ythreads_per_block, zthreads_per_block);
-
-    int block_in_x_dirn = xg / threadsPerBlock.x + (xg % xthreads_per_block != 0);
-    int block_in_y_dirn = zg / threadsPerBlock.y + (yg % ythreads_per_block != 0);
-    int block_in_z_dirn = zg / threadsPerBlock.z + (zg % zthreads_per_block != 0);
-
-    numBlocks = dim3(block_in_x_dirn, block_in_y_dirn, block_in_z_dirn);
-
-    std::cout << "threads_per_block" << threadsPerBlock.x << ", " << threadsPerBlock.y << ", " << threadsPerBlock.z << std::endl;
-    std::cout << "numBlocks" << numBlocks.x << ", " << numBlocks.y << ", " << numBlocks.z << std::endl;
+        ExcludeOutputPoints = new bool[size];
 #endif
+
+#if WITH_GPU
+        F = new Force<T>[size];
+        checkCudaErrors(cudaMalloc((void **)&devF, sizeof(Force<T>) * size));
+        checkCudaErrors(cudaMalloc((void **)&Nu, sizeof(T) * size));
+        checkCudaErrors(cudaMalloc((void **)&O, sizeof(T) * size));
+        ExcludeOutputPoints = new bool[size];
+#endif
+
+#if WITH_GPU_MEMSHARED == 1
+        F = new Force<T>[size];
+
+        checkCudaErrors(cudaHostAlloc((void **)&devF, sizeof(T) * size, cudaHostAllocMapped));
+        checkCudaErrors(cudaHostGetDevicePointer((void **)&devF, (void *)F, 0));
+
+        checkCudaErrors(cudaHostAlloc((void **)&O, sizeof(T) * size, cudaHostAllocMapped));
+        checkCudaErrors(cudaHostGetDevicePointer((void **)&O, (void *)F, 0));
+
+        checkCudaErrors(cudaHostAlloc((void **)&Nu, sizeof(T) * size, cudaHostAllocMapped));
+        checkCudaErrors(cudaHostGetDevicePointer((void **)&Nu, (void *)F, 0));
+
+        ExcludeOutputPoints = new bool[size];
+#endif
+
+
+
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
+        int threads_per_warp = 32;
+        int max_threads_per_block = 512;
+    
+        int xthreads_per_block = 8;
+        int ythreads_per_block = 8;
+        int zthreads_per_block = 8;
+
+        threadsPerBlock = dim3(xthreads_per_block, ythreads_per_block, zthreads_per_block);
+
+        int block_in_x_dirn = xg / threadsPerBlock.x + (xg % xthreads_per_block != 0);
+        int block_in_y_dirn = zg / threadsPerBlock.y + (yg % ythreads_per_block != 0);
+        int block_in_z_dirn = zg / threadsPerBlock.z + (zg % zthreads_per_block != 0);
+
+        numBlocks = dim3(block_in_x_dirn, block_in_y_dirn, block_in_z_dirn);
+
+        std::cout << "threads_per_block" << threadsPerBlock.x << ", " << threadsPerBlock.y << ", " << threadsPerBlock.z << std::endl;
+        std::cout << "numBlocks" << numBlocks.x << ", " << numBlocks.y << ", " << numBlocks.z << std::endl;
+#endif
+    }
+    size = new_size;
+
+    evenStep = true;
 }
+
+
+
+
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, bool allocateMemory):
@@ -112,27 +169,25 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cu
     F = nullptr;
     O = nullptr;
     Nu = nullptr;
-    excludeGeomPoints = nullptr;
+    ExcludeOutputPoints = nullptr;
     init(cuParams, allocateMemory);
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rhs) noexcept: 
-    idi(rhs.idi), idj(rhs.idj), idk(rhs.idk), mpiRank(rhs.mpiRank),
+    idi(rhs.idi), idj(rhs.idj), idk(rhs.idk), nodeID(rhs.nodeID), deviceID(rhs.deviceID),
     x(rhs.x), y(rhs.y), z(rhs.z), i0(rhs.i0), j0(rhs.j0), k0(rhs.k0), xg(rhs.xg), yg(rhs.yg), zg(rhs.zg), xg0(rhs.xg0), yg0(rhs.yg0), zg0(rhs.zg0), xg1(rhs.xg1), yg1(rhs.yg1), zg1(rhs.zg1),
-    ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), excludeGeomPoints(rhs.excludeGeomPoints),
-    outputTree(rhs.outputTree)
-#if WITH_GPU == 1
+    ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), ExcludeOutputPoints(rhs.ExcludeOutputPoints),
+    outputTree(rhs.outputTree), evenStep(rhs.evenStep)
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
     , devF(rhs.devF), devN(rhs.devN), devNu(rhs.debNu), threadsPerBlock(rhs.threadsPerBlock), numBlocks(rhs.numBlocks)
 #endif
 {
     rhs.O = nullptr;
     rhs.Nu = nullptr;
     rhs.F = nullptr;
-    rhs.excludeGeomPoints = nullptr;
-#if WITH_GPU == 1
-    rhs.devN = nullptr;
-    rhs.devNu = nullptr;
+    rhs.ExcludeOutputPoints = nullptr;
+#if WITH_GPU
     rhs.devF = nullptr;
 #endif
 }
@@ -142,13 +197,18 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rh
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::~ComputeUnitBase()
 {
-#if WITH_GPU == 1
-    if (devN != nullptr) {
-        checkCudaErrors(cudaSetDevice(0));
-        checkCudaErrors(cudaFree(devN));
-        checkCudaErrors(cudaFree(devF));
-        checkCudaErrors(cudaFree(devNu));
-    }
+#if WITH_GPU
+    checkCudaErrors(cudaSetDevice(deviceID));
+    checkCudaErrors(cudaFree(F));
+    checkCudaErrors(cudaFree(devF));
+    checkCudaErrors(cudaFree(Nu));
+    checkCudaErrors(cudaFree(O));
+#endif
+#if WITH_GPU_MEMSHARED == 1
+        checkCudaErrors(cudaSetDevice(deviceID));
+        checkCudaErrors(cudaFree(F));
+        checkCudaErrors(cudaFree(Nu));
+        checkCudaErrors(cudaFree(O));
 #endif
 }
 
@@ -156,9 +216,7 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::~ComputeUnitBase()
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
-#if WITH_GPU == 1
-    setToZero<<<numBlocks, threadsPerBlock>>>(devN, devF, xg, yg, zg, QVecSize);
-#else
+
     for (tNi i=0; i<=xg0; i++){
         for (tNi j=0; j<=yg0; j++){
             for (tNi k=0; k<=zg0; k++){
@@ -167,35 +225,45 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
             }
         }
     }
-#endif
 };
+
+
+
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
 
+#ifdef WITH_CPU
     for (tNi i=0; i<=xg0; i++){
         for (tNi j=0; j<=yg0; j++){
             for (tNi k=0; k<=zg0; k++){
 
-                Q[index(i, j, k)].initialise(initialRho);
+                Q[index(i, j, k)].initialiseRho(initialRho, 0.0);
                 F[index(i, j, k)].setToZero();
                 Nu[index(i, j, k)] = 0.0;
                 O[index(i, j, k)] = false;
 
-                excludeGeomPoints[index(i,j,k)] = false;
+                ExcludeOutputPoints[index(i,j,k)] = false;
             }
         }
     }
-};
+#endif
+#if WITH_GPU || WITH_GPU_SHAREDMEM == 1
 
-
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialiseExcludePoints(std::vector<Pos3d<int>> exclude){
-
-    for(auto p: exclude){
-        excludeGeomPoints[index(p.i, p.j, p.k)] = true;
+    setQToZero<<< numBlocks, threadsPerBlock >>>();
+    setRhoTo(flow.initialRho)<<< numBlocks, threadsPerBlock >>>();
+    setForceToZero<<< numBlocks, threadsPerBlock >>>();
+    if (flow.useLES){
+        setNuToZero<<< numBlocks, threadsPerBlock >>>();
     }
+    setOToZero<<< numBlocks, threadsPerBlock >>>();
+
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+#endif
 };
+
+
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocity(tNi i, tNi j, tNi k){
@@ -214,7 +282,7 @@ Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocitySparseF(tNi i
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_read(std::string filePath){
 
-    std::cout << "Node " << mpiRank << " Load " << filePath << std::endl;
+    std::cout << "Node " << nodeID << " Load " << filePath << std::endl;
 
     return fopen(filePath.c_str(), "r");
 }
@@ -222,7 +290,7 @@ FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_read(std::string filePat
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_write(std::string filePath){
 
-    std::cout << "Node " << mpiRank << " Save " << filePath << std::endl;
+    std::cout << "Node " << nodeID << " Save " << filePath << std::endl;
 
     return fopen(filePath.c_str(), "w");
 }
@@ -246,7 +314,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
 
     RunningParams running;
 
-    std::cout << "Node " << mpiRank << " Load " << (outputTree.getAllParamsFilePath(dirname, unit_name) + ".json") << std::endl;
+    std::cout << "Node " << nodeID << " Load " << (outputTree.getAllParamsFilePath(dirname, unit_name) + ".json") << std::endl;
     outputTree.readAllParamsJson(outputTree.getAllParamsFilePath(dirname, unit_name) + ".json", binFormat, running);
     flow = outputTree.getFlowParams<T>();
     init(outputTree.getComputeUnitParams());
@@ -300,7 +368,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_write(std::string un
     binFormat.QDataType = "none";
     binFormat.QOutputLength = QVecSize;
 
-    std::cout << "Node " << mpiRank << " Save " << (binFormat.filePath + ".json") << std::endl;
+    std::cout << "Node " << nodeID << " Save " << (binFormat.filePath + ".json") << std::endl;
     outputTree.setRunningParams(run);
     outputTree.writeAllParamsJson(binFormat, run);
     
@@ -347,18 +415,33 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::index(tNi i, tNi j, tNi k
     return i * (yg * zg) + (j * zg) + k;
 }
 
+
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::index(int i, int j, int k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexPlusGhost(tNi i, tNi j, tNi k)
 {
-    return index(tNi(i), tNi(j), tNi(k));
+#ifdef DEBUG
+    if (((i + ghost)>=xg) || ((j + ghost)>=yg) || ((k + ghost)>=zg)) {
+        std::cout << "Index Error  " << i <<" "<< xg <<" "<< j <<" "<< yg <<" "<< k <<" "<< zg << std::endl;
+        exit(1);
+    }
+#endif
+    return (i + ghost) * (yg * zg) + ((j + ghost) * zg) + (k + ghost);
 }
+
+
+
+
+
+
+
+
 
 
 
 //NO DIRECTION
 // 0  0  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ000(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ00(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + k;
 }
@@ -367,7 +450,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ000(tNi i, tNi j, tN
 //RIGHT DIRECTION
 // +1  0  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ1(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ01(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + (j * zg) + k;
 }
@@ -376,7 +459,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ1(tNi i, tNi j, tNi 
 //LEFT DIRECTION
 // -1  0  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ2(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ02(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + (j * zg) + k;
 }
@@ -385,7 +468,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ2(tNi i, tNi j, tNi 
 //UP DIRECTION
 //  0 +1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ3(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ03(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j + 1) * zg) + k;
 }
@@ -394,7 +477,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ3(tNi i, tNi j, tNi 
 //DOWN DIRECTION
 //  0 -1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ4(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ04(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j - 1) * zg) + k;
 }
@@ -403,7 +486,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ4(tNi i, tNi j, tNi 
 //BACKWARD DIRECTION
 //  0  0 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ5(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ05(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + (k + 1);
 }
@@ -412,7 +495,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ5(tNi i, tNi j, tNi 
 //FORWARD DIRECTION
 //  0  0 -1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ6(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ06(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + (j * zg) + (k - 1);
 }
@@ -421,7 +504,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ6(tNi i, tNi j, tNi 
 //RIGHT_UP DIRECTION
 // +1 +1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ7(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ07(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + ((j + 1) * zg) + k;
 }
@@ -430,7 +513,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ7(tNi i, tNi j, tNi 
 //LEFT_DOWN DIRECTION
 // -1 -1  0
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ8(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ08(tNi i, tNi j, tNi k)
 {
     return ((i - 1) * yg * zg) + ((j - 1) * zg) + k;
 }
@@ -439,7 +522,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ8(tNi i, tNi j, tNi 
 //RIGHT_BACKWARD DIRECTION
 // +1  0 +1
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ9(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ09(tNi i, tNi j, tNi k)
 {
     return ((i + 1) * yg * zg) + (j * zg) + (k + 1);
 }
