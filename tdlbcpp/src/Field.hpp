@@ -98,11 +98,20 @@ struct FieldBase
     FieldBase()
     {
         q = 0;
+        allocated = false;
+        qVectorNumber = 0;
+        qSize = 0;
     }
 
     FieldBase(FieldBase&) = delete;
     FieldBase(FieldBase&& rhs) noexcept : allocated(false), q(rhs.q), qVectorNumber(rhs.qVectorNumber), qSize(rhs.qSize) {
         rhs.q = nullptr;
+    }
+
+    void initSizes(size_t vectorNumber)
+    {
+        qVectorNumber = vectorNumber;
+        qSize = vectorNumber * QVecSize;
     }
 
     void allocate(size_t vectorNumber)
@@ -111,8 +120,7 @@ struct FieldBase
         {
             delete[] q;
         }
-        qVectorNumber = vectorNumber;
-        qSize = vectorNumber * QVecSize;
+        initSizes(vectorNumber);
         q = new T[qSize];
         allocated = true;
 
