@@ -96,7 +96,7 @@ public:
     ComputeUnitBase& operator=(const ComputeUnitBase &) = delete;
     ComputeUnitBase& operator=(ComputeUnitBase &&) noexcept = delete;
     
-    ~ComputeUnitBase();
+    virtual ~ComputeUnitBase();
     
     void init(ComputeUnitParams, bool = true);
     tNi inline index(tNi i, tNi j, tNi k);
