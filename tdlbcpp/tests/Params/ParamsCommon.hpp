@@ -134,9 +134,12 @@ namespace ParamsCommon
         }
     }
     template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-    void fillForTest(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, unsigned long offset = 0)
+    void fillForTest(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, unsigned long offset = 0, bool useOneDigitCoordinates = false)
     {
-
+        unsigned long int coordinateDigits = 100;
+        if (useOneDigitCoordinates) {
+            coordinateDigits = 10;
+        }
         if (cu.xg > 99 || cu.yg > 99 || cu.zg > 99)
         {
             std::cout << "Size too large for testing" << std::endl;
@@ -156,15 +159,15 @@ namespace ParamsCommon
 
                     for (unsigned long int l = 0; l < QVecSize; l++)
                     {
-                        qTmp.q[l] = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + l;
+                        qTmp.q[l] = (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100 + l;
                     }
                     cu.Q[cu.index(i, j, k)] = qTmp;
 
-                    cu.F[cu.index(i, j, k)].x = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100;
-                    cu.F[cu.index(i, j, k)].y = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 1;
-                    cu.F[cu.index(i, j, k)].z = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 2;
+                    cu.F[cu.index(i, j, k)].x = (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100;
+                    cu.F[cu.index(i, j, k)].y = (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100 + 1;
+                    cu.F[cu.index(i, j, k)].z = (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100 + 2;
 
-                    cu.Nu[cu.index(i, j, k)] = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 1;
+                    cu.Nu[cu.index(i, j, k)] = (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100 + 1;
                     cu.O[cu.index(i, j, k)] = true;
                 }
             }
@@ -174,8 +177,12 @@ namespace ParamsCommon
 
     template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
     void generateTestData(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, std::string headerPath, std::string suffix, 
-        bool append = false, unsigned long offset = 0, bool markChanged = false)
+        bool append = false, unsigned long offset = 0, bool markChanged = false, bool useOneDigitCoordinates = false)
     {
+        unsigned long int coordinateDigits = 100;
+        if (useOneDigitCoordinates) {
+            coordinateDigits = 10;
+        }
         std::ios_base::openmode mode = std::ios_base::out;
         if (append) {
             mode |= std::ios_base::app;
@@ -194,7 +201,7 @@ namespace ParamsCommon
         auto m =[&](T v, tNi i, tNi j, tNi k, int l) {
             std::stringstream ss;
             ss << std::setw(7) << v << "ul";
-            if ((markChanged) && (offset*100000000ul+i*1000000+j*10000+k*100+l != v)) {
+            if ((markChanged) && ((((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k)*100+l != v)) {
                 ss << "/*C*/";
             }
             return ss.str();
