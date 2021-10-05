@@ -7,8 +7,9 @@
 
 #pragma once
 
-
+#if !defined(WITH_GPU) && !defined(WITH_GPU_MEMSHARED)
 #define WITH_CPU
+#endif
 
 
 //Dummies when there is no mpi.h included

@@ -1,0 +1,10 @@
+# Convenient flag shortcuts.
+# build --flag_alias=MPI=//src:enable_mpi
+# build --flag_alias=CUDA=//src:enable_cuda
+# build --flag_alias=TEGRA=//src:enable_tegra
+
+build:mpi --client_env=CC=mpicc --copt="-DWITH_MPI" --define mpi=yes --verbose_failures -s
+build:gpu --copt="-DWITH_GPU" --define gpu=yes --verbose_failures -s
+build:gpu_shared --copt="-DWITH_GPU_MEMSHARED" --define gpu=yes --verbose_failures -s
+build:mpi_gpu --@rules_cuda//cuda:compiler=mpicc --client_env=CC=mpicc --copt="-DWITH_MPI" --copt="-DWITH_GPU" --define mpi_gpu=yes --verbose_failures -s
+build:tegra --copt="-DWITH_TEGRA" --verbose_failures -s

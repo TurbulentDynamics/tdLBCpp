@@ -170,7 +170,9 @@ int gpuDeviceID = -1;
         printf("GPU Device %d: \"%s\" totalGlobalMem: %d, managedMemory: %d, with compute capability %d.%d\n\n", i, deviceProp.name,  deviceProp.totalGlobalMem, deviceProp.managedMemory, deviceProp.major, deviceProp.minor);
 
         if (memRequired < deviceProp.totalGlobalMem) {
-            if (WITH_GPU_SHARED && !deviceProp.managedMemory) continue;
+            #if defined(WITH_GPU_MEMSHARED)
+            if (!deviceProp.managedMemory) continue;
+            #endif
 
             gpuDeviceID = i;
         }
@@ -269,7 +271,7 @@ int gpuDeviceID = -1;
     }
 
 
-    geom.generateFixedGeometry(surface);
+    geom.generateFixedGeometry(onSurface);
     std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
 
 
