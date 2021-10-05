@@ -26,6 +26,6 @@ bazel build --config gpu_shared //src:tdLBcpp
 
 
 
-## Vector Identification (see [Header.h](tdlbcpp/src/Header.h)
+## Vector Identification (see [Header.h](tdlbcpp/src/Header.h))
 ![D2Q9 and D3Q19](docs/D2Q9-D3Q19.jpeg)
 
