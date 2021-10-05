@@ -170,7 +170,9 @@ int gpuDeviceID = -1;
         printf("GPU Device %d: \"%s\" totalGlobalMem: %d, managedMemory: %d, with compute capability %d.%d\n\n", i, deviceProp.name,  deviceProp.totalGlobalMem, deviceProp.managedMemory, deviceProp.major, deviceProp.minor);
 
         if (memRequired < deviceProp.totalGlobalMem) {
-            if (WITH_GPU_SHARED && !deviceProp.managedMemory) continue;
+            #if defined(WITH_GPU_MEMSHARED)
+            if (!deviceProp.managedMemory) continue;
+            #endif
 
             gpuDeviceID = i;
         }
@@ -269,7 +271,7 @@ int gpuDeviceID = -1;
     }
 
 
-    geom.generateFixedGeometry(surface);
+    geom.generateFixedGeometry(onSurface);
     std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
 
 
@@ -401,7 +403,8 @@ int gpuDeviceID = -1;
         lb->setOutputExcludePoints(geomFORCING);
 
         for (auto xy: output.XY_planes){
-            if (running.step % xy.repeat == 0) {
+            if ((running.step == xy.start_at_step) || 
+                (running.step > xy.start_at_step) && xy.repeat && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
 //                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
                 lb->calcVorticityXY(xy.cutAt, running);
             }
@@ -410,7 +413,8 @@ int gpuDeviceID = -1;
 
 
         for (auto xz: output.XZ_planes){
-            if (running.step % xz.repeat == 0) {
+            if ((running.step == xz.start_at_step) || 
+                (running.step > xz.start_at_step) && xz.repeat && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
 //                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
                 lb->calcVorticityXZ(xz.cutAt, running);
             }

@@ -7,6 +7,17 @@ git_repository(
 )
 
 local_repository(
+    name = "rules_cuda",
+    path = __workspace_dir__ + "/third_party/rules_cuda",
+)
+
+load("@rules_cuda//cuda:dependencies.bzl", "rules_cuda_dependencies")
+rules_cuda_dependencies()
+
+load("@rules_cc//cc:repositories.bzl", "rules_cc_toolchains")
+rules_cc_toolchains()
+
+local_repository(
     name = "tdLBGeometryRushtonTurbineLib",
     path = __workspace_dir__ + "/tdLBGeometryRushtonTurbineLib",
 )

@@ -112,14 +112,15 @@ struct FieldBase
         }
         qVectorNumber = vectorNumber;
         qSize = vectorNumber * QVecSize;
-        q = new T[qSize];
 
 #if WITH_GPU
-        checkCudaErrors(cudaMalloc((void **)&q, sizeof(T) * qSize);
+        checkCudaErrors(cudaMalloc((void **)&q, sizeof(T) * qSize));
+#else
+        q = new T[qSize];
 #endif
     }
 
-    inline QVecAcc operator[](tNi index)
+    inline HOST_DEVICE_GPU QVecAcc operator[](tNi index)
     {
         return QVecAcc(q, index);
     }
@@ -155,7 +156,7 @@ struct Field<T, QVecSize, MemoryLayoutLIJK> : public FieldBase<T, QVecSize, Memo
 
     using Base::Base;
 
-    inline QVecAcc operator[](tNi index)
+    inline HOST_DEVICE_GPU QVecAcc operator[](tNi index)
     {
         return QVecAcc(q, index, qVectorNumber);
     }

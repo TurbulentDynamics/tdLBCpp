@@ -99,7 +99,7 @@ public:
     ~ComputeUnitBase();
     
     void init(ComputeUnitParams, bool);    
-    tNi inline index(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline index(tNi i, tNi j, tNi k);
     tNi inline indexPlusGhost(tNi i, tNi j, tNi k);
 
 
@@ -316,6 +316,10 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
         }
     }
 }
+
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
+#include "ComputeUnit.cuh"
+#endif
 
 #include "ComputeUnit.hpp"
 #include "ComputeUnitOutput.hpp"
