@@ -120,7 +120,7 @@ struct FieldBase
 #endif
     }
 
-    inline __host__ __device__ QVecAcc operator[](tNi index)
+    inline HOST_DEVICE_GPU QVecAcc operator[](tNi index)
     {
         return QVecAcc(q, index);
     }
@@ -156,7 +156,7 @@ struct Field<T, QVecSize, MemoryLayoutLIJK> : public FieldBase<T, QVecSize, Memo
 
     using Base::Base;
 
-    inline __host__ __device__ QVecAcc operator[](tNi index)
+    inline HOST_DEVICE_GPU QVecAcc operator[](tNi index)
     {
         return QVecAcc(q, index, qVectorNumber);
     }

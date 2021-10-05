@@ -403,7 +403,8 @@ int gpuDeviceID = -1;
         lb->setOutputExcludePoints(geomFORCING);
 
         for (auto xy: output.XY_planes){
-            if (running.step % xy.repeat == 0) {
+            if ((running.step == xy.start_at_step) || 
+                (running.step > xy.start_at_step) && xy.repeat && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
 //                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
                 lb->calcVorticityXY(xy.cutAt, running);
             }
@@ -412,7 +413,8 @@ int gpuDeviceID = -1;
 
 
         for (auto xz: output.XZ_planes){
-            if (running.step % xz.repeat == 0) {
+            if ((running.step == xz.start_at_step) || 
+                (running.step > xz.start_at_step) && xz.repeat && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
 //                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
                 lb->calcVorticityXZ(xz.cutAt, running);
             }

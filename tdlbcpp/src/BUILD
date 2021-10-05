@@ -47,7 +47,7 @@ tdlbcpp_deps = [":cxxopts", ":timer", "//tdlbcpp/src/Params:params", ":computeUn
 
 cc_binary_rule(
     name = "tdlbcpp",
-    srcs = ["main.cpp", "helper_cuda.h"],
+    srcs = ["main.cpp"],
     deps = tdlbcpp_deps,
     deps_gpu = tdlbcpp_deps + [":computeUnitCu"],
     copts = ["-Iexternal/local_cuda/cuda/samples/common/inc/"],

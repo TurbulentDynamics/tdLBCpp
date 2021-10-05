@@ -99,7 +99,7 @@ public:
     ~ComputeUnitBase();
     
     void init(ComputeUnitParams, bool);    
-    __host__ __device__  tNi inline index(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline index(tNi i, tNi j, tNi k);
     tNi inline indexPlusGhost(tNi i, tNi j, tNi k);
 
 
