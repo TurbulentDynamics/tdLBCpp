@@ -172,7 +172,6 @@ public:
         
         std::cout << "DiskOutputTree creating directory: " << dir << std::endl;
         mkdir(dir.c_str(), 0775);
-        
     }
     
     

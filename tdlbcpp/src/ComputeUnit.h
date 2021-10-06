@@ -299,6 +299,7 @@ struct AccessField<T, QVecSize, MemoryLayout, collisionType, Simple> {
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::printDebug(int fi, int ti, int fj, int tj, int fk, int tk) {
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+
     for (int i = fi; i <= fi; i++) {
         for (int j = fj; j <= tj; j++) {
             for (int k = fk; k <= tk; k++) {

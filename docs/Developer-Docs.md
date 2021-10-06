@@ -1,3 +1,3 @@
-# TURBULENT DYNAMICS Lattice Boltzmann Documentation
+# TURBULENT DYNAMICS Lattice Boltzmann Developer Documentation
 
 

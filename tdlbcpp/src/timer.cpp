@@ -263,7 +263,7 @@ double Multi_Timer::check(int block_num, int stream_num, double start, std::stri
 void Multi_Timer::print_time_left(tStep step, tStep num_steps, double print_time_left) {
 
     double time_left = (time_now() - print_time_left) * (num_steps - step) / 60;
-    printf("This step %.1fs     Remaining mins: %.1f\n\n", (time_now() - print_time_left), time_left);
+    printf("This step %.1fs     Remaining mins: %.1f\n", (time_now() - print_time_left), time_left);
 
 }
 

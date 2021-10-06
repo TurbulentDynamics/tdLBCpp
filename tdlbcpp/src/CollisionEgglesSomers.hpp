@@ -247,15 +247,7 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
                 m[M18] = 1.5*q.q[Q01] - 1.5*q.q[Q03] + 1.5*q.q[Q02] - 1.5*q.q[Q04] - 1.5*q.q[Q09] - 1.5* q.q[Q16] - 1.5* q.q[Q10] - 1.5* q.q[Q15] + 1.5*q.q[Q11] + 1.5*q.q[Q18] + 1.5*q.q[Q12] + 1.5*q.q[Q17];
 
                 AF::writeMoments(*this, m, i, j, k);
-//                if (i==2 && j==1 && k==1){
-//                    if (q.q[ 1] < 0.00001) {
-//                        printf("Moments %li %li %li     ", i, j, k);
-//                        for (int l=0; l<N; l++){
-//                            printf("% 1.4E ", qVec.q[l]);
-//                        }
-//                        printf("\n");
-//                    }
-//                }
+
             }
         }
     }
