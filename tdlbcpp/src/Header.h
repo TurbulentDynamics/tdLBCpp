@@ -10,6 +10,13 @@
 
 #define WITH_CPU
 
+//Debug trace
+#ifdef DEBUG
+#define LOG(args...) printf(args)
+#else
+#define LOG(ignored...)
+#endif
+
 
 //Dummies when there is no mpi.h included
 #if WITH_MPI == 0
