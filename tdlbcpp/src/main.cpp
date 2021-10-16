@@ -66,6 +66,8 @@ int main(int argc, char* argv[]){
     OutputParams output("output_debug");
     CheckpointParams checkpoint;
 
+    int idi = 0, idj = 0, idk = 0;
+    std::string unitName("Device");
     std::string inputJsonPath = "";
     std::string geomJsonPath = "";
     std::string checkpointPath = "";
@@ -101,10 +103,10 @@ int main(int argc, char* argv[]){
         std::cout << "error parsing options: " << e.what() << std::endl;
         exit(1);
     }
-
-
+    
     if (checkpointPath != ""){
-        inputJsonPath = checkpointPath + "/AllParams.json";
+        inputJsonPath = checkpointPath + "/AllParams." + patch::to_string(idi) + "." 
+            + patch::to_string(idj) + "." + patch::to_string(idk) + "." + unitName + ".json";
     }
 
     std::cout << "Debug: inputJsonPath, checkpointPath" << inputJsonPath << checkpointPath << std::endl;
@@ -240,9 +242,9 @@ int gpuDeviceID = -1;
     ComputeUnitParams cu;
     cu.nodeID = 0;
     cu.deviceID = gpuDeviceID;
-    cu.idi = 0;
-    cu.idj = 0;
-    cu.idk = 0;
+    cu.idi = idi;
+    cu.idj = idj;
+    cu.idk = idk;
     cu.x = grid.x;
     cu.y = grid.y;
     cu.z = grid.z;
@@ -265,7 +267,7 @@ int gpuDeviceID = -1;
     }
 
     if (checkpointPath != ""){
-        lb->checkpoint_read(checkpointPath, "Device");
+        lb->checkpoint_read(checkpointPath, unitName);
     } else {
         lb->initialise(flow.initialRho);
     }
@@ -434,7 +436,7 @@ int gpuDeviceID = -1;
 
         if (checkpoint.checkpoint_repeat && (running.step % checkpoint.checkpoint_repeat == 0)) {
 
-            lb->checkpoint_write("Device", running);
+            lb->checkpoint_write(unitName, running);
             main_time = mainTimer.check(0, 6, main_time, "Checkpoint");
         }
 
