@@ -273,7 +273,7 @@ int gpuDeviceID = -1;
     }
 
 
-    geom.generateFixedGeometry(surface);
+    geom.generateFixedGeometry(onSurface);
     std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
 
 
