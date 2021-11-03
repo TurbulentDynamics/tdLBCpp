@@ -87,7 +87,6 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
     alpha[M04] = m[M04] + f.z;
 
     //2nd order terms
-    //TODO: replace by calculation in parallel with polynome: a[i] = (2.0 * (m[j] + 0.5 * f) * u - m[k] * c) * b;
     alpha[M05] = (2.0 * (m[M02] + 0.5 * f.x) * u.x - m[M05] * c) * b;
     alpha[M06] = (2.0 * (m[M02] + 0.5 * f.x) * u.y - m[M06] * c) * b;
     alpha[M07] = (2.0 * (m[M03] + 0.5 * f.y) * u.y - m[M07] * c) * b;
@@ -97,7 +96,6 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
     alpha[M10] = (2.0 * (m[M04] + 0.5 * f.z) * u.z - m[M10] * c) * b;
 
     //3rd order terms
-    //TODO: replace by calculation in parallel
     alpha[M11] = -cu.flow.g3 * m[M11];
     alpha[M12] = -cu.flow.g3 * m[M12];
     alpha[M13] = -cu.flow.g3 * m[M13];
@@ -115,13 +113,11 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
     // it's using the "filter matrix E" (not really present in the
     // code as matrix, but it's where the coefficients come from).
 
-    //TODO: calculate in parallel
     for (int l = 0; l < QVecSize; l++)
     {
         alpha[l] /= 24.0;
     }
 
-    //TODO: calculate in parallel with polynome
     m[Q01] = 2 * alpha[M01] + 4 * alpha[M02] + 3 * alpha[M05] - 3 * alpha[M07] - 3 * alpha[M10] - 2 * alpha[M11] - 2 * alpha[M13] + 2 * alpha[M17] + 2 * alpha[M18];
 
     m[Q02] = 2 * alpha[M01] - 4 * alpha[M02] + 3 * alpha[M05] - 3 * alpha[M07] - 3 * alpha[M10] + 2 * alpha[M11] + 2 * alpha[M13] + 2 * alpha[M17] + 2 * alpha[M18];
@@ -178,8 +174,6 @@ __global__ void moments(ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSo
     QVecAcc q = cu.Q[_index(cu, i, j, k)];
 
     QVec<T, QVecSize> m = cu.Q[_index(cu, i, j, k)];
-
-    //TODO: calculate in parallel with polynome
 
     //the first position is simply the entire mass-vector (Q summed up)
     m[M01] = q.q[Q01] + q.q[Q03] + q.q[Q02] + q.q[Q04] + q.q[Q05] + q.q[Q06] + q.q[Q07] + q.q[Q14] + q.q[Q08] + q.q[Q13] + q.q[Q09] + q.q[Q16] + q.q[Q10] + q.q[Q15] + q.q[Q11] + q.q[Q18] + q.q[Q12] + q.q[Q17];
