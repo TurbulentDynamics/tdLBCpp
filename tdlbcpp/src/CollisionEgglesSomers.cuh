@@ -8,13 +8,10 @@
 #pragma once
 
 #include <cuda_runtime.h>
-#include <helper_cuda.h>
-#include <helper_functions.h>
-
 #include "ComputeUnit.h"
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-__device__ tNi _index(tNi i, tNi j, tNi k, ComputeUnitBase<T, QVecSize, MemoryLayout> &cu)
+__device__ inline tNi _index(tNi i, tNi j, tNi k, ComputeUnitBase<T, QVecSize, MemoryLayout> &cu)
 {
     return i * (cu.yg * cu.zg) + (j * cu.zg) + k;
 }
@@ -22,7 +19,7 @@ __device__ tNi _index(tNi i, tNi j, tNi k, ComputeUnitBase<T, QVecSize, MemoryLa
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType> &cu)
 {
-    using AF = AccessField<T, QVecSize, MemoryLayout, streamingType>;
+    using AF = AccessField<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>;
 
     //kinematic viscosity.
     T b = 1.0 / (1.0 + 6 * cu.flow.nu);
@@ -34,7 +31,7 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
     if (i > cu.xg1 || j > cu.yg1 || k > cu.zg1 || i < 1 || j < 1 || k < 1)
         return;
 
-    Force<T> f = F[_index(cu, i, j, k)];
+    Force<T> f = cu.F[_index(cu, i, j, k)];
 
     //TODO Change this to m, but write to q, notation only
     QVec<T, QVecSize> m = AF::read(cu, i, j, k);
@@ -45,26 +42,26 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
 
     if (cu.flow.useLES == 1)
     {
-        T fct = 3.0 / (m.q[M01] * (1.0 + 6.0 * (Nu[_index(cu, i, j, k)] + flow.nu)));
+        T fct = 3.0 / (m.q[M01] * (1.0 + 6.0 * (cu.Nu[_index(cu, i, j, k)] + cu.flow.nu)));
 
         //calculating the derivatives for x, y and z
-        T dudx = fct * ((m.q[M02] + 0.5 * F[_index(cu, i, j, k)].x * u.x - m.q[M05]));
-        T dvdy = fct * ((m.q[M03] + 0.5 * F[_index(cu, i, j, k)].y * u.y - m.q[M07]));
-        T dwdz = fct * ((m.q[M04] + 0.5 * F[_index(cu, i, j, k)].z * u.z - m.q[M10]));
+        T dudx = fct * ((m.q[M02] + 0.5 * cu.F[_index(cu, i, j, k)].x * u.x - m.q[M05]));
+        T dvdy = fct * ((m.q[M03] + 0.5 * cu.F[_index(cu, i, j, k)].y * u.y - m.q[M07]));
+        T dwdz = fct * ((m.q[M04] + 0.5 * cu.F[_index(cu, i, j, k)].z * u.z - m.q[M10]));
 
         T divv = dudx + dvdy + dwdz;
 
         //calculating the cross terms, used for the shear matrix
-        T dudypdvdx = 2 * fct * ((m.q[M03]) + 0.5 * F[_index(cu, i, j, k)].y * u.x - m.q[M06]);
-        T dudzpdwdx = 2 * fct * ((m.q[M04]) + 0.5 * F[_index(cu, i, j, k)].z * u.x - m.q[M08]);
-        T dvdzpdwdy = 2 * fct * ((m.q[M04]) + 0.5 * F[_index(cu, i, j, k)].z * u.y - m.q[M09]);
+        T dudypdvdx = 2 * fct * ((m.q[M03]) + 0.5 * cu.F[_index(cu, i, j, k)].y * u.x - m.q[M06]);
+        T dudzpdwdx = 2 * fct * ((m.q[M04]) + 0.5 * cu.F[_index(cu, i, j, k)].z * u.x - m.q[M08]);
+        T dvdzpdwdy = 2 * fct * ((m.q[M04]) + 0.5 * cu.F[_index(cu, i, j, k)].z * u.y - m.q[M09]);
 
         //calculating sh (the resolved deformation rate, S^2)
         T sh = 2 * pow(dudx, 2) + 2 * pow(dvdy, 2) + 2 * pow(dwdz, 2) + pow(dudypdvdx, 2) + pow(dudzpdwdx, 2) + pow(dvdzpdwdy, 2) - (2.0 / 3.0) * pow(divv, 2);
 
         //calculating eddy viscosity:
         //nu_t = (lambda_mix)^2 * sqrt(S^2)     (Smagorinsky)
-        Nu[_index(cu, i, j, k)] = cu.flow.cs0 * cu.flow.cs0 * sqrt(fabs(sh));
+        cu.Nu[_index(cu, i, j, k)] = cu.flow.cs0 * cu.flow.cs0 * sqrt(fabs(sh));
 
         // Viscosity is adjusted only for LES, because LES uses a
         // subgrid-adjustment model for turbulence that's too small to
@@ -75,7 +72,7 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
         // Somers (1993) -> low strain rates do not excite the
         // eddy viscosity.
 
-        T nut = Nu[_index(cu, i, j, k)] + cu.flow.nu;
+        T nut = cu.Nu[_index(cu, i, j, k)] + cu.flow.nu;
         b = 1.0 / (1.0 + 6 * nut);
         c = 1.0 - 6 * nut;
 
@@ -101,12 +98,12 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
 
     //3rd order terms
     //TODO: replace by calculation in parallel
-    alpha[M11] = -flow.g3 * m[M11];
-    alpha[M12] = -flow.g3 * m[M12];
-    alpha[M13] = -flow.g3 * m[M13];
-    alpha[M14] = -flow.g3 * m[M14];
-    alpha[M15] = -flow.g3 * m[M15];
-    alpha[M16] = -flow.g3 * m[M16];
+    alpha[M11] = -cu.flow.g3 * m[M11];
+    alpha[M12] = -cu.flow.g3 * m[M12];
+    alpha[M13] = -cu.flow.g3 * m[M13];
+    alpha[M14] = -cu.flow.g3 * m[M14];
+    alpha[M15] = -cu.flow.g3 * m[M15];
+    alpha[M16] = -cu.flow.g3 * m[M16];
 
     //4th order terms
     alpha[M17] = 0.0;
@@ -161,14 +158,16 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
 
     m[M17] = alpha[M01] + 2 * alpha[M03] - 2 * alpha[M04] - 1.5 * alpha[M05] + 1.5 * alpha[M07] - 6 * alpha[M09] + 1.5 * alpha[M10] - alpha[M12] + alpha[M14] - alpha[M15] - alpha[M16] + alpha[M17] + alpha[M18];
 
-    AF::write(cu, q, i, j, k);
+    AF::write(cu, m, i, j, k);
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 __global__ void moments(ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType> &cu)
 {
 
+
     using QVecAcc = QVecAccess<T, QVecSize, MemoryLayout>;
+    using AF = AccessField<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>;
 
     tNi i = blockIdx.x * blockDim.x + threadIdx.x;
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
@@ -176,9 +175,9 @@ __global__ void moments(ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSo
     if (i > cu.xg1 || j > cu.yg1 || k > cu.zg1 || i < 1 || j < 1 || k < 1)
         return;
 
-    QVecAcc q = Q[_index(cu, i, j, k)];
+    QVecAcc q = cu.Q[_index(cu, i, j, k)];
 
-    QVec<T, QVecSize> m = Q[_index(cu, i, j, k)];
+    QVec<T, QVecSize> m = cu.Q[_index(cu, i, j, k)];
 
     //TODO: calculate in parallel with polynome
 
