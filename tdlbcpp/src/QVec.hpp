@@ -85,7 +85,7 @@ struct QVecBase {
     }
     
 #ifndef RELEASE
-	T& operator[](int i) {
+	HOST_DEVICE_GPU T& operator[](int i) {
 		assert(i >=0 && i < size);
 		return q[i];
 	}
