@@ -53,7 +53,15 @@ using useQVecPrecision = float;
 
 
 int main(int argc, char* argv[]){
-
+#ifdef WITH_CPU
+    std::cout << "Compiled WITH_CPU defined" << std::endl;
+#endif
+#ifdef WITH_GPU
+    std::cout << "Compiled WITH_GPU defined" << std::endl;
+#endif
+#ifdef WITH_GPU_MEMSHARED
+    std::cout << "Compiled WITH_GPU_MEMSHARED defined" << std::endl;
+#endif
     std::feclearexcept(FE_OVERFLOW);
     std::feclearexcept(FE_UNDERFLOW);
     std::feclearexcept(FE_DIVBYZERO);
@@ -158,7 +166,7 @@ int main(int argc, char* argv[]){
 int gpuDeviceID = -1;
 
 #if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
-    unsigned long long size = (grid.x + (GHOST) + grid.y + (GHOST) + grid.z + (GHOST));
+    unsigned long long size = (grid.x + 2 * (GHOST)) * (grid.y + 2*(GHOST)) * (grid.z + 2*(GHOST));
     unsigned long long memRequired = size * (sizeof(useQVecPrecision) * (QLen::D3Q19 + 3 + 1) + sizeof(bool) * (1 + 1));
 
     int numGpus = 0;
@@ -260,10 +268,18 @@ int gpuDeviceID = -1;
     ComputeUnitBase<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL> *lb;
     if (streaming == "simple") {
         std::cout << "Streaming = Nieve" << std::endl;
-        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cu, flow, outputTree);
+        #if WITH_GPU == 1
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, GPU>(cu, flow, outputTree);
+        #else
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU>(cu, flow, outputTree);
+        #endif
     } else {
         std::cout << "Streaming = Esoteric" << std::endl;
-        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist>(cu, flow, outputTree);
+        #if WITH_GPU == 1
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist, GPU>(cu, flow, outputTree);
+        #else
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist, CPU>(cu, flow, outputTree);
+        #endif
     }
 
     if (checkpointPath != ""){
