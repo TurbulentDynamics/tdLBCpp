@@ -77,14 +77,6 @@ public:
 
     bool * __restrict__ ExcludeOutputPoints;
 
-#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
-    dim3 numBlocks;
-    dim3 threadsPerBlock;
-#endif
-#if WITH_GPU
-    Force<T> *devF;
-#endif
-
 
     DiskOutputTree outputTree;
     bool evenStep;
@@ -98,7 +90,11 @@ public:
     
     ~ComputeUnitBase();
     
-    void init(ComputeUnitParams, bool);    
+    void initParams(ComputeUnitParams);
+    virtual void allocateMemory();
+    virtual void freeMemory();
+    virtual void architectureInit();
+    void init(ComputeUnitParams, bool);
     HOST_DEVICE_GPU tNi inline index(tNi i, tNi j, tNi k);
     tNi inline indexPlusGhost(tNi i, tNi j, tNi k);
 
@@ -107,7 +103,7 @@ public:
     Velocity<T> inline getVelocitySparseF(tNi i, tNi j, tNi k, Force<T> f);
 
     void setQToZero();
-    void initialise(T rho);
+    virtual void initialise(T rho);
 
 
     virtual void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta) = 0;
@@ -277,15 +273,24 @@ public:
     virtual void bounceBackBoundary();
 };
 
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType, Architecture cuArchitecture>
+class ComputeUnitArchitecture {};
+
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-using ComputeUnit=ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+class ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, CPU>: public ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType> {
+    using Base=ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+    using Base::Base;
+};
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType, Architecture cuArchitecture>
+using ComputeUnit=ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, cuArchitecture>;
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 struct AccessField {};
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
 struct AccessField<T, QVecSize, MemoryLayout, collisionType, Simple> {
-    inline static QVec<T, QVecSize> read(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, tNi i, tNi j, tNi k) {
+    HOST_DEVICE_GPU inline static QVec<T, QVecSize> read(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, tNi i, tNi j, tNi k) {
         return cu.Q[cu.index(i,j,k)];
     }
     inline static void write(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
@@ -318,10 +323,6 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
     }
 }
 
-#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
-#include "ComputeUnit.cuh"
-#endif
-
 #include "ComputeUnit.hpp"
 #include "ComputeUnitOutput.hpp"
 #include "CollisionEgglesSomers.hpp"
@@ -331,3 +332,7 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 #include "Boundary.hpp"
 #include "Forcing.hpp"
 
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
+#include "ComputeUnit.cuh"
+#include "ComputeUnitGpu.h"
+#endif
