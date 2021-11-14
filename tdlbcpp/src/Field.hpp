@@ -19,7 +19,7 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutIJKL>
 {
     T *q;
 
-    QVecAccessBase(T *Q, tNi index) : q(Q + index * QVecSize) {}
+    HOST_DEVICE_GPU QVecAccessBase(T *Q, tNi index) : q(Q + index * QVecSize) {}
 
     inline T &operator[](tNi l)
     {
@@ -104,20 +104,10 @@ struct FieldBase
         rhs.q = nullptr;
     }
 
-    void allocate(size_t vectorNumber)
+    void setSize(size_t vectorNumber)
     {
-        if (q != 0)
-        {
-            delete[] q;
-        }
         qVectorNumber = vectorNumber;
         qSize = vectorNumber * QVecSize;
-
-#if WITH_GPU
-        checkCudaErrors(cudaMalloc((void **)&q, sizeof(T) * qSize));
-#else
-        q = new T[qSize];
-#endif
     }
 
     inline HOST_DEVICE_GPU QVecAcc operator[](tNi index)
@@ -128,15 +118,6 @@ struct FieldBase
     inline operator void *()
     {
         return q;
-    }
-
-    ~FieldBase()
-    {
-        if (q != 0)
-        {
-            delete[] q;
-            q = 0;
-        }
     }
 };
 
