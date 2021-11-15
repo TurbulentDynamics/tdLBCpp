@@ -106,7 +106,7 @@ public:
     virtual void initialise(T rho);
 
 
-    virtual void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta) = 0;
+    virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta) = 0;
     
     
     virtual void bounceBackBoundary() = 0;
@@ -160,33 +160,33 @@ private:
 
 public:    
     
-    tNi inline dirnQ00(tNi i, tNi j, tNi k);
-    tNi inline dirnQ01(tNi i, tNi j, tNi k);
-    tNi inline dirnQ02(tNi i, tNi j, tNi k);
-    tNi inline dirnQ03(tNi i, tNi j, tNi k);
-    tNi inline dirnQ04(tNi i, tNi j, tNi k);
-    tNi inline dirnQ05(tNi i, tNi j, tNi k);
-    tNi inline dirnQ06(tNi i, tNi j, tNi k);
-    tNi inline dirnQ07(tNi i, tNi j, tNi k);
-    tNi inline dirnQ08(tNi i, tNi j, tNi k);
-    tNi inline dirnQ09(tNi i, tNi j, tNi k);
-    tNi inline dirnQ10(tNi i, tNi j, tNi k);
-    tNi inline dirnQ11(tNi i, tNi j, tNi k);
-    tNi inline dirnQ12(tNi i, tNi j, tNi k);
-    tNi inline dirnQ13(tNi i, tNi j, tNi k);
-    tNi inline dirnQ14(tNi i, tNi j, tNi k);
-    tNi inline dirnQ15(tNi i, tNi j, tNi k);
-    tNi inline dirnQ16(tNi i, tNi j, tNi k);
-    tNi inline dirnQ17(tNi i, tNi j, tNi k);
-    tNi inline dirnQ18(tNi i, tNi j, tNi k);
-    tNi inline dirnQ19(tNi i, tNi j, tNi k);
-    tNi inline dirnQ20(tNi i, tNi j, tNi k);
-    tNi inline dirnQ21(tNi i, tNi j, tNi k);
-    tNi inline dirnQ22(tNi i, tNi j, tNi k);
-    tNi inline dirnQ23(tNi i, tNi j, tNi k);
-    tNi inline dirnQ24(tNi i, tNi j, tNi k);
-    tNi inline dirnQ25(tNi i, tNi j, tNi k);
-    tNi inline dirnQ26(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ00(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ01(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ02(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ03(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ04(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ05(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ06(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ07(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ08(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ09(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ10(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ11(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ12(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ13(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ14(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ15(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ16(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ17(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ18(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ19(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ20(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ21(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ22(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ23(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ24(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ25(tNi i, tNi j, tNi k);
+    HOST_DEVICE_GPU tNi inline dirnQ26(tNi i, tNi j, tNi k);
 
     virtual void collision() = 0;
     virtual void moments() = 0;
@@ -210,7 +210,7 @@ public:
     using Base::ExcludeOutputPoints;
     using Base::outputTree;
     virtual void moments();
-    virtual void forcing(std::vector<PosPolar<tNi, T>>, T alfa, T beta);
+    virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta);
     virtual void calcVorticityXZ(tNi j, RunningParams runParam);
     virtual void calcVorticityXY(tNi k, RunningParams runParam);
     virtual void printDebug(int fi, int ti, int fj, int tj, int fk, int tk);
@@ -290,13 +290,13 @@ struct AccessField {};
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
 struct AccessField<T, QVecSize, MemoryLayout, collisionType, Simple> {
-    HOST_DEVICE_GPU inline static QVec<T, QVecSize> read(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, tNi i, tNi j, tNi k) {
+    inline static HOST_DEVICE_GPU QVec<T, QVecSize> read(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, tNi i, tNi j, tNi k) {
         return cu.Q[cu.index(i,j,k)];
     }
-    inline static void write(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+    inline static HOST_DEVICE_GPU void write(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
         cu.Q[cu.index(i,j,k)] = q;
     }
-    inline static void writeMoments(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+    inline static HOST_DEVICE_GPU void writeMoments(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
         write(cu, q, i, j, k);
     }
  };
@@ -333,6 +333,5 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 #include "Forcing.hpp"
 
 #if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
-#include "ComputeUnit.cuh"
 #include "ComputeUnitGpu.h"
 #endif

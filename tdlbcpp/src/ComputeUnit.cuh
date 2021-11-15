@@ -47,8 +47,8 @@ __global__ void setRhoTo(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, T initi
 };
 
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-__global__ void setForceToZero(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, T initialRho){
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType, Architecture cuArchitecture>
+__global__ void setForceToZero(ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, cuArchitecture> &cu){
 
     tNi i = blockIdx.x * blockDim.x + threadIdx.x;
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;

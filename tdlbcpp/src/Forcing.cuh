@@ -28,7 +28,6 @@ __global__ void setFToZeroWhenOIsZero(ComputeUnitBase<T, QVecSize, MemoryLayout>
     }//endif
 };
 
-
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 __global__ void forcing(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, PosPolar<tNi, T> *geom, size_t geomSize, T alfa, T beta){
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;

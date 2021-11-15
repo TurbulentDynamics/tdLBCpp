@@ -56,7 +56,7 @@ HOST_DEVICE_GPU void inline smoothedDeltaFunction(T i_cart_fraction, T k_cart_fr
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcing(std::vector<PosPolar<tNi, T>> geom, T alfa, T beta){
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta){
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     for (tNi i=1; i<=xg1; i++) {

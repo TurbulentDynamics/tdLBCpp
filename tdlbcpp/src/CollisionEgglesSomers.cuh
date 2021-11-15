@@ -8,13 +8,10 @@
 #pragma once
 
 #include <cuda_runtime.h>
-#include "ComputeUnit.h"
+#include <helper_cuda.h>
+#include <helper_functions.h>
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-__device__ inline tNi _index(tNi i, tNi j, tNi k, ComputeUnitBase<T, QVecSize, MemoryLayout> &cu)
-{
-    return i * (cu.yg * cu.zg) + (j * cu.zg) + k;
-}
+#include "ComputeUnit.h"
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType> &cu)
@@ -31,7 +28,7 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
     if (i > cu.xg1 || j > cu.yg1 || k > cu.zg1 || i < 1 || j < 1 || k < 1)
         return;
 
-    Force<T> f = cu.F[_index(cu, i, j, k)];
+    Force<T> f = cu.F[cu.index(i, j, k)];
 
     //TODO Change this to m, but write to q, notation only
     QVec<T, QVecSize> m = AF::read(cu, i, j, k);
@@ -42,26 +39,26 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
 
     if (cu.flow.useLES == 1)
     {
-        T fct = 3.0 / (m.q[M01] * (1.0 + 6.0 * (cu.Nu[_index(cu, i, j, k)] + cu.flow.nu)));
+        T fct = 3.0 / (m.q[M01] * (1.0 + 6.0 * (cu.Nu[cu.index(i, j, k)] + cu.flow.nu)));
 
         //calculating the derivatives for x, y and z
-        T dudx = fct * ((m.q[M02] + 0.5 * cu.F[_index(cu, i, j, k)].x * u.x - m.q[M05]));
-        T dvdy = fct * ((m.q[M03] + 0.5 * cu.F[_index(cu, i, j, k)].y * u.y - m.q[M07]));
-        T dwdz = fct * ((m.q[M04] + 0.5 * cu.F[_index(cu, i, j, k)].z * u.z - m.q[M10]));
+        T dudx = fct * ((m.q[M02] + 0.5 * cu.F[cu.index(i, j, k)].x * u.x - m.q[M05]));
+        T dvdy = fct * ((m.q[M03] + 0.5 * cu.F[cu.index(i, j, k)].y * u.y - m.q[M07]));
+        T dwdz = fct * ((m.q[M04] + 0.5 * cu.F[cu.index(i, j, k)].z * u.z - m.q[M10]));
 
         T divv = dudx + dvdy + dwdz;
 
         //calculating the cross terms, used for the shear matrix
-        T dudypdvdx = 2 * fct * ((m.q[M03]) + 0.5 * cu.F[_index(cu, i, j, k)].y * u.x - m.q[M06]);
-        T dudzpdwdx = 2 * fct * ((m.q[M04]) + 0.5 * cu.F[_index(cu, i, j, k)].z * u.x - m.q[M08]);
-        T dvdzpdwdy = 2 * fct * ((m.q[M04]) + 0.5 * cu.F[_index(cu, i, j, k)].z * u.y - m.q[M09]);
+        T dudypdvdx = 2 * fct * ((m.q[M03]) + 0.5 * cu.F[cu.index(i, j, k)].y * u.x - m.q[M06]);
+        T dudzpdwdx = 2 * fct * ((m.q[M04]) + 0.5 * cu.F[cu.index(i, j, k)].z * u.x - m.q[M08]);
+        T dvdzpdwdy = 2 * fct * ((m.q[M04]) + 0.5 * cu.F[cu.index(i, j, k)].z * u.y - m.q[M09]);
 
         //calculating sh (the resolved deformation rate, S^2)
         T sh = 2 * pow(dudx, 2) + 2 * pow(dvdy, 2) + 2 * pow(dwdz, 2) + pow(dudypdvdx, 2) + pow(dudzpdwdx, 2) + pow(dvdzpdwdy, 2) - (2.0 / 3.0) * pow(divv, 2);
 
         //calculating eddy viscosity:
         //nu_t = (lambda_mix)^2 * sqrt(S^2)     (Smagorinsky)
-        cu.Nu[_index(cu, i, j, k)] = cu.flow.cs0 * cu.flow.cs0 * sqrt(fabs(sh));
+        cu.Nu[cu.index(i, j, k)] = cu.flow.cs0 * cu.flow.cs0 * sqrt(fabs(sh));
 
         // Viscosity is adjusted only for LES, because LES uses a
         // subgrid-adjustment model for turbulence that's too small to
@@ -72,7 +69,7 @@ __global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, Eggles
         // Somers (1993) -> low strain rates do not excite the
         // eddy viscosity.
 
-        T nut = cu.Nu[_index(cu, i, j, k)] + cu.flow.nu;
+        T nut = cu.Nu[cu.index(i, j, k)] + cu.flow.nu;
         b = 1.0 / (1.0 + 6 * nut);
         c = 1.0 - 6 * nut;
 
@@ -171,9 +168,9 @@ __global__ void moments(ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSo
     if (i > cu.xg1 || j > cu.yg1 || k > cu.zg1 || i < 1 || j < 1 || k < 1)
         return;
 
-    QVecAcc q = cu.Q[_index(cu, i, j, k)];
+    QVecAcc q = cu.Q[cu.index(i, j, k)];
 
-    QVec<T, QVecSize> m = cu.Q[_index(cu, i, j, k)];
+    QVec<T, QVecSize> m = cu.Q[cu.index(i, j, k)];
 
     //the first position is simply the entire mass-vector (Q summed up)
     m[M01] = q.q[Q01] + q.q[Q03] + q.q[Q02] + q.q[Q04] + q.q[Q05] + q.q[Q06] + q.q[Q07] + q.q[Q14] + q.q[Q08] + q.q[Q13] + q.q[Q09] + q.q[Q16] + q.q[Q10] + q.q[Q15] + q.q[Q11] + q.q[Q18] + q.q[Q12] + q.q[Q17];

@@ -38,7 +38,8 @@ cc_library(
 
 cc_library(
     name = "computeUnitCu",
-    hdrs = ["ComputeUnit.cuh", "ComputeUnitGpu.h", "ComputeUnitGpu.hpp", "Forcing.cuh"],
+    hdrs = ["ComputeUnit.cuh", "ComputeUnitGpu.h", "ComputeUnitGpu.hpp", "Forcing.cuh", "CollisionEgglesSomers.cuh", "Boundary.cuh", "StreamingNieve.cuh"
+     , "StreamingEsoTwist.cuh"],
     visibility = ["//visibility:public"],
 )
 

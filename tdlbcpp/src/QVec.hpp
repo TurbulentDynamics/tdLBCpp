@@ -62,10 +62,10 @@ template <typename T, int size=QLen::D3Q19>
 struct QVecBase {
     T q[size];
     
-    QVecBase() {
+    HOST_DEVICE_GPU QVecBase() {
     }
 
-    QVecBase(const T* qFrom) {
+    HOST_DEVICE_GPU QVecBase(const T* qFrom) {
         copy(qFrom);
     }
 
@@ -73,13 +73,13 @@ struct QVecBase {
         copy(qFrom, step);
     }
 
-    ~QVecBase() {
+    HOST_DEVICE_GPU ~QVecBase() {
         freeMem();
     }
-    QVecBase(const QVecBase<T, size>& other) {
+    HOST_DEVICE_GPU QVecBase(const QVecBase<T, size>& other) {
         copy(other);
     }
-    QVecBase<T, size>& operator=(const QVecBase<T, size>& other) {
+    HOST_DEVICE_GPU QVecBase<T, size>& operator=(const QVecBase<T, size>& other) {
         copy(other);
         return *this;
     }
@@ -93,22 +93,22 @@ struct QVecBase {
     
     
 private:
-    void freeMem() {
+    HOST_DEVICE_GPU void freeMem() {
     }
 
-    inline void copy(const T* qFrom) {
+    inline HOST_DEVICE_GPU void copy(const T* qFrom) {
         for (int l = 0; l < size; l++) {
             q[l] = qFrom[l];
         }
     }
 
-    inline void copy(const T* qFrom, size_t step) {
+    inline HOST_DEVICE_GPU void copy(const T* qFrom, size_t step) {
         for (int l = 0; l < size; l++) {
             q[l] = *(qFrom + l * step);
         }
     }
     
-    inline void copy(const QVecBase<T, size> &other) {
+    inline HOST_DEVICE_GPU void copy(const QVecBase<T, size> &other) {
         if (this != &other) {
             freeMem();
             copy(other.q);
@@ -122,7 +122,7 @@ struct CommonOperations : public Base {
     using Base::Base;
     using Base::operator=;
 
-    Velocity<T> velocity(Force<T> f){
+    HOST_DEVICE_GPU Velocity<T> velocity(Force<T> f){
 
 
         Velocity<T> u;

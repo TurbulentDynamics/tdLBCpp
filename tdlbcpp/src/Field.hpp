@@ -26,12 +26,12 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutIJKL>
         return q[l];
     }
 
-    inline operator QVec<T, QVecSize>()
+    inline HOST_DEVICE_GPU operator QVec<T, QVecSize>()
     {
         return QVec<T, QVecSize>(q);
     }
 
-    inline QVecAccessBase<T, QVecSize, MemoryLayoutIJKL> &operator=(const QVec<T, QVecSize> &v)
+    inline HOST_DEVICE_GPU QVecAccessBase<T, QVecSize, MemoryLayoutIJKL> &operator=(const QVec<T, QVecSize> &v)
     {
         for (int i = 0; i < QVecSize; i++)
         {
@@ -72,7 +72,7 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutLIJK>
         return QVec<T, QVecSize>(q.q, ijkSize);
     }
 
-    inline QVecAccessBase<T, QVecSize, MemoryLayoutLIJK> &operator=(const QVec<T, QVecSize> &v)
+    inline HOST_DEVICE_GPU QVecAccessBase<T, QVecSize, MemoryLayoutLIJK> &operator=(const QVec<T, QVecSize> &v)
     {
         for (int i = 0; i < QVecSize; i++)
         {

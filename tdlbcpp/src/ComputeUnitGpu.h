@@ -9,6 +9,7 @@ class ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamin
 {
 public:
     using Base = ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+    using Current = ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>;
     using Base::Base;
     using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1;
     using Base::F; using Base::index; using Base::Q; using Base::Nu;
@@ -16,13 +17,12 @@ public:
     using Base::xg; using Base::yg; using Base::zg;
     using Base::init;
 
-    Force<T> *devF;
-
     dim3 numBlocks;
     dim3 threadsPerBlock;
-    ComputeUnitBase<T, QVecSize, MemoryLayout> *gpuThis;
+    Current *gpuThis;
     int gpuGeomSize;
     PosPolar<tNi, T> *gpuGeom;
+    T *Vort;
 
     ComputeUnitArchitecture();
     ComputeUnitArchitecture(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
@@ -33,6 +33,10 @@ public:
     virtual void architectureInit();
     virtual void initialise(T rho);
     virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta);
+    virtual void collision();
+    virtual void moments();
+    virtual void bounceBackBoundary();
+    virtual void streamingPush();
 };
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
