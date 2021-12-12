@@ -19,19 +19,19 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutIJKL>
 {
     T *q;
 
-    QVecAccessBase(T *Q, tNi index) : q(Q + index * QVecSize) {}
+    HOST_DEVICE_GPU QVecAccessBase(T *Q, tNi index) : q(Q + index * QVecSize) {}
 
     inline T &operator[](tNi l)
     {
         return q[l];
     }
 
-    inline operator QVec<T, QVecSize>()
+    inline HOST_DEVICE_GPU operator QVec<T, QVecSize>()
     {
         return QVec<T, QVecSize>(q);
     }
 
-    inline QVecAccessBase<T, QVecSize, MemoryLayoutIJKL> &operator=(const QVec<T, QVecSize> &v)
+    inline HOST_DEVICE_GPU QVecAccessBase<T, QVecSize, MemoryLayoutIJKL> &operator=(const QVec<T, QVecSize> &v)
     {
         for (int i = 0; i < QVecSize; i++)
         {
@@ -47,7 +47,7 @@ struct SparseArray
     T *q;
     size_t step;
     SparseArray(T *q, size_t step) : q(q), step(step) {}
-    inline T &operator[](tNi l)
+    inline HOST_DEVICE_GPU T &operator[](tNi l)
     {
         return q[l * step];
     }
@@ -60,19 +60,19 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutLIJK>
 
     tNi ijkSize;
 
-    QVecAccessBase(T *Q, tNi index, tNi ijkSize) : q(Q + index, ijkSize), ijkSize(ijkSize) {}
+    HOST_DEVICE_GPU QVecAccessBase(T *Q, tNi index, tNi ijkSize) : q(Q + index, ijkSize), ijkSize(ijkSize) {}
 
-    inline T &operator[](tNi l)
+    inline HOST_DEVICE_GPU T &operator[](tNi l)
     {
         return q[l];
     }
 
-    inline operator QVec<T, QVecSize>()
+    inline HOST_DEVICE_GPU  operator QVec<T, QVecSize>()
     {
         return QVec<T, QVecSize>(q.q, ijkSize);
     }
 
-    inline QVecAccessBase<T, QVecSize, MemoryLayoutLIJK> &operator=(const QVec<T, QVecSize> &v)
+    inline HOST_DEVICE_GPU QVecAccessBase<T, QVecSize, MemoryLayoutLIJK> &operator=(const QVec<T, QVecSize> &v)
     {
         for (int i = 0; i < QVecSize; i++)
         {
@@ -104,20 +104,10 @@ struct FieldBase
         rhs.q = nullptr;
     }
 
-    void allocate(size_t vectorNumber)
+    void setSize(size_t vectorNumber)
     {
-        if (q != 0)
-        {
-            delete[] q;
-        }
         qVectorNumber = vectorNumber;
         qSize = vectorNumber * QVecSize;
-
-#if WITH_GPU
-        checkCudaErrors(cudaMalloc((void **)&q, sizeof(T) * qSize));
-#else
-        q = new T[qSize];
-#endif
     }
 
     inline HOST_DEVICE_GPU QVecAcc operator[](tNi index)
@@ -128,15 +118,6 @@ struct FieldBase
     inline operator void *()
     {
         return q;
-    }
-
-    ~FieldBase()
-    {
-        if (q != 0)
-        {
-            delete[] q;
-            q = 0;
-        }
     }
 };
 

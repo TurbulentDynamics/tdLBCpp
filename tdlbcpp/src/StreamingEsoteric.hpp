@@ -26,7 +26,7 @@ void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Esotwist>::s
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
 struct AccessField<T, QVecSize, MemoryLayout, collisionType, Esotwist> {
-    inline static QVec<T, QVecSize> read(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Esotwist> &cu, tNi i, tNi j, tNi k) {
+    inline static HOST_DEVICE_GPU QVec<T, QVecSize> read(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Esotwist> &cu, tNi i, tNi j, tNi k) {
         if (cu.evenStep) {
             QVec<T, QVecSize> qVec;
             tNi ind0 = cu.index(i,j,k);
@@ -79,7 +79,7 @@ struct AccessField<T, QVecSize, MemoryLayout, collisionType, Esotwist> {
             return qVec;
         }
     }
-    inline static void write(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Esotwist> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+    inline static HOST_DEVICE_GPU void write(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Esotwist> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
         if (cu.evenStep) {
             tNi ind0 = cu.index(i,j,k);
             cu.Q[ind0].q[Q01] = q[Q02];
@@ -128,7 +128,7 @@ struct AccessField<T, QVecSize, MemoryLayout, collisionType, Esotwist> {
             cu.Q[ cu.index((i==cu.xg1 ? 1 : i+1),(j==cu.yg1 ? 1 : j+1),k)].q[Q07] = q[Q07];
         }
     }
-    inline static void writeMoments(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Esotwist> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+    inline static HOST_DEVICE_GPU void writeMoments(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Esotwist> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
         if (cu.evenStep) {
             tNi ind0 = cu.index(i,j,k);
             cu.Q[ind0].q[Q01] = q[Q01];

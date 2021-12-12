@@ -187,6 +187,8 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
                        false, 90, false, "Debug");
     TooJpeg::closeJpeg();
 
+    delete[] Vort;
+    delete[] pict;
 }
 
 
@@ -245,23 +247,23 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
     }
 
     // Saving JPEG
-    auto *pict = new unsigned char[xg1 * zg1];
+    auto *pict = new unsigned char[xg1 * yg1];
+
 
     //Set at min max on step 74, for nx=80, slowstart=200
-    //TODO: DEBUG
-    //    min = -25.5539;
-    //    max = -0.681309;
+    //TODO: Fix
+//    min = -25.5539;
+//    max = -0.681309;
 
 
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi j = 1; j <= yg1; j++) {
-            pict[yg1 * (j - 1) + (i - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+            pict[(i - 1) + xg1 * (j - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
         }
     }
-//    std::string plotDir = outputTree.formatXYPlaneDir(runParam.step, k);
-//    outputTree.createDir(plotDir);
-    //    std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
+    std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, k);
+    outputTree.createDir(plotDir);
     std::string jpegPath = "vort.xy." + formatStep(runParam.step) + ".jpeg";
 
 
@@ -270,6 +272,8 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
                        false, 90, false, "Debug");
     TooJpeg::closeJpeg();
 
+    delete[] Vort;
+    delete[] pict;
 }
 
 
@@ -438,3 +442,56 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::savePlaneXZ(OrthoPlane plane, B
 }
 
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void inline ComputeUnitBase<T, QVecSize, MemoryLayout>::saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam)
+{
+    bool minInitialized = false, maxInitialized = false;
+    T max = 0, min = 0;
+
+    for (tNi i = border;  i < pictX - border; i++) {
+        for (tNi j = border; j < pictY - border; j++) {
+            T vortValue = Vort[j * pictX + i];
+            if (!std::isinf(vortValue) && !std::isnan(vortValue) && (!minInitialized || vortValue < min)) {
+                min = vortValue;
+                minInitialized = true;
+            }
+            if (!std::isinf(vortValue) && !std::isnan(vortValue) && (!maxInitialized || vortValue > max)) {
+                max = vortValue;
+                maxInitialized = true;
+            }
+        }
+    }
+
+    // Saving JPEG
+    tNi pictSizeX = pictX - 2*border;
+    tNi pictSizeY = pictY - 2*border;
+    auto *pict = new unsigned char[pictSizeX * pictSizeY];
+
+    //Set at min max on step 74, for nx=80, slowstart=200
+    //TODO: DEBUG
+    //    min = -25.5539;
+    //    max = -0.681309;
+
+
+
+    for (tNi i = 0;  i < pictSizeX; i++) {
+        for (tNi j = 0; j < pictSizeY; j++) {
+            T vortValue = Vort[(border + j) *  pictX + (border + i)];
+            if (std::isinf(vortValue) || std::isnan(vortValue)) {
+                pict[pictSizeX * j + i] = 0;
+            } else {
+                pict[pictSizeX * j + i] = floor(255 * ((vortValue - min) / (max - min)));
+            }
+        }
+    }
+
+    std::string jpegPath = "vort." + std::string(tag) + "." + formatStep(runParam.step) + ".jpeg";
+
+
+    TooJpeg::openJpeg(jpegPath);
+    TooJpeg::writeJpeg(pict, pictSizeX, pictSizeY,
+                       false, 90, false, "Debug");
+    TooJpeg::closeJpeg();
+
+    delete[] pict;
+}

@@ -16,6 +16,15 @@ config_setting(
     define_values = {"mpi_gpu" : "yes"},
 )
 
+
+[genrule(
+    name = "generate_hpp_%d" % order,
+    srcs = [inputFile],
+    outs = [inputFile.replace(".gyb", "")],
+    cmd = "$(location @gyb//bin:gyb) -o ../../$@ $<",
+    tools = ["@gyb//bin:gyb"]
+) for (inputFile, order) in [("StreamingNieve.cuh.gyb", 1)]]
+
 cc_library(
     name = "cxxopts",
     hdrs = ["cxxopts.hpp"]
@@ -38,8 +47,10 @@ cc_library(
 
 cc_library(
     name = "computeUnitCu",
-    hdrs = ["ComputeUnit.cuh"],
+    hdrs = ["ComputeUnit.cuh", "ComputeUnitGpu.h", "ComputeUnitGpu.hpp", "Forcing.cuh", "CollisionEgglesSomers.cuh", "Boundary.cuh", 
+            "StreamingNieve.cuh", "StreamingEsoTwist.cuh", "ComputeUnitOutput.cuh"],
     visibility = ["//visibility:public"],
+    strip_include_prefix="",
 )
 
 tdlbcpp_deps = [":cxxopts", ":timer", "//tdlbcpp/src/Params:params", ":computeUnit", "//tdlbcpp/src/Tools:toojpeg",
@@ -50,13 +61,6 @@ cc_binary_rule(
     srcs = ["main.cpp"],
     deps = tdlbcpp_deps,
     deps_gpu = tdlbcpp_deps + [":computeUnitCu"],
-    copts = ["-Iexternal/local_cuda/cuda/samples/common/inc/"],
+    copts = ["-Iexternal/local_cuda/cuda/samples/common/inc/",
+             "-I$(BINDIR)/tdlbcpp/src"], # workaround for generated sources
 )
-
-
-
-
-
-
-
-

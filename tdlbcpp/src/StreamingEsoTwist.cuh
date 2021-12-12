@@ -13,6 +13,11 @@
 
 #include "ComputeUnit.h"
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+__global__ void streamingPush(ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Esotwist> &cu) {
+	//TODO
+	cu.evenStep = !cu.evenStep;
+}
 
 
 

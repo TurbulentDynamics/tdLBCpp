@@ -46,7 +46,7 @@ public:
 
 TEST_F(ComputeUnitCheckpointTests, ComputeUnitCheckpointWriteReadValid)
 {
-    using ComputeUnitT = ComputeUnit<double, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>;
+    using ComputeUnitT = ComputeUnit<double, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU>;
     std::string unitName = TestUtils::random_string(10);
     CheckpointParams checkpointParams = ParamsCommon::createCheckpointParamsFixed();
     checkpointParams.checkpoint_root_dir = checkpointTestsFolderCheckpointFull;

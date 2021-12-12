@@ -14,6 +14,14 @@
 #define HOST_DEVICE_GPU __host__ __device__
 #endif
 
+#define DEBUG_LOG
+
+//Debug trace
+#ifdef DEBUG_LOG
+#define LOG(args...) printf(args)
+#else
+#define LOG(ignored...)
+#endif
 
 //Dummies when there is no mpi.h included
 #if WITH_MPI == 0
@@ -28,6 +36,7 @@ enum QLen {D3Q19 = 18, D3Q27 = 26};
 enum Collision {EgglesSomers, EgglesSomersLES, Entropic};
 enum Streaming {Simple, Esotwist};
 enum MemoryLayoutType {MemoryLayoutIJKL, MemoryLayoutLIJK};
+enum Architecture {CPU,GPU,GPU_MEM_SHARED};
 
 
 using tNi = long int;

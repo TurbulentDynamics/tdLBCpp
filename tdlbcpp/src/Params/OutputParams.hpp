@@ -562,6 +562,7 @@ struct OutputParams {
     template <typename ParamType> Json::Value getJsonOfArray(std::vector<ParamType> &array) {
         Json::Value jsonArray = Json::arrayValue;
         for (ParamType param : array) {
+            std::cout << param.getJson() << std::endl;
             jsonArray.append(param.getJson());
         }
         return jsonArray;

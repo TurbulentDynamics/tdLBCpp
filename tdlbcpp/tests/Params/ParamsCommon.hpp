@@ -133,6 +133,39 @@ namespace ParamsCommon
             ASSERT_EQ(expected.Nu[i], actual.Nu[i]) << "Nu[" << i << "] field has a wrong value after being written to a file and then read";
         }
     }
+    #if WITH_GPU == 1
+    template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+    void __global__ initTestData(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, unsigned long offset = 0) {
+        tNi i = blockIdx.x * blockDim.x + threadIdx.x;
+        tNi j = blockIdx.y * blockDim.y + threadIdx.y;
+        tNi k = blockIdx.z * blockDim.z + threadIdx.z;
+        
+        if (i >= cu.xg || j >= cu.yg || k >= cu.zg) {
+            return;
+        }
+
+        QVec<T, QVecSize> qTmp;
+
+        for (unsigned long int l = 0; l < QVecSize; l++)
+        {
+            qTmp.q[l] = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + l;
+        }
+        cu.Q[cu.index(i, j, k)] = qTmp;
+
+        cu.F[cu.index(i, j, k)].x = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100;
+        cu.F[cu.index(i, j, k)].y = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 1;
+        cu.F[cu.index(i, j, k)].z = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 2;
+
+        cu.Nu[cu.index(i, j, k)] = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 1;
+        cu.O[cu.index(i, j, k)] = true;
+    }
+    template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+    void fillForTestGpu(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, unsigned long offset = 0) {
+
+        initTestData<<<cu.numBlocks, cu.threadsPerBlock>>>(*cu.gpuThis, offset);        
+    }
+    #endif
+
     template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
     void fillForTest(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, unsigned long offset = 0)
     {
@@ -142,9 +175,7 @@ namespace ParamsCommon
             std::cout << "Size too large for testing" << std::endl;
             exit(1);
         }
-#if WITH_GPU == 1
-        setToZero<<<numBlocks, threadsPerBlock>>>(devN, devF, xg, yg, zg, QVecSize);
-#else
+
         for (tNi i = 0; i < cu.xg; i++)
         {
             for (tNi j = 0; j < cu.yg; j++)
@@ -169,7 +200,6 @@ namespace ParamsCommon
                 }
             }
         }
-#endif
     }
 
     template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
