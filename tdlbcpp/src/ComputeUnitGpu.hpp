@@ -288,6 +288,13 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, Simple, G
     ::streamingPushDir<<<blocksYXZ, threadsYXZ>>>(*gpuThis, Q15);
     ::streamingPushDir<<<blocksXYZ, threadsXYZ>>>(*gpuThis, Q17);
 }
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, Esotwist, GPU>::streamingPush() {
+    evenStep = !evenStep;
+    checkCudaErrors(cudaMemcpy(gpuThis, this, sizeof(Current), cudaMemcpyHostToDevice));
+}
+
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXZ(tNi j, RunningParams runParam) {
     T *Vort = new(T[xg * zg]);

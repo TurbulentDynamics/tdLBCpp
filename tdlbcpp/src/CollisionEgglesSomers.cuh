@@ -168,9 +168,9 @@ __global__ void moments(ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSo
     if (i > cu.xg1 || j > cu.yg1 || k > cu.zg1 || i < 1 || j < 1 || k < 1)
         return;
 
-    QVecAcc q = cu.Q[cu.index(i, j, k)];
+    QVec<T, QVecSize> q = AF::read(cu, i, j, k);
 
-    QVec<T, QVecSize> m = cu.Q[cu.index(i, j, k)];
+    QVec<T, QVecSize> m;
 
     //the first position is simply the entire mass-vector (Q summed up)
     m[M01] = q.q[Q01] + q.q[Q03] + q.q[Q02] + q.q[Q04] + q.q[Q05] + q.q[Q06] + q.q[Q07] + q.q[Q14] + q.q[Q08] + q.q[Q13] + q.q[Q09] + q.q[Q16] + q.q[Q10] + q.q[Q15] + q.q[Q11] + q.q[Q18] + q.q[Q12] + q.q[Q17];

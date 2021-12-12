@@ -84,9 +84,9 @@ class ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, Esotwist
 public:
     using Base = ComputeUnitArchitectureCollision<T, QVecSize, MemoryLayout, collisionType, Esotwist>;
     using Current = ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, Esotwist, GPU>;
-    using Base::Base;    
-    //virtual void bounceBackBoundary();
-    //virtual void streamingPush();
+    using Base::Base;
+    using Base::gpuThis; using Base::evenStep;
+    virtual void streamingPush();
 };
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
