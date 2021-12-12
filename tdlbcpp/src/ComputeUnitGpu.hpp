@@ -229,8 +229,14 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
         checkCudaErrors(cudaMalloc((void **)&gpuGeom, sizeof(PosPolar<tNi, T>) * gpuGeomSize));
     }
     checkCudaErrors(cudaMemcpy(gpuGeom, &geom[0], sizeof(PosPolar<tNi, T>) *geom.size(), cudaMemcpyHostToDevice));
-    ::forcing<T, QVecSize, MemoryLayout, collisionType, streamingType><<<blocks, threadsPerBlock>>>(*gpuThis, gpuGeom, geom.size(), alfa, beta);
+    ::forcing<T, QVecSize, MemoryLayout, collisionType, streamingType><<<blocks, threadsPerBlock.x>>>(*gpuThis, gpuGeom, geom.size(), alfa, beta);
     ::setFToZeroWhenOIsZero<<<numBlocks, threadsPerBlock>>>(*gpuThis);
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::checkpoint_read(std::string dirname, std::string unit_name) {
+    ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(dirname, unit_name);
+    checkCudaErrors(cudaMemcpy(gpuThis, this, sizeof(Current), cudaMemcpyHostToDevice));
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>

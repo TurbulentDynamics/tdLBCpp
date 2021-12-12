@@ -48,6 +48,9 @@ public:
 
     virtual void unsetOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
     virtual void unsetOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
+
+    void checkpoint_read(std::string dirname, std::string unit_name);
+
     ~ComputeUnitArchitectureCommonGPU();
 };
 
