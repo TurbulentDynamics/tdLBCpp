@@ -134,11 +134,11 @@ public:
 
     bool hasOutputAtStep(OutputParams output, RunningParams running);
     
-    void setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
-    void setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
+    virtual void setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
+    virtual void setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
 
-    void unsetOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
-    void unsetOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
+    virtual void unsetOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
+    virtual void unsetOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
 
 
     template <typename tDiskPrecision, int tDiskSize>
@@ -150,7 +150,7 @@ public:
     virtual void calcVorticityXZ(tNi j, RunningParams runParam) = 0;
     virtual void calcVorticityXY(tNi k, RunningParams runParam) = 0;
 
-    
+    void saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam);
     
     
 private:

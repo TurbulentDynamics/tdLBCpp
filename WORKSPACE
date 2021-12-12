@@ -21,3 +21,8 @@ local_repository(
     name = "tdLBGeometryRushtonTurbineLib",
     path = __workspace_dir__ + "/tdLBGeometryRushtonTurbineLib",
 )
+
+local_repository(
+    name = "gyb",
+    path = __workspace_dir__ + "/third_party/gyb",
+)

@@ -14,7 +14,7 @@
 #include "ComputeUnit.h"
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
-__global__ void collision(ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType> &cu)
+__global__ void collisionEgglesSommers(ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType> &cu)
 {
     using AF = AccessField<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>;
 

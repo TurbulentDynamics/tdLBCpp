@@ -9,8 +9,10 @@
 #include "Boundary.cuh"
 #include "StreamingNieve.cuh"
 #include "StreamingEsoTwist.cuh"
+#include "ComputeUnitOutput.cuh"
+
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::checkEnoughMemory()
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::checkEnoughMemory()
 {
     checkCudaErrors(cudaSetDevice(deviceID));
 
@@ -27,7 +29,7 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::allocateMemory()
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::allocateMemory()
 {
     checkEnoughMemory();
 
@@ -37,11 +39,15 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
     checkCudaErrors(cudaMalloc((void **)&Nu, sizeof(T) * size));
     checkCudaErrors(cudaMalloc((void **)&O, sizeof(T) * size));
     ExcludeOutputPoints = new bool[size];
+    checkCudaErrors(cudaMalloc((void **)&devExcludeOutputPoints, sizeof(bool) * size));
     checkCudaErrors(cudaMalloc((void **)&gpuThis, sizeof(Current)));
+    checkCudaErrors(cudaMalloc((void **)&VortXZ, sizeof(T) * size_t(xg) * zg));
+    checkCudaErrors(cudaMalloc((void **)&VortXY, sizeof(T) * size_t(xg) * yg));
+    std::cout << "GPU Memory allocated" << std::endl;
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::freeMemory()
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::freeMemory()
 {
     if (gpuThis != nullptr)
     {
@@ -67,6 +73,16 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
     {
         checkCudaErrors(cudaFree(O));
         O = nullptr;
+    }
+    if (VortXZ != nullptr)
+    {
+        checkCudaErrors(cudaFree(VortXZ));
+        VortXZ = nullptr;
+    }
+    if (VortXY != nullptr)
+    {
+        checkCudaErrors(cudaFree(VortXY));
+        VortXY = nullptr;
     }
     if (ExcludeOutputPoints != nullptr)
     {
@@ -133,7 +149,7 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::architectureInit()
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::architectureInit()
 {
 
     int threads_per_warp = 32;
@@ -156,7 +172,7 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::ComputeUnitArchitecture(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree) : 
+ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::ComputeUnitArchitectureCommonGPU(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree) : 
     ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>(cuParams, flow, outputTree)
 {
     gpuThis = nullptr;
@@ -167,15 +183,26 @@ ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType,
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::ComputeUnitArchitecture(ComputeUnitArchitecture &&rhs) noexcept : 
+ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::ComputeUnitArchitectureCommonGPU(ComputeUnitArchitectureCommonGPU &&rhs) noexcept : 
     ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>(rhs),
-    threadsPerBlock(rhs.threadsPerBlock), numBlocks(rhs.numBlocks), gpuThis(rhs.gpuThis)
+    threadsPerBlock(rhs.threadsPerBlock), numBlocks(rhs.numBlocks), gpuThis(rhs.gpuThis), VortXZ(rhs.VortXZ), VortXY(rhs.VortXY),
+    gpuGeomSize(rhs.gpuGeomSize), gpuGeom(rhs.gpuGeom)
 {
     rhs.gpuThis = nullptr;
+    rhs.gpuGeomSize = 0;
+    rhs.gpuGeom = nullptr;
+    rhs.VortXZ = nullptr;
+    rhs.VortXY = nullptr;
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::initialise(T initialRho)
+ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::~ComputeUnitArchitectureCommonGPU()
+{
+    freeMemory();
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::initialise(T initialRho)
 {
     checkCudaErrors(cudaMemcpy(gpuThis, this, sizeof(Current), cudaMemcpyHostToDevice));
     ::setQToZero<<<numBlocks, threadsPerBlock>>>(*gpuThis);
@@ -191,7 +218,7 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
 };
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta) {
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta) {
     ::setOToZero<<<numBlocks, threadsPerBlock>>>(*gpuThis);
     int blocks = (geom.size() + threadsPerBlock.x - 1) / threadsPerBlock.x;
     if (gpuGeomSize < geom.size()) {
@@ -206,18 +233,18 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
     ::setFToZeroWhenOIsZero<<<numBlocks, threadsPerBlock>>>(*gpuThis);
 }
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::collision() {
-    ::collision<<<numBlocks, threadsPerBlock>>>(*gpuThis);
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+void ComputeUnitArchitectureCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>::collision() {
+    ::collisionEgglesSommers<<<numBlocks, threadsPerBlock>>>(*gpuThis);
 }
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::moments() {
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
+void ComputeUnitArchitectureCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType>::moments() {
     ::moments<<<numBlocks, threadsPerBlock>>>(*gpuThis);
 }
 
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::bounceBackBoundary() {
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, Simple, GPU>::bounceBackBoundary() {
     dim3 blocksXY(numBlocks.x, numBlocks.y);
     dim3 threadsXY(threadsPerBlock.x, threadsPerBlock.y);
     ::bounceBackBoundaryBackward<<<blocksXY, threadsXY>>>(*gpuThis);
@@ -236,7 +263,74 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
     ::bounceBackEdges<<<numBlocks.x, threadsPerBlock.x>>>(*gpuThis, Q01);
 }
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
+void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, Simple, GPU>::streamingPush() {
+    dim3 blocksYZ(numBlocks.y, numBlocks.z, 1);
+    dim3 threadsYZ(threadsPerBlock.y, threadsPerBlock.z, 2);
+    ::streamingPushDir<<<blocksYZ, threadsYZ>>>(*gpuThis, Q01);
+    dim3 blocksXZ(numBlocks.x, numBlocks.z, 1);
+    dim3 threadsXZ(threadsPerBlock.x, threadsPerBlock.z, 2);
+    ::streamingPushDir<<<blocksXZ, threadsXZ>>>(*gpuThis, Q03);
+    dim3 blocksXY(numBlocks.x, numBlocks.y, 1);
+    dim3 threadsXY(threadsPerBlock.x, threadsPerBlock.y, 2);
+    ::streamingPushDir<<<blocksXY, threadsXY>>>(*gpuThis, Q05);
+    dim3 blocksZXY(numBlocks.z, numBlocks.x + numBlocks.y, 1);
+    dim3 threadsZXY(threadsPerBlock.z, threadsPerBlock.x, 2);
+    ::streamingPushDir<<<blocksZXY, threadsZXY>>>(*gpuThis, Q07);
+    dim3 blocksYXZ(numBlocks.y, numBlocks.x + numBlocks.z, 1);
+    dim3 threadsYXZ(threadsPerBlock.y, threadsPerBlock.x, 2);
+    ::streamingPushDir<<<blocksYXZ, threadsYXZ>>>(*gpuThis, Q09);
+    dim3 blocksXYZ(numBlocks.x, numBlocks.y + numBlocks.z, 1);
+    dim3 threadsXYZ(threadsPerBlock.x, threadsPerBlock.y, 2);
+    ::streamingPushDir<<<blocksXYZ, threadsXYZ>>>(*gpuThis, Q11);
+
+    ::streamingPushDir<<<blocksZXY, threadsZXY>>>(*gpuThis, Q13);
+    ::streamingPushDir<<<blocksYXZ, threadsYXZ>>>(*gpuThis, Q15);
+    ::streamingPushDir<<<blocksXYZ, threadsXYZ>>>(*gpuThis, Q17);
+}
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamingType, GPU>::streamingPush() {
-    ::streamingPush<<<1, 2>>>(*gpuThis);
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXZ(tNi j, RunningParams runParam) {
+    T *Vort = new(T[xg * zg]);
+    dim3 blocksXZ(numBlocks.x, 1, numBlocks.z);
+    dim3 threadsXZ(threadsPerBlock.x, 1, threadsPerBlock.z);
+    ::calcVorticityXZ<<<blocksXZ, threadsXZ>>>(*gpuThis, j);
+    checkCudaErrors(cudaMemcpy(Vort, VortXZ, sizeof(T) * xg * zg, cudaMemcpyDeviceToHost));
+    saveJpeg("xz", Vort, xg, zg, 1, runParam);
+    delete []Vort;
+}
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXY(tNi k, RunningParams runParam) {
+    T *Vort = new(T[xg * yg]);
+    dim3 blocksXY(numBlocks.x, numBlocks.y, 1);
+    dim3 threadsXY(threadsPerBlock.x, threadsPerBlock.y, 1);
+    ::calcVorticityXY<<<blocksXY, threadsXY>>>(*gpuThis, k);
+    checkCudaErrors(cudaMemcpy(Vort, VortXY, sizeof(T) * xg * yg, cudaMemcpyDeviceToHost));
+    saveJpeg("xy", Vort, xg, yg, 1, runParam);
+    delete []Vort;
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints){
+    ComputeUnitBase<T, QVecSize, MemoryLayout>::setOutputExcludePoints(geomPoints);
+    checkCudaErrors(cudaMemcpy(devExcludeOutputPoints, ExcludeOutputPoints, sizeof(bool) * size, cudaMemcpyHostToDevice));
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints){
+    ComputeUnitBase<T, QVecSize, MemoryLayout>::setOutputExcludePoints(geomPoints);
+    checkCudaErrors(cudaMemcpy(devExcludeOutputPoints, ExcludeOutputPoints, sizeof(bool) * size, cudaMemcpyHostToDevice));
+}
+
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::unsetOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints){
+    ComputeUnitBase<T, QVecSize, MemoryLayout>::unsetOutputExcludePoints(geomPoints);
+    checkCudaErrors(cudaMemcpy(devExcludeOutputPoints, ExcludeOutputPoints, sizeof(bool) * size, cudaMemcpyHostToDevice));
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::unsetOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints){
+    ComputeUnitBase<T, QVecSize, MemoryLayout>::unsetOutputExcludePoints(geomPoints);
+    checkCudaErrors(cudaMemcpy(devExcludeOutputPoints, ExcludeOutputPoints, sizeof(bool) * size, cudaMemcpyHostToDevice));
 }

@@ -245,7 +245,7 @@ namespace ParamsCommon
         outputParams.add_YZ_plane("dirTest9", 46, 47, 48, 49, 50, false);
 
         outputParams.add_angle("dirTest10", 51, 52.0, 53, 54, 55, true);
-        outputParams.add_angle("dirTest11", 56, 52.0, 53, 54, 55, false);
+        outputParams.add_angle("dirTest11", 56, 57.0, 58, 59, 60, false);
         outputParams.add_angle("dirTest12", 61, 62.0, 63, 64, 65, true);
         outputParams.add_angle("dirTest13", 66, 67.0, 68, 69, 70, false);
         outputParams.add_angle("dirTest14", 71, 72.0, 73, 74, 75, true);

@@ -192,6 +192,8 @@ int gpuDeviceID = -1;
         std::cout << "Cannot find acceptable GPU device, exiting.  Please check log." << std::endl;
         exit(EXIT_WAIVED);
     }
+    
+    checkCudaErrors(cudaSetDeviceFlags(cudaDeviceBlockingSync));
 
 #endif
 

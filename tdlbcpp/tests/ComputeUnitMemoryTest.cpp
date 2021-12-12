@@ -97,7 +97,7 @@ TEST_F(ComputeUnitMemoryTest, ComputeUnitMemoryIJKLTest)
     DiskOutputTree diskOutputTree = DiskOutputTree(checkpointParams, outputParams);
     diskOutputTree.setParams<unsigned long>(cuParams, gridParams, flow, runningParams, outputParams, checkpointParams);
 
-    auto lb = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple>(cuParams, flow, diskOutputTree);
+    auto lb = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU>(cuParams, flow, diskOutputTree);
 
     ParamsCommon::fillForTest<unsigned long, QLen::D3Q19, MemoryLayoutIJKL>(lb);
 
@@ -109,7 +109,7 @@ TEST_F(ComputeUnitMemoryTest, ComputeUnitMemoryLIJKTest)
     DiskOutputTree diskOutputTree = DiskOutputTree(checkpointParams, outputParams);
     diskOutputTree.setParams<unsigned long>(cuParams, gridParams, flow, runningParams, outputParams, checkpointParams);
 
-    auto lb = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK, EgglesSomers, Simple>(cuParams, flow, diskOutputTree);
+    auto lb = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK, EgglesSomers, Simple, CPU>(cuParams, flow, diskOutputTree);
 
     ParamsCommon::fillForTest<unsigned long, QLen::D3Q19, MemoryLayoutLIJK>(lb);
 

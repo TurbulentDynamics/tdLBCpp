@@ -69,7 +69,7 @@ struct QVecBase {
         copy(qFrom);
     }
 
-    QVecBase(const T* qFrom, size_t step) {
+    HOST_DEVICE_GPU QVecBase(const T* qFrom, size_t step) {
         copy(qFrom, step);
     }
 
@@ -133,7 +133,7 @@ struct CommonOperations : public Base {
         return u;
     }
 
-    Velocity<T> velocity(){
+    HOST_DEVICE_GPU Velocity<T> velocity(){
         
         Velocity<T> u;
         u.x = q[M02] / q[M01];

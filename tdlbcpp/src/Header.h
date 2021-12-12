@@ -14,6 +14,14 @@
 #define HOST_DEVICE_GPU __host__ __device__
 #endif
 
+#define DEBUG_LOG
+
+//Debug trace
+#ifdef DEBUG_LOG
+#define LOG(args...) printf(args)
+#else
+#define LOG(ignored...)
+#endif
 
 //Dummies when there is no mpi.h included
 #if WITH_MPI == 0

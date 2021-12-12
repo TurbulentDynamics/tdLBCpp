@@ -15,9 +15,6 @@
 #include "Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 
 
-
-
-
 template <typename T>
 HOST_DEVICE_GPU T inline calcWeight(T x){
     
