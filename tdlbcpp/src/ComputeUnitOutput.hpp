@@ -187,6 +187,8 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
                        false, 90, false, "Debug");
     TooJpeg::closeJpeg();
 
+    delete[] Vort;
+    delete[] pict;
 }
 
 
@@ -257,7 +259,7 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi j = 1; j <= yg1; j++) {
-            pict[yg1 * (i - 1) + (j - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+            pict[(i - 1) + xg1 * (j - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
         }
     }
     std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, k);
@@ -270,6 +272,8 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
                        false, 90, false, "Debug");
     TooJpeg::closeJpeg();
 
+    delete[] Vort;
+    delete[] pict;
 }
 
 
@@ -472,7 +476,12 @@ void inline ComputeUnitBase<T, QVecSize, MemoryLayout>::saveJpeg(const char *tag
 
     for (tNi i = 0;  i < pictSizeX; i++) {
         for (tNi j = 0; j < pictSizeY; j++) {
-            pict[pictSizeX * j + i] = floor(255 * ((Vort[(border + j) *  pictX + (border + i)] - min) / (max - min)));
+            T vortValue = Vort[(border + j) *  pictX + (border + i)];
+            if (std::isinf(vortValue) || std::isnan(vortValue)) {
+                pict[pictSizeX * j + i] = 0;
+            } else {
+                pict[pictSizeX * j + i] = floor(255 * ((vortValue - min) / (max - min)));
+            }
         }
     }
 

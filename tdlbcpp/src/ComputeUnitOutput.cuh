@@ -11,7 +11,7 @@ __device__ T calcVorticity(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryL
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     if (cu.devExcludeOutputPoints[cu.index(i,j,k)] == true) {
-        return (T)0;
+        return (T)-1.0;
     }
 
 
