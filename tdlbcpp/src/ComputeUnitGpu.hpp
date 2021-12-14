@@ -226,7 +226,9 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
             checkCudaErrors(cudaFree(gpuGeom));
         }
         gpuGeomSize = geom.size();
-        checkCudaErrors(cudaMalloc((void **)&gpuGeom, sizeof(PosPolar<tNi, T>) * gpuGeomSize));
+        size_t gpuGeomSizeBytes = sizeof(PosPolar<tNi, T>) * gpuGeomSize;
+        LOG("gpuGeom resize, new size: %ld\n", gpuGeomSizeBytes);
+        checkCudaErrors(cudaMalloc((void **)&gpuGeom, gpuGeomSizeBytes));
     }
     checkCudaErrors(cudaMemcpy(gpuGeom, &geom[0], sizeof(PosPolar<tNi, T>) *geom.size(), cudaMemcpyHostToDevice));
     ::forcing<T, QVecSize, MemoryLayout, collisionType, streamingType><<<blocks, threadsPerBlock.x>>>(*gpuThis, gpuGeom, geom.size(), alfa, beta);

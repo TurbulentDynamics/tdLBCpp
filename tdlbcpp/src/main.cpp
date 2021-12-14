@@ -345,27 +345,11 @@ int gpuDeviceID = -1;
 
 
 
-        std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geom.getImpellerBlades(running.angle, deltaRunningAngle, surfaceAndInternal);
-
-
-        if (running.step < geom.impellerStartupStepsUntilNormalSpeed){
-
-            geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, surfaceAndInternal);
-
-            std::vector<PosPolar<tNi, useQVecPrecision>> rotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
-
-            geomFORCING.insert( geomFORCING.end(), rotatingNonUpdating.begin(), rotatingNonUpdating.end() );
-
-
-        } else {
-
-            geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, surfaceAndInternal);
-
-            std::vector<PosPolar<tNi, useQVecPrecision>> rotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
-
-            geomFORCING.insert( geomFORCING.end(), rotatingNonUpdating.begin(), rotatingNonUpdating.end() );
-
-        }
+        std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geomFixed;
+        geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
+        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
+        std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
+        geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );
 
 
 
@@ -476,6 +460,11 @@ int gpuDeviceID = -1;
         mainTimer.print_timer(step);
 
 
+        #if WITH_GPU == 1
+            size_t mf, ma;
+            cudaMemGetInfo(&mf, &ma);
+            std::cout << "GPU memory: free: " << mf << " total: " << ma << std::endl;
+        #endif
 
 
     }//end of main loop  end of main loop
