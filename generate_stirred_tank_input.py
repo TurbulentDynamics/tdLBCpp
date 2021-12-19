@@ -16,7 +16,7 @@ from Params import *
 
 
 
-FILENAME = "input_debug.json"
+FILENAME = "input_debug_gridx60_numSteps20.json"
 
 # (ngx, grid.x)
 val = [
@@ -28,46 +28,6 @@ val = [
  (1, 800),
  (4, 3000),
  ]
-
-
-def getMinValidInputJson():
-
-    inputJson = dict()
-
-    level1Params = ["GridParams", "RunningParams", "FlowParams", "CheckpointParams", "BinFileParams", "OutputParams"]
-
-
-#    outputStructs = dict()
-#
-#        if struct["name"] in level1Params:
-#            inputJson[struct["name"]] = vars
-#        else:
-#            outputStructs[struct["name"]] = vars
-#
-#
-#    print inputJson
-#
-#    outputParams = ["XY_planes", "XZ_planes", "YZ_planes", "YZ_plane_when_angle", "capture_at_blade_angle", "outputRootDir", "volumes"]
-#    for struct in outputParams:
-#        inputJson["OutputParams"][struct] = list()
-#
-#    orthoPlaneXY = outputStructs["OrthoPlane"].copy()
-#    orthoPlaneXY["cutAt"] = int(inputJson["GridParams"]["z"]) / 2
-#    orthoPlaneXY["repeat"] = 10
-#    orthoPlaneXY["name_root"] = "plot_slice"
-#    inputJson["OutputParams"]["XY_planes"].append(orthoPlaneXY)
-#
-#
-#    orthoPlaneXZ = outputStructs["OrthoPlane"].copy()
-#    orthoPlaneXZ["cutAt"] = int(inputJson["GridParams"]["y"]) / 3 * 2
-#    orthoPlaneXZ["repeat"] = 10
-#    orthoPlaneXZ["name_root"] = "plot_axis"
-#    inputJson["OutputParams"]["XZ_planes"].append(orthoPlaneXZ)
-
-
-    return inputJson
-
-
 
 
 

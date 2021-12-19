@@ -23,7 +23,7 @@ config_setting(
     outs = [inputFile.replace(".gyb", "")],
     cmd = "$(location @gyb//bin:gyb) -o ../../$@ $<",
     tools = ["@gyb//bin:gyb"]
-) for (inputFile, order) in [("StreamingNieve.cuh.gyb", 1)]]
+) for (inputFile, order) in [("StreamingSimple.cuh.gyb", 1)]]
 
 cc_library(
     name = "cxxopts",
@@ -40,7 +40,7 @@ cc_library(
 
 cc_library(
     name = "computeUnit",
-    hdrs = ["ComputeUnit.h", "Header.h", "Output.hpp", "DiskOutputTree.h", "Boundary.hpp", "CollisionEntropic.hpp", "GlobalStructures.hpp", "StreamingEsoteric.hpp", "cxxopts.hpp", "CollisionEgglesSomers.hpp", "ComputeUnit.hpp", "ComputeUnitOutput.hpp", "Forcing.hpp", "QVec.hpp", "StreamingNieve.hpp", "timer.h", "Field.hpp"],
+    hdrs = ["ComputeUnit.h", "Header.h", "Output.hpp", "DiskOutputTree.h", "Boundary.hpp", "CollisionEntropic.hpp", "GlobalStructures.hpp", "StreamingEsoteric.hpp", "cxxopts.hpp", "CollisionEgglesSomers.hpp", "ComputeUnit.hpp", "ComputeUnitOutput.hpp", "Forcing.hpp", "QVec.hpp", "StreamingSimple.hpp", "timer.h", "Field.hpp"],
     visibility = ["//visibility:public"],
     strip_include_prefix="",
 )
@@ -48,7 +48,7 @@ cc_library(
 cc_library(
     name = "computeUnitCu",
     hdrs = ["ComputeUnit.cuh", "ComputeUnitGpu.h", "ComputeUnitGpu.hpp", "Forcing.cuh", "CollisionEgglesSomers.cuh", "Boundary.cuh", 
-            "StreamingNieve.cuh", "StreamingEsoTwist.cuh", "ComputeUnitOutput.cuh"],
+            "StreamingSimple.cuh", "StreamingEsoTwist.cuh", "ComputeUnitOutput.cuh"],
     visibility = ["//visibility:public"],
     strip_include_prefix="",
 )

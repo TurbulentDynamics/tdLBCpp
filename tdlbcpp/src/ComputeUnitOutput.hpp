@@ -166,8 +166,8 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 
     //Set at min max on step 74, for nx=80, slowstart=200
     //TODO: Fix
-//    min = -25.5539;
-//    max = -0.681309;
+    //    min = -25.5539;
+    //    max = -0.681309;
 
 
 
@@ -176,10 +176,10 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
             pict[zg1 * (i - 1) + (k - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
         }
     }
+
     std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, j);
-    outputTree.createDir(plotDir);
-//    std::string jpegPath = outputTree.formatJpegFileNamePath(plotDir);
-    std::string jpegPath = "vort.xz." + formatStep(runParam.step) + ".jpeg";
+
+    std::string jpegPath = plotDir + ".jpeg";
 
 
     TooJpeg::openJpeg(jpegPath);
@@ -252,8 +252,8 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 
     //Set at min max on step 74, for nx=80, slowstart=200
     //TODO: Fix
-//    min = -25.5539;
-//    max = -0.681309;
+    //    min = -25.5539;
+    //    max = -0.681309;
 
 
 
@@ -262,9 +262,10 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
             pict[(i - 1) + xg1 * (j - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
         }
     }
-    std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, k);
-    outputTree.createDir(plotDir);
-    std::string jpegPath = "vort.xy." + formatStep(runParam.step) + ".jpeg";
+
+    std::string plotDir = outputTree.formatXYPlaneDir(runParam.step, k);
+
+    std::string jpegPath = plotDir + ".jpeg";
 
 
     TooJpeg::openJpeg(jpegPath);
@@ -287,22 +288,22 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
     if (!hasOutputAtStep(output, running)) return;
 
 
-//    for (auto &p: excludeRotating){
-//        ExcludeOutputPoints[index(p.i, p.j, p.k)] = 1;
-//    }
+    //    for (auto &p: excludeRotating){
+    //        ExcludeOutputPoints[index(p.i, p.j, p.k)] = 1;
+    //    }
 
 
 
-//    for (auto xy: output.XY_planes){
-//
-//        if ((running.step == xy.start_at_step) ||
-//            (running.step > xy.start_at_step
-//             && xy.repeat > 0
-//             && (running.step - xy.start_at_step) % xy.repeat == 0)) {
-//
-//            lb.template savePlaneXY<float, 4>(xy, binFormat, running);
-//        }
-//    }
+    //    for (auto xy: output.XY_planes){
+    //
+    //        if ((running.step == xy.start_at_step) ||
+    //            (running.step > xy.start_at_step
+    //             && xy.repeat > 0
+    //             && (running.step - xy.start_at_step) % xy.repeat == 0)) {
+    //
+    //            lb.template savePlaneXY<float, 4>(xy, binFormat, running);
+    //        }
+    //    }
 
 
     for (auto xz: output.XZ_planes){
@@ -320,27 +321,27 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
     }
 
 
-//    for (auto yz: output.YZ_planes){
-//
-//        if ((running.step == yz.start_at_step) ||
-//            (running.step > yz.start_at_step
-//             && yz.repeat > 0
-//             && (running.step - yz.start_at_step) % yz.repeat == 0)) {
-//
-//            lb.template savePlaneYZ<float, 4>(yz, binFormat, running);
-//        }
-//    }
+    //    for (auto yz: output.YZ_planes){
+    //
+    //        if ((running.step == yz.start_at_step) ||
+    //            (running.step > yz.start_at_step
+    //             && yz.repeat > 0
+    //             && (running.step - yz.start_at_step) % yz.repeat == 0)) {
+    //
+    //            lb.template savePlaneYZ<float, 4>(yz, binFormat, running);
+    //        }
+    //    }
 
 
 
-//
-//
-//
-//    //REMOVE THE ROTATING POINTS.
-//    // FIXME: this might remove points from the hub!!!
-//    for (auto &p: excludeRotating){
-//        ExcludeOutputPoints[index(p.i, p.j, p.k)] = 0;
-//    }
+    //
+    //
+    //
+    //    //REMOVE THE ROTATING POINTS.
+    //    // FIXME: this might remove points from the hub!!!
+    //    for (auto &p: excludeRotating){
+    //        ExcludeOutputPoints[index(p.i, p.j, p.k)] = 0;
+    //    }
 
 
 

@@ -6,8 +6,8 @@ This is a basic version of the multi-node heterogeneous HPC code to run simulati
 ## Running
 ```python
 #Generate an input file
-python3 generate_stirred_tank_input.py -x 60 -f input_ngx1_x60.json
-./tdlbcpp --input_file input_ngx1_x60.json
+python3 generate_stirred_tank_input.py -x 100 -f input_debug_gridx100_numSteps20.json
+./tdlbcpp --input_file input_debug_gridx100_numSteps20.json
 
 #Load from checkpoint dir
 ./tdlbcpp --checkpoint_dir checkpoint_2021_9_21__jd7aflakjd
@@ -39,7 +39,7 @@ Specify capabilities and custom cuda path using the following switches:
 `--repo_env=CUDA_PATH=/usr/local/cuda-ZZZ`
 
 ```
-bazel build -c dbg --config gpu --@rules_cuda//cuda:cuda_targets=sm_30 --repo_env=CUDA_PATH=/usr/local/cuda-9.1 //tdlbcpp/src:tdlbcpp
+bazel build -c dbg --config gpu --@rules_cuda//cuda:cuda_targets=sm_75 --repo_env=CUDA_PATH=/usr/local/cuda-11.5 //tdlbcpp/src:tdlbcpp
 ```
 
 ##Tests

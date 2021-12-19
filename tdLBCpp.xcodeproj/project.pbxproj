@@ -47,6 +47,10 @@
 		D60526C5270D9A61002FB3CA /* D2Q9-D3Q19.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "D2Q9-D3Q19.jpeg"; sourceTree = "<group>"; };
 		D60526C6270DA165002FB3CA /* ComputeUnit.cuh */ = {isa = PBXFileReference; lastKnownFileType = text; path = ComputeUnit.cuh; sourceTree = "<group>"; };
 		D60B522126B1B00400963282 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		D64D234F276F2F3A000AC263 /* StreamingSimple.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = StreamingSimple.hpp; sourceTree = "<group>"; };
+		D64D2350276F2F3A000AC263 /* ComputeUnitGpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ComputeUnitGpu.h; sourceTree = "<group>"; };
+		D64D2351276F2F3A000AC263 /* StreamingSimple.cuh.gyb */ = {isa = PBXFileReference; lastKnownFileType = text; path = StreamingSimple.cuh.gyb; sourceTree = "<group>"; };
+		D64D2352276F2F3A000AC263 /* ComputeUnitGpu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnitGpu.hpp; sourceTree = "<group>"; };
 		D652A6A226AECDB900028C5D /* ComputeUnitOutput.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnitOutput.hpp; sourceTree = "<group>"; };
 		D66D0F86269C49E50079FCAC /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		D66D0F88269C4A200079FCAC /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
@@ -80,7 +84,6 @@
 		D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RushtonTurbine.hpp; sourceTree = "<group>"; };
 		D6E5C5BD25DBEC0B0067FDE1 /* GeomMidPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GeomMidPoint.hpp; sourceTree = "<group>"; };
 		D6E5C72425EE184B0067FDE1 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
-		D6E5C72625EE184B0067FDE1 /* StreamingNieve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StreamingNieve.hpp; sourceTree = "<group>"; };
 		D6E5C72825EE184B0067FDE1 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
 		D6E5C72A25EE184B0067FDE1 /* cxxopts.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cxxopts.hpp; sourceTree = "<group>"; };
 		D6E5C72B25EE184B0067FDE1 /* Boundary.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Boundary.hpp; sourceTree = "<group>"; };
@@ -254,8 +257,11 @@
 				D6008AA226E61495003CE0E2 /* CollisionEgglesSomers.cuh */,
 				D6E5C73925EE184B0067FDE1 /* CollisionEntropic.hpp */,
 				D6E5C73A25EE184B0067FDE1 /* StreamingEsoteric.hpp */,
-				D6E5C72625EE184B0067FDE1 /* StreamingNieve.hpp */,
 				D6008AA326E614F1003CE0E2 /* StreamingEsoTwist.cuh */,
+				D64D2350276F2F3A000AC263 /* ComputeUnitGpu.h */,
+				D64D2352276F2F3A000AC263 /* ComputeUnitGpu.hpp */,
+				D64D2351276F2F3A000AC263 /* StreamingSimple.cuh.gyb */,
+				D64D234F276F2F3A000AC263 /* StreamingSimple.hpp */,
 				D6E5C73D25EE184B0067FDE1 /* Forcing.hpp */,
 				D6E5C72B25EE184B0067FDE1 /* Boundary.hpp */,
 				D6ACCEF325F60FEA00705722 /* GlobalStructures.hpp */,

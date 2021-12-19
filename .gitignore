@@ -7,10 +7,11 @@ bazel-*
 build/
 .DS_Store
 __pycache__
+xcuserdata
 
 
 debug_*
-
+Error_*
 
 *.jpeg
 *.json

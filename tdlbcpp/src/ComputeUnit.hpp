@@ -41,7 +41,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initParams(ComputeUnitParams cu
 
     ghost = cuParams.ghost;
 
-    
+
     xg = x + 2 * ghost;
     yg = y + 2 * ghost;
     zg = z + 2 * ghost;
@@ -104,7 +104,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
         reallocate = false;
     }
     size = new_size;
-    
+
     if (reallocate) {
         freeMemory();
     }
@@ -125,11 +125,11 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cu
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rhs) noexcept: 
-    idi(rhs.idi), idj(rhs.idj), idk(rhs.idk), nodeID(rhs.nodeID), deviceID(rhs.deviceID),
-    x(rhs.x), y(rhs.y), z(rhs.z), i0(rhs.i0), j0(rhs.j0), k0(rhs.k0), xg(rhs.xg), yg(rhs.yg), zg(rhs.zg), xg0(rhs.xg0), yg0(rhs.yg0), zg0(rhs.zg0), xg1(rhs.xg1), yg1(rhs.yg1), zg1(rhs.zg1),
-    ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), ExcludeOutputPoints(rhs.ExcludeOutputPoints),
-    outputTree(rhs.outputTree), evenStep(rhs.evenStep)
+ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rhs) noexcept:
+idi(rhs.idi), idj(rhs.idj), idk(rhs.idk), nodeID(rhs.nodeID), deviceID(rhs.deviceID),
+x(rhs.x), y(rhs.y), z(rhs.z), i0(rhs.i0), j0(rhs.j0), k0(rhs.k0), xg(rhs.xg), yg(rhs.yg), zg(rhs.zg), xg0(rhs.xg0), yg0(rhs.yg0), zg0(rhs.zg0), xg1(rhs.xg1), yg1(rhs.yg1), zg1(rhs.zg1),
+ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), ExcludeOutputPoints(rhs.ExcludeOutputPoints),
+outputTree(rhs.outputTree), evenStep(rhs.evenStep)
 {
     rhs.O = nullptr;
     rhs.Nu = nullptr;
@@ -199,6 +199,12 @@ Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocitySparseF(tNi i
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_read(std::string filePath){
 
+    std::stringstream text;
+    text << "Node " << nodeID << " Starting Checkpoint Writing " << filePath << std::endl;
+    std::cout << text.str() << std::endl;
+    outputTree.writeToRunningDataFile(text.str());
+
+
     std::cout << "Node " << nodeID << " Load " << filePath << std::endl;
 
     return fopen(filePath.c_str(), "r");
@@ -207,7 +213,7 @@ FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_read(std::string filePat
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_write(std::string filePath){
 
-    std::cout << "Node " << nodeID << " Save " << filePath << std::endl;
+    std::cout << "Node " << nodeID << " Save File " << filePath << std::endl;
 
     return fopen(filePath.c_str(), "w");
 }
@@ -218,7 +224,7 @@ FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_write(std::string filePa
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dirname, std::string unit_name){
-    
+
     BinFileParams binFormat;
     binFormat.filePath = outputTree.getAllParamsFilePath(dirname, unit_name);
     binFormat.structName = "checkpoint";
@@ -235,7 +241,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
     outputTree.readAllParamsJson(outputTree.getAllParamsFilePath(dirname, unit_name) + ".json", binFormat, running);
     flow = outputTree.getFlowParams<T>();
     init(outputTree.getComputeUnitParams(), true);
-    
+
     std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
     FILE *fpQ = fopen_read(filePath);
     if (fpQ) {
@@ -245,7 +251,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
         std::cerr << "File " << filePath << " couldn't be read. " << std::strerror(errno) << std::endl;
     }
 
-    
+
     filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "F");
     FILE *fpF = fopen_read(filePath);
     if (fpF) {
@@ -255,7 +261,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
         std::cerr << "File " << filePath << " couldn't be read. " << std::strerror(errno) << std::endl;
     }
 
-    
+
     filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Nu");
     FILE *fpNu = fopen_read(filePath);
     if (fpNu) {
@@ -270,11 +276,11 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_write(std::string unit_name, RunningParams run){
-    
+
 
     std::string dirname = outputTree.getCheckpointDirName(run);
-    
-    
+
+
     BinFileParams binFormat;
     binFormat.filePath = outputTree.getAllParamsFilePath(dirname, unit_name);
     binFormat.structName = "checkpoint";
@@ -285,22 +291,30 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_write(std::string un
     binFormat.QDataType = "none";
     binFormat.QOutputLength = QVecSize;
 
-    std::cout << "Node " << nodeID << " Save " << (binFormat.filePath + ".json") << std::endl;
+
+    std::stringstream text;
+    text << "Node " << nodeID << " Starting Checkpoint Writing " << dirname;
+    std::cout << text.str() << std::endl;
+    outputTree.writeToRunningDataFile(text.str());
+
+
     outputTree.setRunningParams(run);
     outputTree.writeAllParamsJson(binFormat, run);
-    
+
     std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
+
+
     FILE *fpQ = fopen_write(filePath);
     fwrite(Q, sizeof(QVec<T, QVecSize>), size, fpQ);
     fclose(fpQ);
-    
-    
+
+
     filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "F");
     FILE *fpF = fopen_write(filePath);
     fwrite(F, sizeof(Force<T>), size, fpF);
     fclose(fpF);
-    
-    
+
+
     filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Nu");
     FILE *fpNu = fopen_write(filePath);
     fwrite(Nu, sizeof(T), size, fpNu);

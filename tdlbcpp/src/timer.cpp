@@ -124,7 +124,7 @@ void Multi_Timer::set_average_steps(tStep step){
 
 
 
-std::string Multi_Timer::get_average_str(tStep step, int block, int stream, std::string name, double start_time, double elapsed){
+std::string Multi_Timer::averagePerFunction(tStep step, int block, int stream, std::string name, double start_time, double elapsed){
 
 
     using namespace std;
@@ -150,15 +150,14 @@ std::string Multi_Timer::get_average_str(tStep step, int block, int stream, std:
 }
 
 
+std::string Multi_Timer::averageAllFunctions(tStep step){
 
 
+    using namespace std;
 
+    stringstream sstream;
 
-
-void Multi_Timer::print_start_time_and_elapsed_time_in_seconds(tStep step){
-
-
-    std::cout << "Average time for the last " << steps_per_average << " steps @ Current step: " << step << "\n";
+    sstream << "Average time for the last " << steps_per_average << " steps @ Current step: " << step << "\n";
 
     for (int b = 0; b < MAX_FUNC; b++){
         if (block[b] == -1) break;
@@ -168,58 +167,24 @@ void Multi_Timer::print_start_time_and_elapsed_time_in_seconds(tStep step){
             if (block[func] == b && names[func] != "-"){
 
 
-                std::string line = get_average_str(step, block[func], stream[func], names[func], start_time[func], elapsed[func]);
-                std::cout << line;
+                sstream << averagePerFunction(step, block[func], stream[func], names[func], start_time[func], elapsed[func]);
 
             }
         }
     }
+
+    return sstream.str();
 }
 
 
-
-void Multi_Timer::print_start_time_and_elapsed_time_in_seconds_to_file(tStep step, std::string dir) {
-
-    using namespace std;
+void Multi_Timer::printAverageAllFunctions(tStep step) {
 
 
-    ofstream myfile;
-
-    if (timer_files_created){
-        myfile.open(dir + "/node.timer_funcs.node." + to_string(rank), ofstream::app);
-    } else {
-        myfile.open(dir + "/node.timer_funcs.node." + to_string(rank), ofstream::out);
-        timer_files_created = 1;
-    }
-
-
-    if (myfile.is_open()){
-
-        myfile << "Average time for the last " << steps_per_average << " steps @ Current step: " << step << endl;
-
-        for (int b = 0; b < MAX_FUNC; b++){
-            if (block[b] == -1) break;
-
-            for (int func = 0; func < MAX_FUNC; func++){
-
-                if (block[func] == b && names[func] != "-"){
-
-                    std::string line = get_average_str(step, block[func], stream[func], names[func], start_time[func], elapsed[func]);
-
-                    myfile << line;
-                }
-            }
-        }
-        myfile << endl << endl;
-        myfile.close();
-
-    } else {
-        cout << "Unable to open file";
+    if (step == 1 || (step > 1 && (step % steps_per_average) == 0)) {
+        std::cout << averageAllFunctions(step);
     }
 
 }
-
-
 
 double Multi_Timer::check(int block_num, int stream_num, double start, std::string func){
 
@@ -260,38 +225,25 @@ double Multi_Timer::check(int block_num, int stream_num, double start, std::stri
 
 
 
-void Multi_Timer::print_time_left(tStep step, tStep num_steps, double print_time_left) {
+std::string Multi_Timer::timeLeft(tStep step, tStep num_steps, double print_time_left) {
+
+    using namespace std;
 
     double time_left = (time_now() - print_time_left) * (num_steps - step) / 60;
-    printf("This step %.1fs     Remaining mins: %.1f\n", (time_now() - print_time_left), time_left);
 
-}
+    stringstream sstream;
 
+    sstream << "This step " << fixed << setw(4) << setprecision(1) << (time_now() - print_time_left) << "s ";
 
+    sstream << "    Remaining mins: " << fixed << setw(4) << setprecision(1) << time_left << endl;
 
-
-void Multi_Timer::print_timer(tStep step) {
-
-
-    if (step == 1 || (step > 1 && (step % steps_per_average) == 0)) {
-        print_start_time_and_elapsed_time_in_seconds(step);
-    }
-
+    return sstream.str();
 }
 
 
 
 
 
-
-void Multi_Timer::print_timer_all_nodes_to_files(tStep step, std::string dir) {
-
-    if (step == 1 || (step > 1 && (step % steps_per_average) == 0)) {
-        print_start_time_and_elapsed_time_in_seconds_to_file(step, dir);
-    }
-
-
-}
 
 
 

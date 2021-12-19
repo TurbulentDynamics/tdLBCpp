@@ -74,9 +74,9 @@ int main(int argc, char* argv[]){
 
     std::string inputJsonFile = "";
     std::string checkpointDir = "";
-//    std::string geomJsonPath = "";
+    //    std::string geomJsonPath = "";
 
-    std::string streaming = "";
+//    std::string streaming = "";
 
 
     // MARK: Load json files
@@ -87,12 +87,13 @@ int main(int argc, char* argv[]){
             .show_positional_help();
 
         options.add_options()
-        ("i,input_file", "Load input json file", cxxopts::value<std::string>(inputJsonFile))
+        ("i,input_file", "Load input json file", cxxopts::value<std::string>(inputJsonFile)->default_value("input_debug_gridx60_numSteps20.json"))
         ("c,checkpoint_dir", "Load from Checkpoint directory", cxxopts::value<std::string>(checkpointDir))
         //        ("g,geom", "Load geometry input json file", cxxopts::value<std::string>(geomJsonPath))
 
-        ("s,streaming", "Streaming simple or esoteric", cxxopts::value<std::string>(streaming)->default_value("simple"))
-        ("x,snx", "Number of Cells in x direction ie snx", cxxopts::value<tNi>(grid.x))
+        //Debugging
+//        ("s,streaming", "Streaming simple or esoteric", cxxopts::value<std::string>(streaming)->default_value("simple"))
+//        ("x,snx", "Number of Cells in x direction ie snx", cxxopts::value<tNi>(grid.x))
 
         ("h,help", "Help")
         ;
@@ -120,7 +121,7 @@ int main(int argc, char* argv[]){
     //MARK: Load Checkpoint json and data, or load inputfile and initialise data on ComputeUnit.initialise
 
     if (checkpointDir != ""){
-        inputJsonFile = checkpointDir + "/AllParams.json";
+        inputJsonFile = checkpointDir + "/AllParams.0.0.0.device.json";
     }
 
 
@@ -190,10 +191,13 @@ int main(int argc, char* argv[]){
         std::cout << "Cannot find acceptable GPU device, exiting.  Please check log." << std::endl;
         return(EXIT_WAIVED);
     }
-    
+
     checkCudaErrors(cudaSetDeviceFlags(cudaDeviceBlockingSync));
 
 #endif
+
+
+
 
 
 
@@ -217,19 +221,19 @@ int main(int argc, char* argv[]){
 
     FlowParams<double> flowAsDouble = flow.asDouble();
 
-    DiskOutputTree outputTree = DiskOutputTree(checkpoint, output);
+    DiskOutputTree outputTree = DiskOutputTree(output, checkpoint);
 
     outputTree.setParams(cu, grid, flowAsDouble, running, output, checkpoint);
 
 
 
     ComputeUnitBase<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL> *lb;
-    if (streaming == "simple") {
-        std::cout << "Streaming = Nieve" << std::endl;
+    if (flow.streaming == "Simple") {
+        std::cout << "Streaming = Simple" << std::endl;
 #if WITH_GPU == 1
-        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Nieve, GPU>(cu, flow, outputTree);
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, GPU>(cu, flow, outputTree);
 #else
-        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Nieve, CPU>(cu, flow, outputTree);
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU>(cu, flow, outputTree);
 #endif
     } else {
         std::cout << "Streaming = Esoteric" << std::endl;
@@ -306,22 +310,12 @@ int main(int argc, char* argv[]){
 
     int rank = 0;
     Multi_Timer mainTimer(rank);
-    mainTimer.set_average_steps(10);
+    mainTimer.set_average_steps(running.numStepsForAverageCalc);
 
+    std::string runFile = outputTree.getInitTimeAndParams(running.runningDataFilePrefix);
+    outputTree.setRunningDataFile(running.runningDataFileDir, runFile);
 
-
-    std::string runDir = outputTree.getInitTimeAndParams();
-    outputTree.createDir(runDir);
-
-    outputTree.writeAllParamsJson(binFormat, running, "startParams_" + runDir);
-
-
-    //Set up a directory to store the timing of EVERY node, separate file for each node
-    std::string timer_dir_nodes = "timer_" + runDir;
-
-    //Here also write initial params.
-
-
+    outputTree.writeAllParamsJson(binFormat, running, outputTree.runningDataPath);
 
 
 
@@ -340,7 +334,16 @@ int main(int argc, char* argv[]){
         useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
         running.angle += deltaRunningAngle;
 
-        std::cout << "angle " << running.angle << "  deltaRunningAngle " << deltaRunningAngle << std::endl;
+        if (step < running.impellerStartupStepsUntilNormalSpeed) {
+
+            std::stringstream sstream;
+            sstream << "Angle " << running.angle << "  deltaRunningAngle " << deltaRunningAngle;
+
+            std::cout << sstream.str() << std::endl;
+            outputTree.writeToRunningDataFile(sstream.str());
+        }
+
+
 
 
 
@@ -391,6 +394,7 @@ int main(int argc, char* argv[]){
         lb->setOutputExcludePoints(geomFORCING);
 
         for (auto xy: output.XY_planes){
+
             if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
                 //                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
                 lb->calcVorticityXY(xy.cutAt, running);
@@ -400,6 +404,7 @@ int main(int argc, char* argv[]){
 
 
         for (auto xz: output.XZ_planes){
+
             if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
                 //                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
                 lb->calcVorticityXZ(xz.cutAt, running);
@@ -410,52 +415,58 @@ int main(int argc, char* argv[]){
         lb->unsetOutputExcludePoints(geomFORCING);
 
 
-        //        lb.writeAllOutput(geom, output, binFormat, running);
+        //TODO: This will write BINARY PLOTS
+        //                lb.writeAllOutput(geom, output, binFormat, running);
         main_time = mainTimer.check(0, 5, main_time, "writeAllOutput");
-
-
 
 
 
 
         // MARK: CHECKPOINT
 
-        if (checkpoint.checkpoint_repeat && (running.step % checkpoint.checkpoint_repeat == 0)) {
+        if (checkpoint.checkpointRepeat && (running.step % checkpoint.checkpointRepeat == 0)) {
 
-            lb->checkpoint_write("Device", running);
+            lb->checkpoint_write("device", running);
             main_time = mainTimer.check(0, 6, main_time, "Checkpoint");
         }
-
-
 
 
 
         mainTimer.check(1, 0, total_time, "TOTAL STEP");
 
 
-        //MAINLY FOR FOR TESTING
-        mainTimer.print_timer_all_nodes_to_files(step, timer_dir_nodes);
-        //TODO:
-        //Add std::out to stdout_runStartTime
 
-
+        //Print running updates
         tGeomShapeRT revs = running.angle * ((180.0/M_PI)/360);
-        printf("\nNode %2i Step %lu/%lu, Angle: % 1.4E (%.1f revs)    ",  rank, step, running.num_steps, running.angle, revs);
-        mainTimer.print_time_left(step, running.num_steps, total_time);
+        std::stringstream sstream;
+        sstream << "Node " << rank;
+        sstream << " Step " << step << "/" << running.num_steps;
+        sstream << ", Angle: " << std::setprecision(4) << running.angle;
+        sstream << " (" << std::setprecision(1) << revs << " revs)";
 
-        mainTimer.print_timer(step);
+        sstream << mainTimer.timeLeft(step, running.num_steps, total_time);
+
+        std::cout << sstream.str() << std::endl;
+        outputTree.writeToRunningDataFile(sstream.str());
+
+#if WITH_GPU == 1
+        size_t mf, ma;
+        cudaMemGetInfo(&mf, &ma);
+        std::cout << "GPU memory: free: " << mf << " total: " << ma << std::endl;
+#endif
+
+        //Print average time per function
+        if (step == 1 || (step > 1 && (step % running.numStepsForAverageCalc) == 0)) {
+            std::string text = mainTimer.averageAllFunctions(step);
+            outputTree.writeToRunningDataFile(text);
+            std::cout << text;
+        }
 
 
-        #if WITH_GPU == 1
-            size_t mf, ma;
-            cudaMemGetInfo(&mf, &ma);
-            std::cout << "GPU memory: free: " << mf << " total: " << ma << std::endl;
-        #endif
+
 
 
     }//end of main loop  end of main loop
-
-
 
 
 

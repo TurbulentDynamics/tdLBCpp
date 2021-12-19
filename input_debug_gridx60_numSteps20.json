@@ -103,7 +103,6 @@
         "repeatPrintTimerToStdOut": 10,
         "runningDataFileDir": ".",
         "runningDataFilePrefix": "debug_running",
-        "runningRootDir": "debug_running_dir",
         "step": 1
     }
 }

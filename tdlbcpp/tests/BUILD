@@ -30,7 +30,7 @@ testCOpts = ["-Itdlbcpp/src", "-Itdlbcpp/src/Tools"]
 
 cc_test(
   name = "diskOutputTest",
-  srcs = ["DiskOutputTreeTest.cpp", "StreamingNieveTest.cpp", "StreamingNieveTest.hpp", "StreamingNievePushTest.hpp", "ComputeUnitCheckpointTest.cpp", "ComputeUnitMemoryTest.cpp"],
+  srcs = ["DiskOutputTreeTest.cpp", "StreamingSimpleTest.cpp", "StreamingSimpleTest.hpp", "StreamingSimplePushTest.hpp", "ComputeUnitCheckpointTest.cpp", "ComputeUnitMemoryTest.cpp"],
   deps = testDeps + ["//tdlbcpp/tests/Params:ParamsCommon"],
   copts = testCOpts
 )
@@ -40,7 +40,7 @@ testCOptsGpu = testCOpts + ["-Iexternal/local_cuda/cuda/samples/common/inc/"]
 
 cuda_library(
   name = "gpuCudaCode",
-  srcs = ["StreamingNieveGpuTestLib.cpp"],
+  srcs = ["StreamingSimpleGpuTestLib.cpp"],
   deps = testDeps + ["//tdlbcpp/src:computeUnitCu", "//tdlbcpp/tests/Params:ParamsCommonCu"],
   copts = testCOptsGpu,
   target_compatible_with = select({
@@ -51,7 +51,7 @@ cuda_library(
 
 cc_binary(
   name = "gpuTest",
-  srcs = ["StreamingNieveGpuTest.cpp", "StreamingNievePushTest.hpp"],
+  srcs = ["StreamingSimpleGpuTest.cpp", "StreamingSimplePushTest.hpp"],
   deps = testDeps + [":gpuCudaCode", "@rules_cuda//cuda:cuda_runtime"],
   features = ["cuda", "-use_header_modules", "-layering_check", "-parse_headers"],
   copts = testCOptsGpu,

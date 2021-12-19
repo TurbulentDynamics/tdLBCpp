@@ -42,7 +42,7 @@ private:
     double elapsed[MAX_FUNC];
     double average[MAX_FUNC];
 
-    std::string get_average_str(tStep step, int bloc, int stream, std::string name, double start_time, double elapsed);
+    std::string getAveragePerFunction(tStep step, int bloc, int stream, std::string name, double start_time, double elapsed);
 
 public:
 
@@ -70,18 +70,15 @@ public:
 
 
 
-
     void set_average_steps(tStep);
 
 
-    void print_start_time_and_elapsed_time_in_seconds(tStep);
-    void print_start_time_and_elapsed_time_in_seconds_to_file(tStep, std::string dir);
+    std::string averagePerFunction(tStep step, int block, int stream, std::string name, double start_time, double elapsed);
 
-    
-    void print_time_left(tStep step, tStep num_steps, double print_time_left);
-    
-    void print_timer(tStep step);
-    void print_timer_all_nodes_to_files(tStep step, std::string dir);
+    std::string averageAllFunctions(tStep step);
+    void printAverageAllFunctions(tStep step);
+
+    std::string timeLeft(tStep step, tStep num_steps, double print_time_left);
 
 
 

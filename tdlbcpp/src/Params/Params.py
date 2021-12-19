@@ -197,7 +197,7 @@ class GridParams(ParamsBase):
     """
     //Grid Params are the maximum extent of the regular lattice.
     """
-    
+
     def __init__(self):
         super().__init__("""
 tNi ngx 1
@@ -246,7 +246,7 @@ T beta 1.9
 bool useLES false
 
 std::string collision EgglesSomers
-std::string streaming Nieve
+std::string streaming Simple
 """)
 
         self.template = "template <typename T>"
@@ -290,11 +290,17 @@ std::string streaming Nieve
 class RunningParams(ParamsBase):
     def __init__(self):
         super().__init__("""
-tStep step 0
+tStep step 1
 double angle 0
 tStep num_steps 20
 tStep impellerStartupStepsUntilNormalSpeed 30
-std::string runningRootDir debug_running_dir
+
+std::string runningDataFileDir .
+std::string runningDataFilePrefix debug_running
+tStep numStepsForAverageCalc 10
+tStep repeatPrintTimerToFile 20
+tStep repeatPrintTimerToStdOut 10
+
 """)
 
         self.extra_methods = """
@@ -339,11 +345,14 @@ class CheckpointParams(ParamsBase):
     def __init__(self):
         super().__init__("""
 
-bool start_with_checkpoint false
-std::string load_checkpoint_dirname debug_checkpoint_dir/debug_checkpoint
+bool startWithCheckpoint false
+std::string checkpointLoadFromDir notSet
 
-int checkpoint_repeat 0
-std::string checkpointRootDir debug_checkpoint_dir
+int checkpointRepeat 10
+std::string checkpointWriteRootDir .
+std::string checkpointWriteDirPrefix debug
+bool checkpointWriteDirAppendTime true
+
 """)
 
 
@@ -508,7 +517,7 @@ std::string outputRootDir debug_output_dir
     def add_debug_output(self, grid):
 
         orthoPlaneXY = OrthoPlane()
-        orthoPlaneXY.name = "XY_Plane"
+        orthoPlaneXY.struct_name = "XY_planes"
         orthoPlaneXY.cutAt = grid.z / 2
         orthoPlaneXY.repeat = 10
         orthoPlaneXY.name_root = "plot_slice"
@@ -516,7 +525,7 @@ std::string outputRootDir debug_output_dir
         self.ortho_plane_objs.append(orthoPlaneXY)
 
         orthoPlaneXZ = OrthoPlane()
-        orthoPlaneXZ.name = "XZ_Plane"
+        orthoPlaneXZ.struct_name = "XZ_planes"
         orthoPlaneXZ.cutAt = grid.y / 3 * 2
         orthoPlaneXZ.repeat = 10
         orthoPlaneXZ.name_root = "plot_axis"
