@@ -163,12 +163,8 @@ int main(int argc, char* argv[]){
     int gpuDeviceID = -1;
 
 #if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
-<<<<<<< Updated upstream
-    unsigned long long size = (grid.x + 2 * (GHOST)) * (grid.y + 2*(GHOST)) * (grid.z + 2*(GHOST));
-=======
     unsigned long long size = grid.x * grid.y * grid.z;
     //memRequired = size * precision * (QLen + F + Ob)
->>>>>>> Stashed changes
     unsigned long long memRequired = size * (sizeof(useQVecPrecision) * (QLen::D3Q19 + 3 + 1) + sizeof(bool) * (1 + 1));
 
     int numGpus = 0;
