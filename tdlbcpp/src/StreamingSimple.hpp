@@ -1,5 +1,5 @@
 //
-//  StreamingNieve.hpp
+//  StreamingSimple.hpp
 //  tdLB
 //
 //  Created by Niall Ó Broin on 08/12/2020.
@@ -16,7 +16,7 @@
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
-void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Nieve>::streamingPull(){
+void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>::streamingPull(){
 
 
     for (tNi i=1; i<=xg1; i++){
@@ -74,7 +74,7 @@ void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Nieve>::stre
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
-void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Nieve>::streamingPush(){
+void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>::streamingPush(){
 
 
     for (tNi i=1; i<=xg1; i++){

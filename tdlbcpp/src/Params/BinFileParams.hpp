@@ -1,5 +1,5 @@
 //
-//  ComputeUnitParams.hpp
+//  BinFileParams.hpp
 //  Turbulent Dynamics Lattice Boltzmann Cpp
 //
 //  Created by Niall Ó Broin on 08/01/2019.
@@ -21,31 +21,27 @@
 
 //
 
-struct ComputeUnitParams {
+struct BinFileParams {
 
-        int nodeID = 0;
-    int deviceID = 0;
-    int idi = 0;
-    int idj = 0;
-    int idk = 0;
-    tNi x = 0;
-    tNi y = 0;
-    tNi z = 0;
+        std::string filePath = "NoFilePath";
+    std::string name = "NoName";
+
+    //NoNote
+    std::string note = "NoNote";
+    std::string structName = "tDisk_colrow_Q4";
+    tNi binFileSizeInStructs = 0;
+    std::string coordsType = "uint16_t";
+    bool hasGridtCoords = false;
+    bool hasColRowtCoords = true;
+    std::string reference = "absolute";
     tNi i0 = 0;
     tNi j0 = 0;
     tNi k0 = 0;
-    tNi ghost = 0;
-    tNi resolution = 0;
-    std::string strQVecPrecision = "notSet";
-    std::string strMemoryLayout = "notSet";
+    std::string QDataType = "float";
+    int QOutputLength = 4;
 
     
     
-    ComputeUnitParams() {}
-
-    ComputeUnitParams(int nodeID, int deviceID, int idi, int idj, int idk, tNi x, tNi y, tNi z, tNi i0, tNi j0, tNi k0, tNi ghost)
-     : nodeID(nodeID), deviceID(deviceID), idi(idi), idj(idj), idk(idk), x(x), y(y), z(z), i0(i0), j0(j0), k0(k0), ghost(ghost) {}
-
     
     void getParamsFromJson(Json::Value jsonParams) {
 
@@ -53,27 +49,26 @@ struct ComputeUnitParams {
         try
         {
 
-                nodeID = (int)jsonParams["nodeID"].asInt();
-    deviceID = (int)jsonParams["deviceID"].asInt();
-    idi = (int)jsonParams["idi"].asInt();
-    idj = (int)jsonParams["idj"].asInt();
-    idk = (int)jsonParams["idk"].asInt();
-    x = (tNi)jsonParams["x"].asUInt64();
-    y = (tNi)jsonParams["y"].asUInt64();
-    z = (tNi)jsonParams["z"].asUInt64();
+                filePath = (std::string)jsonParams["filePath"].asString();
+    name = (std::string)jsonParams["name"].asString();
+    note = (std::string)jsonParams["note"].asString();
+    structName = (std::string)jsonParams["structName"].asString();
+    binFileSizeInStructs = (tNi)jsonParams["binFileSizeInStructs"].asUInt64();
+    coordsType = (std::string)jsonParams["coordsType"].asString();
+    hasGridtCoords = (bool)jsonParams["hasGridtCoords"].asBool();
+    hasColRowtCoords = (bool)jsonParams["hasColRowtCoords"].asBool();
+    reference = (std::string)jsonParams["reference"].asString();
     i0 = (tNi)jsonParams["i0"].asUInt64();
     j0 = (tNi)jsonParams["j0"].asUInt64();
     k0 = (tNi)jsonParams["k0"].asUInt64();
-    ghost = (tNi)jsonParams["ghost"].asUInt64();
-    resolution = (tNi)jsonParams["resolution"].asUInt64();
-    strQVecPrecision = (std::string)jsonParams["strQVecPrecision"].asString();
-    strMemoryLayout = (std::string)jsonParams["strMemoryLayout"].asString();
+    QDataType = (std::string)jsonParams["QDataType"].asString();
+    QOutputLength = (int)jsonParams["QOutputLength"].asInt();
 
             
         }
         catch(std::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in ComputeUnitParams: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in BinFileParams: " << e.what() << std::endl;
             exit(EXIT_FAILURE);
         }
                 
@@ -86,28 +81,27 @@ struct ComputeUnitParams {
             
             Json::Value jsonParams;
             
-                jsonParams["nodeID"] = (int)nodeID;
-    jsonParams["deviceID"] = (int)deviceID;
-    jsonParams["idi"] = (int)idi;
-    jsonParams["idj"] = (int)idj;
-    jsonParams["idk"] = (int)idk;
-    jsonParams["x"] = (Json::UInt64)x;
-    jsonParams["y"] = (Json::UInt64)y;
-    jsonParams["z"] = (Json::UInt64)z;
+                jsonParams["filePath"] = (std::string)filePath;
+    jsonParams["name"] = (std::string)name;
+    jsonParams["note"] = (std::string)note;
+    jsonParams["structName"] = (std::string)structName;
+    jsonParams["binFileSizeInStructs"] = (Json::UInt64)binFileSizeInStructs;
+    jsonParams["coordsType"] = (std::string)coordsType;
+    jsonParams["hasGridtCoords"] = (bool)hasGridtCoords;
+    jsonParams["hasColRowtCoords"] = (bool)hasColRowtCoords;
+    jsonParams["reference"] = (std::string)reference;
     jsonParams["i0"] = (Json::UInt64)i0;
     jsonParams["j0"] = (Json::UInt64)j0;
     jsonParams["k0"] = (Json::UInt64)k0;
-    jsonParams["ghost"] = (Json::UInt64)ghost;
-    jsonParams["resolution"] = (Json::UInt64)resolution;
-    jsonParams["strQVecPrecision"] = (std::string)strQVecPrecision;
-    jsonParams["strMemoryLayout"] = (std::string)strMemoryLayout;
+    jsonParams["QDataType"] = (std::string)QDataType;
+    jsonParams["QOutputLength"] = (int)QOutputLength;
 
             
             return jsonParams;
             
         } catch(std::exception& e) {
             
-            std::cerr << "Exception reached parsing arguments in ComputeUnitParams: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in BinFileParams: " << e.what() << std::endl;
 
             return "";
         }
@@ -152,7 +146,7 @@ struct ComputeUnitParams {
             
         } catch(std::exception& e){
             
-            std::cerr << "Exception writing json file for ComputeUnitParams: " << e.what() << std::endl;
+            std::cerr << "Exception writing json file for BinFileParams: " << e.what() << std::endl;
         }
         
         return 0;

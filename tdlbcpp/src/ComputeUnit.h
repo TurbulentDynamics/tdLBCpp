@@ -21,18 +21,18 @@
 
 
 #include "Header.h"
-#include "Params/Flow.hpp"
+#include "Params/FlowParams.hpp"
 #include "Params/ComputeUnitParams.hpp"
-#include "Params/BinFile.hpp"
+#include "Params/BinFileParams.hpp"
 #include "Params/OutputParams.hpp"
+#include "Params/CheckpointParams.hpp"
+#include "Params/RunningParams.hpp"
 
 #include "Sources/tdLBGeometryRushtonTurbineLibCPP/RushtonTurbine.hpp"
 #include "Sources/tdLBGeometryRushtonTurbineLibCPP/GeomPolar.hpp"
 
 #include "Field.hpp"
 #include "QVec.hpp"
-#include "Params/Checkpoint.hpp"
-#include "Params/Running.hpp"
 #include "DiskOutputTree.h"
 #include "Output.hpp"
 
@@ -244,9 +244,9 @@ template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision coll
 class ComputeUnitStreaming {};
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
-class ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>: public ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Simple> {
+class ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Nieve>: public ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Nieve> {
 public:
-    using Base=ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Simple>;
+    using Base=ComputeUnitCollision<T, QVecSize, MemoryLayout, collisionType, Nieve>;
     using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1; using Base::index; using Base::Q;
     using Base::dirnQ01; using Base::dirnQ02; using Base::dirnQ03; using Base::dirnQ04; using Base::dirnQ05;
     using Base::dirnQ06; using Base::dirnQ07; using Base::dirnQ08; using Base::dirnQ09; using Base::dirnQ10;
@@ -289,14 +289,15 @@ template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision coll
 struct AccessField {};
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
-struct AccessField<T, QVecSize, MemoryLayout, collisionType, Simple> {
-    inline static HOST_DEVICE_GPU QVec<T, QVecSize> read(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, tNi i, tNi j, tNi k) {
+struct AccessField<T, QVecSize, MemoryLayout, collisionType, Nieve> {
+    inline static HOST_DEVICE_GPU QVec<T, QVecSize> read(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Nieve> &cu, tNi i, tNi j, tNi k) {
         return cu.Q[cu.index(i,j,k)];
     }
-    inline static HOST_DEVICE_GPU void write(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+    inline static HOST_DEVICE_GPU void write(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Nieve> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
         cu.Q[cu.index(i,j,k)] = q;
     }
-    inline static HOST_DEVICE_GPU void writeMoments(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Simple> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+    inline static HOST_DEVICE_GPU void writeMoments(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, Nieve> &cu, QVec<T, QVecSize> &q, tNi i, tNi j, tNi k) {
+
         write(cu, q, i, j, k);
     }
  };

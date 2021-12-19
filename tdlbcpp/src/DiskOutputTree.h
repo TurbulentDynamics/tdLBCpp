@@ -25,9 +25,9 @@
 
 #include "Header.h"
 
-#include "Params/Grid.hpp"
+#include "Params/GridParams.hpp"
 #include "Params/ComputeUnitParams.hpp"
-#include "Params/Flow.hpp"
+#include "Params/FlowParams.hpp"
 
 
 
@@ -55,6 +55,8 @@ class DiskOutputTree {
 private:
 
     ComputeUnitParams cu;
+
+    std::string initTime = getTimeNowAsString();
     
     Json::Value cuJson;
 
@@ -66,16 +68,17 @@ private:
 
     
 public:
-    
-    std::string outputRootDir = "output_dir";
-    std::string checkpointRootDir = "checkpoint_dir";
+
+    //These directories maybe on separate external disks
+    std::string outputRootDir = "Error_UnInitialised_Output_Dir";
+    std::string checkpointRootDir = "Error_UnInitialised_Checkpoint_Dir";
 
     
     DiskOutputTree(CheckpointParams checkpoint1, OutputParams output1){
-        outputRootDir = output1.rootDir;
+        outputRootDir = output1.outputRootDir;
         createDir(outputRootDir);
 
-        checkpointRootDir = checkpoint1.checkpoint_root_dir;
+        checkpointRootDir = checkpoint1.checkpointRootDir;
         createDir(checkpointRootDir);
 
         output = output1.getJson();
@@ -108,10 +111,10 @@ public:
         checkpoint = checkpoint1.getJson();
 
         
-        outputRootDir = output1.rootDir;
+        outputRootDir = output1.outputRootDir;
         createDir(outputRootDir);
 
-        checkpointRootDir = checkpoint1.checkpoint_root_dir;
+        checkpointRootDir = checkpoint1.checkpointRootDir;
         createDir(checkpointRootDir);
     };
     
@@ -207,22 +210,45 @@ public:
         outputRootDir = runDir1;
     }
     
-    std::string getRunDirWithTimeAndParams(std::string prefix, tNi gridX, int re_m, bool les, float uav, tStep step = 0){
 
-        std::string str = prefix + "_";
+    std::string runSummary(){
+        std::string str = "gridx_" + grid["x"].asString() + "_";
+        str += "re_" + flow["reMNonDimensional"].asString() + "_";
+        str += "les_" + flow["useLES"].asString() + "_";
+        str += "uav_" + flow["uav"].asString();
+        return str;
+    }
+
+    std::string getInitTimeAndParams(tStep step = 0, std::string prefix = ""){
+
+        std::string str = "";
+        if (prefix != ""){
+            str += prefix + "_";
+        }
 
         if (step) str += "step_" + std::to_string(step) + "__";
 
-        str += "datetime_" + getTimeNowAsString() + "_";
-        str += "gridx_" + std::to_string(gridX) + "_";
-        str += "re_" + std::to_string(re_m) + "_";
-        str += "les_" + std::to_string(les) + "_";
-        str += "uav_" + std::to_string(uav);
+        str += "datetime_" + initTime + "_";
+        str += runSummary();
 
         return str;
     }
-    
-    
+
+    std::string getTimeNowAndParams(tStep step = 0, std::string prefix = ""){
+
+        std::string str = "";
+        if (prefix != ""){
+            str += prefix + "_";
+        }
+        if (step) str += "step_" + std::to_string(step) + "__";
+
+        str += "datetime_" + getTimeNowAsString() + "_";
+        str += runSummary();
+
+        return str;
+    }
+
+
     //==================================================
     
     
@@ -307,7 +333,7 @@ public:
     }
     
     
-    int writeAllParamsJson(BinFileParams format, RunningParams runParam){
+    int writeAllParamsJson(BinFileParams format, RunningParams runParam, std::string filePath=""){
 
         try {
 
@@ -322,10 +348,12 @@ public:
             jsonParams["OutputParams"] = output;
             jsonParams["CheckpointParams"] = checkpoint;
 
-            
-            std::string path = format.filePath + ".json";
-            
-            std::ofstream out(path.c_str(), std::ofstream::out);
+
+            if (filePath == ""){
+                std::string filePath = format.filePath + ".json";
+            }
+
+            std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams;
             out.close();
 

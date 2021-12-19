@@ -13,7 +13,7 @@
 
 #include "ComputeUnit.h"
 #include "DiskOutputTree.h"
-#include "Params/BinFile.hpp"
+#include "Params/BinFileParams.hpp"
 
 
 

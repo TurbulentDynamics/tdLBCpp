@@ -1,0 +1,109 @@
+{
+    "BinFileParams": {
+        "QDataType": "float",
+        "QOutputLength": 4,
+        "binFileSizeInStructs": 0,
+        "coordsType": "uint16_t",
+        "filePath": "NoFilePath",
+        "hasColRowtCoords": true,
+        "hasGridtCoords": false,
+        "i0": 0,
+        "j0": 0,
+        "k0": 0,
+        "name": "NoName",
+        "note": "NoNote",
+        "reference": "absolute",
+        "structName": "tDisk_colrow_Q4"
+    },
+    "CheckpointParams": {
+        "checkpointLoadFromDir": "notSet",
+        "checkpointRepeat": 10,
+        "checkpointWriteDirAppendTime": true,
+        "checkpointWriteDirPrefix": "debug",
+        "checkpointWriteRootDir": ".",
+        "startWithCheckpoint": false
+    },
+    "ComputeUnitParams": {
+        "deviceID": 0,
+        "ghost": 0,
+        "i0": 0,
+        "idi": 0,
+        "idj": 0,
+        "idk": 0,
+        "j0": 0,
+        "k0": 0,
+        "nodeID": 0,
+        "resolution": 0,
+        "strMemoryLayout": "notSet",
+        "strQVecPrecision": "notSet",
+        "x": 0,
+        "y": 0,
+        "z": 0
+    },
+    "FlowParams": {
+        "Re_f": 0.0,
+        "Re_m": 0.0,
+        "alpha": 0.97,
+        "beta": 1.9,
+        "collision": "EgglesSomers",
+        "cs0": 0.12,
+        "fx0": 0.0,
+        "g3": 0.8,
+        "initialRho": 8.0,
+        "nu": 0.0,
+        "reMNonDimensional": 7300.0,
+        "streaming": "Simple",
+        "uav": 0.1,
+        "uf": 0.0,
+        "useLES": false
+    },
+    "GridParams": {
+        "multiStep": 1,
+        "ngx": 1,
+        "ngy": 1,
+        "ngz": 1,
+        "strMinQVecPrecision": "float",
+        "x": 60,
+        "y": 60,
+        "z": 60
+    },
+    "OutputParams": {
+        "XY_planes": [
+            {
+                "QDataType": "float",
+                "Q_output_len": 4,
+                "cutAt": 30.0,
+                "end_at_repeat": 0,
+                "name_root": "plot_slice",
+                "repeat": 10,
+                "start_at_step": 0,
+                "use_half_float": false
+            }
+        ],
+        "XZ_planes": [
+            {
+                "QDataType": "float",
+                "Q_output_len": 4,
+                "cutAt": 40.0,
+                "end_at_repeat": 0,
+                "name_root": "plot_axis",
+                "repeat": 10,
+                "start_at_step": 0,
+                "use_half_float": false
+            }
+        ],
+        "outputRootDir": "debug_output_dir"
+    },
+    "RunningParams": {
+        "angle": 0.0,
+        "impellerStartupStepsUntilNormalSpeed": 30,
+        "numStepsForAverageCalc": 10,
+        "num_steps": 20,
+        "repeatPrintTimerToFile": 20,
+        "repeatPrintTimerToStdOut": 10,
+        "runningDataFileDir": ".",
+        "runningDataFilePrefix": "debug_running",
+        "runningRootDir": "debug_running_dir",
+        "step": 1
+    }
+}

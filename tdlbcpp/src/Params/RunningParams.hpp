@@ -1,6 +1,6 @@
 //
-//  define_datastructures.hpp
-//  stirred-tank-3d-xcode-cpp
+//  RunningParams.hpp
+//  Turbulent Dynamics Lattice Boltzmann Cpp
 //
 //  Created by Niall Ó Broin on 08/01/2019.
 //  Copyright © 2019 Niall Ó Broin. All rights reserved.
@@ -17,26 +17,31 @@
 
 
 
-struct RunningParams
-{
-    tStep step = 0;
-    double angle = 0;
 
-    tStep num_steps = 1;
 
+//
+
+struct RunningParams {
+
+        tStep step = 0;
+    double angle = 0.0;
+    tStep num_steps = 20;
     tStep impellerStartupStepsUntilNormalSpeed = 30;
+    std::string runningRootDir = "debug_running_dir";
 
+    
+    
     void update(tStep _step, double _angle){
-                
+
         step = (tStep)_step;
         angle = (double)_angle;
 
     }
-    
+
     void incrementStep(){
         step ++;
     }
-    
+
     
     void getParamsFromJson(Json::Value jsonParams) {
 
@@ -44,26 +49,21 @@ struct RunningParams
         try
         {
 
-            angle = jsonParams["angle"].asDouble();
-            
-            step = (Json::UInt64)jsonParams["step"].asUInt64();
-            num_steps = (tStep)jsonParams["num_steps"].asUInt64();
-            impellerStartupStepsUntilNormalSpeed = (tStep)jsonParams["impellerStartupStepsUntilNormalSpeed"].asUInt64();
+                step = (tStep)jsonParams["step"].asUInt64();
+    angle = (double)jsonParams["angle"].asDouble();
+    num_steps = (tStep)jsonParams["num_steps"].asUInt64();
+    impellerStartupStepsUntilNormalSpeed = (tStep)jsonParams["impellerStartupStepsUntilNormalSpeed"].asUInt64();
+    runningRootDir = (std::string)jsonParams["runningRootDir"].asString();
 
             
         }
         catch(std::exception& e)
         {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "Exception reached parsing arguments in RunningParams: " << e.what() << std::endl;
+            exit(EXIT_FAILURE);
         }
-            
-    };
-    
-    
-    
-    
-    
+                
+    }
     
     
     Json::Value getJson(){
@@ -72,24 +72,24 @@ struct RunningParams
             
             Json::Value jsonParams;
             
-            jsonParams["name"] = "Running";
-            
-            jsonParams["step"] = (Json::UInt64)step;
-            jsonParams["angle"] = (double)angle;
-
-            jsonParams["num_steps"] = (Json::UInt64)num_steps;
-            jsonParams["impellerStartupStepsUntilNormalSpeed"] = (Json::UInt64)impellerStartupStepsUntilNormalSpeed;
+                jsonParams["step"] = (Json::UInt64)step;
+    jsonParams["angle"] = (double)angle;
+    jsonParams["num_steps"] = (Json::UInt64)num_steps;
+    jsonParams["impellerStartupStepsUntilNormalSpeed"] = (Json::UInt64)impellerStartupStepsUntilNormalSpeed;
+    jsonParams["runningRootDir"] = (std::string)runningRootDir;
 
             
             return jsonParams;
             
         } catch(std::exception& e) {
             
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "Exception reached parsing arguments in RunningParams: " << e.what() << std::endl;
+
             return "";
         }
     }
+    
+    
     
     
     void getParamsFromJsonFile(const std::string filePath) {
@@ -106,8 +106,8 @@ struct RunningParams
         }
         catch(std::exception& e)
         {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "Exception reading from input file: " << e.what() << std::endl;
+            exit(EXIT_FAILURE);
         }
         
     };
@@ -128,9 +128,7 @@ struct RunningParams
             
         } catch(std::exception& e){
             
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
-            return 1;
+            std::cerr << "Exception writing json file for RunningParams: " << e.what() << std::endl;
         }
         
         return 0;
@@ -144,6 +142,5 @@ struct RunningParams
         << std::endl;
         
     }
-    
     
 };//end of struct

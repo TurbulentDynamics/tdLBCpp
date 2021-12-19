@@ -1,5 +1,5 @@
 //
-//  StreamingNieve.cuh
+//  StreamingSimple.cuh
 //  tdLBcpp
 //
 //  Created by Niall Ó Broin on 2021/09/03.

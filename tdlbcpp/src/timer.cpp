@@ -178,7 +178,7 @@ void Multi_Timer::print_start_time_and_elapsed_time_in_seconds(tStep step){
 
 
 
-void Multi_Timer::print_start_time_and_elapsed_time_in_seconds_to_file(tStep step, std::string dir=".") {
+void Multi_Timer::print_start_time_and_elapsed_time_in_seconds_to_file(tStep step, std::string dir) {
 
     using namespace std;
 
@@ -284,7 +284,7 @@ void Multi_Timer::print_timer(tStep step) {
 
 
 
-void Multi_Timer::print_timer_all_nodes_to_files(tStep step, std::string dir=".") {
+void Multi_Timer::print_timer_all_nodes_to_files(tStep step, std::string dir) {
 
     if (step == 1 || (step > 1 && (step % steps_per_average) == 0)) {
         print_start_time_and_elapsed_time_in_seconds_to_file(step, dir);

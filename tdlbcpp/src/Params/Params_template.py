@@ -1,6 +1,6 @@
 //
-//  define_datastructures.hpp
-//  stirred-tank-3d-xcode-cpp
+//  $struct_name.hpp
+//  Turbulent Dynamics Lattice Boltzmann Cpp
 //
 //  Created by Niall Ó Broin on 08/01/2019.
 //  Copyright © 2019 Niall Ó Broin. All rights reserved.
@@ -14,21 +14,18 @@
 
 #include "json.h"
 
+$include
 
 
 
-//Grid Params are the maximum extent of the regular lattice.
-struct GridParams
-{
-    tNi ngx = 1;
-    tNi ngy = 1;
-    tNi ngz = 1;
+
+$doc_string
+$template
+struct $struct_name {
+
+    $define
     
-    tNi x = 44;
-    tNi y = 44;
-    tNi z = 44;
-    
-
+    $extra_methods
     
     void getParamsFromJson(Json::Value jsonParams) {
 
@@ -36,19 +33,13 @@ struct GridParams
         try
         {
 
-            ngx = (tNi)jsonParams["ngx"].asInt();
-            ngy = (tNi)jsonParams["ngy"].asInt();
-            ngz = (tNi)jsonParams["ngz"].asInt();
-            
-            x = (tNi)jsonParams["x"].asInt();
-            y = (tNi)jsonParams["y"].asInt();
-            z = (tNi)jsonParams["z"].asInt();
+            $load_json
             
         }
         catch(std::exception& e)
         {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "Exception reached parsing arguments in $struct_name: " << e.what() << std::endl;
+            exit(EXIT_FAILURE);
         }
                 
     }
@@ -60,22 +51,14 @@ struct GridParams
             
             Json::Value jsonParams;
             
-            jsonParams["name"] = "GridParams";
-            
-            jsonParams["ngx"] = (int)ngx;
-            jsonParams["ngy"] = (int)ngy;
-            jsonParams["ngz"] = (int)ngz;
-            
-            jsonParams["x"] = (int)x;
-            jsonParams["y"] = (int)y;
-            jsonParams["z"] = (int)z;
+            $save_json
             
             return jsonParams;
             
         } catch(std::exception& e) {
             
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "Exception reached parsing arguments in $struct_name: " << e.what() << std::endl;
+
             return "";
         }
     }
@@ -97,8 +80,8 @@ struct GridParams
         }
         catch(std::exception& e)
         {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "Exception reading from input file: " << e.what() << std::endl;
+            exit(EXIT_FAILURE);
         }
         
     };
@@ -119,9 +102,7 @@ struct GridParams
             
         } catch(std::exception& e){
             
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
-            return 1;
+            std::cerr << "Exception writing json file for $struct_name: " << e.what() << std::endl;
         }
         
         return 0;

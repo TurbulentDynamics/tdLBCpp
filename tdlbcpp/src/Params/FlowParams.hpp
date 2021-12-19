@@ -1,6 +1,6 @@
 //
-//  define_datastructures.hpp
-//  stirred-tank-3d-xcode-cpp
+//  FlowParams.hpp
+//  Turbulent Dynamics Lattice Boltzmann Cpp
 //
 //  Created by Niall Ó Broin on 08/01/2019.
 //  Copyright © 2019 Niall Ó Broin. All rights reserved.
@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <cmath>
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
@@ -18,19 +17,21 @@
 
 
 
+
+
+//
 template <typename T>
 struct FlowParams {
 
-    T initialRho = (T)8.0;
-    T reMNonDimensional = (T)7300.0;
-
-    T uav = (T)0.1;
+        T initialRho = 8.0;
+    T reMNonDimensional = 7300.0;
+    T uav = 0.1;
 
     //ratio mixing length / lattice spacing delta (Smagorinsky)
     T cs0 = 0.12;
 
     //compensation of third order terms
-    T g3 = (T)0.8;
+    T g3 = 0.8;
 
     //kinematic viscosity
     T nu = 0.0;
@@ -46,22 +47,21 @@ struct FlowParams {
 
     //friction velocity
     T uf = 0.0;
-
-    T alpha = (T)0.97;
-    T beta = (T)1.9;
-
-    bool useLES = 0;
-
+    T alpha = 0.97;
+    T beta = 1.9;
+    bool useLES = false;
     std::string collision = "EgglesSomers";
     std::string streaming = "Nieve";
 
-    void calc_nu(int impellerBladeOuterRadius){
+    
+    
+    void calcNuAndRe_m(int impellerBladeOuterRadius){
 
         Re_m = reMNonDimensional * M_PI / 2.0;
 
         nu  = uav * (T)impellerBladeOuterRadius / Re_m;
     }
-    
+
     FlowParams<double> asDouble(){
         FlowParams<double> f;
 
@@ -75,7 +75,7 @@ struct FlowParams {
         f.Re_m = (double)Re_m;
         f.Re_f = (double)Re_f;
         f.uf = (double)uf;
-        
+
         f.alpha = (double)alpha;
         f.beta = (double)beta;
 
@@ -85,83 +85,74 @@ struct FlowParams {
 
         return f;
     }
-        
 
-
+    
     void getParamsFromJson(Json::Value jsonParams) {
 
+        
         try
         {
-            
-            initialRho = (T)jsonParams["initialRho"].asDouble();
-            reMNonDimensional = (T)jsonParams["reMNonDimensional"].asDouble();
 
-            uav = (T)jsonParams["uav"].asDouble();
-
-            cs0 = (T)jsonParams["cs0"].asDouble();
-            g3 = (T)jsonParams["g3"].asDouble();
-
-            nu = (T)jsonParams["nu"].asDouble();
-            fx0 = (T)jsonParams["fx0"].asDouble();
-
-            Re_m = (T)jsonParams["Re_m"].asDouble();
-            Re_f = (T)jsonParams["Re_f"].asDouble();
-            uf = (T)jsonParams["uf"].asDouble();
-
-            alpha = (T)jsonParams["alpha"].asDouble();
-            beta = (T)jsonParams["beta"].asDouble();
-            
-            useLES = (T)jsonParams["useLES"].asBool();
-            collision = jsonParams["collision"].asString();
-            streaming = jsonParams["streaming"].asString();
+                initialRho = (T)jsonParams["initialRho"].asDouble();
+    reMNonDimensional = (T)jsonParams["reMNonDimensional"].asDouble();
+    uav = (T)jsonParams["uav"].asDouble();
+    cs0 = (T)jsonParams["cs0"].asDouble();
+    g3 = (T)jsonParams["g3"].asDouble();
+    nu = (T)jsonParams["nu"].asDouble();
+    fx0 = (T)jsonParams["fx0"].asDouble();
+    Re_m = (T)jsonParams["Re_m"].asDouble();
+    Re_f = (T)jsonParams["Re_f"].asDouble();
+    uf = (T)jsonParams["uf"].asDouble();
+    alpha = (T)jsonParams["alpha"].asDouble();
+    beta = (T)jsonParams["beta"].asDouble();
+    useLES = (bool)jsonParams["useLES"].asBool();
+    collision = (std::string)jsonParams["collision"].asString();
+    streaming = (std::string)jsonParams["streaming"].asString();
 
             
         }
         catch(std::exception& e)
         {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "Exception reached parsing arguments in FlowParams: " << e.what() << std::endl;
+            exit(EXIT_FAILURE);
         }
+                
     }
     
     
-
     Json::Value getJson(){
-        try
-        {
+        
+        try {
+            
             Json::Value jsonParams;
             
-            jsonParams["name"] = "FlowParams";
-            
-            jsonParams["initialRho"] = (double)initialRho;
-            jsonParams["reMNonDimensional"] = (double)reMNonDimensional;
-            jsonParams["uav"] = (double)uav;
-            jsonParams["cs0"] = (double)cs0;
-            jsonParams["nu"] = (double)nu;
-            jsonParams["g3"] = (double)g3;
-            jsonParams["fx0"] = (double)fx0;
-            jsonParams["Re_f"] = (double)Re_f;
-            jsonParams["uf"] = (double)uf;
-            jsonParams["Re_m"] = (double)Re_m;
-            
-            jsonParams["alpha"] = (double)alpha;
-            jsonParams["beta"] = (double)beta;
+                jsonParams["initialRho"] = (double)initialRho;
+    jsonParams["reMNonDimensional"] = (double)reMNonDimensional;
+    jsonParams["uav"] = (double)uav;
+    jsonParams["cs0"] = (double)cs0;
+    jsonParams["g3"] = (double)g3;
+    jsonParams["nu"] = (double)nu;
+    jsonParams["fx0"] = (double)fx0;
+    jsonParams["Re_m"] = (double)Re_m;
+    jsonParams["Re_f"] = (double)Re_f;
+    jsonParams["uf"] = (double)uf;
+    jsonParams["alpha"] = (double)alpha;
+    jsonParams["beta"] = (double)beta;
+    jsonParams["useLES"] = (bool)useLES;
+    jsonParams["collision"] = (std::string)collision;
+    jsonParams["streaming"] = (std::string)streaming;
 
-            jsonParams["useLES"] = (bool)useLES;
-            jsonParams["collision"] = (std::string)collision;
-            jsonParams["streaming"] = (std::string)streaming;
-
-            
             
             return jsonParams;
             
         } catch(std::exception& e) {
             
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "Exception reached parsing arguments in FlowParams: " << e.what() << std::endl;
+
             return "";
         }
     }
+    
     
     
     
@@ -179,8 +170,8 @@ struct FlowParams {
         }
         catch(std::exception& e)
         {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "Exception reading from input file: " << e.what() << std::endl;
+            exit(EXIT_FAILURE);
         }
         
     };
@@ -201,9 +192,7 @@ struct FlowParams {
             
         } catch(std::exception& e){
             
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
-            return 1;
+            std::cerr << "Exception writing json file for FlowParams: " << e.what() << std::endl;
         }
         
         return 0;
@@ -218,6 +207,4 @@ struct FlowParams {
         
     }
     
-    
-    
-}; //end of struct
+};//end of struct

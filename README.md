@@ -3,14 +3,23 @@
 This is a basic version of the multi-node heterogeneous HPC code to run simulation with hundreds of billions of cells.
 
 
+## Running
+```python
+#Generate an input file
+python3 generate_stirred_tank_input.py -x 60 -f input_ngx1_x60.json
+./tdlbcpp --input_file input_ngx1_x60.json
 
-
+#Load from checkpoint dir
+./tdlbcpp --checkpoint_dir checkpoint_2021_9_21__jd7aflakjd
+```
 
 ## Building
 
 ### Generic build
 ```
 bazel build //tdlbcpp/src:tdlbcpp --verbose_failures -s
+
+
 ```
 ### GPU build
 uses `nvcc` compiler for cuda files and main.cpp and sets WITH_GPU | WITH_GPU_MEMSHARED define
@@ -31,6 +40,11 @@ Specify capabilities and custom cuda path using the following switches:
 
 ```
 bazel build -c dbg --config gpu --@rules_cuda//cuda:cuda_targets=sm_30 --repo_env=CUDA_PATH=/usr/local/cuda-9.1 //tdlbcpp/src:tdlbcpp
+```
+
+##Tests
+```
+bazel test //tdlbcpp/tests/Params:tests
 ```
 
 ## Package Structure

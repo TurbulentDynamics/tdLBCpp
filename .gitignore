@@ -1,15 +1,15 @@
+tdlbcpp-bin
+
 tdLBGeometryRushtonTurbineLib/
 tdLBCppApi/
 
 bazel-*
-
 build/
 .DS_Store
+__pycache__
 
 
-checkpoint_debug
-output_debug
-timer_tmp
+debug_*
 
 
 *.jpeg

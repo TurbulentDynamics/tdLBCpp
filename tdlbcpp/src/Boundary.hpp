@@ -15,7 +15,7 @@ void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Esotwist>::b
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType>
-void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Simple>::bounceBackBoundary(){
+void ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, Nieve>::bounceBackBoundary(){
 
     //Takes the vector from the active cell, reverses it, and places it in the
     //ghost cell (the streaming function can then operate on the ghost cell to
