@@ -230,7 +230,7 @@ public:
     std::string paramSummary(){
         std::string str = "_gridx_" + grid["x"].asString();
         str += "_re_" + flow["reMNonDimensional"].asString();
-//        str += "_les_" + flow["useLES"].asString();
+        str += "_les_" + flow["useLES"].asString();
 //        str += "_uav_" + flow["uav"].asString();
         return str;
     }

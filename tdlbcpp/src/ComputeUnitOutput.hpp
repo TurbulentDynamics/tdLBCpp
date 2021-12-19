@@ -184,7 +184,7 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 
     TooJpeg::openJpeg(jpegPath);
     TooJpeg::writeJpeg(pict, xg1, zg1,
-                       false, 90, false, "Debug");
+                       false, 100, false, "Debug");
     TooJpeg::closeJpeg();
 
     delete[] Vort;
@@ -265,12 +265,16 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 
     std::string plotDir = outputTree.formatXYPlaneDir(runParam.step, k);
 
+
+
     std::string jpegPath = plotDir + ".jpeg";
+
+	std::cout << plotDir << " " << jpegPath <<std::endl;
 
 
     TooJpeg::openJpeg(jpegPath);
     TooJpeg::writeJpeg(pict, xg1, yg1,
-                       false, 90, false, "Debug");
+                       false, 100, false, "Debug");
     TooJpeg::closeJpeg();
 
     delete[] Vort;
@@ -444,7 +448,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::savePlaneXZ(OrthoPlaneParams pl
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void inline ComputeUnitBase<T, QVecSize, MemoryLayout>::saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam)
+void inline ComputeUnitBase<T, QVecSize, MemoryLayout>::saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam, tNi cutAt)
 {
     bool minInitialized = false, maxInitialized = false;
     T max = 0, min = 0;
@@ -486,12 +490,18 @@ void inline ComputeUnitBase<T, QVecSize, MemoryLayout>::saveJpeg(const char *tag
         }
     }
 
-    std::string jpegPath = "vort." + std::string(tag) + "." + formatStep(runParam.step) + ".jpeg";
+    std::string plotDir;
+    if (tag=="xy") plotDir = outputTree.formatYZPlaneDir(runParam.step, cutAt);
+    else if (tag=="xz") plotDir = outputTree.formatXZPlaneDir(runParam.step, cutAt);
+
+    std::string jpegPath = plotDir + ".jpeg";
+
+  // std::string jpegPath = "vort." + std::string(tag) + "." + formatStep(runParam.step) + ".jpeg";
 
 
     TooJpeg::openJpeg(jpegPath);
     TooJpeg::writeJpeg(pict, pictSizeX, pictSizeY,
-                       false, 90, false, "Debug");
+                       false, 100, false, "Debug");
     TooJpeg::closeJpeg();
 
     delete[] pict;

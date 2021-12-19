@@ -150,7 +150,7 @@ public:
     virtual void calcVorticityXZ(tNi j, RunningParams runParam) = 0;
     virtual void calcVorticityXY(tNi k, RunningParams runParam) = 0;
 
-    void saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam);
+    void saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam, tNi cutAt);
     
     
 private:
