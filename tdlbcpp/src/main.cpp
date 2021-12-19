@@ -271,6 +271,7 @@ int main(int argc, char* argv[]){
 
 
     //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
+    
     RushtonTurbinePolarCPP<tNi, useQVecPrecision> geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
     geom.impellerStartupStepsUntilNormalSpeed = running.impellerStartupStepsUntilNormalSpeed;
     useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
@@ -337,10 +338,8 @@ int main(int argc, char* argv[]){
         if (step < running.impellerStartupStepsUntilNormalSpeed) {
 
             std::stringstream sstream;
-            sstream << "Angle " << running.angle << "  deltaRunningAngle " << deltaRunningAngle;
-
-            std::cout << sstream.str() << std::endl;
-            outputTree.writeToRunningDataFile(sstream.str());
+            sstream << "Angle " << fixed << std::setw(6) << std::setprecision(4) << running.angle << "  deltaRunningAngle " << deltaRunningAngle << std::endl;
+            outputTree.writeToRunningDataFileAndPrint(sstream.str());
         }
 
 
@@ -442,12 +441,11 @@ int main(int argc, char* argv[]){
         sstream << "Node " << rank;
         sstream << " Step " << step << "/" << running.num_steps;
         sstream << ", Angle: " << std::setprecision(4) << running.angle;
-        sstream << " (" << std::setprecision(1) << revs << " revs)";
+        sstream << " (" << std::setprecision(1) << revs << " revs)    ";
 
-        sstream << mainTimer.timeLeft(step, running.num_steps, total_time);
+        sstream << mainTimer.timeLeft(step, running.num_steps, total_time) << std::endl;
 
-        std::cout << sstream.str() << std::endl;
-        outputTree.writeToRunningDataFile(sstream.str());
+        outputTree.writeToRunningDataFileAndPrint(sstream.str());
 
 #if WITH_GPU == 1
         size_t mf, ma;
@@ -458,8 +456,7 @@ int main(int argc, char* argv[]){
         //Print average time per function
         if (step == 1 || (step > 1 && (step % running.numStepsForAverageCalc) == 0)) {
             std::string text = mainTimer.averageAllFunctions(step);
-            outputTree.writeToRunningDataFile(text);
-            std::cout << text;
+            outputTree.writeToRunningDataFileAndPrint(text);
         }
 
 

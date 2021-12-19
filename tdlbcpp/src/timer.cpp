@@ -132,7 +132,7 @@ std::string Multi_Timer::averagePerFunction(tStep step, int block, int stream, s
     stringstream sstream;
 
     sstream << setfill('0') << setw(2);
-    sstream << "Node " << rank << " Block " << block << " Stream " << stream;
+    sstream << "Node " << rank << ": Block " << block << " Stream " << stream;
 
     sstream << " Step " << step << "  ";
 

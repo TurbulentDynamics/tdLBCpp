@@ -85,15 +85,13 @@ public:
 
         initTime = getTimeNowAsString();
 
+        output = o.getJson();
+        setOutputDir();
+        createDir(outputDir);
+
         checkpoint = c.getJson();
         setCheckpointWriteDir();
         createDir(checkpointWriteDir);
-
-
-        output = o.getJson();
-        outputDir = o.outputRootDir + "_" + initTime;
-        createDir(outputDir);
-
     };
 
 
@@ -103,7 +101,7 @@ public:
 
         cuJson = cu.getJson();
 
-        outputDir = output["outputRootDir"].asString() + "_" + initTime;
+        setOutputDir();
         createDir(outputDir);
 
         setCheckpointWriteDir();
@@ -128,7 +126,7 @@ public:
         checkpoint = checkpoint1.getJson();
 
 
-        outputDir = output1.outputRootDir + "_" + initTime;
+        setOutputDir();
         createDir(outputDir);
 
         setCheckpointWriteDir();
@@ -230,20 +228,20 @@ public:
 
 
     std::string paramSummary(){
-        std::string str = "gridx_" + grid["x"].asString() + "_";
-        str += "re_" + flow["reMNonDimensional"].asString() + "_";
-        str += "les_" + flow["useLES"].asString() + "_";
-        str += "uav_" + flow["uav"].asString();
+        std::string str = "_gridx_" + grid["x"].asString();
+        str += "_re_" + flow["reMNonDimensional"].asString();
+//        str += "_les_" + flow["useLES"].asString();
+//        str += "_uav_" + flow["uav"].asString();
         return str;
     }
 
     std::string getInitTimeAndParams(std::string prefix = "", tStep step = 0){
 
         std::string str = "";
-        if (prefix != "") str += prefix + "_";
-        if (step) str += "step_" + formatStep(step) + "_";
+        if (prefix != "") str += prefix;
+        if (step) str += "_step_" + formatStep(step);
 
-        str += initTime + "_";
+        str += "_" + initTime;
         str += paramSummary();
 
         return str;
@@ -277,13 +275,23 @@ public:
     }
 
 
+    std::string nodePrintText(std::string text){
+
+        std::stringstream nodeText;
+
+        nodeText << "Node " << cuJson["nodeID"] << ": ";
+
+        nodeText << text;
+
+        return nodeText.str();
+    }
+
+
     void writeToRunningDataFile(std::string text){
 
         using namespace std;
 
-        std::ofstream runningDataFile;
-
-
+        ofstream runningDataFile;
 
 
         if (pathExists(runningDataPath)){
@@ -294,14 +302,20 @@ public:
 
         if (runningDataFile.is_open()){
             runningDataFile << text;
-            runningDataFile << endl << endl;
         } else {
+
             cout << "Error: runningFile not open ";
+            cout << "Trying to print -> " << text << "<-" << endl;
         }
     }
 
 
+    void writeToRunningDataFileAndPrint(std::string text){
 
+
+        writeToRunningDataFile(nodePrintText(text));
+        std::cout << nodePrintText(text);
+    }
 
 
     //==================================================
@@ -316,6 +330,12 @@ public:
 
         return sstream.str();
     }
+
+    void setOutputDir(){
+
+        outputDir = output["outputRootDir"].asString() + "_" + initTime;
+    }
+
 
 
     std::string formatPlotDir(std::string prefix, std::string plotType, tStep step) {

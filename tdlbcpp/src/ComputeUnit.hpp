@@ -200,12 +200,8 @@ template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_read(std::string filePath){
 
     std::stringstream text;
-    text << "Node " << nodeID << " Starting Checkpoint Writing " << filePath << std::endl;
-    std::cout << text.str() << std::endl;
-    outputTree.writeToRunningDataFile(text.str());
-
-
-    std::cout << "Node " << nodeID << " Load " << filePath << std::endl;
+    text << " cu.fopen_read: Starting Checkpoint LOADING " << filePath << std::endl;
+    outputTree.writeToRunningDataFileAndPrint(text.str());
 
     return fopen(filePath.c_str(), "r");
 }
@@ -213,7 +209,9 @@ FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_read(std::string filePat
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_write(std::string filePath){
 
-    std::cout << "Node " << nodeID << " Save File " << filePath << std::endl;
+    std::stringstream text;
+    text << " cu.fopen_write: Open File for Writing:" << filePath << std::endl;
+    outputTree.writeToRunningDataFileAndPrint(text.str());
 
     return fopen(filePath.c_str(), "w");
 }
@@ -237,10 +235,21 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
 
     RunningParams running;
 
-    std::cout << "Node " << nodeID << " Load " << (outputTree.getAllParamsFilePath(dirname, unit_name) + ".json") << std::endl;
-    outputTree.readAllParamsJson(outputTree.getAllParamsFilePath(dirname, unit_name) + ".json", binFormat, running);
+
+
+    std::string paramsFilePath = outputTree.getAllParamsFilePath(dirname, unit_name) + ".json";
+
+
+    std::stringstream text;
+    text << " Checkpoint Load: " << paramsFilePath << std::endl;
+
+
+    outputTree.readAllParamsJson(paramsFilePath, binFormat, running);
     flow = outputTree.getFlowParams<T>();
+
+    //TODO: Check this
     init(outputTree.getComputeUnitParams(), true);
+
 
     std::string filePath = outputTree.getCheckpointFilePath(dirname, unit_name, "Q");
     FILE *fpQ = fopen_read(filePath);
@@ -248,7 +257,10 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
         fread(Q, sizeof(QVec<T, QVecSize>), size, fpQ);
         fclose(fpQ);
     } else {
-        std::cerr << "File " << filePath << " couldn't be read. " << std::strerror(errno) << std::endl;
+        std::stringstream text;
+        // std::strerror(errno)
+        text << " checkpoint_read: File couldn't be read: " << filePath << " "  << std::endl;
+        outputTree.writeToRunningDataFileAndPrint(text.str());
     }
 
 
@@ -258,7 +270,9 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
         fread(F, sizeof(Force<T>), size, fpF);
         fclose(fpF);
     } else {
-        std::cerr << "File " << filePath << " couldn't be read. " << std::strerror(errno) << std::endl;
+        std::stringstream text;
+        text << " checkpoint_read: File couldn't be read: " << filePath << " "  << std::endl;
+        outputTree.writeToRunningDataFileAndPrint(text.str());
     }
 
 
@@ -268,7 +282,10 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
         fread(Nu, sizeof(T), size, fpNu);
         fclose(fpNu);
     } else {
-        std::cerr << "File " << filePath << " couldn't be read. " << std::strerror(errno) << std::endl;
+        std::stringstream text;
+        text << " checkpoint_read: File couldn't be read: " << filePath << " "  << std::endl;
+        outputTree.writeToRunningDataFileAndPrint(text.str());
+
     }
 
 }
@@ -293,7 +310,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_write(std::string un
 
 
     std::stringstream text;
-    text << "Node " << nodeID << " Starting Checkpoint Writing " << dirname;
+    text << " Starting Checkpoint Writing " << dirname;
     std::cout << text.str() << std::endl;
     outputTree.writeToRunningDataFile(text.str());
 

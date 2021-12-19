@@ -246,7 +246,7 @@ T beta 1.9
 bool useLES false
 
 std::string collision EgglesSomers
-std::string streaming Simple
+std::string streaming Esotwist
 """)
 
         self.template = "template <typename T>"
