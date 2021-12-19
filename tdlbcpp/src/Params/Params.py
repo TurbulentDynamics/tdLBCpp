@@ -376,9 +376,16 @@ tNi k0 0
 
 tNi ghost 0
 tNi resolution 0
+
 std::string strQVecPrecision notSet
+std::string strQLength notSet
 std::string strMemoryLayout notSet
+std::string strCollisonAlgo notSet
+std::string strStreamingAlgo notSet
+std::string strCompileFlag notSet
 """)
+
+
 
         self.extra_methods = """
     ComputeUnitParams() {}
@@ -388,7 +395,7 @@ std::string strMemoryLayout notSet
 """
 
 
-class OrthoPlane(ParamsBase):
+class OrthoPlaneParams(ParamsBase):
     def __init__(self):
         super().__init__("""
 std::string name_root plane
@@ -403,7 +410,7 @@ tStep end_at_repeat 0
 """)
 
 
-class Volume(ParamsBase):
+class VolumeParams(ParamsBase):
     def __init__(self):
         super().__init__("""
 std::string name_root volume
@@ -417,7 +424,7 @@ bool use_half_float false
 std::string QDataType float
 """)
 
-class Angle(ParamsBase):
+class AngleParams(ParamsBase):
     def __init__(self):
         super().__init__("""
 std::string name_root angle
@@ -432,7 +439,7 @@ bool use_half_float false
 std::string QDataType float
 """)
 
-class PlaneAtAngle(ParamsBase):
+class PlaneAtAngleParams(ParamsBase):
     def __init__(self):
         super().__init__("""
 std::string name_root plane_at_angle
@@ -449,7 +456,7 @@ std::string QDataType float
 """)
 
 
-class Sector(ParamsBase):
+class SectorParams(ParamsBase):
     def __init__(self):
         super().__init__("""
 std::string name_root sector
@@ -481,11 +488,11 @@ std::string outputRootDir debug_output_dir
         self.sector_objs = list()
 
         self.include = """
-#include "OrthoPlane.hpp"
-#include "Volume.hpp"
-#include "Angle.hpp"
-#include "PlaneAtAngle.hpp"
-#include "Sector.hpp"
+#include "OrthoPlaneParams.hpp"
+#include "VolumeParams.hpp"
+#include "AngleParams.hpp"
+#include "PlaneAtAngleParams.hpp"
+#include "SectorParams.hpp"
 """
 
     @property
@@ -516,7 +523,7 @@ std::string outputRootDir debug_output_dir
 
     def add_debug_output(self, grid):
 
-        orthoPlaneXY = OrthoPlane()
+        orthoPlaneXY = OrthoPlaneParams()
         orthoPlaneXY.struct_name = "XY_planes"
         orthoPlaneXY.cutAt = grid.z / 2
         orthoPlaneXY.repeat = 10
@@ -524,7 +531,7 @@ std::string outputRootDir debug_output_dir
 
         self.ortho_plane_objs.append(orthoPlaneXY)
 
-        orthoPlaneXZ = OrthoPlane()
+        orthoPlaneXZ = OrthoPlaneParams()
         orthoPlaneXZ.struct_name = "XZ_planes"
         orthoPlaneXZ.cutAt = grid.y / 3 * 2
         orthoPlaneXZ.repeat = 10
@@ -561,19 +568,19 @@ if __name__ == '__main__':
 
 
 
-    out = OrthoPlane()
+    out = OrthoPlaneParams()
     out.cpp_file()
 
-    out = Volume()
+    out = VolumeParams()
     out.cpp_file()
 
-    out = Angle()
+    out = AngleParams()
     out.cpp_file()
 
-    out = PlaneAtAngle()
+    out = PlaneAtAngleParams()
     out.cpp_file()
 
-    out = Sector()
+    out = SectorParams()
     out.cpp_file()
 
 

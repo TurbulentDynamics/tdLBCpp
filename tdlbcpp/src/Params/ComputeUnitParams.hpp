@@ -37,7 +37,11 @@ struct ComputeUnitParams {
     tNi ghost = 0;
     tNi resolution = 0;
     std::string strQVecPrecision = "notSet";
+    std::string strQLength = "notSet";
     std::string strMemoryLayout = "notSet";
+    std::string strCollisonAlgo = "notSet";
+    std::string strStreamingAlgo = "notSet";
+    std::string strCompileFlag = "notSet";
 
     
     
@@ -67,7 +71,11 @@ struct ComputeUnitParams {
     ghost = (tNi)jsonParams["ghost"].asUInt64();
     resolution = (tNi)jsonParams["resolution"].asUInt64();
     strQVecPrecision = (std::string)jsonParams["strQVecPrecision"].asString();
+    strQLength = (std::string)jsonParams["strQLength"].asString();
     strMemoryLayout = (std::string)jsonParams["strMemoryLayout"].asString();
+    strCollisonAlgo = (std::string)jsonParams["strCollisonAlgo"].asString();
+    strStreamingAlgo = (std::string)jsonParams["strStreamingAlgo"].asString();
+    strCompileFlag = (std::string)jsonParams["strCompileFlag"].asString();
 
             
         }
@@ -100,7 +108,11 @@ struct ComputeUnitParams {
     jsonParams["ghost"] = (Json::UInt64)ghost;
     jsonParams["resolution"] = (Json::UInt64)resolution;
     jsonParams["strQVecPrecision"] = (std::string)strQVecPrecision;
+    jsonParams["strQLength"] = (std::string)strQLength;
     jsonParams["strMemoryLayout"] = (std::string)strMemoryLayout;
+    jsonParams["strCollisonAlgo"] = (std::string)strCollisonAlgo;
+    jsonParams["strStreamingAlgo"] = (std::string)strStreamingAlgo;
+    jsonParams["strCompileFlag"] = (std::string)strCompileFlag;
 
             
             return jsonParams;

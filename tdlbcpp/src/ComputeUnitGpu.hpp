@@ -7,7 +7,7 @@
 #include "ComputeUnit.cuh"
 #include "CollisionEgglesSomers.cuh"
 #include "Boundary.cuh"
-#include "StreamingNieve.cuh"
+#include "StreamingSimple.cuh"
 #include "StreamingEsoTwist.cuh"
 #include "ComputeUnitOutput.cuh"
 

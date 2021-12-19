@@ -50,15 +50,19 @@ using useQVecPrecision = float;
 
 
 int main(int argc, char* argv[]){
+
+    std::string strCompileFlag;
 #ifdef WITH_CPU
-    std::cout << "Compiled WITH_CPU defined" << std::endl;
+    strCompileFlag = "WITH_CPU";
 #endif
 #ifdef WITH_GPU
-    std::cout << "Compiled WITH_GPU defined" << std::endl;
+    strCompileFlag = "WITH_GPU";
 #endif
 #ifdef WITH_GPU_MEMSHARED
-    std::cout << "Compiled WITH_GPU_MEMSHARED defined" << std::endl;
+    strCompileFlag = "WITH_GPU_MEMSHARED";
 #endif
+    std::cout << "Compiled with " << strCompileFlag << std::endl;
+
     std::feclearexcept(FE_OVERFLOW);
     std::feclearexcept(FE_UNDERFLOW);
     std::feclearexcept(FE_DIVBYZERO);
@@ -218,11 +222,16 @@ int main(int argc, char* argv[]){
     cu.ghost = grid.multiStep;
     cu.resolution = 1;
 
+    cu.strCompileFlag = strCompileFlag;
+    cu.strCollisonAlgo = "EgglesSomers";
+    cu.strStreamingAlgo = flow.streaming;
+//    std::string strQVecPrecision =;
+//    std::string strQLength =;
+//    std::string strMemoryLayout =;
 
     FlowParams<double> flowAsDouble = flow.asDouble();
 
     DiskOutputTree outputTree = DiskOutputTree(output, checkpoint);
-
     outputTree.setParams(cu, grid, flowAsDouble, running, output, checkpoint);
 
 
@@ -271,7 +280,7 @@ int main(int argc, char* argv[]){
 
 
     //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
-    
+
     RushtonTurbinePolarCPP<tNi, useQVecPrecision> geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
     geom.impellerStartupStepsUntilNormalSpeed = running.impellerStartupStepsUntilNormalSpeed;
     useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
@@ -348,6 +357,7 @@ int main(int argc, char* argv[]){
 
         std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geomFixed;
         geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
+
         geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
         std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
         geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );

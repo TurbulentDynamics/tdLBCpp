@@ -1,5 +1,5 @@
 //
-//  Sector.hpp
+//  SectorParams.hpp
 //  Turbulent Dynamics Lattice Boltzmann Cpp
 //
 //  Created by Niall Ó Broin on 08/01/2019.
@@ -21,7 +21,7 @@
 
 //
 
-struct Sector {
+struct SectorParams {
 
         std::string name_root = "sector";
     tStep repeat = 0;
@@ -56,7 +56,7 @@ struct Sector {
         }
         catch(std::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in Sector: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in SectorParams: " << e.what() << std::endl;
             exit(EXIT_FAILURE);
         }
                 
@@ -84,7 +84,7 @@ struct Sector {
             
         } catch(std::exception& e) {
             
-            std::cerr << "Exception reached parsing arguments in Sector: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in SectorParams: " << e.what() << std::endl;
 
             return "";
         }
@@ -129,7 +129,7 @@ struct Sector {
             
         } catch(std::exception& e){
             
-            std::cerr << "Exception writing json file for Sector: " << e.what() << std::endl;
+            std::cerr << "Exception writing json file for SectorParams: " << e.what() << std::endl;
         }
         
         return 0;

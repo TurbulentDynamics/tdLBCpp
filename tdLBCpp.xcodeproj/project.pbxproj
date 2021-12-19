@@ -56,14 +56,9 @@
 		D66D0F88269C4A200079FCAC /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
 		D67F4D2F276615AE00952021 /* CheckpointParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CheckpointParams.hpp; sourceTree = "<group>"; };
 		D67F4D30276615AE00952021 /* BinFileParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BinFileParams.hpp; sourceTree = "<group>"; };
-		D67F4D31276615AE00952021 /* OrthoPlane.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = OrthoPlane.hpp; sourceTree = "<group>"; };
 		D67F4D32276615AE00952021 /* GridParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GridParams.hpp; sourceTree = "<group>"; };
 		D67F4D33276615AE00952021 /* Params_template.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Params_template.py; sourceTree = "<group>"; };
-		D67F4D34276615AE00952021 /* PlaneAtAngle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = PlaneAtAngle.hpp; sourceTree = "<group>"; };
-		D67F4D35276615AE00952021 /* Sector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Sector.hpp; sourceTree = "<group>"; };
-		D67F4D36276615AE00952021 /* Angle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Angle.hpp; sourceTree = "<group>"; };
 		D67F4D37276615AE00952021 /* Params.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Params.py; sourceTree = "<group>"; };
-		D67F4D38276615AE00952021 /* Volume.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Volume.hpp; sourceTree = "<group>"; };
 		D67F4D39276615AE00952021 /* FlowParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FlowParams.hpp; sourceTree = "<group>"; };
 		D67F4D3A276615AE00952021 /* RunningParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RunningParams.hpp; sourceTree = "<group>"; };
 		D67F4D3D276615F300952021 /* generate_stirred_tank_input.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = generate_stirred_tank_input.py; sourceTree = "<group>"; };
@@ -81,6 +76,11 @@
 		D6AC3268268E20090057E1E1 /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
 		D6ACCEF325F60FEA00705722 /* GlobalStructures.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GlobalStructures.hpp; sourceTree = "<group>"; };
 		D6AF70B22689BC2100022ECF /* OutputParams.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = OutputParams.hpp; sourceTree = "<group>"; };
+		D6DAD652276F8F9D00DB5EB7 /* AngleParams.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AngleParams.hpp; sourceTree = "<group>"; };
+		D6DAD653276F8F9D00DB5EB7 /* OrthoPlaneParams.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = OrthoPlaneParams.hpp; sourceTree = "<group>"; };
+		D6DAD654276F8F9D00DB5EB7 /* SectorParams.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SectorParams.hpp; sourceTree = "<group>"; };
+		D6DAD655276F8F9D00DB5EB7 /* VolumeParams.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VolumeParams.hpp; sourceTree = "<group>"; };
+		D6DAD656276F8F9D00DB5EB7 /* PlaneAtAngleParams.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PlaneAtAngleParams.hpp; sourceTree = "<group>"; };
 		D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RushtonTurbine.hpp; sourceTree = "<group>"; };
 		D6E5C5BD25DBEC0B0067FDE1 /* GeomMidPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GeomMidPoint.hpp; sourceTree = "<group>"; };
 		D6E5C72425EE184B0067FDE1 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
@@ -276,18 +276,18 @@
 		D6F533492615815D00A715C9 /* Params */ = {
 			isa = PBXGroup;
 			children = (
-				D67F4D36276615AE00952021 /* Angle.hpp */,
 				D67F4D30276615AE00952021 /* BinFileParams.hpp */,
+				D6DAD652276F8F9D00DB5EB7 /* AngleParams.hpp */,
+				D6DAD653276F8F9D00DB5EB7 /* OrthoPlaneParams.hpp */,
+				D6DAD656276F8F9D00DB5EB7 /* PlaneAtAngleParams.hpp */,
+				D6DAD654276F8F9D00DB5EB7 /* SectorParams.hpp */,
+				D6DAD655276F8F9D00DB5EB7 /* VolumeParams.hpp */,
 				D67F4D2F276615AE00952021 /* CheckpointParams.hpp */,
 				D67F4D39276615AE00952021 /* FlowParams.hpp */,
 				D67F4D32276615AE00952021 /* GridParams.hpp */,
-				D67F4D31276615AE00952021 /* OrthoPlane.hpp */,
 				D67F4D33276615AE00952021 /* Params_template.py */,
 				D67F4D37276615AE00952021 /* Params.py */,
-				D67F4D34276615AE00952021 /* PlaneAtAngle.hpp */,
 				D67F4D3A276615AE00952021 /* RunningParams.hpp */,
-				D67F4D35276615AE00952021 /* Sector.hpp */,
-				D67F4D38276615AE00952021 /* Volume.hpp */,
 				D6F5335E2615E84F00A715C9 /* BUILD */,
 				D6E5C73225EE184B0067FDE1 /* json.h */,
 				D6E5C73F25EE184B0067FDE1 /* jsoncpp.cpp */,

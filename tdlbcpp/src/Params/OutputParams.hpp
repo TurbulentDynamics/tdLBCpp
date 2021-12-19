@@ -15,11 +15,11 @@
 #include "json.h"
 
 
-#include "OrthoPlane.hpp"
-#include "Volume.hpp"
-#include "Angle.hpp"
-#include "PlaneAtAngle.hpp"
-#include "Sector.hpp"
+#include "OrthoPlaneParams.hpp"
+#include "VolumeParams.hpp"
+#include "AngleParams.hpp"
+#include "PlaneAtAngleParams.hpp"
+#include "SectorParams.hpp"
 
 
 
@@ -35,12 +35,12 @@ struct OutputParams {
 
 
 
-    std::vector<OrthoPlane> XY_planes;
-    std::vector<OrthoPlane> XZ_planes;
-    std::vector<OrthoPlane> YZ_planes;
-    std::vector<Angle> capture_at_blade_angle;
-    std::vector<PlaneAtAngle> YZ_plane_when_angle;
-    std::vector<Volume> volumes;
+    std::vector<OrthoPlaneParams> XY_planes;
+    std::vector<OrthoPlaneParams> XZ_planes;
+    std::vector<OrthoPlaneParams> YZ_planes;
+    std::vector<AngleParams> capture_at_blade_angle;
+    std::vector<PlaneAtAngleParams> YZ_plane_when_angle;
+    std::vector<VolumeParams> volumes;
 
 
 
@@ -58,7 +58,7 @@ struct OutputParams {
         std::string QDataType = "float";
         if (Q_output_len == 19) QDataType = "float";
 
-        OrthoPlane p;
+        OrthoPlaneParams p;
         p.name_root = dir;
         p.repeat = repeat;
         p.cutAt = cutAt;
@@ -88,7 +88,7 @@ struct OutputParams {
         std::string QDataType = "float";
         if (Q_output_len == 19) QDataType = "float";
 
-        OrthoPlane p;
+        OrthoPlaneParams p;
         p.name_root = dir;
         p.repeat = repeat;
         p.cutAt = cutAt;
@@ -115,7 +115,7 @@ struct OutputParams {
         if (Q_output_len == 19) QDataType = "float";
 
 
-        OrthoPlane p;
+        OrthoPlaneParams p;
         p.name_root = dir;
         p.repeat = repeat;
         p.cutAt = cutAt;
@@ -144,7 +144,7 @@ struct OutputParams {
         std::string QDataType = "float";
         if (Q_output_len == 19) QDataType = "float";
 
-        Angle a;
+        AngleParams a;
         a.name_root = dir;
         a.repeat = rotational_capture_repeat;
         a.degrees = rotational_capture_behind_impeller_degrees;
@@ -168,7 +168,7 @@ struct OutputParams {
         std::string QDataType = "float";
         if (Q_output_len == 19) QDataType = "float";
 
-        PlaneAtAngle p;
+        PlaneAtAngleParams p;
         p.name_root = dir;
         p.degrees = fixed_axis_capture_behind_impeller_degrees;
         p.tolerance = tolerance;
@@ -195,7 +195,7 @@ struct OutputParams {
         std::string QDataType = "float";
         if (Q_output_len == 19) QDataType = "float";
 
-        Volume v;
+        VolumeParams v;
         v.name_root = dir;
         v.repeat = plot_full_repeat;
         v.Q_output_len = Q_output_len;

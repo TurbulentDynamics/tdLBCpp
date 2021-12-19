@@ -349,7 +349,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 template <typename tDiskPrecision, int tDiskSize>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::savePlaneXZ(OrthoPlane plane, BinFileParams binFormat, RunningParams runParam){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::savePlaneXZ(OrthoPlaneParams plane, BinFileParams binFormat, RunningParams runParam){
 
 
     tDiskGrid<tDiskPrecision, tDiskSize> *outputBuffer = new tDiskGrid<tDiskPrecision, tDiskSize>[xg * zg];

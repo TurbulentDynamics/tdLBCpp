@@ -1,5 +1,5 @@
 //
-//  Volume.hpp
+//  AngleParams.hpp
 //  Turbulent Dynamics Lattice Boltzmann Cpp
 //
 //  Created by Niall Ó Broin on 08/01/2019.
@@ -21,10 +21,11 @@
 
 //
 
-struct Volume {
+struct AngleParams {
 
-        std::string name_root = "volume";
+        std::string name_root = "angle";
     tStep repeat = 0;
+    double degrees = 0.0;
     int Q_output_len = 4;
     tStep start_at_step = 0;
     tStep end_at_repeat = 0;
@@ -42,6 +43,7 @@ struct Volume {
 
                 name_root = (std::string)jsonParams["name_root"].asString();
     repeat = (tStep)jsonParams["repeat"].asUInt64();
+    degrees = (double)jsonParams["degrees"].asDouble();
     Q_output_len = (int)jsonParams["Q_output_len"].asInt();
     start_at_step = (tStep)jsonParams["start_at_step"].asUInt64();
     end_at_repeat = (tStep)jsonParams["end_at_repeat"].asUInt64();
@@ -52,7 +54,7 @@ struct Volume {
         }
         catch(std::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in Volume: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in AngleParams: " << e.what() << std::endl;
             exit(EXIT_FAILURE);
         }
                 
@@ -67,6 +69,7 @@ struct Volume {
             
                 jsonParams["name_root"] = (std::string)name_root;
     jsonParams["repeat"] = (Json::UInt64)repeat;
+    jsonParams["degrees"] = (double)degrees;
     jsonParams["Q_output_len"] = (int)Q_output_len;
     jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
     jsonParams["end_at_repeat"] = (Json::UInt64)end_at_repeat;
@@ -78,7 +81,7 @@ struct Volume {
             
         } catch(std::exception& e) {
             
-            std::cerr << "Exception reached parsing arguments in Volume: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in AngleParams: " << e.what() << std::endl;
 
             return "";
         }
@@ -123,7 +126,7 @@ struct Volume {
             
         } catch(std::exception& e){
             
-            std::cerr << "Exception writing json file for Volume: " << e.what() << std::endl;
+            std::cerr << "Exception writing json file for AngleParams: " << e.what() << std::endl;
         }
         
         return 0;

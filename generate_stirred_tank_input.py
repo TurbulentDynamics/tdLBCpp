@@ -18,15 +18,14 @@ from Params import *
 
 FILENAME = "input_debug_gridx60_numSteps20.json"
 
-# (ngx, grid.x)
+# (ngx, grid.x, numSteps, chkRepeat)
 val = [
- (1, 9),
- (1, 60),
- (1, 100),
- (1, 200),
- (1, 400),
- (1, 800),
- (4, 3000),
+ (1, 9, 3, 0),
+# (1, 60, 100, 20), Initialised Params Setup
+ (1, 100, 200, 50),
+ (1, 200, 1000, 500),
+ (1, 400, 2000, 500),
+ (1, 600, 5000, 1000),
  ]
 
 
@@ -62,9 +61,9 @@ def main():
     parser.add_argument("-a", "--start_with_checkpoint", type=bool, help="Start with Checkpoint")
     parser.add_argument("-b", "--load_checkpoint_dirname", type=str, help="Load Checkpoint Dirname")
 
-    parser.add_argument("-i", "--initialRho", type=float, help="Initial density")
+    parser.add_argument("--initialRho", type=float, help="Initial density")
     parser.add_argument("-r", "--reMNonDimensional", type=int, help="Reynolds number")
-    parser.add_argument("-u", "--uav", type=float, help="X")
+    parser.add_argument("--uav", type=float, help="X")
 
     parser.add_argument("-o", "--outputRootDir", type=int, help="Output Root Dir")
 
@@ -93,7 +92,7 @@ def main():
 
 
     if args.esotwist:
-        flow.streaming = "esotwist"
+        flow.streaming = "Esotwist"
 
 
     if args.num_steps:

@@ -1,5 +1,5 @@
 //
-//  OrthoPlane.hpp
+//  OrthoPlaneParams.hpp
 //  Turbulent Dynamics Lattice Boltzmann Cpp
 //
 //  Created by Niall Ó Broin on 08/01/2019.
@@ -21,7 +21,7 @@
 
 //
 
-struct OrthoPlane {
+struct OrthoPlaneParams {
 
         std::string name_root = "plane";
     std::string QDataType = "float";
@@ -54,7 +54,7 @@ struct OrthoPlane {
         }
         catch(std::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in OrthoPlane: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in OrthoPlaneParams: " << e.what() << std::endl;
             exit(EXIT_FAILURE);
         }
                 
@@ -81,7 +81,7 @@ struct OrthoPlane {
             
         } catch(std::exception& e) {
             
-            std::cerr << "Exception reached parsing arguments in OrthoPlane: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in OrthoPlaneParams: " << e.what() << std::endl;
 
             return "";
         }
@@ -126,7 +126,7 @@ struct OrthoPlane {
             
         } catch(std::exception& e){
             
-            std::cerr << "Exception writing json file for OrthoPlane: " << e.what() << std::endl;
+            std::cerr << "Exception writing json file for OrthoPlaneParams: " << e.what() << std::endl;
         }
         
         return 0;

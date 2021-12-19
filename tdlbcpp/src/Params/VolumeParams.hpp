@@ -1,5 +1,5 @@
 //
-//  PlaneAtAngle.hpp
+//  VolumeParams.hpp
 //  Turbulent Dynamics Lattice Boltzmann Cpp
 //
 //  Created by Niall Ó Broin on 08/01/2019.
@@ -21,12 +21,10 @@
 
 //
 
-struct PlaneAtAngle {
+struct VolumeParams {
 
-        std::string name_root = "plane_at_angle";
-    double degrees = 0.0;
-    double tolerance = 0.0;
-    tNi cutAt = 0;
+        std::string name_root = "volume";
+    tStep repeat = 0;
     int Q_output_len = 4;
     tStep start_at_step = 0;
     tStep end_at_repeat = 0;
@@ -43,9 +41,7 @@ struct PlaneAtAngle {
         {
 
                 name_root = (std::string)jsonParams["name_root"].asString();
-    degrees = (double)jsonParams["degrees"].asDouble();
-    tolerance = (double)jsonParams["tolerance"].asDouble();
-    cutAt = (tNi)jsonParams["cutAt"].asUInt64();
+    repeat = (tStep)jsonParams["repeat"].asUInt64();
     Q_output_len = (int)jsonParams["Q_output_len"].asInt();
     start_at_step = (tStep)jsonParams["start_at_step"].asUInt64();
     end_at_repeat = (tStep)jsonParams["end_at_repeat"].asUInt64();
@@ -56,7 +52,7 @@ struct PlaneAtAngle {
         }
         catch(std::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in PlaneAtAngle: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in VolumeParams: " << e.what() << std::endl;
             exit(EXIT_FAILURE);
         }
                 
@@ -70,9 +66,7 @@ struct PlaneAtAngle {
             Json::Value jsonParams;
             
                 jsonParams["name_root"] = (std::string)name_root;
-    jsonParams["degrees"] = (double)degrees;
-    jsonParams["tolerance"] = (double)tolerance;
-    jsonParams["cutAt"] = (Json::UInt64)cutAt;
+    jsonParams["repeat"] = (Json::UInt64)repeat;
     jsonParams["Q_output_len"] = (int)Q_output_len;
     jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
     jsonParams["end_at_repeat"] = (Json::UInt64)end_at_repeat;
@@ -84,7 +78,7 @@ struct PlaneAtAngle {
             
         } catch(std::exception& e) {
             
-            std::cerr << "Exception reached parsing arguments in PlaneAtAngle: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in VolumeParams: " << e.what() << std::endl;
 
             return "";
         }
@@ -129,7 +123,7 @@ struct PlaneAtAngle {
             
         } catch(std::exception& e){
             
-            std::cerr << "Exception writing json file for PlaneAtAngle: " << e.what() << std::endl;
+            std::cerr << "Exception writing json file for VolumeParams: " << e.what() << std::endl;
         }
         
         return 0;

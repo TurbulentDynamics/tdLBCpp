@@ -142,7 +142,7 @@ public:
 
 
     template <typename tDiskPrecision, int tDiskSize>
-    void savePlaneXZ(OrthoPlane plane, BinFileParams binFormat, RunningParams runParam);
+    void savePlaneXZ(OrthoPlaneParams plane, BinFileParams binFormat, RunningParams runParam);
 
     void writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams runParam);
 
