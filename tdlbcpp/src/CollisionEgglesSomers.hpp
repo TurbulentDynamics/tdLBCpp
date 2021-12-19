@@ -67,7 +67,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 
 
                     //calculating sh (the resolved deformation rate, S^2)
-                    T sh = 2 * pow(dudx,2) + 2 * pow(dvdy,2) + 2 * pow(dwdz,2) + pow(dudypdvdx,2) + pow(dudzpdwdx,2) + pow(dvdzpdwdy,2) - (2.0/3.0) * pow(divv,2);
+                    T sh = 2 * dudx*dudx + 2 * dvdy*dvdy + 2 * dwdz*dwdz + dudypdvdx*dudypdvdx + dudzpdwdx*dudzpdwdx + dvdzpdwdy*dvdzpdwdy - (2.0 / 3.0) * divv*divv;
 
 
                     //calculating eddy viscosity:

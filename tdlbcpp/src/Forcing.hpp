@@ -24,9 +24,10 @@ HOST_DEVICE_GPU T inline calcWeight(T x){
     
     if (x <= 1.5) {
         if (x <= 0.5) {
-            weight = (1.0 / 3.0) * (1.0 + sqrt(-3.0 * pow(x, 2) + 1.0));
+            weight = (1.0 / 3.0) * (1.0 + sqrt(-3.0 * x*x + 1.0));
         }else{
-            weight = (1.0 / 6.0) * (5.0 - (3.0 * x) - sqrt((-3.0 * pow((1.0 - x), 2)) + 1.0));
+            weight = (1.0 / 6.0) * (5.0 - (3.0 * x) - sqrt((-3.0 * ((1.0 - x)*(1.0 - x))) + 1.0));
+
         }
     }
     
@@ -162,7 +163,6 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
         for (tNi j = 1; j<=yg1; j++){
             for (tNi k = 1; k<=zg1; k++){
                 
-                //pos =  offsetb + offsets + k;
                 if (O[index(i,j,k)] == 0) {
                     F[index(i,j,k)].x = 0.0;
                     F[index(i,j,k)].y = 0.0;

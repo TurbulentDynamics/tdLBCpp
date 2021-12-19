@@ -54,7 +54,7 @@ __global__ void collisionEgglesSommers(ComputeUnitCollision<T, QVecSize, MemoryL
         T dvdzpdwdy = 2 * fct * ((m.q[M04]) + 0.5 * cu.F[cu.index(i, j, k)].z * u.y - m.q[M09]);
 
         //calculating sh (the resolved deformation rate, S^2)
-        T sh = 2 * pow(dudx, 2) + 2 * pow(dvdy, 2) + 2 * pow(dwdz, 2) + pow(dudypdvdx, 2) + pow(dudzpdwdx, 2) + pow(dvdzpdwdy, 2) - (2.0 / 3.0) * pow(divv, 2);
+        T sh = 2 * dudx*dudx + 2 * dvdy*dvdy + 2 * dwdz*dwdz + dudypdvdx*dudypdvdx + dudzpdwdx*dudzpdwdx + dvdzpdwdy*dvdzpdwdy - (2.0 / 3.0) * divv*divv;
 
         //calculating eddy viscosity:
         //nu_t = (lambda_mix)^2 * sqrt(S^2)     (Smagorinsky)

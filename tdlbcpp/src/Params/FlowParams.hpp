@@ -39,6 +39,12 @@ struct FlowParams {
     //forcing in x-direction
     T fx0 = 0.0;
 
+    //forcing in y-direction
+    T fy0 = 0.0;
+
+    //forcing in z-direction
+    T fz0 = 0.0;
+
     //Reynolds number based on mean or tip velocity
     T Re_m = 0.0;
 
@@ -100,6 +106,8 @@ struct FlowParams {
     g3 = (T)jsonParams["g3"].asDouble();
     nu = (T)jsonParams["nu"].asDouble();
     fx0 = (T)jsonParams["fx0"].asDouble();
+    fy0 = (T)jsonParams["fy0"].asDouble();
+    fz0 = (T)jsonParams["fz0"].asDouble();
     Re_m = (T)jsonParams["Re_m"].asDouble();
     Re_f = (T)jsonParams["Re_f"].asDouble();
     uf = (T)jsonParams["uf"].asDouble();
@@ -133,6 +141,8 @@ struct FlowParams {
     jsonParams["g3"] = (double)g3;
     jsonParams["nu"] = (double)nu;
     jsonParams["fx0"] = (double)fx0;
+    jsonParams["fy0"] = (double)fy0;
+    jsonParams["fz0"] = (double)fz0;
     jsonParams["Re_m"] = (double)Re_m;
     jsonParams["Re_f"] = (double)Re_f;
     jsonParams["uf"] = (double)uf;

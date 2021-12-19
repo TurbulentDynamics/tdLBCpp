@@ -231,6 +231,8 @@ T g3 0.8 compensation of third order terms
 T nu 0.0 kinematic viscosity
 
 T fx0 0.0 forcing in x-direction
+T fy0 0.0 forcing in y-direction
+T fz0 0.0 forcing in z-direction
 
 
 T Re_m 0.0 Reynolds number based on mean or tip velocity
@@ -244,9 +246,9 @@ T alpha 0.97
 T beta 1.9
 
 bool useLES false
-
 std::string collision EgglesSomers
 std::string streaming Esotwist
+
 """)
 
         self.template = "template <typename T>"
