@@ -180,7 +180,7 @@ int main(int argc, char* argv[]){
         cudaDeviceProp deviceProp;
         checkCudaErrors(cudaGetDeviceProperties(&deviceProp, i));
 
-        printf("GPU Device %d: \"%s\" totalGlobalMem: %d, managedMemory: %d, with compute capability %d.%d\n\n", i, deviceProp.name,  deviceProp.totalGlobalMem, deviceProp.managedMemory, deviceProp.major, deviceProp.minor);
+        printf("GPU Device %d: \"%s\" totalGlobalMem: %zu, managedMemory: %d, with compute capability %d.%d\n\n", i, deviceProp.name,  deviceProp.totalGlobalMem, deviceProp.managedMemory, deviceProp.major, deviceProp.minor);
 
         if (memRequired < deviceProp.totalGlobalMem) {
 #if defined(WITH_GPU_MEMSHARED)
@@ -328,26 +328,26 @@ int main(int argc, char* argv[]){
     lb->forcing(geomFixedInternal, flow.alpha, flow.beta);
     lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta);
     lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta);
-//    lb->forcing(geomRotatingSurface, flow.alpha, flow.beta);
-//    lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
+    lb->forcing(geomRotatingSurface, flow.alpha, flow.beta);
+    lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
 
 
 //    lb->forcing(geomFixed, flow.alpha, flow.beta);
 //    lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta);
-    lb->forcing(geomRotating, flow.alpha, flow.beta);
+    //lb->forcing(geomRotating, flow.alpha, flow.beta);
 
 
     lb->setOutputExcludePoints(geomFixedSurface);
     lb->setOutputExcludePoints(geomFixedInternal);
     lb->setOutputExcludePoints(geomRotatingNonUpdatingInternal);
     lb->setOutputExcludePoints(geomRotatingNonUpdatingSurface);
-//    lb->setOutputExcludePoints(geomRotatingInternal);
-//    lb->setOutputExcludePoints(geomRotatingSurface);
+    lb->setOutputExcludePoints(geomRotatingInternal);
+    lb->setOutputExcludePoints(geomRotatingSurface);
 
 
 //    lb->setOutputExcludePoints(geomFixed);
 //    lb->setOutputExcludePoints(geomRotatingNonUpdating);
-    lb->setOutputExcludePoints(geomRotating);
+    //lb->setOutputExcludePoints(geomRotating);
 
 
     
@@ -400,8 +400,6 @@ int main(int argc, char* argv[]){
         geom.updateRotatingGeometry(running.angle, deltaRunningAngle, onSurface);
         geomRotatingSurface = geom.returnRotatingGeometry();
 
-        std::cout<<"QQQQQQQQQQQQQQQQQQQQQQ   " << geomRotatingSurface.size()  <<std::endl;
-
 
         geom.updateRotatingGeometry(running.angle, deltaRunningAngle, internal);
         geomRotatingInternal = geom.returnRotatingGeometry();
@@ -441,16 +439,16 @@ int main(int argc, char* argv[]){
 
 
 
-        lb->forcing(geomFixedSurface, flow.alpha, flow.beta);
-        lb->forcing(geomFixedInternal, flow.alpha, flow.beta);
+       // lb->forcing(geomFixedSurface, flow.alpha, flow.beta);
+        //lb->forcing(geomFixedInternal, flow.alpha, flow.beta);
 
-        lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta);
-        lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta);
+        //lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta);
+        //lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta);
 
-//        lb->forcing(geomRotatingSurface, flow.alpha, flow.beta);
-//        lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
+        lb->forcing(geomRotatingSurface, flow.alpha, flow.beta);
+        lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
 
-        lb->forcing(geomRotating, flow.alpha, flow.beta);
+       // lb->forcing(geomRotating, flow.alpha, flow.beta);
 
 
 
@@ -464,6 +462,8 @@ int main(int argc, char* argv[]){
         // MARK: OUTPUT
 //        lb->setOutputExcludePoints(geomRotating);
 
+        //lb->setOutputExcludePoints(geomRotatingNonUpdatingSurface);
+        lb->setOutputExcludePoints(geomRotatingNonUpdatingInternal);  //Replaces the disk cells that are deleted from last step
         lb->setOutputExcludePoints(geomRotatingSurface);
         lb->setOutputExcludePoints(geomRotatingInternal);
 

@@ -69,14 +69,14 @@
         "ngy": 1,
         "ngz": 1,
         "strMinQVecPrecision": "float",
-        "x": 100,
-        "y": 100,
-        "z": 100
+        "x": 200,
+        "y": 200,
+        "z": 200
     },
     "OutputParams": {
         "XY_vorticity_planes": [
             {
-                "cutAt": 50.0,
+                "cutAt": 100.0,
                 "end_at_step": 0,
                 "jpegCompression": 100,
                 "name_root": "vort_slice",
@@ -86,7 +86,7 @@
         ],
         "XZ_vorticity_planes": [
             {
-                "cutAt": 66.0,
+                "cutAt": 133.0,
                 "end_at_step": 0,
                 "jpegCompression": 100,
                 "name_root": "vort_axis",
