@@ -285,31 +285,73 @@ int main(int argc, char* argv[]){
     useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
 
 
+//    geom.generateFixedGeometry(surfaceAndInternal);
+//    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
+
+
     geom.generateFixedGeometry(onSurface);
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixedSurface = geom.returnFixedGeometry();
+
+    geom.generateFixedGeometry(internal);
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixedInternal = geom.returnFixedGeometry();
 
 
-    geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, surfaceAndInternal);
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+
+
+
+//    geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, surfaceAndInternal);
+//    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+
+
+    geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, onSurface);
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdatingSurface = geom.returnRotatingNonUpdatingGeometry();
+
+    geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, internal);
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdatingInternal = geom.returnRotatingNonUpdatingGeometry();
+
+
 
 
     geom.generateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
     std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
 
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geomFixed;
-    geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
-    geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );
-
-    lb->forcing(geomFORCING, flow.alpha, flow.beta);
+    geom.generateRotatingGeometry(running.angle, deltaRunningAngle, onSurface);
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingSurface = geom.returnRotatingGeometry();
 
 
+    geom.generateRotatingGeometry(running.angle, deltaRunningAngle, internal);
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingInternal = geom.returnRotatingGeometry();
 
-    lb->setOutputExcludePoints(geomFixed);
+
+    lb->forcing(geomFixedSurface, flow.alpha, flow.beta);
+    lb->forcing(geomFixedInternal, flow.alpha, flow.beta);
+    lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta);
+    lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta);
+//    lb->forcing(geomRotatingSurface, flow.alpha, flow.beta);
+//    lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
 
 
-    //TODO FIX GENERATE BAFFLES INTERNAL
-    lb->setOutputExcludePoints(geomFixed);
+//    lb->forcing(geomFixed, flow.alpha, flow.beta);
+//    lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta);
+    lb->forcing(geomRotating, flow.alpha, flow.beta);
+
+
+    lb->setOutputExcludePoints(geomFixedSurface);
+    lb->setOutputExcludePoints(geomFixedInternal);
+    lb->setOutputExcludePoints(geomRotatingNonUpdatingInternal);
+    lb->setOutputExcludePoints(geomRotatingNonUpdatingSurface);
+//    lb->setOutputExcludePoints(geomRotatingInternal);
+//    lb->setOutputExcludePoints(geomRotatingSurface);
+
+
+//    lb->setOutputExcludePoints(geomFixed);
+//    lb->setOutputExcludePoints(geomRotatingNonUpdating);
+    lb->setOutputExcludePoints(geomRotating);
+
+
+    
+    //Cells outside the tank
     std::vector<Pos3d<tNi>> externalPoints = geom.getExternalPoints();
     lb->setOutputExcludePoints(externalPoints);
 
@@ -355,21 +397,19 @@ int main(int argc, char* argv[]){
         }
 
 
+        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, onSurface);
+        geomRotatingSurface = geom.returnRotatingGeometry();
+
+        std::cout<<"QQQQQQQQQQQQQQQQQQQQQQ   " << geomRotatingSurface.size()  <<std::endl;
 
 
+        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, internal);
+        geomRotatingInternal = geom.returnRotatingGeometry();
 
 
-
-        std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geomFixed;
-        geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
 
         geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
         std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
-        geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );
-
-
-
-
 
 
         main_time = mainTimer.check(0, 0, main_time, "updateRotatingGeometry");
@@ -397,7 +437,23 @@ int main(int argc, char* argv[]){
         main_time = mainTimer.check(0, 4, main_time, "Moments");
 
 
-        lb->forcing(geomFORCING, flow.alpha, flow.beta);
+
+
+
+
+        lb->forcing(geomFixedSurface, flow.alpha, flow.beta);
+        lb->forcing(geomFixedInternal, flow.alpha, flow.beta);
+
+        lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta);
+        lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta);
+
+//        lb->forcing(geomRotatingSurface, flow.alpha, flow.beta);
+//        lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
+
+        lb->forcing(geomRotating, flow.alpha, flow.beta);
+
+
+
         main_time = mainTimer.check(0, 5, main_time, "Forcing");
 
 
@@ -406,10 +462,11 @@ int main(int argc, char* argv[]){
 
 
         // MARK: OUTPUT
+//        lb->setOutputExcludePoints(geomRotating);
 
-        //TODO: Need to exclude inside of baffles
+        lb->setOutputExcludePoints(geomRotatingSurface);
+        lb->setOutputExcludePoints(geomRotatingInternal);
 
-        lb->setOutputExcludePoints(geomFORCING);
 
 //        for (auto xy: output.XY_planes){
 //            if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
@@ -438,7 +495,12 @@ int main(int argc, char* argv[]){
 
 
         //REMOVE THE ROTATING POINTS.
-        lb->unsetOutputExcludePoints(geomFORCING);
+        lb->unsetOutputExcludePoints(geomRotatingSurface);
+        lb->unsetOutputExcludePoints(geomRotatingInternal);
+
+//        lb->unsetOutputExcludePoints(geomRotating);
+
+
 
 
         //TODO: This will write BINARY PLOTS
