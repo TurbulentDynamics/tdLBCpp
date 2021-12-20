@@ -58,7 +58,7 @@
         "initialRho": 8.0,
         "nu": 0.0,
         "reMNonDimensional": 7300.0,
-        "streaming": "Simple",
+        "streaming": "Esotwist",
         "uav": 0.1,
         "uf": 0.0,
         "useLES": false

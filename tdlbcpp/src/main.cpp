@@ -401,8 +401,8 @@ int main(int argc, char* argv[]){
         geomRotatingSurface = geom.returnRotatingGeometry();
 
 
-        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, internal);
-        geomRotatingInternal = geom.returnRotatingGeometry();
+        //geom.updateRotatingGeometry(running.angle, deltaRunningAngle, internal);
+        //geomRotatingInternal = geom.returnRotatingGeometry();
 
 
 
@@ -446,7 +446,7 @@ int main(int argc, char* argv[]){
         //lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta);
 
         lb->forcing(geomRotatingSurface, flow.alpha, flow.beta);
-        lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
+        //lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
 
        // lb->forcing(geomRotating, flow.alpha, flow.beta);
 
