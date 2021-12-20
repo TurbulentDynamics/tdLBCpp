@@ -7,7 +7,7 @@
 #include "ComputeUnit.h"
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-__device__ T calcVorticity(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, tNi i, tNi j, tNi k, int jpegCompression) {
+__device__ T calcVorticity(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, tNi i, tNi j, tNi k) {
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     if (cu.devExcludeOutputPoints[cu.index(i,j,k)] == true) {
@@ -47,7 +47,7 @@ __global__ void calcVorticityXZ(ComputeUnitArchitectureCommonGPU<T, QVecSize, Me
         return;
     }
 
-    cu.VortXZ[cu.xg * k + i] = calcVorticity(cu, i, j, k, jpegCompression);
+    cu.VortXZ[cu.xg * k + i] = calcVorticity(cu, i, j, k);
 
 }
 
@@ -59,6 +59,6 @@ __global__ void calcVorticityXY(ComputeUnitArchitectureCommonGPU<T, QVecSize, Me
         return;
     }
 
-    cu.VortXY[cu.xg * j + i] = calcVorticity(cu, i, j, k, jpegCompression);
+    cu.VortXY[cu.xg * j + i] = calcVorticity(cu, i, j, k);
 
 }
