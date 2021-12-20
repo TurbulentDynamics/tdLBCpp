@@ -68,30 +68,6 @@ struct FlowParams {
         nu  = uav * (T)impellerBladeOuterRadius / Re_m;
     }
 
-    FlowParams<double> asDouble(){
-        FlowParams<double> f;
-
-        f.initialRho = (double)initialRho;
-        f.reMNonDimensional = (double)reMNonDimensional;
-        f.uav = (double)uav;
-        f.cs0 = (double)cs0;
-        f.g3 = (double)g3;
-        f.nu = (double)nu;
-        f.fx0 = (double)fx0;
-        f.Re_m = (double)Re_m;
-        f.Re_f = (double)Re_f;
-        f.uf = (double)uf;
-
-        f.alpha = (double)alpha;
-        f.beta = (double)beta;
-
-        f.useLES = useLES;
-        f.collision = collision;
-        f.streaming = streaming;
-
-        return f;
-    }
-
     
     void getParamsFromJson(Json::Value jsonParams) {
 

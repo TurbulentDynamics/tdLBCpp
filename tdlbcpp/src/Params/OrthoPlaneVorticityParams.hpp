@@ -1,5 +1,5 @@
 //
-//  AngleParams.hpp
+//  OrthoPlaneVorticityParams.hpp
 //  Turbulent Dynamics Lattice Boltzmann Cpp
 //
 //  Created by Niall Ó Broin on 08/01/2019.
@@ -21,16 +21,14 @@
 
 //
 
-struct AngleParams {
+struct OrthoPlaneVorticityParams {
 
-        std::string name_root = "angle";
+        std::string name_root = "vort";
+    int jpegCompression = 100;
+    tNi cutAt = 0;
     tStep repeat = 0;
-    double degrees = 0.0;
-    int Q_output_len = 4;
     tStep start_at_step = 0;
     tStep end_at_step = 0;
-    bool use_half_float = false;
-    std::string QDataType = "float";
 
     
     
@@ -42,19 +40,17 @@ struct AngleParams {
         {
 
                 name_root = (std::string)jsonParams["name_root"].asString();
+    jpegCompression = (int)jsonParams["jpegCompression"].asInt();
+    cutAt = (tNi)jsonParams["cutAt"].asUInt64();
     repeat = (tStep)jsonParams["repeat"].asUInt64();
-    degrees = (double)jsonParams["degrees"].asDouble();
-    Q_output_len = (int)jsonParams["Q_output_len"].asInt();
     start_at_step = (tStep)jsonParams["start_at_step"].asUInt64();
     end_at_step = (tStep)jsonParams["end_at_step"].asUInt64();
-    use_half_float = (bool)jsonParams["use_half_float"].asBool();
-    QDataType = (std::string)jsonParams["QDataType"].asString();
 
             
         }
         catch(std::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in AngleParams: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in OrthoPlaneVorticityParams: " << e.what() << std::endl;
             exit(EXIT_FAILURE);
         }
                 
@@ -68,20 +64,18 @@ struct AngleParams {
             Json::Value jsonParams;
             
                 jsonParams["name_root"] = (std::string)name_root;
+    jsonParams["jpegCompression"] = (int)jpegCompression;
+    jsonParams["cutAt"] = (Json::UInt64)cutAt;
     jsonParams["repeat"] = (Json::UInt64)repeat;
-    jsonParams["degrees"] = (double)degrees;
-    jsonParams["Q_output_len"] = (int)Q_output_len;
     jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
     jsonParams["end_at_step"] = (Json::UInt64)end_at_step;
-    jsonParams["use_half_float"] = (bool)use_half_float;
-    jsonParams["QDataType"] = (std::string)QDataType;
 
             
             return jsonParams;
             
         } catch(std::exception& e) {
             
-            std::cerr << "Exception reached parsing arguments in AngleParams: " << e.what() << std::endl;
+            std::cerr << "Exception reached parsing arguments in OrthoPlaneVorticityParams: " << e.what() << std::endl;
 
             return "";
         }
@@ -126,7 +120,7 @@ struct AngleParams {
             
         } catch(std::exception& e){
             
-            std::cerr << "Exception writing json file for AngleParams: " << e.what() << std::endl;
+            std::cerr << "Exception writing json file for OrthoPlaneVorticityParams: " << e.what() << std::endl;
         }
         
         return 0;

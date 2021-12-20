@@ -304,21 +304,21 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, Esotwist,
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXZ(tNi j, RunningParams runParam) {
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression) {
     T *Vort = new(T[xg * zg]);
     dim3 blocksXZ(numBlocks.x, 1, numBlocks.z);
     dim3 threadsXZ(threadsPerBlock.x, 1, threadsPerBlock.z);
-    ::calcVorticityXZ<<<blocksXZ, threadsXZ>>>(*gpuThis, j);
+    ::calcVorticityXZ<<<blocksXZ, threadsXZ>>>(*gpuThis, j, jpegCompression);
     checkCudaErrors(cudaMemcpy(Vort, VortXZ, sizeof(T) * xg * zg, cudaMemcpyDeviceToHost));
     saveJpeg("xz", Vort, xg, zg, 1, runParam, j);
     delete []Vort;
 }
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXY(tNi k, RunningParams runParam) {
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXY(tNi k, RunningParams runParam, int jpegCompression) {
     T *Vort = new(T[xg * yg]);
     dim3 blocksXY(numBlocks.x, numBlocks.y, 1);
     dim3 threadsXY(threadsPerBlock.x, threadsPerBlock.y, 1);
-    ::calcVorticityXY<<<blocksXY, threadsXY>>>(*gpuThis, k);
+    ::calcVorticityXY<<<blocksXY, threadsXY>>>(*gpuThis, k, jpegCompression);
     checkCudaErrors(cudaMemcpy(Vort, VortXY, sizeof(T) * xg * yg, cudaMemcpyDeviceToHost));
     saveJpeg("xy", Vort, xg, yg, 1, runParam, k);
     delete []Vort;

@@ -229,10 +229,9 @@ int main(int argc, char* argv[]){
 //    std::string strQLength =;
 //    std::string strMemoryLayout =;
 
-    FlowParams<double> flowAsDouble = flow.asDouble();
 
     DiskOutputTree outputTree = DiskOutputTree(output, checkpoint);
-    outputTree.setParams(cu, grid, flowAsDouble, running, output, checkpoint);
+    outputTree.setParams(cu, grid.getJson(), flow.getJson(), running.getJson(), output.getJson(), checkpoint.getJson());
 
 
 
@@ -278,7 +277,7 @@ int main(int argc, char* argv[]){
 
     Extents<tNi> e = Extents<tNi>(0, grid.x, 0, grid.y, 0, grid.z);
 
-
+    //Alternate calculation for geometry
     //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
 
     RushtonTurbinePolarCPP<tNi, useQVecPrecision> geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
@@ -307,6 +306,10 @@ int main(int argc, char* argv[]){
 
 
     lb->setOutputExcludePoints(geomFixed);
+
+
+    //TODO FIX GENERATE BAFFLES INTERNAL
+    lb->setOutputExcludePoints(geomFixed);
     std::vector<Pos3d<tNi>> externalPoints = geom.getExternalPoints();
     lb->setOutputExcludePoints(externalPoints);
 
@@ -322,9 +325,9 @@ int main(int argc, char* argv[]){
     Multi_Timer mainTimer(rank);
     mainTimer.set_average_steps(running.numStepsForAverageCalc);
 
-    std::string runFile = outputTree.getInitTimeAndParams(running.runningDataFilePrefix);
-    outputTree.setRunningDataFile(running.runningDataFileDir, runFile);
 
+    std::string runFile = outputTree.runningDataFileName();
+    outputTree.setRunningDataFile(running.runningDataFileDir, runFile);
     outputTree.writeAllParamsJson(binFormat, running, outputTree.runningDataPath);
 
 
@@ -350,6 +353,8 @@ int main(int argc, char* argv[]){
             sstream << "Angle " << fixed << std::setw(6) << std::setprecision(4) << running.angle << "  deltaRunningAngle " << deltaRunningAngle << std::endl;
             outputTree.writeToRunningDataFileAndPrint(sstream.str());
         }
+
+
 
 
 
@@ -387,11 +392,13 @@ int main(int argc, char* argv[]){
         lb->streamingPush();
         main_time = mainTimer.check(0, 3, main_time, "Streaming");
 
+
         lb->moments();
+        main_time = mainTimer.check(0, 4, main_time, "Moments");
 
 
         lb->forcing(geomFORCING, flow.alpha, flow.beta);
-        main_time = mainTimer.check(0, 4, main_time, "Forcing");
+        main_time = mainTimer.check(0, 5, main_time, "Forcing");
 
 
 
@@ -400,25 +407,35 @@ int main(int argc, char* argv[]){
 
         // MARK: OUTPUT
 
+        //TODO: Need to exclude inside of baffles
+
         lb->setOutputExcludePoints(geomFORCING);
 
-        for (auto xy: output.XY_planes){
+//        for (auto xy: output.XY_planes){
+//            if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
+//                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
+//            }
+//        }
 
+        for (auto xy: output.XY_vorticity_planes){
             if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
-                //                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
-                lb->calcVorticityXY(xy.cutAt, running);
+                lb->calcVorticityXY(xy.cutAt, running, xy.jpegCompression);
             }
         }
 
 
+//        for (auto xz: output.XZ_planes){
+//            if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
+//                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
+//            }
+//        }
 
-        for (auto xz: output.XZ_planes){
-
+        for (auto xz: output.XZ_vorticity_planes){
             if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
-                //                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
-                lb->calcVorticityXZ(xz.cutAt, running);
+                lb->calcVorticityXZ(xz.cutAt, running, xz.jpegCompression);
             }
         }
+
 
         //REMOVE THE ROTATING POINTS.
         lb->unsetOutputExcludePoints(geomFORCING);
@@ -426,7 +443,9 @@ int main(int argc, char* argv[]){
 
         //TODO: This will write BINARY PLOTS
         //                lb.writeAllOutput(geom, output, binFormat, running);
-        main_time = mainTimer.check(0, 5, main_time, "writeAllOutput");
+        main_time = mainTimer.check(0, 6, main_time, "writeAllOutput");
+
+
 
 
 

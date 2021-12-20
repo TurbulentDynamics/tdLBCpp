@@ -111,41 +111,42 @@ public:
     };
 
 
-    DiskOutputTree(ComputeUnitParams cu1, GridParams grid1, FlowParams<double> flow1, RunningParams running1,  OutputParams output1, CheckpointParams checkpoint1){
+//    DiskOutputTree(ComputeUnitParams cu1, GridParams grid1, FlowParams<T> flow1, RunningParams running1,  OutputParams output1, CheckpointParams checkpoint1){
+//
+//        initTime = getTimeNowAsString();
+//
+//        cu = cu1;
+//
+//        cuJson = cu1.getJson();
+//
+//        grid = grid1.getJson();
+//        flow =  flow1.getJson();
+//        running = running1.getJson();
+//        output = output1.getJson();
+//        checkpoint = checkpoint1.getJson();
+//
+//
+//        setOutputDir();
+//        createDir(outputDir);
+//
+//        setCheckpointWriteDir();
+//        createDir(checkpointWriteDir);
+//    };
 
-        initTime = getTimeNowAsString();
+    void setParams(ComputeUnitParams cu1, Json::Value grid1, Json::Value flow1, Json::Value running1, Json::Value output1, Json::Value checkpoint1){
 
         cu = cu1;
-
         cuJson = cu1.getJson();
 
-        grid = grid1.getJson();
-        flow =  flow1.getJson();
-        running = running1.getJson();
-        output = output1.getJson();
-        checkpoint = checkpoint1.getJson();
-
-
-        setOutputDir();
-        createDir(outputDir);
-
-        setCheckpointWriteDir();
-        createDir(checkpointWriteDir);
-    };
-
-    template <typename T>
-    void setParams(ComputeUnitParams cu1, GridParams grid1, FlowParams<T> flow1, RunningParams running1, OutputParams output1, CheckpointParams checkpoint1){
-
-        cu = cu1;
-        cuJson = cu1.getJson();
-
-        grid = grid1.getJson();
-        flow =  flow1.getJson();
-        running = running1.getJson();
-        output = output1.getJson();
-        checkpoint = checkpoint1.getJson();
+        grid = grid1;
+        flow =  flow1;
+        running = running1;
+        output = output1;
+        checkpoint = checkpoint1;
 
     }
+
+
 
     void setComputeUnitParams(ComputeUnitParams cu1) {
         cu = cu1;
@@ -156,17 +157,11 @@ public:
         grid = grid1.getJson();
     }
 
-    template <typename T>
-    void setFlowParams(FlowParams<T> flow1) {
-        flow =  flow1.getJson();
-    }
+
 
     void setRunningParams(RunningParams running1){
         running = running1.getJson();
     };
-
-
-
 
 
 
@@ -262,6 +257,15 @@ public:
 
 
 
+    std::string runningDataFileName(){
+
+        std::string name = "";
+        if (running["runningDataFilePrefix"].asString() != "") name += running["runningDataFilePrefix"].asString() + "_";
+        name += "running";
+        if (running["runningDataFileAppendTime"].asBool()) name += "_" + initTime;
+
+        return name;
+    }
 
 
     void setRunningDataFile(std::string dir, std::string fileName){

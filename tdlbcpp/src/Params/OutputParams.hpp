@@ -16,6 +16,7 @@
 
 
 #include "OrthoPlaneParams.hpp"
+#include "OrthoPlaneVorticityParams.hpp"
 #include "VolumeParams.hpp"
 #include "AngleParams.hpp"
 #include "PlaneAtAngleParams.hpp"
@@ -38,6 +39,11 @@ struct OutputParams {
     std::vector<OrthoPlaneParams> XY_planes;
     std::vector<OrthoPlaneParams> XZ_planes;
     std::vector<OrthoPlaneParams> YZ_planes;
+
+    std::vector<OrthoPlaneVorticityParams> XY_vorticity_planes;
+    std::vector<OrthoPlaneVorticityParams> XZ_vorticity_planes;
+    std::vector<OrthoPlaneVorticityParams> YZ_vorticity_planes;
+
     std::vector<AngleParams> capture_at_blade_angle;
     std::vector<PlaneAtAngleParams> YZ_plane_when_angle;
     std::vector<VolumeParams> volumes;
@@ -50,7 +56,7 @@ struct OutputParams {
 
 
     void add_XY_plane(std::string dir, tStep repeat, tNi cutAt,
-                      int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
+                      int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_colrow_Q4";
         //        if (Q_output_len == 19) QDataType = "tDisk_colrow_Q19";
@@ -64,11 +70,11 @@ struct OutputParams {
         p.cutAt = cutAt;
         p.Q_output_len = Q_output_len;
         p.start_at_step = start_at_step;
-        p.end_at_repeat = end_at_repeat;
+        p.end_at_step = end_at_step;
         p.use_half_float = use_half_float;
         p.QDataType = QDataType;
 
-        //        plane p = {dir, repeat, cutAt, Q_output_len, start_at_step, end_at_repeat, use_half_float, QDataType};
+        //        plane p = {dir, repeat, cutAt, Q_output_len, start_at_step, end_at_step, use_half_float, QDataType};
         XY_planes.push_back(p);
     }
 
@@ -80,7 +86,7 @@ struct OutputParams {
 
     //formally axis
     void add_XZ_plane(const std::string dir, tStep repeat, tNi cutAt,
-                      int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
+                      int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_colrow_Q4";
         //        if (Q_output_len == 19) QDataType = "tDisk_colrow_Q19";
@@ -94,11 +100,11 @@ struct OutputParams {
         p.cutAt = cutAt;
         p.Q_output_len = Q_output_len;
         p.start_at_step = start_at_step;
-        p.end_at_repeat = end_at_repeat;
+        p.end_at_step = end_at_step;
         p.use_half_float = use_half_float;
         p.QDataType = QDataType;
 
-        //        plane p = {dir, repeat, cutAt, Q_output_len, start_at_step, end_at_repeat, use_half_float, QDataType};
+        //        plane p = {dir, repeat, cutAt, Q_output_len, start_at_step, end_at_step, use_half_float, QDataType};
         XZ_planes.push_back(p);
     }
 
@@ -106,7 +112,7 @@ struct OutputParams {
 
     //Formaly slice
     void add_YZ_plane(const std::string dir, tStep repeat, tNi cutAt,
-                      int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
+                      int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_colrow_Q4";
         //        if (Q_output_len == 19) QDataType = "tDisk_colrow_Q19";
@@ -121,11 +127,53 @@ struct OutputParams {
         p.cutAt = cutAt;
         p.Q_output_len = Q_output_len;
         p.start_at_step = start_at_step;
-        p.end_at_repeat = end_at_repeat;
+        p.end_at_step = end_at_step;
         p.use_half_float = use_half_float;
         p.QDataType = QDataType;
 
         YZ_planes.push_back(p);
+    }
+
+
+
+
+    void add_XY_vorticity_plane(std::string dir, tStep repeat, tNi cutAt,
+                    int jpegCompression=100, tStep start_at_step = 0, tStep end_at_step = 0){
+        OrthoPlaneVorticityParams p;
+        p.name_root = dir;
+        p.jpegCompression = jpegCompression;
+        p.repeat = repeat;
+        p.cutAt = cutAt;
+        p.start_at_step = start_at_step;
+        p.end_at_step = end_at_step;
+
+        XY_vorticity_planes.push_back(p);
+    }
+
+    void add_XZ_vorticity_plane(std::string dir, tStep repeat, tNi cutAt,
+                                int jpegCompression=100, tStep start_at_step = 0, tStep end_at_step = 0){
+        OrthoPlaneVorticityParams p;
+        p.name_root = dir;
+        p.jpegCompression = jpegCompression;
+        p.repeat = repeat;
+        p.cutAt = cutAt;
+        p.start_at_step = start_at_step;
+        p.end_at_step = end_at_step;
+
+        XZ_vorticity_planes.push_back(p);
+    }
+
+    void add_YZ_vorticity_plane(std::string dir, tStep repeat, tNi cutAt,
+                                int jpegCompression=100, tStep start_at_step = 0, tStep end_at_step = 0){
+        OrthoPlaneVorticityParams p;
+        p.name_root = dir;
+        p.jpegCompression = jpegCompression;
+        p.repeat = repeat;
+        p.cutAt = cutAt;
+        p.start_at_step = start_at_step;
+        p.end_at_step = end_at_step;
+
+        YZ_vorticity_planes.push_back(p);
     }
 
 
@@ -136,7 +184,7 @@ struct OutputParams {
 
     void add_angle(const std::string dir,
                    tStep rotational_capture_repeat, double rotational_capture_behind_impeller_degrees,
-                   int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
+                   int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_colrow_Q4";
         //        if (Q_output_len == 19) QDataType = "tDisk_colrow_Q19";
@@ -150,7 +198,7 @@ struct OutputParams {
         a.degrees = rotational_capture_behind_impeller_degrees;
         a.Q_output_len = Q_output_len;
         a.start_at_step = start_at_step;
-        a.end_at_repeat = end_at_repeat;
+        a.end_at_step = end_at_step;
         a.use_half_float = use_half_float;
         a.QDataType = QDataType;
 
@@ -160,7 +208,7 @@ struct OutputParams {
 
 
     void add_YZ_plane_at_angle(const std::string dir, double fixed_axis_capture_behind_impeller_degrees,
-                               double tolerance, tNi cutAt, int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
+                               double tolerance, tNi cutAt, int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_colrow_Q4";
         //        if (Q_output_len == 19) QDataType = "tDisk_colrow_Q19";
@@ -175,7 +223,7 @@ struct OutputParams {
         p.cutAt = cutAt;
         p.Q_output_len = Q_output_len;
         p.start_at_step = start_at_step;
-        p.end_at_repeat = end_at_repeat;
+        p.end_at_step = end_at_step;
         p.use_half_float = use_half_float;
         p.QDataType = QDataType;
 
@@ -187,7 +235,7 @@ struct OutputParams {
 
 
     void add_volume(const std::string dir, tStep plot_full_repeat,
-                    int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_repeat = 0, bool use_half_float=0){
+                    int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_grid_Q4";
         //        if (Q_output_len == 19) QDataType = "tDisk_grid_Q19";
@@ -200,7 +248,7 @@ struct OutputParams {
         v.repeat = plot_full_repeat;
         v.Q_output_len = Q_output_len;
         v.start_at_step = start_at_step;
-        v.end_at_repeat = end_at_repeat;
+        v.end_at_step = end_at_step;
         v.use_half_float = use_half_float;
         v.QDataType = QDataType;
 
@@ -225,6 +273,9 @@ struct OutputParams {
             getParamsFromJsonArray(jsonParams["XY_planes"], XY_planes);
             getParamsFromJsonArray(jsonParams["XZ_planes"], XZ_planes);
             getParamsFromJsonArray(jsonParams["YZ_planes"], YZ_planes);
+            getParamsFromJsonArray(jsonParams["XY_vorticity_planes"], XY_vorticity_planes);
+            getParamsFromJsonArray(jsonParams["XZ_vorticity_planes"], XZ_vorticity_planes);
+            getParamsFromJsonArray(jsonParams["YZ_vorticity_planes"], YZ_vorticity_planes);
             getParamsFromJsonArray(jsonParams["capture_at_blade_angle"], capture_at_blade_angle);
             getParamsFromJsonArray(jsonParams["YZ_plane_when_angle"], YZ_plane_when_angle);
             getParamsFromJsonArray(jsonParams["volumes"], volumes);
@@ -255,6 +306,9 @@ struct OutputParams {
             jsonParams["XY_planes"] = getJsonOfArray(XY_planes);
             jsonParams["XZ_planes"] = getJsonOfArray(XZ_planes);
             jsonParams["YZ_planes"] = getJsonOfArray(YZ_planes);
+            jsonParams["XY_vorticity_planes"] = getJsonOfArray(XY_vorticity_planes);
+            jsonParams["XZ_vorticity_planes"] = getJsonOfArray(XZ_vorticity_planes);
+            jsonParams["YZ_vorticity_planes"] = getJsonOfArray(YZ_vorticity_planes);
             jsonParams["capture_at_blade_angle"] = getJsonOfArray(capture_at_blade_angle);
             jsonParams["YZ_plane_when_angle"] = getJsonOfArray(YZ_plane_when_angle);
             jsonParams["volumes"] = getJsonOfArray(volumes);

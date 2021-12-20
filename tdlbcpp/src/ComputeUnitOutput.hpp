@@ -111,7 +111,7 @@ static inline std::string formatStep(tStep step){
 
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXZ(tNi j, RunningParams runParam){
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression){
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     T *Vort = new T[size];
@@ -196,7 +196,7 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXY(tNi k, RunningParams runParam){
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXY(tNi k, RunningParams runParam, int jpegCompression){
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     T *Vort = new T[size];
@@ -320,7 +320,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
             savePlaneXZ<float, 4>(xz, binFormat, running);
 
             //FOR DEBUGGING
-            calcVorticityXZ(xz.cutAt, running);
+//            calcVorticityXZ(xz.cutAt, running, xz.jpegCompression);
         }
     }
 
@@ -448,7 +448,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::savePlaneXZ(OrthoPlaneParams pl
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void inline ComputeUnitBase<T, QVecSize, MemoryLayout>::saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam, tNi cutAt)
+void inline ComputeUnitBase<T, QVecSize, MemoryLayout>::saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam, tNi cutAt, int jpegCompression)
 {
     bool minInitialized = false, maxInitialized = false;
     T max = 0, min = 0;
@@ -490,18 +490,16 @@ void inline ComputeUnitBase<T, QVecSize, MemoryLayout>::saveJpeg(const char *tag
         }
     }
 
-    std::string plotDir;
-    if (tag=="xy") plotDir = outputTree.formatYZPlaneDir(runParam.step, cutAt);
-    else if (tag=="xz") plotDir = outputTree.formatXZPlaneDir(runParam.step, cutAt);
+
+    std::string plotDir = "Error_PlotDir_NotSet_saveJPEG";
+    if (strcmp(tag, "xy") == 0) plotDir = outputTree.formatYZPlaneDir(runParam.step, cutAt);
+    else if (strcmp(tag, "xz") == 0)  plotDir = outputTree.formatXZPlaneDir(runParam.step, cutAt);
 
     std::string jpegPath = plotDir + ".jpeg";
 
-  // std::string jpegPath = "vort." + std::string(tag) + "." + formatStep(runParam.step) + ".jpeg";
-
-
     TooJpeg::openJpeg(jpegPath);
     TooJpeg::writeJpeg(pict, pictSizeX, pictSizeY,
-                       false, 100, false, "Debug");
+                       false, jpegCompression, false, "Debug");
     TooJpeg::closeJpeg();
 
     delete[] pict;

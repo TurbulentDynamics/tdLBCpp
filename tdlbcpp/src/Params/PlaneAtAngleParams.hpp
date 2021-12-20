@@ -29,7 +29,7 @@ struct PlaneAtAngleParams {
     tNi cutAt = 0;
     int Q_output_len = 4;
     tStep start_at_step = 0;
-    tStep end_at_repeat = 0;
+    tStep end_at_step = 0;
     bool use_half_float = false;
     std::string QDataType = "float";
 
@@ -48,7 +48,7 @@ struct PlaneAtAngleParams {
     cutAt = (tNi)jsonParams["cutAt"].asUInt64();
     Q_output_len = (int)jsonParams["Q_output_len"].asInt();
     start_at_step = (tStep)jsonParams["start_at_step"].asUInt64();
-    end_at_repeat = (tStep)jsonParams["end_at_repeat"].asUInt64();
+    end_at_step = (tStep)jsonParams["end_at_step"].asUInt64();
     use_half_float = (bool)jsonParams["use_half_float"].asBool();
     QDataType = (std::string)jsonParams["QDataType"].asString();
 
@@ -75,7 +75,7 @@ struct PlaneAtAngleParams {
     jsonParams["cutAt"] = (Json::UInt64)cutAt;
     jsonParams["Q_output_len"] = (int)Q_output_len;
     jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
-    jsonParams["end_at_repeat"] = (Json::UInt64)end_at_repeat;
+    jsonParams["end_at_step"] = (Json::UInt64)end_at_step;
     jsonParams["use_half_float"] = (bool)use_half_float;
     jsonParams["QDataType"] = (std::string)QDataType;
 

@@ -83,6 +83,7 @@
 		D6DAD656276F8F9D00DB5EB7 /* PlaneAtAngleParams.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PlaneAtAngleParams.hpp; sourceTree = "<group>"; };
 		D6DAD657276F9F0100DB5EB7 /* Boundary.cuh */ = {isa = PBXFileReference; lastKnownFileType = text; path = Boundary.cuh; sourceTree = "<group>"; };
 		D6DAD658276F9F0100DB5EB7 /* ComputeUnitOutput.cuh */ = {isa = PBXFileReference; lastKnownFileType = text; path = ComputeUnitOutput.cuh; sourceTree = "<group>"; };
+		D6DAD6592770669A00DB5EB7 /* OrthoPlaneVorticityParams.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = OrthoPlaneVorticityParams.hpp; sourceTree = "<group>"; };
 		D6E5C5BB25DBEC0B0067FDE1 /* RushtonTurbine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RushtonTurbine.hpp; sourceTree = "<group>"; };
 		D6E5C5BD25DBEC0B0067FDE1 /* GeomMidPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GeomMidPoint.hpp; sourceTree = "<group>"; };
 		D6E5C72425EE184B0067FDE1 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
@@ -289,6 +290,7 @@
 				D67F4D2F276615AE00952021 /* CheckpointParams.hpp */,
 				D67F4D39276615AE00952021 /* FlowParams.hpp */,
 				D67F4D32276615AE00952021 /* GridParams.hpp */,
+				D6DAD6592770669A00DB5EB7 /* OrthoPlaneVorticityParams.hpp */,
 				D67F4D33276615AE00952021 /* Params_template.py */,
 				D67F4D37276615AE00952021 /* Params.py */,
 				D67F4D3A276615AE00952021 /* RunningParams.hpp */,

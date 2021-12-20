@@ -260,30 +260,6 @@ std::string streaming Esotwist
 
         nu  = uav * (T)impellerBladeOuterRadius / Re_m;
     }
-
-    FlowParams<double> asDouble(){
-        FlowParams<double> f;
-
-        f.initialRho = (double)initialRho;
-        f.reMNonDimensional = (double)reMNonDimensional;
-        f.uav = (double)uav;
-        f.cs0 = (double)cs0;
-        f.g3 = (double)g3;
-        f.nu = (double)nu;
-        f.fx0 = (double)fx0;
-        f.Re_m = (double)Re_m;
-        f.Re_f = (double)Re_f;
-        f.uf = (double)uf;
-
-        f.alpha = (double)alpha;
-        f.beta = (double)beta;
-
-        f.useLES = useLES;
-        f.collision = collision;
-        f.streaming = streaming;
-
-        return f;
-    }
 """
 
 
@@ -297,11 +273,13 @@ double angle 0
 tStep num_steps 20
 tStep impellerStartupStepsUntilNormalSpeed 30
 
-std::string runningDataFileDir .
-std::string runningDataFilePrefix debug_running
 tStep numStepsForAverageCalc 10
 tStep repeatPrintTimerToFile 20
 tStep repeatPrintTimerToStdOut 10
+
+std::string runningDataFileDir .
+std::string runningDataFilePrefix debug
+bool runningDataFileAppendTime true
 
 """)
 
@@ -408,7 +386,20 @@ bool use_half_float false
 tNi cutAt 0
 tStep repeat 0
 tStep start_at_step 0
-tStep end_at_repeat 0
+tStep end_at_step 0
+""")
+
+
+class OrthoPlaneVorticityParams(ParamsBase):
+    def __init__(self):
+        super().__init__("""
+std::string name_root vort
+int jpegCompression 100
+
+tNi cutAt 0
+tStep repeat 0
+tStep start_at_step 0
+tStep end_at_step 0
 """)
 
 
@@ -420,7 +411,7 @@ tStep repeat 0
 
 int Q_output_len 4
 tStep start_at_step 0
-tStep end_at_repeat 0
+tStep end_at_step 0
 bool use_half_float false
 
 std::string QDataType float
@@ -435,7 +426,7 @@ double degrees 0
 
 int Q_output_len 4
 tStep start_at_step 0
-tStep end_at_repeat 0
+tStep end_at_step 0
 bool use_half_float false
 
 std::string QDataType float
@@ -451,7 +442,7 @@ tNi cutAt 0
 
 int Q_output_len 4
 tStep start_at_step 0
-tStep end_at_repeat 0
+tStep end_at_step 0
 bool use_half_float false
 
 std::string QDataType float
@@ -469,7 +460,7 @@ double angle_behind_blade 0.0
 
 int Q_output_len 4
 tStep start_at_step 0
-tStep end_at_repeat 0
+tStep end_at_step 0
 bool use_half_float false
 
 std::string QDataType float
@@ -491,6 +482,7 @@ std::string outputRootDir debug_output_dir
 
         self.include = """
 #include "OrthoPlaneParams.hpp"
+#include "OrthoPlaneVorticityParams.hpp"
 #include "VolumeParams.hpp"
 #include "AngleParams.hpp"
 #include "PlaneAtAngleParams.hpp"
@@ -528,7 +520,7 @@ std::string outputRootDir debug_output_dir
         orthoPlaneXY = OrthoPlaneParams()
         orthoPlaneXY.struct_name = "XY_planes"
         orthoPlaneXY.cutAt = grid.z / 2
-        orthoPlaneXY.repeat = 10
+        orthoPlaneXY.repeat = 20
         orthoPlaneXY.name_root = "plot_slice"
 
         self.ortho_plane_objs.append(orthoPlaneXY)
@@ -536,12 +528,33 @@ std::string outputRootDir debug_output_dir
         orthoPlaneXZ = OrthoPlaneParams()
         orthoPlaneXZ.struct_name = "XZ_planes"
         orthoPlaneXZ.cutAt = grid.y / 3 * 2
-        orthoPlaneXZ.repeat = 10
+        orthoPlaneXZ.repeat = 20
         orthoPlaneXZ.name_root = "plot_axis"
 
         self.ortho_plane_objs.append(orthoPlaneXZ)
 
 
+
+
+        orthoPlaneVorticityXY = OrthoPlaneVorticityParams()
+        orthoPlaneVorticityXY.struct_name = "XY_vorticity_planes"
+        orthoPlaneVorticityXY.cutAt = grid.z / 2
+        orthoPlaneVorticityXY.repeat = 1
+        orthoPlaneVorticityXY.name_root = "vort_slice"
+        orthoPlaneVorticityXY.jpegCompression = 100
+
+        self.ortho_plane_objs.append(orthoPlaneVorticityXY)
+
+
+
+        orthoPlaneVorticityXZ = OrthoPlaneVorticityParams()
+        orthoPlaneVorticityXZ.struct_name = "XZ_vorticity_planes"
+        orthoPlaneVorticityXZ.cutAt = grid.y / 3 * 2
+        orthoPlaneVorticityXZ.repeat = 1
+        orthoPlaneVorticityXZ.name_root = "vort_axis"
+        orthoPlaneVorticityXZ.jpegCompression = 100
+
+        self.ortho_plane_objs.append(orthoPlaneVorticityXZ)
 
 
 
@@ -572,6 +585,9 @@ if __name__ == '__main__':
 
     out = OrthoPlaneParams()
     out.cpp_file()
+    out = OrthoPlaneVorticityParams()
+    out.cpp_file()
+
 
     out = VolumeParams()
     out.cpp_file()

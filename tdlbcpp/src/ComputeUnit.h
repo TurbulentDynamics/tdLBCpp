@@ -147,10 +147,10 @@ public:
     void writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams runParam);
 
     //Debug
-    virtual void calcVorticityXZ(tNi j, RunningParams runParam) = 0;
-    virtual void calcVorticityXY(tNi k, RunningParams runParam) = 0;
+    virtual void calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression) = 0;
+    virtual void calcVorticityXY(tNi k, RunningParams runParam, int jpegCompression) = 0;
 
-    void saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam, tNi cutAt);
+    void saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam, tNi cutAt, int jpegCompression=100);
     
     
 private:
@@ -211,8 +211,8 @@ public:
     using Base::outputTree;
     virtual void moments();
     virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta);
-    virtual void calcVorticityXZ(tNi j, RunningParams runParam);
-    virtual void calcVorticityXY(tNi k, RunningParams runParam);
+    virtual void calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression);
+    virtual void calcVorticityXY(tNi k, RunningParams runParam, int jpegCompression);
     virtual void printDebug(int fi, int ti, int fj, int tj, int fk, int tk);
 };
 

@@ -34,8 +34,12 @@
         "k0": 0,
         "nodeID": 0,
         "resolution": 0,
+        "strCollisonAlgo": "notSet",
+        "strCompileFlag": "notSet",
         "strMemoryLayout": "notSet",
+        "strQLength": "notSet",
         "strQVecPrecision": "notSet",
+        "strStreamingAlgo": "notSet",
         "x": 0,
         "y": 0,
         "z": 0
@@ -48,6 +52,8 @@
         "collision": "EgglesSomers",
         "cs0": 0.12,
         "fx0": 0.0,
+        "fy0": 0.0,
+        "fz0": 0.0,
         "g3": 0.8,
         "initialRho": 8.0,
         "nu": 0.0,
@@ -73,11 +79,21 @@
                 "QDataType": "float",
                 "Q_output_len": 4,
                 "cutAt": 30.0,
-                "end_at_repeat": 0,
+                "end_at_step": 0,
                 "name_root": "plot_slice",
-                "repeat": 10,
+                "repeat": 20,
                 "start_at_step": 0,
                 "use_half_float": false
+            }
+        ],
+        "XY_vorticity_planes": [
+            {
+                "cutAt": 30.0,
+                "end_at_step": 0,
+                "jpegCompression": 100,
+                "name_root": "vort_slice",
+                "repeat": 1,
+                "start_at_step": 0
             }
         ],
         "XZ_planes": [
@@ -85,11 +101,21 @@
                 "QDataType": "float",
                 "Q_output_len": 4,
                 "cutAt": 40.0,
-                "end_at_repeat": 0,
+                "end_at_step": 0,
                 "name_root": "plot_axis",
-                "repeat": 10,
+                "repeat": 20,
                 "start_at_step": 0,
                 "use_half_float": false
+            }
+        ],
+        "XZ_vorticity_planes": [
+            {
+                "cutAt": 40.0,
+                "end_at_step": 0,
+                "jpegCompression": 100,
+                "name_root": "vort_axis",
+                "repeat": 1,
+                "start_at_step": 0
             }
         ],
         "outputRootDir": "debug_output_dir"
@@ -101,8 +127,9 @@
         "num_steps": 20,
         "repeatPrintTimerToFile": 20,
         "repeatPrintTimerToStdOut": 10,
+        "runningDataFileAppendTime": true,
         "runningDataFileDir": ".",
-        "runningDataFilePrefix": "debug_running",
+        "runningDataFilePrefix": "debug",
         "step": 1
     }
 }

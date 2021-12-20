@@ -9,7 +9,7 @@ cc_library(
 
 cc_library(
     name = "params",
-    hdrs = ["CheckpointParams.hpp", "OutputParams.hpp", "FlowParams.hpp", "GridParams.hpp", "RunningParams.hpp", "BinFileParams.hpp", "ComputeUnitParams.hpp", "OrthoPlaneParams.hpp", "VolumeParams.hpp", "AngleParams.hpp", "PlaneAtAngleParams.hpp", "SectorParams.hpp"],
+    hdrs = ["CheckpointParams.hpp", "OutputParams.hpp", "FlowParams.hpp", "GridParams.hpp", "RunningParams.hpp", "BinFileParams.hpp", "ComputeUnitParams.hpp", "OrthoPlaneParams.hpp", "OrthoPlaneVorticityParams.hpp", "VolumeParams.hpp", "AngleParams.hpp", "PlaneAtAngleParams.hpp", "SectorParams.hpp"],
     deps = [":pjson"],
     visibility = ["//visibility:public"],
     include_prefix = "Params",

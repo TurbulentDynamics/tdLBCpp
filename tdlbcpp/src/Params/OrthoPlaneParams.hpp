@@ -30,7 +30,7 @@ struct OrthoPlaneParams {
     tNi cutAt = 0;
     tStep repeat = 0;
     tStep start_at_step = 0;
-    tStep end_at_repeat = 0;
+    tStep end_at_step = 0;
 
     
     
@@ -48,7 +48,7 @@ struct OrthoPlaneParams {
     cutAt = (tNi)jsonParams["cutAt"].asUInt64();
     repeat = (tStep)jsonParams["repeat"].asUInt64();
     start_at_step = (tStep)jsonParams["start_at_step"].asUInt64();
-    end_at_repeat = (tStep)jsonParams["end_at_repeat"].asUInt64();
+    end_at_step = (tStep)jsonParams["end_at_step"].asUInt64();
 
             
         }
@@ -74,7 +74,7 @@ struct OrthoPlaneParams {
     jsonParams["cutAt"] = (Json::UInt64)cutAt;
     jsonParams["repeat"] = (Json::UInt64)repeat;
     jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
-    jsonParams["end_at_repeat"] = (Json::UInt64)end_at_repeat;
+    jsonParams["end_at_step"] = (Json::UInt64)end_at_step;
 
             
             return jsonParams;

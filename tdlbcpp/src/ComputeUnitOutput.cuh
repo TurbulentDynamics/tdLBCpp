@@ -40,25 +40,25 @@ __device__ T calcVorticity(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryL
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-__global__ void calcVorticityXZ(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, tNi j) {
+__global__ void calcVorticityXZ(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, tNi j, int jpegCompression) {
     tNi i = blockIdx.x * blockDim.x + threadIdx.x;
     tNi k = blockIdx.z * blockDim.z + threadIdx.z;
     if (i > cu.xg1 || j > cu.yg1 || k > cu.zg1 || i < 1 || j < 1 || k < 1) {
         return;
     }
 
-    cu.VortXZ[cu.xg * k + i] = calcVorticity(cu, i, j, k);
+    cu.VortXZ[cu.xg * k + i] = calcVorticity(cu, i, j, k, jpegCompression);
 
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-__global__ void calcVorticityXY(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, tNi k) {
+__global__ void calcVorticityXY(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, tNi k, int jpegCompression) {
     tNi i = blockIdx.x * blockDim.x + threadIdx.x;
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
     if (i > cu.xg1 || j > cu.yg1 || k > cu.zg1 || i < 1 || j < 1 || k < 1) {
         return;
     }
 
-    cu.VortXY[cu.xg * j + i] = calcVorticity(cu, i, j, k);
+    cu.VortXY[cu.xg * j + i] = calcVorticity(cu, i, j, k, jpegCompression);
 
 }

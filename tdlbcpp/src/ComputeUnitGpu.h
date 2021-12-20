@@ -40,8 +40,8 @@ public:
     //virtual void moments();
     //virtual void bounceBackBoundary();
     //virtual void streamingPush();
-    virtual void calcVorticityXZ(tNi j, RunningParams runParam);
-    virtual void calcVorticityXY(tNi k, RunningParams runParam);
+    virtual void calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression);
+    virtual void calcVorticityXY(tNi k, RunningParams runParam, int jpegCompression);
 
     virtual void setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
     virtual void setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);

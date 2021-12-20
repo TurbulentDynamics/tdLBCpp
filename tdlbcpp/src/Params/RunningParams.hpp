@@ -27,11 +27,12 @@ struct RunningParams {
     double angle = 0.0;
     tStep num_steps = 20;
     tStep impellerStartupStepsUntilNormalSpeed = 30;
-    std::string runningDataFileDir = ".";
-    std::string runningDataFilePrefix = "debug_running";
     tStep numStepsForAverageCalc = 10;
     tStep repeatPrintTimerToFile = 20;
     tStep repeatPrintTimerToStdOut = 10;
+    std::string runningDataFileDir = ".";
+    std::string runningDataFilePrefix = "debug";
+    bool runningDataFileAppendTime = true;
 
     
     
@@ -57,11 +58,12 @@ struct RunningParams {
     angle = (double)jsonParams["angle"].asDouble();
     num_steps = (tStep)jsonParams["num_steps"].asUInt64();
     impellerStartupStepsUntilNormalSpeed = (tStep)jsonParams["impellerStartupStepsUntilNormalSpeed"].asUInt64();
-    runningDataFileDir = (std::string)jsonParams["runningDataFileDir"].asString();
-    runningDataFilePrefix = (std::string)jsonParams["runningDataFilePrefix"].asString();
     numStepsForAverageCalc = (tStep)jsonParams["numStepsForAverageCalc"].asUInt64();
     repeatPrintTimerToFile = (tStep)jsonParams["repeatPrintTimerToFile"].asUInt64();
     repeatPrintTimerToStdOut = (tStep)jsonParams["repeatPrintTimerToStdOut"].asUInt64();
+    runningDataFileDir = (std::string)jsonParams["runningDataFileDir"].asString();
+    runningDataFilePrefix = (std::string)jsonParams["runningDataFilePrefix"].asString();
+    runningDataFileAppendTime = (bool)jsonParams["runningDataFileAppendTime"].asBool();
 
             
         }
@@ -84,11 +86,12 @@ struct RunningParams {
     jsonParams["angle"] = (double)angle;
     jsonParams["num_steps"] = (Json::UInt64)num_steps;
     jsonParams["impellerStartupStepsUntilNormalSpeed"] = (Json::UInt64)impellerStartupStepsUntilNormalSpeed;
-    jsonParams["runningDataFileDir"] = (std::string)runningDataFileDir;
-    jsonParams["runningDataFilePrefix"] = (std::string)runningDataFilePrefix;
     jsonParams["numStepsForAverageCalc"] = (Json::UInt64)numStepsForAverageCalc;
     jsonParams["repeatPrintTimerToFile"] = (Json::UInt64)repeatPrintTimerToFile;
     jsonParams["repeatPrintTimerToStdOut"] = (Json::UInt64)repeatPrintTimerToStdOut;
+    jsonParams["runningDataFileDir"] = (std::string)runningDataFileDir;
+    jsonParams["runningDataFilePrefix"] = (std::string)runningDataFilePrefix;
+    jsonParams["runningDataFileAppendTime"] = (bool)runningDataFileAppendTime;
 
             
             return jsonParams;
