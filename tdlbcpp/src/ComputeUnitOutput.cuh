@@ -7,7 +7,7 @@
 #include "ComputeUnit.h"
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-__device__ T calcVorticity(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, tNi i, tNi j, tNi k) {
+__device__ T calcVorticity(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, tNi i, tNi j, tNi k, int jpegCompression) {
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     if (cu.devExcludeOutputPoints[cu.index(i,j,k)] == true) {
