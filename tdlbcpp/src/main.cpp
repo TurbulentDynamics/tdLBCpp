@@ -400,14 +400,15 @@ int main(int argc, char* argv[]){
         geom.updateRotatingGeometry(running.angle, deltaRunningAngle, onSurface);
         geomRotatingSurface = geom.returnRotatingGeometry();
 
+        //TODO: GPU Copy Geom to GPU here on another cuda stream
 
-        //geom.updateRotatingGeometry(running.angle, deltaRunningAngle, internal);
-        //geomRotatingInternal = geom.returnRotatingGeometry();
+        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, internal);
+        geomRotatingInternal = geom.returnRotatingGeometry();
 
 
 
-        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
-        std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
+//        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
+//        std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
 
         main_time = mainTimer.check(0, 0, main_time, "updateRotatingGeometry");
@@ -439,17 +440,21 @@ int main(int argc, char* argv[]){
 
 
 
-       // lb->forcing(geomFixedSurface, flow.alpha, flow.beta);
-        //lb->forcing(geomFixedInternal, flow.alpha, flow.beta);
+        // MARK: FORCING
 
-        //lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta);
-        //lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta);
+
+        lb->forcingDUMMY(geomFixedSurface);
+        lb->forcingDUMMY(geomFixedInternal);
+
+        lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta);
+        lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta);
 
         lb->forcing(geomRotatingSurface, flow.alpha, flow.beta);
-        //lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
+        lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
 
        // lb->forcing(geomRotating, flow.alpha, flow.beta);
 
+        lb->forcingRESET();
 
 
         main_time = mainTimer.check(0, 5, main_time, "Forcing");
@@ -460,51 +465,67 @@ int main(int argc, char* argv[]){
 
 
         // MARK: OUTPUT
-//        lb->setOutputExcludePoints(geomRotating);
-
-        //lb->setOutputExcludePoints(geomRotatingNonUpdatingSurface);
-        lb->setOutputExcludePoints(geomRotatingNonUpdatingInternal);  //Replaces the disk cells that are deleted from last step
-        lb->setOutputExcludePoints(geomRotatingSurface);
-        lb->setOutputExcludePoints(geomRotatingInternal);
+        //lb.writeAllOutput(geom, output, binFormat, running);
 
 
-//        for (auto xy: output.XY_planes){
-//            if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
-//                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
-//            }
-//        }
+        //        for (auto xy: output.XY_planes){
+        //            if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
+        //                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
+        //            }
+        //        }
 
+        //        for (auto xz: output.XZ_planes){
+        //            if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
+        //                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
+        //            }
+        //        }
+
+        bool outputThisStep = false;
         for (auto xy: output.XY_vorticity_planes){
             if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
-                lb->calcVorticityXY(xy.cutAt, running, xy.jpegCompression);
+                outputThisStep = true;
             }
         }
-
-
-//        for (auto xz: output.XZ_planes){
-//            if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
-//                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
-//            }
-//        }
-
         for (auto xz: output.XZ_vorticity_planes){
             if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
-                lb->calcVorticityXZ(xz.cutAt, running, xz.jpegCompression);
+                outputThisStep = true;
             }
         }
 
+        if (outputThisStep){
 
-        //REMOVE THE ROTATING POINTS.
-        lb->unsetOutputExcludePoints(geomRotatingSurface);
-        lb->unsetOutputExcludePoints(geomRotatingInternal);
+            //Replaces the disk cells that are deleted from last step when unsetting Rotating blades.
+            lb->setOutputExcludePoints(geomRotatingNonUpdatingSurface);
+            lb->setOutputExcludePoints(geomRotatingNonUpdatingInternal);
 
-//        lb->unsetOutputExcludePoints(geomRotating);
+            lb->setOutputExcludePoints(geomRotatingSurface);
+            lb->setOutputExcludePoints(geomRotatingInternal);
 
 
 
+            for (auto xy: output.XY_vorticity_planes){
+                if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
+                    lb->calcVorticityXY(xy.cutAt, running, xy.jpegCompression);
+                }
+            }
 
-        //TODO: This will write BINARY PLOTS
-        //                lb.writeAllOutput(geom, output, binFormat, running);
+
+            for (auto xz: output.XZ_vorticity_planes){
+                if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
+                    lb->calcVorticityXZ(xz.cutAt, running, xz.jpegCompression);
+                }
+            }
+
+
+            lb->unsetOutputExcludePoints(geomRotatingSurface);
+            lb->unsetOutputExcludePoints(geomRotatingInternal);
+
+
+            //        lb->unsetOutputExcludePoints(geomRotating);
+
+
+        }
+
         main_time = mainTimer.check(0, 6, main_time, "writeAllOutput");
 
 

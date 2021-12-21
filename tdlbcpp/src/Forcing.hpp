@@ -57,17 +57,7 @@ template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision col
 void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta){
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
-    for (tNi i=1; i<=xg1; i++) {
-        for (tNi j = 1; j<=yg1; j++){
-            for (tNi k = 1; k<=zg1; k++){
-                
-                O[index(i,j,k)] = 0;
-            }
-        }
-    }
-    
-    
-    
+
     
     for (auto &g: geom){
         
@@ -156,13 +146,22 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
         
     }//endfor
     
+
+
     
-    
+}//end of func
+
+
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcingRESET(){
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     for (tNi i=1; i<=xg1; i++) {
         for (tNi j = 1; j<=yg1; j++){
             for (tNi k = 1; k<=zg1; k++){
-                
+
                 if (O[index(i,j,k)] == 0) {
                     F[index(i,j,k)].x = 0.0;
                     F[index(i,j,k)].y = 0.0;
@@ -172,10 +171,47 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
                     O[index(i,j,k)] = 0;
                 }//endif
             }}}//endfor  ijk
-    
+
+}
+
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcingDUMMY(std::vector<PosPolar<tNi, T>> &geom){
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+
+
+
+    for (auto &g: geom){
+
+        T ppp[3][3];
+
+        tNi i = g.i + ghost;
+        tNi j = g.j + ghost;
+        tNi k = g.k + ghost;
+
+
+        for (tNi k1 = -1; k1<=1; k1++){
+            for (tNi i1 = -1; i1<=1; i1++){
+
+                tNi i2 = i + i1;
+                tNi j2 = j;
+                tNi k2 = k + k1;
+
+
+                if (i2 == 0)   i2 = xg1;
+                if (i2 == xg0) i2 = 1;
+                if (k2 == 0)   k2 = zg1;
+                if (k2 == zg0) k2 = 1;
+
+                O[index(i2,j2,k2)] = 1;
+
+            }}//endfor  j1, k1
+
+    }//endfor
+
+
+
 }//end of func
-
-
-
 
 
