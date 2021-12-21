@@ -100,7 +100,7 @@
         "angle": 0.0,
         "impellerStartupStepsUntilNormalSpeed": 30,
         "numStepsForAverageCalc": 10,
-        "num_steps": 100,
+        "num_steps": 50,
         "repeatPrintTimerToFile": 20,
         "repeatPrintTimerToStdOut": 10,
         "runningDataFileAppendTime": true,

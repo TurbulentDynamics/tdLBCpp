@@ -297,23 +297,15 @@ int main(int argc, char* argv[]){
     std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
 
-
     lb->forcing(geomFixed, flow.alpha, flow.beta, 1);
-    lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, 2);
-    lb->forcing(geomRotating, flow.alpha, flow.beta, 3);
+    lb->forcing(geomRotating, flow.alpha, flow.beta, 2);
+    lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, 3);
 
 
     lb->setOutputExcludePoints(geomFixed);
-    lb->setOutputExcludePoints(geomRotatingNonUpdating);
-    //Rotating set in loop
 
-    
-    //Cells outside the tank
     std::vector<Pos3d<tNi>> externalPoints = geom.getExternalPoints();
     lb->setOutputExcludePoints(externalPoints);
-
-
-
 
 
 
@@ -354,8 +346,18 @@ int main(int argc, char* argv[]){
         }
 
 
+
+        std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geomFixed;
+
+        geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
+
         geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
         std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
+        geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );
+
+
+//        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
+//        std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
         //TODO: GPU Copy Geom to GPU here on another cuda stream
 
@@ -389,14 +391,16 @@ int main(int argc, char* argv[]){
 
 
         // MARK: FORCING
-        lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, 3);
+
+//        lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, 3);
         lb->forcing(geomRotating, flow.alpha, flow.beta, 3);
 
-        //Resets everything thats 0, and sets O==3 back to 0.  ie forcing and nonUpdating not 0, so Forcing not set, and 1,2 not reseet to 0.
+
         lb->forcingRESET(3);
 
 
         main_time = mainTimer.check(0, 5, main_time, "Forcing");
+
 
 
 
@@ -433,11 +437,10 @@ int main(int argc, char* argv[]){
 
         if (outputThisStep){
 
-            //Replaces the disk cells that are deleted from last step when unsetting Rotating blades.
-            lb->setOutputExcludePoints(geomRotatingNonUpdating); //TODO, maybe just Disc. Or add disk to Rotating?
-
+//            lb->setOutputExcludePoints(geomFORCING);
+//            lb->setOutputExcludePoints(geomRotatingNonUpdating);
             lb->setOutputExcludePoints(geomRotating);
-
+//            lb->setOutputExcludePoints(geomFixed);
 
 
             for (auto xy: output.XY_vorticity_planes){
@@ -454,11 +457,17 @@ int main(int argc, char* argv[]){
             }
 
 
+//            lb->unsetOutputExcludePoints(geomFORCING);
+//            lb->unsetOutputExcludePoints(geomRotatingNonUpdating);
             lb->unsetOutputExcludePoints(geomRotating);
+//            lb->unsetOutputExcludePoints(geomFixed);
 
         }
 
         main_time = mainTimer.check(0, 6, main_time, "writeAllOutput");
+
+
+
 
 
 
