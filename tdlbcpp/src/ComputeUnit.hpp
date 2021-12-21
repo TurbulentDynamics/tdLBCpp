@@ -31,6 +31,8 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initParams(ComputeUnitParams cu
     idj = cuParams.idj;
     idk = cuParams.idk;
 
+    resolution = cuParams.resolution;
+
     x = cuParams.x;
     y = cuParams.y;
     z = cuParams.z;
@@ -165,6 +167,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
+
     for (tNi i=0; i<=xg0; i++){
         for (tNi j=0; j<=yg0; j++){
             for (tNi k=0; k<=zg0; k++){
@@ -214,6 +217,92 @@ FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_write(std::string filePa
     outputTree.writeToRunningDataFileAndPrint(text.str());
 
     return fopen(filePath.c_str(), "w");
+}
+
+
+
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::doubleResolutionFullCU(){
+
+    tNi factor = 2;
+
+    resolution += factor;
+
+
+    //Set up new pointers to copy from existing matrices
+    Fld fromQ;
+    fromQ.q = Q.q;
+    Force<T> *fromF = F;
+    T *fromNu = Nu;
+    bool *fromO = O;
+    bool *fromExcludeOutputPoints = ExcludeOutputPoints;
+
+
+
+    
+
+
+//    nodeID = cuParams.nodeID;
+//    deviceID = cuParams.deviceID;
+//
+//    idi = cuParams.idi;
+//    idj = cuParams.idj;
+//    idk = cuParams.idk;
+
+    x *= factor;
+    y *= factor;
+    z *= factor;
+
+//    i0 = cuParams.i0;
+//    j0 = cuParams.j0;
+//    k0 = cuParams.k0;
+
+//    ghost = cuParams.ghost;
+
+    xg = x + 2 * ghost;
+    yg = y + 2 * ghost;
+    zg = z + 2 * ghost;
+
+    //Allows for (tNi i=0; i<=xg0; i++){
+    xg0 = xg - 1;
+    yg0 = yg - 1;
+    zg0 = zg - 1;
+
+    //Allows for (tNi i=1; i<=xg1; i++){
+    xg1 = xg - 2;
+    yg1 = yg - 2;
+    zg1 = zg - 2;
+
+
+    //Setup Size
+    size = size_t(xg) * yg * zg;
+
+    //Reallocate New Memory for Q, F, Nu, O, ExcludeOutputPoints
+    allocateMemory();
+
+
+    for (tNi i=0;  i <= xg0; i++) {
+        for (tNi j=0;  j <= yg0; j++) {
+            for (tNi k=0;  k <= zg0; k++) {
+
+                Q[index(i,j,k)] = fromQ[indexIncreasingResolutionFROM(i,j,k)];
+
+            }}}
+
+
+    delete[] fromQ.q;
+    delete[] fromF;
+    delete[] fromNu;
+    delete[] fromO;
+    delete[] fromExcludeOutputPoints;
+
+
+//Need to corordinate with creating NEW GPU MALLOC
+//    architectureInit();
+
+
 }
 
 
@@ -377,7 +466,28 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexPlusGhost(tNi i, tNi
 }
 
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexIncreasingResolutionFROM(tNi i, tNi j, tNi k)
+{
+    tNi factor = 2;
 
+    tNi fromXG = x / factor + ghost * 2;
+    tNi fromYG = y / factor + ghost * 2;
+    tNi fromZG = z / factor + ghost * 2;
+
+    tNi fromI = (i/factor + i % factor);
+    tNi fromJ = (i/factor + i % factor);
+    tNi fromK = (i/factor + i % factor);
+
+#ifdef DEBUG
+
+    if ((fromI>=fromXG) || (fromJ>=fromYG) || (fromK>=fromZG)) {
+        std::cout << "Index Error  " << i <<" "<< xg <<" "<< j <<" "<< yg <<" "<< k <<" "<< zg << std::endl;
+        exit(1);
+    }
+#endif
+    return fromI * (fromYG * fromZG) + (fromJ * fromZG) + fromK;
+}
 
 
 

@@ -223,7 +223,7 @@ int main(int argc, char* argv[]){
     cu.resolution = 1;
 
     cu.strCompileFlag = strCompileFlag;
-    cu.strCollisonAlgo = "EgglesSomers";
+    cu.strCollisonAlgo = flow.collision;
     cu.strStreamingAlgo = flow.streaming;
 //    std::string strQVecPrecision =;
 //    std::string strQLength =;
@@ -252,6 +252,9 @@ int main(int argc, char* argv[]){
 #endif
     }
 
+
+
+//    lb->doubleResolutionFullCU();
 
 
 
