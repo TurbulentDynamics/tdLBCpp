@@ -538,7 +538,7 @@ std::string outputRootDir debug_output_dir
 
         orthoPlaneVorticityXY = OrthoPlaneVorticityParams()
         orthoPlaneVorticityXY.struct_name = "XY_vorticity_planes"
-        orthoPlaneVorticityXY.cutAt = grid.z / 2
+        orthoPlaneVorticityXY.cutAt = int(grid.z / 2)
         orthoPlaneVorticityXY.repeat = 1
         orthoPlaneVorticityXY.name_root = "vort_slice"
         orthoPlaneVorticityXY.jpegCompression = 100
@@ -549,7 +549,7 @@ std::string outputRootDir debug_output_dir
 
         orthoPlaneVorticityXZ = OrthoPlaneVorticityParams()
         orthoPlaneVorticityXZ.struct_name = "XZ_vorticity_planes"
-        orthoPlaneVorticityXZ.cutAt = grid.y / 3 * 2
+        orthoPlaneVorticityXZ.cutAt = int(grid.y / 3 * 2)
         orthoPlaneVorticityXZ.repeat = 1
         orthoPlaneVorticityXZ.name_root = "vort_axis"
         orthoPlaneVorticityXZ.jpegCompression = 100
