@@ -298,8 +298,8 @@ int main(int argc, char* argv[]){
 
 
     lb->forcing(geomFixed, flow.alpha, flow.beta, 1);
-    lb->forcing(geomRotating, flow.alpha, flow.beta, 2);
-    lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, 3);
+    lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, 2);
+    lb->forcing(geomRotating, flow.alpha, flow.beta, 3);
 
 
     lb->setOutputExcludePoints(geomFixed);
@@ -435,12 +435,16 @@ int main(int argc, char* argv[]){
             }
         }
 
+
+
         if (outputThisStep){
 
 //            lb->setOutputExcludePoints(geomFORCING);
 //            lb->setOutputExcludePoints(geomRotatingNonUpdating);
+
+
+            //TOFIX: THIS IS NOT WORKING
             lb->setOutputExcludePoints(geomRotating);
-//            lb->setOutputExcludePoints(geomFixed);
 
 
             for (auto xy: output.XY_vorticity_planes){
@@ -460,7 +464,6 @@ int main(int argc, char* argv[]){
 //            lb->unsetOutputExcludePoints(geomFORCING);
 //            lb->unsetOutputExcludePoints(geomRotatingNonUpdating);
             lb->unsetOutputExcludePoints(geomRotating);
-//            lb->unsetOutputExcludePoints(geomFixed);
 
         }
 
