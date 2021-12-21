@@ -285,61 +285,27 @@ int main(int argc, char* argv[]){
     useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
 
 
-//    geom.generateFixedGeometry(surfaceAndInternal);
-//    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
+    geom.generateFixedGeometry(surfaceAndInternal);
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
 
 
-    geom.generateFixedGeometry(onSurface);
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixedSurface = geom.returnFixedGeometry();
-
-    geom.generateFixedGeometry(internal);
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomFixedInternal = geom.returnFixedGeometry();
-
-
-
-
-
-//    geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, surfaceAndInternal);
-//    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
-
-
-    geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, onSurface);
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdatingSurface = geom.returnRotatingNonUpdatingGeometry();
-
-    geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, internal);
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdatingInternal = geom.returnRotatingNonUpdatingGeometry();
-
-
+    geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, surfaceAndInternal);
+    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
 
 
     geom.generateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
     std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
 
-    geom.generateRotatingGeometry(running.angle, deltaRunningAngle, onSurface);
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingSurface = geom.returnRotatingGeometry();
+
+    lb->forcing(geomFixed, flow.alpha, flow.beta, 1);
+    lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, 2);
+    lb->forcing(geomRotating, flow.alpha, flow.beta, 3);
 
 
-    geom.generateRotatingGeometry(running.angle, deltaRunningAngle, internal);
-    std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingInternal = geom.returnRotatingGeometry();
-
-
-    lb->forcing(geomFixedSurface, flow.alpha, flow.beta, 1);
-    lb->forcing(geomFixedInternal, flow.alpha, flow.beta, 1);
-    lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta, 2);
-    lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta, 2);
-    lb->forcing(geomRotatingSurface, flow.alpha, flow.beta, 3);
-    lb->forcing(geomRotatingInternal, flow.alpha, flow.beta, 3);
-
-
-
-    lb->setOutputExcludePoints(geomFixedSurface);
-    lb->setOutputExcludePoints(geomFixedInternal);
-    lb->setOutputExcludePoints(geomRotatingNonUpdatingInternal);
-    lb->setOutputExcludePoints(geomRotatingNonUpdatingSurface);
-    lb->setOutputExcludePoints(geomRotatingInternal);
-    lb->setOutputExcludePoints(geomRotatingSurface);
-
+    lb->setOutputExcludePoints(geomFixed);
+    lb->setOutputExcludePoints(geomRotatingNonUpdating);
+    //Rotating set in loop
 
     
     //Cells outside the tank
@@ -388,18 +354,10 @@ int main(int argc, char* argv[]){
         }
 
 
-        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, onSurface);
-        geomRotatingSurface = geom.returnRotatingGeometry();
-
-        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, internal);
-        geomRotatingInternal = geom.returnRotatingGeometry();
+        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
+        std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
         //TODO: GPU Copy Geom to GPU here on another cuda stream
-
-
-
-//        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
-//        std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
 
         main_time = mainTimer.check(0, 0, main_time, "updateRotatingGeometry");
@@ -408,7 +366,6 @@ int main(int argc, char* argv[]){
 
 
         // MARK: COLLISION AND STREAMING
-
 
 
         lb->collision();
@@ -432,16 +389,10 @@ int main(int argc, char* argv[]){
 
 
         // MARK: FORCING
+        lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, 3);
+        lb->forcing(geomRotating, flow.alpha, flow.beta, 3);
 
-
-        lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta, 2);
-        lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta, 2);
-
-        lb->forcing(geomRotatingSurface, flow.alpha, flow.beta, 3);
-        lb->forcing(geomRotatingInternal, flow.alpha, flow.beta, 3);
-
-       // lb->forcing(geomRotating, flow.alpha, flow.beta);
-
+        //Resets everything thats 0, and sets O==3 back to 0.  ie forcing and nonUpdating not 0, so Forcing not set, and 1,2 not reseet to 0.
         lb->forcingRESET(3);
 
 
@@ -483,11 +434,9 @@ int main(int argc, char* argv[]){
         if (outputThisStep){
 
             //Replaces the disk cells that are deleted from last step when unsetting Rotating blades.
-            lb->setOutputExcludePoints(geomRotatingNonUpdatingSurface);
-            lb->setOutputExcludePoints(geomRotatingNonUpdatingInternal);
+            lb->setOutputExcludePoints(geomRotatingNonUpdating); //TODO, maybe just Disc. Or add disk to Rotating?
 
-            lb->setOutputExcludePoints(geomRotatingSurface);
-            lb->setOutputExcludePoints(geomRotatingInternal);
+            lb->setOutputExcludePoints(geomRotating);
 
 
 
@@ -505,12 +454,7 @@ int main(int argc, char* argv[]){
             }
 
 
-            lb->unsetOutputExcludePoints(geomRotatingSurface);
-            lb->unsetOutputExcludePoints(geomRotatingInternal);
-
-
-            //        lb->unsetOutputExcludePoints(geomRotating);
-
+            lb->unsetOutputExcludePoints(geomRotating);
 
         }
 
