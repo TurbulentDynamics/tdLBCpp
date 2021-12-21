@@ -54,7 +54,7 @@ HOST_DEVICE_GPU void inline smoothedDeltaFunction(T i_cart_fraction, T k_cart_fr
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta){
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta, int oFlag){
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
 
@@ -140,7 +140,7 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
                 F[index(i2,j2,k2)].z = alfa * localForce.z - beta * ppp[i1+1][k1+1] * zSum;
                 
                 
-                O[index(i2,j2,k2)] = 1;
+                O[index(i2,j2,k2)] = oFlag;
                 
             }}//endfor  j1, k1
         
@@ -155,7 +155,7 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcingRESET(){
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcingRESET(int oFlag){
 
 
     for (tNi i=1; i<=xg1; i++) {
@@ -166,7 +166,7 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
                     F[index(i,j,k)].x = 0.0;
                     F[index(i,j,k)].y = 0.0;
                     F[index(i,j,k)].z = 0.0;
-                } else {
+                } else if (O[index(i,j,k)] == oFlag) {
                     //Set it back to 0
                     O[index(i,j,k)] = 0;
                 }//endif
@@ -174,41 +174,5 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
             }}}//endfor  ijk
 }
 
-
-
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcingDUMMY(std::vector<PosPolar<tNi, T>> &geom){
-
-
-    for (auto &g: geom){
-
-
-        tNi i = g.i + ghost;
-        tNi j = g.j + ghost;
-        tNi k = g.k + ghost;
-
-
-        for (tNi k1 = -1; k1<=1; k1++){
-            for (tNi i1 = -1; i1<=1; i1++){
-
-                tNi i2 = i + i1;
-                tNi j2 = j;
-                tNi k2 = k + k1;
-
-
-                if (i2 == 0)   i2 = xg1;
-                if (i2 == xg0) i2 = 1;
-                if (k2 == 0)   k2 = zg1;
-                if (k2 == zg0) k2 = 1;
-
-                O[index(i2,j2,k2)] = 1;
-
-            }}//endfor  j1, k1
-
-    }//endfor
-
-
-
-}//end of func
 
 

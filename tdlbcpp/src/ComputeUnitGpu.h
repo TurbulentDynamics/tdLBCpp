@@ -37,9 +37,8 @@ public:
     virtual void initialise(T rho);
 
     virtual void copyGeomToGPU(std::vector<PosPolar<tNi, T>> &geom);
-    virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta);
-    virtual void forcingDUMMY(std::vector<PosPolar<tNi, T>> &geom);
-    virtual void forcingRESET();
+    virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta, int oFlag);
+    virtual void forcingRESET(int oFlag);
     //virtual void collision();
     //virtual void moments();
     //virtual void bounceBackBoundary();

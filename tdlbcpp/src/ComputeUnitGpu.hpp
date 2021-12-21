@@ -234,7 +234,7 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta) {
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta, int oFlag) {
     int blocks = (geom.size() + threadsPerBlock.x - 1) / threadsPerBlock.x;
     if (gpuGeomSize < geom.size()) {
         if (gpuGeom != nullptr) {
@@ -246,28 +246,12 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
         checkCudaErrors(cudaMalloc((void **)&gpuGeom, gpuGeomSizeBytes));
     }
     checkCudaErrors(cudaMemcpy(gpuGeom, &geom[0], sizeof(PosPolar<tNi, T>) *geom.size(), cudaMemcpyHostToDevice));
-    ::forcing<T, QVecSize, MemoryLayout, collisionType, streamingType><<<blocks, threadsPerBlock.x>>>(*gpuThis, gpuGeom, geom.size(), alfa, beta);
+    ::forcing<T, QVecSize, MemoryLayout, collisionType, streamingType><<<blocks, threadsPerBlock.x>>>(*gpuThis, gpuGeom, geom.size(), alfa, beta, int oFlag);
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcingDUMMY(std::vector<PosPolar<tNi, T>> &geom) {
-    int blocks = (geom.size() + threadsPerBlock.x - 1) / threadsPerBlock.x;
-    if (gpuGeomSize < geom.size()) {
-        if (gpuGeom != nullptr) {
-            checkCudaErrors(cudaFree(gpuGeom));
-        }
-        gpuGeomSize = geom.size();
-        size_t gpuGeomSizeBytes = sizeof(PosPolar<tNi, T>) * gpuGeomSize;
-        LOG("gpuGeom resize, new size: %ld\n", gpuGeomSizeBytes);
-        checkCudaErrors(cudaMalloc((void **)&gpuGeom, gpuGeomSizeBytes));
-    }
-    checkCudaErrors(cudaMemcpy(gpuGeom, &geom[0], sizeof(PosPolar<tNi, T>) *geom.size(), cudaMemcpyHostToDevice));
-    ::forcingDUMMY<T, QVecSize, MemoryLayout, collisionType, streamingType><<<blocks, threadsPerBlock.x>>>(*gpuThis, gpuGeom, geom.size());
-}
-
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcingRESET() {
-    ::setFToZeroWhenOIsZero<<<numBlocks, threadsPerBlock>>>(*gpuThis);
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcingRESET(int oFlag) {
+    ::setFToZeroWhenOIsZero<<<numBlocks, threadsPerBlock>>>(*gpuThis, int oFlag);
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>

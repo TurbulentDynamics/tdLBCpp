@@ -324,17 +324,13 @@ int main(int argc, char* argv[]){
     std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingInternal = geom.returnRotatingGeometry();
 
 
-    lb->forcing(geomFixedSurface, flow.alpha, flow.beta);
-    lb->forcing(geomFixedInternal, flow.alpha, flow.beta);
-    lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta);
-    lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta);
-    lb->forcing(geomRotatingSurface, flow.alpha, flow.beta);
-    lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
+    lb->forcing(geomFixedSurface, flow.alpha, flow.beta, 1);
+    lb->forcing(geomFixedInternal, flow.alpha, flow.beta, 1);
+    lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta, 2);
+    lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta, 2);
+    lb->forcing(geomRotatingSurface, flow.alpha, flow.beta, 3);
+    lb->forcing(geomRotatingInternal, flow.alpha, flow.beta, 3);
 
-
-//    lb->forcing(geomFixed, flow.alpha, flow.beta);
-//    lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta);
-    //lb->forcing(geomRotating, flow.alpha, flow.beta);
 
 
     lb->setOutputExcludePoints(geomFixedSurface);
@@ -343,11 +339,6 @@ int main(int argc, char* argv[]){
     lb->setOutputExcludePoints(geomRotatingNonUpdatingSurface);
     lb->setOutputExcludePoints(geomRotatingInternal);
     lb->setOutputExcludePoints(geomRotatingSurface);
-
-
-//    lb->setOutputExcludePoints(geomFixed);
-//    lb->setOutputExcludePoints(geomRotatingNonUpdating);
-    //lb->setOutputExcludePoints(geomRotating);
 
 
     
@@ -400,10 +391,10 @@ int main(int argc, char* argv[]){
         geom.updateRotatingGeometry(running.angle, deltaRunningAngle, onSurface);
         geomRotatingSurface = geom.returnRotatingGeometry();
 
-        //TODO: GPU Copy Geom to GPU here on another cuda stream
-
         geom.updateRotatingGeometry(running.angle, deltaRunningAngle, internal);
         geomRotatingInternal = geom.returnRotatingGeometry();
+
+        //TODO: GPU Copy Geom to GPU here on another cuda stream
 
 
 
@@ -443,18 +434,15 @@ int main(int argc, char* argv[]){
         // MARK: FORCING
 
 
-        lb->forcingDUMMY(geomFixedSurface);
-        lb->forcingDUMMY(geomFixedInternal);
+        lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta, 2);
+        lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta, 2);
 
-        lb->forcing(geomRotatingNonUpdatingSurface, flow.alpha, flow.beta);
-        lb->forcing(geomRotatingNonUpdatingInternal, flow.alpha, flow.beta);
-
-        lb->forcing(geomRotatingSurface, flow.alpha, flow.beta);
-        lb->forcing(geomRotatingInternal, flow.alpha, flow.beta);
+        lb->forcing(geomRotatingSurface, flow.alpha, flow.beta, 3);
+        lb->forcing(geomRotatingInternal, flow.alpha, flow.beta, 3);
 
        // lb->forcing(geomRotating, flow.alpha, flow.beta);
 
-        lb->forcingRESET();
+        lb->forcingRESET(3);
 
 
         main_time = mainTimer.check(0, 5, main_time, "Forcing");

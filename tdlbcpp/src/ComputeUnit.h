@@ -106,9 +106,8 @@ public:
     virtual void initialise(T rho);
 
 
-    virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta) = 0;
-    virtual void forcingRESET() = 0;
-    virtual void forcingDUMMY(std::vector<PosPolar<tNi, T>> &geom) = 0;
+    virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta, int oFlag) = 0;
+    virtual void forcingRESET(int oFlag) = 0;
 
     
     virtual void bounceBackBoundary() = 0;
@@ -212,9 +211,8 @@ public:
     using Base::ExcludeOutputPoints;
     using Base::outputTree;
     virtual void moments();
-    virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta);
-    virtual void forcingRESET();
-    virtual void forcingDUMMY(std::vector<PosPolar<tNi, T>> &geom);
+    virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta, int oFlag);
+    virtual void forcingRESET(int oFlag);
     virtual void calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression);
     virtual void calcVorticityXY(tNi k, RunningParams runParam, int jpegCompression);
     virtual void printDebug(int fi, int ti, int fj, int tj, int fk, int tk);
