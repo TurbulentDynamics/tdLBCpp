@@ -105,7 +105,6 @@ def main():
         grid.y = args.gridx
         grid.z = args.gridx
 
-    out.add_debug_output(grid)
 
 
     if args.esotwist:
@@ -149,9 +148,13 @@ def main():
 
             chkp.repeat = d[3]
 
+            out = OutputParams()
+            out.add_debug_output(grid)
+
             write_json(grid, flow, running, binfile, chkp, cup, out, args.filename)
 
     else:
+        out.add_debug_output(grid)
         write_json(grid, flow, running, binfile, chkp, cup, out, args.filename)
 
 
