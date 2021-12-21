@@ -16,16 +16,16 @@ from Params import *
 
 
 
-FILENAME = "input_debug_gridx60_numSteps20.json"
+FILENAME = "input_debug_gridx%s_numSteps%s.json"
 
 # (ngx, grid.x, numSteps, chkRepeat)
-val = [
+all_debug = [
  (1, 9, 3, 0),
-# (1, 60, 100, 20), Initialised Params Setup
- (1, 100, 200, 50),
- (1, 200, 1000, 500),
- (1, 400, 2000, 500),
- (1, 600, 5000, 1000),
+ (1, 60, 100, 20), #Initialised Params Setup
+ (1, 102, 200, 0),
+ (1, 204, 1000, 1000),
+ (1, 402, 2000, 2000),
+ (1, 600, 5000, 5000),
  ]
 
 
@@ -42,12 +42,27 @@ def printFile(filename):
 
 
 
+def write_json(grid, flow, running, binfile, chkp, cup, out, filename):
+    json = dict()
+    json[grid.struct_name] = grid.json
+    json[flow.struct_name] = flow.json
+    json[running.struct_name] = running.json
+    json[binfile.struct_name] = binfile.json
+    json[chkp.struct_name] = chkp.json
+    json[cup.struct_name] = cup.json
+    json[out.struct_name] = out.json
+
+
+    writeJsonFile(json, filename or FILENAME % (grid.x, running.num_steps))
+
+    printFile(filename or FILENAME % (grid.x, running.num_steps))
+
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
-    parser.add_argument("-f", "--filename", type=str, help="filanem")
+    parser.add_argument("-f", "--filename", type=str, help="filename")
 
     parser.add_argument("--esotwist", dest="esotwist", action="store_true", help="Streaming with Esotwist")
 
@@ -81,6 +96,8 @@ def main():
     chkp = CheckpointParams()
     cup = ComputeUnitParams()
     out = OutputParams()
+
+
 
 
     if args.gridx:
@@ -118,20 +135,26 @@ def main():
 
 
 
+    #Rebuild all debug json files
+    # (ngx, grid.x, numSteps, chkRepeat)
 
-    json = dict()
-    json[grid.struct_name] = grid.json
-    json[flow.struct_name] = flow.json
-    json[running.struct_name] = running.json
-    json[binfile.struct_name] = binfile.json
-    json[chkp.struct_name] = chkp.json
-    json[cup.struct_name] = cup.json
-    json[out.struct_name] = out.json
+    print(sys.argv)
+    if len(sys.argv) == 1:
+        for d in all_debug:
+            grid.x = d[1]
+            grid.y = d[1]
+            grid.z = d[1]
+
+            running.num_steps = d[2]
+
+            chkp.repeat = d[3]
+
+            write_json(grid, flow, running, binfile, chkp, cup, out, args.filename)
+
+    else:
+        write_json(grid, flow, running, binfile, chkp, cup, out, args.filename)
 
 
-    writeJsonFile(json, args.filename or FILENAME)
-
-    printFile(args.filename or FILENAME)
 
 
 
