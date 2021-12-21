@@ -233,6 +233,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::doubleResolutionFullCU(){
 
     //Set up new pointers to copy from existing matrices
     Fld fromQ;
+    fromQ.setSize(size);
     fromQ.q = Q.q;
     Force<T> *fromF = F;
     T *fromNu = Nu;
@@ -240,8 +241,6 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::doubleResolutionFullCU(){
     bool *fromExcludeOutputPoints = ExcludeOutputPoints;
 
 
-
-    
 
 
 //    nodeID = cuParams.nodeID;
@@ -282,14 +281,34 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::doubleResolutionFullCU(){
     //Reallocate New Memory for Q, F, Nu, O, ExcludeOutputPoints
     allocateMemory();
 
+    //Zero ALL matrices, Q with density 0
+    initialise(0);
 
     for (tNi i=0;  i <= xg0; i++) {
         for (tNi j=0;  j <= yg0; j++) {
             for (tNi k=0;  k <= zg0; k++) {
 
-                Q[index(i,j,k)] = fromQ[indexIncreasingResolutionFROM(i,j,k)];
+//                Q[index(i,j,k)] = fromQ[indexPreviousResolution(i,j,k)];
+
+                for (int l=0; l<19;l++){
+                    Q[index(i,j,k)].q[l] = fromQ[indexPreviousResolution(i,j,k)].q[l];
+                }
 
             }}}
+
+    //F will be recalculated with new geom size
+
+    for (tNi i=0;  i <= xg0; i++) {
+        for (tNi j=0;  j <= yg0; j++) {
+            for (tNi k=0;  k <= zg0; k++) {
+
+                Nu[index(i,j,k)] = fromNu[indexPreviousResolution(i,j,k)];
+
+            }}}
+
+    //O will be set with new geom size
+
+    //Exclude will be set with new geom size
 
 
     delete[] fromQ.q;
@@ -297,11 +316,6 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::doubleResolutionFullCU(){
     delete[] fromNu;
     delete[] fromO;
     delete[] fromExcludeOutputPoints;
-
-
-//Need to corordinate with creating NEW GPU MALLOC
-//    architectureInit();
-
 
 }
 
@@ -467,7 +481,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexPlusGhost(tNi i, tNi
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexIncreasingResolutionFROM(tNi i, tNi j, tNi k)
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexPreviousResolution(tNi i, tNi j, tNi k)
 {
     tNi factor = 2;
 
@@ -476,8 +490,8 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexIncreasingResolution
     tNi fromZG = z / factor + ghost * 2;
 
     tNi fromI = (i/factor + i % factor);
-    tNi fromJ = (i/factor + i % factor);
-    tNi fromK = (i/factor + i % factor);
+    tNi fromJ = (j/factor + j % factor);
+    tNi fromK = (k/factor + k % factor);
 
 #ifdef DEBUG
 

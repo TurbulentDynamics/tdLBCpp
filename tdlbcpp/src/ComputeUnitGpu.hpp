@@ -218,6 +218,25 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
 };
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::doubleResolutionFullCU()
+{
+    checkCudaErrors(cudaMemcpy(this, gpuThis, sizeof(Current), cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+
+    //CALL ON CPU
+    doubleResoltionFullCPU();
+
+    checkEnoughMemory();
+    freeMemory();
+    allocateMemory();//using new cu.x, size etc
+
+    checkCudaErrors(cudaMemcpy(gpuThis, this, sizeof(Current), cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+};
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta) {
     ::setOToZero<<<numBlocks, threadsPerBlock>>>(*gpuThis);
     int blocks = (geom.size() + threadsPerBlock.x - 1) / threadsPerBlock.x;

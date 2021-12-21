@@ -33,6 +33,7 @@ struct RunningParams {
     std::string runningDataFileDir = ".";
     std::string runningDataFilePrefix = "debug";
     bool runningDataFileAppendTime = true;
+    tStep doubleResolutionAtStep = 10;
 
     
     
@@ -64,6 +65,7 @@ struct RunningParams {
     runningDataFileDir = (std::string)jsonParams["runningDataFileDir"].asString();
     runningDataFilePrefix = (std::string)jsonParams["runningDataFilePrefix"].asString();
     runningDataFileAppendTime = (bool)jsonParams["runningDataFileAppendTime"].asBool();
+    doubleResolutionAtStep = (tStep)jsonParams["doubleResolutionAtStep"].asUInt64();
 
             
         }
@@ -92,6 +94,7 @@ struct RunningParams {
     jsonParams["runningDataFileDir"] = (std::string)runningDataFileDir;
     jsonParams["runningDataFilePrefix"] = (std::string)runningDataFilePrefix;
     jsonParams["runningDataFileAppendTime"] = (bool)runningDataFileAppendTime;
+    jsonParams["doubleResolutionAtStep"] = (Json::UInt64)doubleResolutionAtStep;
 
             
             return jsonParams;

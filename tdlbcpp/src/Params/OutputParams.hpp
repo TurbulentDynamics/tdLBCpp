@@ -54,6 +54,17 @@ struct OutputParams {
     OutputParams(std::string outputRootDir):outputRootDir(outputRootDir){};
 
 
+    void updateParamsOnResolutionDouble(){
+
+        for (auto &p: XY_planes) p.cutAt *= 2;
+        for (auto &p: XZ_planes) p.cutAt *= 2;
+        for (auto &p: YZ_planes) p.cutAt *= 2;
+
+        for (auto &p: XY_vorticity_planes) p.cutAt *= 2;
+        for (auto &p: XZ_vorticity_planes) p.cutAt *= 2;
+        for (auto &p: YZ_vorticity_planes) p.cutAt *= 2;
+    }
+
 
     void add_XY_plane(std::string dir, tStep repeat, tNi cutAt,
                       int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){

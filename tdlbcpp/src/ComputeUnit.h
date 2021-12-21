@@ -99,7 +99,7 @@ public:
     void init(ComputeUnitParams, bool);
     HOST_DEVICE_GPU tNi inline index(tNi i, tNi j, tNi k);
     tNi inline indexPlusGhost(tNi i, tNi j, tNi k);
-    tNi inline indexIncreasingResolutionFROM(tNi i, tNi j, tNi k);
+    tNi inline indexPreviousResolution(tNi i, tNi j, tNi k);
 
 
     Velocity<T> inline getVelocity(tNi i, tNi j, tNi k);
