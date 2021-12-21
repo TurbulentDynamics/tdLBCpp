@@ -52,6 +52,7 @@
 		D64D2351276F2F3A000AC263 /* StreamingSimple.cuh.gyb */ = {isa = PBXFileReference; lastKnownFileType = text; path = StreamingSimple.cuh.gyb; sourceTree = "<group>"; };
 		D64D2352276F2F3A000AC263 /* ComputeUnitGpu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnitGpu.hpp; sourceTree = "<group>"; };
 		D652A6A226AECDB900028C5D /* ComputeUnitOutput.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ComputeUnitOutput.hpp; sourceTree = "<group>"; };
+		D65BFD092771F8CB0075809C /* Forcing.cuh */ = {isa = PBXFileReference; lastKnownFileType = text; path = Forcing.cuh; sourceTree = "<group>"; };
 		D66D0F86269C49E50079FCAC /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		D66D0F88269C4A200079FCAC /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
 		D67F4D2F276615AE00952021 /* CheckpointParams.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CheckpointParams.hpp; sourceTree = "<group>"; };
@@ -265,6 +266,7 @@
 				D6008AA326E614F1003CE0E2 /* StreamingEsoTwist.cuh */,
 				D64D2350276F2F3A000AC263 /* ComputeUnitGpu.h */,
 				D64D2352276F2F3A000AC263 /* ComputeUnitGpu.hpp */,
+				D65BFD092771F8CB0075809C /* Forcing.cuh */,
 				D64D2351276F2F3A000AC263 /* StreamingSimple.cuh.gyb */,
 				D64D234F276F2F3A000AC263 /* StreamingSimple.hpp */,
 				D6E5C73D25EE184B0067FDE1 /* Forcing.hpp */,

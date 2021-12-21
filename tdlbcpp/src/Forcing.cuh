@@ -124,3 +124,42 @@ __global__ void forcing(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionT
         }
     }//endfor  j1, k1
 }//end of func
+
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+__global__ void forcingDUMMY(ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, PosPolar<tNi, T> *geom, size_t geomSize){
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+
+    tNi geomIndex = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (geomIndex >= geomSize) {
+        return;
+    }
+
+    auto &g = geom[geomIndex];
+
+    tNi i = g.i + cu.ghost;
+    tNi j = g.j + cu.ghost;
+    tNi k = g.k + cu.ghost;
+
+
+    for (tNi k1 = -1; k1<=1; k1++){
+        for (tNi i1 = -1; i1<=1; i1++){
+
+            tNi i2 = i + i1;
+            tNi j2 = j;
+            tNi k2 = k + k1;
+
+
+            if (i2 == 0)   i2 = cu.xg1;
+            if (i2 == cu.xg0) i2 = 1;
+            if (k2 == 0)   k2 = cu.zg1;
+            if (k2 == cu.zg0) k2 = 1;
+
+            cu.O[cu.index(i2,j2,k2)] = 1;
+
+    }}//endfor  j1, k1
+
+}//end of func
+

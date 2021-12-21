@@ -35,7 +35,11 @@ public:
     virtual void freeMemory();
     virtual void architectureInit();
     virtual void initialise(T rho);
+
+    virtual void copyGeomToGPU(std::vector<PosPolar<tNi, T>> &geom);
     virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta);
+    virtual void forcingDUMMY(std::vector<PosPolar<tNi, T>> &geom);
+    virtual void forcingRESET();
     //virtual void collision();
     //virtual void moments();
     //virtual void bounceBackBoundary();

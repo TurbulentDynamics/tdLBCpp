@@ -156,7 +156,7 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcingRESET(){
-    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+
 
     for (tNi i=1; i<=xg1; i++) {
         for (tNi j = 1; j<=yg1; j++){
@@ -170,21 +170,18 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
                     //Set it back to 0
                     O[index(i,j,k)] = 0;
                 }//endif
-            }}}//endfor  ijk
 
+            }}}//endfor  ijk
 }
 
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::forcingDUMMY(std::vector<PosPolar<tNi, T>> &geom){
-    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
-
 
 
     for (auto &g: geom){
 
-        T ppp[3][3];
 
         tNi i = g.i + ghost;
         tNi j = g.j + ghost;
