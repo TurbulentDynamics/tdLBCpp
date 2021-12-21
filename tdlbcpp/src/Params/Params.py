@@ -517,21 +517,21 @@ std::string outputRootDir debug_output_dir
 
     def add_debug_output(self, grid):
 
-        orthoPlaneXY = OrthoPlaneParams()
-        orthoPlaneXY.struct_name = "XY_planes"
-        orthoPlaneXY.cutAt = grid.z / 2
-        orthoPlaneXY.repeat = 20
-        orthoPlaneXY.name_root = "plot_slice"
-
-        self.ortho_plane_objs.append(orthoPlaneXY)
-
-        orthoPlaneXZ = OrthoPlaneParams()
-        orthoPlaneXZ.struct_name = "XZ_planes"
-        orthoPlaneXZ.cutAt = grid.y / 3 * 2
-        orthoPlaneXZ.repeat = 20
-        orthoPlaneXZ.name_root = "plot_axis"
-
-        self.ortho_plane_objs.append(orthoPlaneXZ)
+#        orthoPlaneXY = OrthoPlaneParams()
+#        orthoPlaneXY.struct_name = "XY_planes"
+#        orthoPlaneXY.cutAt = grid.z / 2
+#        orthoPlaneXY.repeat = 20
+#        orthoPlaneXY.name_root = "plot_slice"
+#
+#        self.ortho_plane_objs.append(orthoPlaneXY)
+#
+#        orthoPlaneXZ = OrthoPlaneParams()
+#        orthoPlaneXZ.struct_name = "XZ_planes"
+#        orthoPlaneXZ.cutAt = grid.y / 3 * 2
+#        orthoPlaneXZ.repeat = 20
+#        orthoPlaneXZ.name_root = "plot_axis"
+#
+#        self.ortho_plane_objs.append(orthoPlaneXZ)
 
 
 
