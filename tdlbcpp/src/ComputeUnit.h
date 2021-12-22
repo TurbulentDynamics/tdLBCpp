@@ -92,6 +92,7 @@ public:
     
     ~ComputeUnitBase();
     
+    void initGridParams();
     void initParams(ComputeUnitParams);
     virtual void allocateMemory();
     virtual void freeMemory();
@@ -132,7 +133,8 @@ public:
     void checkpoint_read(std::string dirname, std::string unit_name);
     void checkpoint_write(std::string unit_name, RunningParams run);
     
-    void doubleResolutionFullCU();
+    void copyFieldsWithScaling(Fld &newQ, Fld &oldQ, T *newNu, T* oldNu);
+    virtual void doubleResolutionFullCU();
 
 
 

@@ -23,6 +23,23 @@
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::initGridParams() {
+    xg = x + 2 * ghost;
+    yg = y + 2 * ghost;
+    zg = z + 2 * ghost;
+
+    //Allows for (tNi i=0; i<=xg0; i++){
+    xg0 = xg - 1;
+    yg0 = yg - 1;
+    zg0 = zg - 1;
+
+    //Allows for (tNi i=1; i<=xg1; i++){
+    xg1 = xg - 2;
+    yg1 = yg - 2;
+    zg1 = zg - 2;
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::initParams(ComputeUnitParams cuParams) {
     nodeID = cuParams.nodeID;
     deviceID = cuParams.deviceID;
@@ -43,20 +60,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initParams(ComputeUnitParams cu
 
     ghost = cuParams.ghost;
 
-
-    xg = x + 2 * ghost;
-    yg = y + 2 * ghost;
-    zg = z + 2 * ghost;
-
-    //Allows for (tNi i=0; i<=xg0; i++){
-    xg0 = xg - 1;
-    yg0 = yg - 1;
-    zg0 = zg - 1;
-
-    //Allows for (tNi i=1; i<=xg1; i++){
-    xg1 = xg - 2;
-    yg1 = yg - 2;
-    zg1 = zg - 2;
+    initGridParams();
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
@@ -220,7 +224,32 @@ FILE* ComputeUnitBase<T, QVecSize, MemoryLayout>::fopen_write(std::string filePa
 }
 
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::copyFieldsWithScaling(Fld &newQ, Fld &oldQ, T *newNu, T* oldNu) {
+        for (tNi i=0;  i <= xg0; i++) {
+        for (tNi j=0;  j <= yg0; j++) {
+            for (tNi k=0;  k <= zg0; k++) {
 
+                //newQ[index(i,j,k)] = oldQ[indexPreviousResolution(i,j,k)];
+
+                for (int l=0; l<19;l++){
+                    newQ[index(i,j,k)].q[l] = oldQ[indexPreviousResolution(i,j,k)].q[l];
+                }
+
+            }}}
+
+    //F will be recalculated with new geom size
+
+    for (tNi i=0;  i <= xg0; i++) {
+        for (tNi j=0;  j <= yg0; j++) {
+            for (tNi k=0;  k <= zg0; k++) {
+
+                newNu[index(i,j,k)] = oldNu[indexPreviousResolution(i,j,k)];
+
+            }}}
+
+
+}
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
@@ -260,20 +289,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::doubleResolutionFullCU(){
 
 //    ghost = cuParams.ghost;
 
-    xg = x + 2 * ghost;
-    yg = y + 2 * ghost;
-    zg = z + 2 * ghost;
-
-    //Allows for (tNi i=0; i<=xg0; i++){
-    xg0 = xg - 1;
-    yg0 = yg - 1;
-    zg0 = zg - 1;
-
-    //Allows for (tNi i=1; i<=xg1; i++){
-    xg1 = xg - 2;
-    yg1 = yg - 2;
-    zg1 = zg - 2;
-
+    initGridParams();
 
     //Setup Size
     size = size_t(xg) * yg * zg;
@@ -284,32 +300,10 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::doubleResolutionFullCU(){
     //Zero ALL matrices, Q with density 0
     initialise(0);
 
-    for (tNi i=0;  i <= xg0; i++) {
-        for (tNi j=0;  j <= yg0; j++) {
-            for (tNi k=0;  k <= zg0; k++) {
-
-//                Q[index(i,j,k)] = fromQ[indexPreviousResolution(i,j,k)];
-
-                for (int l=0; l<19;l++){
-                    Q[index(i,j,k)].q[l] = fromQ[indexPreviousResolution(i,j,k)].q[l];
-                }
-
-            }}}
-
-    //F will be recalculated with new geom size
-
-    for (tNi i=0;  i <= xg0; i++) {
-        for (tNi j=0;  j <= yg0; j++) {
-            for (tNi k=0;  k <= zg0; k++) {
-
-                Nu[index(i,j,k)] = fromNu[indexPreviousResolution(i,j,k)];
-
-            }}}
-
     //O will be set with new geom size
 
     //Exclude will be set with new geom size
-
+    copyFieldsWithScaling(Q, fromQ, Nu, fromNu);
 
     delete[] fromQ.q;
     delete[] fromF;
