@@ -22,6 +22,7 @@ namespace TestUtils
     void captureStderr();
     std::string getCapturedStderr();
     std::string joinPath(const std::string &p1, const std::string &p2);
+    void createDir(const std::string &path);
 }
 
 #endif //UTILS_H_INCLUDED

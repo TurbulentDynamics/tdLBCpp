@@ -1,3 +1,4 @@
+#include <sys/stat.h>
 #include <algorithm>
 #include <fstream>
 #include <string>
@@ -89,5 +90,11 @@ namespace TestUtils
     std::string joinPath(const std::string &p1, const std::string &p2)
     {
         return std::string(p1 + "/" + p2);
+    }
+
+    void createDir(const std::string &path) 
+    {
+        std::cerr << "TestUtils creating directory: " << path << std::endl;
+        mkdir(path.c_str(), 0775);
     }
 }

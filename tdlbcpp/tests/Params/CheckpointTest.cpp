@@ -11,7 +11,7 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/Checkpoint.hpp"
+#include "Params/CheckpointParams.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
 #include "tdlbcpp/tests/Params/ParamsCommon.hpp"

@@ -11,7 +11,7 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/Flow.hpp"
+#include "Params/FlowParams.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
 #include "tdlbcpp/tests/Params/ParamsCommon.hpp"

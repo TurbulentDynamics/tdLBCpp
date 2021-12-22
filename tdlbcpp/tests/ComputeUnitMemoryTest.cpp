@@ -11,8 +11,8 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/Running.hpp"
-#include "Params/Checkpoint.hpp"
+#include "Params/RunningParams.hpp"
+#include "Params/CheckpointParams.hpp"
 #include "Params/OutputParams.hpp"
 #include "ComputeUnit.hpp"
 
@@ -84,7 +84,7 @@ public:
                               gridParams(ParamsCommon::createGridParamsFixed()),
                               runningParams(ParamsCommon::createRunningParamsFixed())
     {
-        checkpointParams.checkpoint_root_dir = TestUtils::getTempFilename(testing::TempDir(), "ComputeUnitMemoryTestRoot");
+        checkpointParams.checkpointWriteRootDir = TestUtils::getTempFilename(testing::TempDir(), "ComputeUnitMemoryTestRoot");
         cuParams.x = 3;
         cuParams.y = 3;
         cuParams.z = 3;
@@ -94,8 +94,8 @@ public:
 
 TEST_F(ComputeUnitMemoryTest, ComputeUnitMemoryIJKLTest)
 {
-    DiskOutputTree diskOutputTree = DiskOutputTree(checkpointParams, outputParams);
-    diskOutputTree.setParams<unsigned long>(cuParams, gridParams, flow, runningParams, outputParams, checkpointParams);
+    DiskOutputTree diskOutputTree = DiskOutputTree(outputParams, checkpointParams);
+    diskOutputTree.setParams(cuParams, gridParams.getJson(), flow.getJson(), runningParams.getJson(), outputParams.getJson(), checkpointParams.getJson());
 
     auto lb = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU>(cuParams, flow, diskOutputTree);
 
@@ -106,8 +106,8 @@ TEST_F(ComputeUnitMemoryTest, ComputeUnitMemoryIJKLTest)
 
 TEST_F(ComputeUnitMemoryTest, ComputeUnitMemoryLIJKTest)
 {
-    DiskOutputTree diskOutputTree = DiskOutputTree(checkpointParams, outputParams);
-    diskOutputTree.setParams<unsigned long>(cuParams, gridParams, flow, runningParams, outputParams, checkpointParams);
+    DiskOutputTree diskOutputTree = DiskOutputTree(outputParams, checkpointParams);
+    diskOutputTree.setParams(cuParams, gridParams.getJson(), flow.getJson(), runningParams.getJson(), outputParams.getJson(), checkpointParams.getJson());
 
     auto lb = ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK, EgglesSomers, Simple, CPU>(cuParams, flow, diskOutputTree);
 

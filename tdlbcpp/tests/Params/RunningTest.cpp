@@ -12,7 +12,7 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/Running.hpp"
+#include "Params/RunningParams.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
 #include "tdlbcpp/tests/Params/ParamsCommon.hpp"

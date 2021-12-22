@@ -12,10 +12,10 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/Running.hpp"
-#include "Params/Checkpoint.hpp"
+#include "Params/RunningParams.hpp"
+#include "Params/CheckpointParams.hpp"
 #include "Params/OutputParams.hpp"
-#include "Params/BinFile.hpp"
+#include "Params/BinFileParams.hpp"
 #include "DiskOutputTree.h"
 #include "ComputeUnit.hpp"
 
@@ -49,15 +49,16 @@ TEST_F(ComputeUnitCheckpointTests, ComputeUnitCheckpointWriteReadValid)
     using ComputeUnitT = ComputeUnit<double, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU>;
     std::string unitName = TestUtils::random_string(10);
     CheckpointParams checkpointParams = ParamsCommon::createCheckpointParamsFixed();
-    checkpointParams.checkpoint_root_dir = checkpointTestsFolderCheckpointFull;
+    checkpointParams.checkpointWriteRootDir = checkpointTestsFolderCheckpointFull;
+    TestUtils::createDir(checkpointTestsFolderCheckpointFull);
     OutputParams outputParams(checkpointTestsFolderCheckpointFull);
-    DiskOutputTree diskOutputTree(checkpointParams, outputParams);
+    DiskOutputTree diskOutputTree(outputParams, checkpointParams);
 
     ComputeUnitParams computeUnitParams = ParamsCommon::createComputeUnitParamsFixed();
     GridParams gridParams = ParamsCommon::createGridParamsFixed();
     FlowParams<double> flowParams = ParamsCommon::createFlowParamsWithRandomValues<double>();
     RunningParams runningParams = ParamsCommon::createRunningParamsFixed();
-    diskOutputTree.setParams(computeUnitParams, gridParams, flowParams, runningParams, outputParams, checkpointParams);
+    diskOutputTree.setParams(computeUnitParams, gridParams.getJson(), flowParams.getJson(), runningParams.getJson(), outputParams.getJson(), checkpointParams.getJson());
 
     BinFileParams binFileParams;
     binFileParams.filePath = filename;

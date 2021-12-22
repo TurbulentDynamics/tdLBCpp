@@ -2,12 +2,12 @@
 
 #include "Header.h"
 #include "ParamsCommon.hpp"
-#include "Params/Checkpoint.hpp"
-#include "Params/BinFile.hpp"
+#include "Params/CheckpointParams.hpp"
+#include "Params/BinFileParams.hpp"
 #include "Params/ComputeUnitParams.hpp"
-#include "Params/Flow.hpp"
-#include "Params/Grid.hpp"
-#include "Params/Running.hpp"
+#include "Params/FlowParams.hpp"
+#include "Params/GridParams.hpp"
+#include "Params/RunningParams.hpp"
 #include "Params/OutputParams.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
@@ -18,29 +18,33 @@ namespace ParamsCommon
     CheckpointParams createCheckpointParamsFixed()
     {
         CheckpointParams checkpointParams;
-        checkpointParams.start_with_checkpoint = true;
-        checkpointParams.load_checkpoint_dirname = "test1";
-        checkpointParams.checkpoint_repeat = 1;
-        checkpointParams.checkpoint_root_dir = "test2";
+        checkpointParams.startWithCheckpoint = true;
+        checkpointParams.checkpointLoadFromDir = "test1";
+        checkpointParams.checkpointRepeat = 1;
+        checkpointParams.checkpointWriteRootDir = "test2";
+        checkpointParams.checkpointWriteDirPrefix = "test3";
+        checkpointParams.checkpointWriteDirAppendTime = true;
         return checkpointParams;
     }
 
     CheckpointParams createCheckpointParamsRandom()
     {
         CheckpointParams checkpointParams;
-        checkpointParams.start_with_checkpoint = (rand() & 1) == 1;
-        checkpointParams.load_checkpoint_dirname = TestUtils::random_string(TestUtils::randomStringLength);
-        checkpointParams.checkpoint_repeat = rand();
-        checkpointParams.checkpoint_root_dir = TestUtils::random_string(TestUtils::randomStringLength);
+        checkpointParams.startWithCheckpoint = (rand() & 1) == 1;
+        checkpointParams.checkpointLoadFromDir = TestUtils::random_string(TestUtils::randomStringLength);
+        checkpointParams.checkpointRepeat = rand();
+        checkpointParams.checkpointWriteRootDir = TestUtils::random_string(TestUtils::randomStringLength);
+        checkpointParams.checkpointWriteDirPrefix = TestUtils::random_string(TestUtils::randomStringLength);
+        checkpointParams.checkpointWriteDirAppendTime = (rand() & 1) == 1;
         return checkpointParams;
     }
 
     void checkAllFields(CheckpointParams &expected, CheckpointParams &actual)
     {
-        ASSERT_EQ(expected.start_with_checkpoint, actual.start_with_checkpoint) << "start_with_checkpoint field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.load_checkpoint_dirname, actual.load_checkpoint_dirname) << "load_checkpoint_dirname field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.checkpoint_repeat, actual.checkpoint_repeat) << "checkpoint_repeat field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.checkpoint_root_dir, actual.checkpoint_root_dir) << "checkpoint_root_dir field has a wrong value after being written to a file and then read";
+        ASSERT_EQ(expected.startWithCheckpoint, actual.startWithCheckpoint) << "startWithCheckpoint field has a wrong value after being written to a file and then read";
+        ASSERT_EQ(expected.checkpointLoadFromDir, actual.checkpointLoadFromDir) << "checkpointLoadFromDir field has a wrong value after being written to a file and then read";
+        ASSERT_EQ(expected.checkpointRepeat, actual.checkpointRepeat) << "checkpointRepeat field has a wrong value after being written to a file and then read";
+        ASSERT_EQ(expected.checkpointWriteRootDir, actual.checkpointWriteRootDir) << "checkpointWriteRootDir field has a wrong value after being written to a file and then read";
     }
 
     // BinFileParams helper methods
@@ -298,42 +302,42 @@ namespace ParamsCommon
         return outputParams;
     }
 
-    void checkAllFields(OrthoPlane &expected, OrthoPlane &actual)
+    void checkAllFields(OrthoPlaneParams &expected, OrthoPlaneParams &actual)
     {
         ASSERT_EQ(expected.name_root, actual.name_root) << "name_root field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.repeat, actual.repeat) << "repeat field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.cutAt, actual.cutAt) << "cutAt field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.Q_output_len, actual.Q_output_len) << "Q_output_len field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.start_at_step, actual.start_at_step) << "start_at_step field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.end_at_repeat, actual.end_at_repeat) << "end_at_repeat field has a wrong value after being written to a file and then read";
+        ASSERT_EQ(expected.end_at_step, actual.end_at_step) << "end_at_step field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.use_half_float, actual.use_half_float) << "use_half_float field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.QDataType, actual.QDataType) << "QDataType field has a wrong value after being written to a file and then read";
     }
 
-    void checkAllFields(Volume &expected, Volume &actual)
+    void checkAllFields(VolumeParams &expected, VolumeParams &actual)
     {
         ASSERT_EQ(expected.name_root, actual.name_root) << "name_root field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.repeat, actual.repeat) << "repeat field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.Q_output_len, actual.Q_output_len) << "Q_output_len field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.start_at_step, actual.start_at_step) << "start_at_step field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.end_at_repeat, actual.end_at_repeat) << "end_at_repeat field has a wrong value after being written to a file and then read";
+        ASSERT_EQ(expected.end_at_step, actual.end_at_step) << "end_at_step field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.use_half_float, actual.use_half_float) << "use_half_float field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.QDataType, actual.QDataType) << "QDataType field has a wrong value after being written to a file and then read";
     }
 
-    void checkAllFields(Angle &expected, Angle &actual)
+    void checkAllFields(AngleParams &expected, AngleParams &actual)
     {
         ASSERT_EQ(expected.name_root, actual.name_root) << "name_root field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.repeat, actual.repeat) << "repeat field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.degrees, actual.degrees) << "degrees field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.Q_output_len, actual.Q_output_len) << "Q_output_len field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.start_at_step, actual.start_at_step) << "start_at_step field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.end_at_repeat, actual.end_at_repeat) << "end_at_repeat field has a wrong value after being written to a file and then read";
+        ASSERT_EQ(expected.end_at_step, actual.end_at_step) << "end_at_step field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.use_half_float, actual.use_half_float) << "use_half_float field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.QDataType, actual.QDataType) << "QDataType field has a wrong value after being written to a file and then read";
     }
 
-    void checkAllFields(PlaneAtAngle &expected, PlaneAtAngle &actual)
+    void checkAllFields(PlaneAtAngleParams &expected, PlaneAtAngleParams &actual)
     {
         ASSERT_EQ(expected.name_root, actual.name_root) << "name_root field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.degrees, actual.degrees) << "degrees field has a wrong value after being written to a file and then read";
@@ -341,12 +345,12 @@ namespace ParamsCommon
         ASSERT_EQ(expected.cutAt, actual.cutAt) << "cutAt field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.Q_output_len, actual.Q_output_len) << "Q_output_len field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.start_at_step, actual.start_at_step) << "start_at_step field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.end_at_repeat, actual.end_at_repeat) << "end_at_repeat field has a wrong value after being written to a file and then read";
+        ASSERT_EQ(expected.end_at_step, actual.end_at_step) << "end_at_step field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.use_half_float, actual.use_half_float) << "use_half_float field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.QDataType, actual.QDataType) << "QDataType field has a wrong value after being written to a file and then read";
     }
 
-    void checkAllFields(Sector &expected, Sector &actual)
+    void checkAllFields(SectorParams &expected, SectorParams &actual)
     {
         ASSERT_EQ(expected.name_root, actual.name_root) << "name_root field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.repeat, actual.repeat) << "repeat field has a wrong value after being written to a file and then read";
@@ -354,14 +358,14 @@ namespace ParamsCommon
         ASSERT_EQ(expected.angle_behind_blade, actual.angle_behind_blade) << "angle_behind_blade field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.Q_output_len, actual.Q_output_len) << "Q_output_len field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.start_at_step, actual.start_at_step) << "start_at_step field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.end_at_repeat, actual.end_at_repeat) << "end_at_repeat field has a wrong value after being written to a file and then read";
+        ASSERT_EQ(expected.end_at_step, actual.end_at_step) << "end_at_step field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.use_half_float, actual.use_half_float) << "use_half_float field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.QDataType, actual.QDataType) << "QDataType field has a wrong value after being written to a file and then read";
     }
 
     void checkAllFields(OutputParams &expected, OutputParams &actual)
     {
-        ASSERT_EQ(expected.rootDir, actual.rootDir) << "rootDir field has a wrong value after being written to a file and then read";
+        ASSERT_EQ(expected.outputRootDir, actual.outputRootDir) << "outputRootDir field has a wrong value after being written to a file and then read";
 
         ASSERT_EQ(expected.XY_planes.size(), actual.XY_planes.size()) << "XY_planes field has wrong size after being written to a file and then read";
         for (size_t i = 0; i < expected.XY_planes.size(); i++)

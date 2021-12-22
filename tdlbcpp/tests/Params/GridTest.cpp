@@ -12,7 +12,7 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/Grid.hpp"
+#include "Params/GridParams.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
 #include "tdlbcpp/tests/Params/ParamsCommon.hpp"
