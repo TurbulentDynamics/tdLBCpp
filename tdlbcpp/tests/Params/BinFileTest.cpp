@@ -71,7 +71,7 @@ TEST_F(BinFileTests, BinFileParamsReadInValidTest)
                               "  Missing ',' or '}' in object declaration\n");
 }
 
-/*TEST_F(BinFileTests, BinFileParamsReadInValidTestInvalidType)
+TEST_F(BinFileTests, BinFileParamsReadInValidTestInvalidType)
 {
     std::ofstream out(filename);
     out << "{\"filePath\":\"somepath\", \"binFileSizeInStructs\": \"invalidNumber\"}";
@@ -79,12 +79,7 @@ TEST_F(BinFileTests, BinFileParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     BinFileParams binFileParamsRead;
-    TestUtils::captureStderr();
-    binFileParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
-                              "Value is not convertible to UInt64."
-                              ", application will now exit\n")
-        << "cerr should contain error";
-}*/
+    
+    EXPECT_EXIT(binFileParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reached parsing arguments in BinFileParams: Value is not convertible to UInt64.\n");
+}

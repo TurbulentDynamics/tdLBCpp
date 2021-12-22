@@ -67,14 +67,9 @@ TEST_F(RunningParamsTests, RunningParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     RunningParams runningParamsRead;
-    TestUtils::captureStderr();
-    runningParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 35\n"
-                              "  Missing '}' or object member name\n"
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(runningParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reading from input file: \\* Line 1, Column 35\n"
+                              "  Missing '}' or object member name\n");
 }
 
 TEST_F(RunningParamsTests, RunningParamsReadInValidTestInvalidType)
@@ -85,12 +80,6 @@ TEST_F(RunningParamsTests, RunningParamsReadInValidTestInvalidType)
     std::cerr << filename << std::endl;
 
     RunningParams runningParamsRead;
-    TestUtils::captureStderr();
-    runningParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
-                              "Value is not convertible to UInt64."
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(runningParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reached parsing arguments in RunningParams: Value is not convertible to UInt64.\n");;
 }

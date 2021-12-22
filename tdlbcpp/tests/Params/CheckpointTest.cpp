@@ -66,30 +66,19 @@ TEST_F(CheckpointParamsTests, CheckpointParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     CheckpointParams checkpointParamsRead;
-    TestUtils::captureStderr();
-    checkpointParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 38\n"
-                              "  Missing ',' or '}' in object declaration\n"
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(checkpointParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reading from input file: \\* Line 1, Column 38\n"
+                              "  Missing ',' or '}' in object declaration\n");
 }
 
 TEST_F(CheckpointParamsTests, CheckpointParamsReadInValidTestInvalidType)
 {
     std::ofstream out(filename);
-    out << "{\"load_checkpoint_dirname\":\"somepath\", \"checkpoint_repeat\": \"invalidNumber\"}";
+    out << "{\"load_checkpoint_dirname\":\"somepath\", \"checkpointRepeat\": \"invalidNumber\"}";
     out.close();
     std::cerr << filename << std::endl;
 
     CheckpointParams checkpointParamsRead;
-    TestUtils::captureStderr();
-    checkpointParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
-                              "Value is not convertible to Int."
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(checkpointParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reached parsing arguments in CheckpointParams: Value is not convertible to Int.\n");
 }

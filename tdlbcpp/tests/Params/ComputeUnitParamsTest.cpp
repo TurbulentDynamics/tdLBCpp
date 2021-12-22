@@ -66,14 +66,9 @@ TEST_F(ComputeUnitParamsTests, ComputeUnitParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     ComputeUnitParams computeUnitParamsRead;
-    TestUtils::captureStderr();
-    computeUnitParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 9\n"
-                              "  Missing ',' or '}' in object declaration\n"
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(computeUnitParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reading from input file: \\* Line 1, Column 9\n"
+                              "  Missing ',' or '}' in object declaration\n");
 }
 
 TEST_F(ComputeUnitParamsTests, ComputeUnitParamsReadInValidTestInvalidType)
@@ -84,12 +79,6 @@ TEST_F(ComputeUnitParamsTests, ComputeUnitParamsReadInValidTestInvalidType)
     std::cerr << filename << std::endl;
 
     ComputeUnitParams computeUnitParamsRead;
-    TestUtils::captureStderr();
-    computeUnitParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
-                              "Value is not convertible to Int."
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(computeUnitParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reached parsing arguments in ComputeUnitParams: Value is not convertible to Int.\n");
 }
