@@ -95,6 +95,9 @@ template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::architectureInit() {}
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::architectureCleanup() {}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams, bool reallocate) {
 
     initParams(cuParams);
@@ -142,6 +145,7 @@ outputTree(rhs.outputTree), evenStep(rhs.evenStep)
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 ComputeUnitBase<T, QVecSize, MemoryLayout>::~ComputeUnitBase()
 {
+    architectureCleanup();
     freeMemory();
 }
 
@@ -193,6 +197,8 @@ Velocity<T> ComputeUnitBase<T, QVecSize, MemoryLayout>::getVelocitySparseF(tNi i
 };
 
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::copyGeomToGPU(std::vector<PosPolar<tNi, T>> &geom) {}
 
 
 

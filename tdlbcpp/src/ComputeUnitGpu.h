@@ -26,6 +26,7 @@ public:
     T *VortXZ;
     T *VortXY;
     bool *devExcludeOutputPoints;
+    cudaStream_t gpuStream2;
 
     ComputeUnitArchitectureCommonGPU();
     ComputeUnitArchitectureCommonGPU(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
@@ -34,6 +35,7 @@ public:
     virtual void allocateMemory();
     virtual void freeMemory();
     virtual void architectureInit();
+    virtual void architectureCleanup();
     virtual void initialise(T rho);
 
     virtual void copyGeomToGPU(std::vector<PosPolar<tNi, T>> &geom);

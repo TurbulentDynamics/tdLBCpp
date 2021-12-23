@@ -297,8 +297,11 @@ int main(int argc, char* argv[]){
     std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
 
+    lb->copyGeomToGPU(geomFixed);
     lb->forcing(geomFixed, flow.alpha, flow.beta, 1);
+    lb->copyGeomToGPU(geomRotatingNonUpdating);
     lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, 2);
+    lb->copyGeomToGPU(geomRotating);
     lb->forcing(geomRotating, flow.alpha, flow.beta, 3);
 
 
@@ -360,6 +363,7 @@ int main(int argc, char* argv[]){
 //        std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
         //TODO: GPU Copy Geom to GPU here on another cuda stream
+        lb->copyGeomToGPU(geomRotating);
 
 
         main_time = mainTimer.check(0, 0, main_time, "updateRotatingGeometry");

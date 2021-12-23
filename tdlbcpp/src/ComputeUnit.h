@@ -94,6 +94,7 @@ public:
     virtual void allocateMemory();
     virtual void freeMemory();
     virtual void architectureInit();
+    virtual void architectureCleanup();
     void init(ComputeUnitParams, bool);
     HOST_DEVICE_GPU tNi inline index(tNi i, tNi j, tNi k);
     tNi inline indexPlusGhost(tNi i, tNi j, tNi k);
@@ -106,6 +107,7 @@ public:
     virtual void initialise(T rho);
 
 
+    virtual void copyGeomToGPU(std::vector<PosPolar<tNi, T>> &geom);
     virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta, int oFlag) = 0;
     virtual void forcingRESET(int oFlag) = 0;
 
