@@ -11,23 +11,26 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/Running.hpp"
-#include "Params/Checkpoint.hpp"
+#include "Params/RunningParams.hpp"
+#include "Params/CheckpointParams.hpp"
 #include "Params/OutputParams.hpp"
 #include "ComputeUnit.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
 #include "tdlbcpp/tests/Params/ParamsCommon.hpp"
-#include "StreamingNieveTest.hpp"
-#include "StreamingNievePushTest.hpp"
+#include "StreamingSimpleTest.hpp"
+#include "StreamingSimplePushTest.hpp"
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void testStream(bool push, std::string tag, ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, ComputeUnitBase<T, QVecSize, MemoryLayout> &actual)
 {
     ComputeUnit<T, QVecSize, MemoryLayout, EgglesSomers, Simple, CPU> expected(cuParams, flow, outputTree);
-    if (push) {
+    if (push)
+    {
         TestUtils::fillExpectedComputeUnitValuesTestStreamingNievePush(expected);
-    } else {
+    }
+    else
+    {
         TestUtils::fillExpectedComputeUnitValuesTestStreamingNieve(expected);
     }
     for (tNi i = 0; i < actual.xg; i++)
@@ -56,12 +59,12 @@ TEST(StreamingNieveTest, StreamingNieveValidTest)
     ComputeUnitParams cuParams = ParamsCommon::createComputeUnitParamsFixed();
     FlowParams<unsigned long> flow;
     CheckpointParams checkpointParams = ParamsCommon::createCheckpointParamsFixed();
-    checkpointParams.checkpoint_root_dir = TestUtils::getTempFilename(testing::TempDir(), "StreamingNieveTestRoot");
+    checkpointParams.checkpointWriteRootDir = TestUtils::getTempFilename(testing::TempDir(), "StreamingNieveTestRoot");
     OutputParams outputParams(TestUtils::getTempFilename(testing::TempDir(), "StreamingNieveTestOutput"));
-    DiskOutputTree diskOutputTree(checkpointParams, outputParams);
+    DiskOutputTree diskOutputTree(outputParams, checkpointParams);
     GridParams gridParams = ParamsCommon::createGridParamsFixed();
     RunningParams runningParams = ParamsCommon::createRunningParamsFixed();
-    diskOutputTree.setParams(cuParams, gridParams, flow, runningParams, outputParams, checkpointParams);
+    diskOutputTree.setParams(cuParams, gridParams.getJson(), flow.getJson(), runningParams.getJson(), outputParams.getJson(), checkpointParams.getJson());
     // if cu parameters change then StreamingNieveTest.hpp needs to be recreated
     cuParams.x = 3;
     cuParams.y = 3;
@@ -92,12 +95,12 @@ TEST(StreamingNieveTest, StreamingNievePushValidTest)
     ComputeUnitParams cuParams = ParamsCommon::createComputeUnitParamsFixed();
     FlowParams<unsigned long> flow;
     CheckpointParams checkpointParams = ParamsCommon::createCheckpointParamsFixed();
-    checkpointParams.checkpoint_root_dir = TestUtils::getTempFilename(testing::TempDir(), "StreamingNieveTestRoot");
+    checkpointParams.checkpointWriteRootDir = TestUtils::getTempFilename(testing::TempDir(), "StreamingNieveTestRoot");
     OutputParams outputParams(TestUtils::getTempFilename(testing::TempDir(), "StreamingNieveTestOutput"));
-    DiskOutputTree diskOutputTree(checkpointParams, outputParams);
+    DiskOutputTree diskOutputTree(outputParams, checkpointParams);
     GridParams gridParams = ParamsCommon::createGridParamsFixed();
     RunningParams runningParams = ParamsCommon::createRunningParamsFixed();
-    diskOutputTree.setParams(cuParams, gridParams, flow, runningParams, outputParams, checkpointParams);
+    diskOutputTree.setParams(cuParams, gridParams.getJson(), flow.getJson(), runningParams.getJson(), outputParams.getJson(), checkpointParams.getJson());
     // if cu parameters change then StreamingNieveTest.hpp needs to be recreated
     cuParams.x = 3;
     cuParams.y = 3;

@@ -223,7 +223,7 @@ int main(int argc, char* argv[]){
     cu.resolution = 1;
 
     cu.strCompileFlag = strCompileFlag;
-    cu.strCollisonAlgo = "EgglesSomers";
+    cu.strCollisonAlgo = flow.collision;
     cu.strStreamingAlgo = flow.streaming;
 //    std::string strQVecPrecision =;
 //    std::string strQLength =;
@@ -332,12 +332,76 @@ int main(int argc, char* argv[]){
         double main_time = mainTimer.time_now();
         double total_time = mainTimer.time_now();
 
+        running.incrementStep();
+
+
+
+
+        // MARK: IF INCREASE RESOLUTION
+
+        if (running.step == running.doubleResolutionAtStep){
+
+            std::stringstream text;
+            text << std::endl << std::endl << "INCREASING RESOLUTION FROM grid.x " << lb->x;
+
+            lb->doubleResolutionFullCU();
+
+            text << " TO " <<  lb->x << std::endl << std::endl << std::endl;
+            outputTree.writeToRunningDataFileAndPrint(text.str());
+
+
+            rt = RushtonTurbine((int)lb->x);
+            flow.calcNuAndRe_m(rt.impellers[0].blades.outerRadius);
+            flow.printParams();
+
+
+            e = Extents<tNi>(0, lb->x, 0, lb->y, 0, lb->z);
+
+            //Alternate calculation for geometry
+            //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
+
+            geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
+            useQVecPrecision deltaRunningAngleSTART = geom.calcThisStepImpellerIncrement(running.step);
+            running.angle += deltaRunningAngleSTART;
+
+            geom.impellerStartupStepsUntilNormalSpeed = running.impellerStartupStepsUntilNormalSpeed;
+            deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
+
+
+
+            geom.generateFixedGeometry(surfaceAndInternal);
+            std::vector<PosPolar<tNi, useQVecPrecision>> geomFixed = geom.returnFixedGeometry();
+
+
+            geom.generateRotatingNonUpdatingGeometry(deltaRunningAngle, surfaceAndInternal);
+            std::vector<PosPolar<tNi, useQVecPrecision>> geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+
+
+            geom.generateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
+            std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
+
+            
+            lb->copyGeomToGPU(geomFixed);
+            lb->forcing(geomFixed, flow.alpha, flow.beta, 1);
+            lb->copyGeomToGPU(geomRotatingNonUpdating);
+            lb->forcing(geomRotatingNonUpdating, flow.alpha, flow.beta, 2);
+            lb->copyGeomToGPU(geomRotating);
+            lb->forcing(geomRotating, flow.alpha, flow.beta, 3);
+
+            lb->setOutputExcludePoints(geomFixed);
+            externalPoints = geom.getExternalPoints();
+            lb->setOutputExcludePoints(externalPoints);
+
+
+            output.updateParamsOnResolutionDouble();
+
+        }
+
 
 
 
         // MARK: GEOMETRY UPDATE
 
-        running.incrementStep();
         useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
         running.angle += deltaRunningAngle;
 
@@ -362,7 +426,6 @@ int main(int argc, char* argv[]){
 //        geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
 //        std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
 
-        //TODO: GPU Copy Geom to GPU here on another cuda stream
         lb->copyGeomToGPU(geomRotating);
 
 

@@ -281,6 +281,7 @@ std::string runningDataFileDir .
 std::string runningDataFilePrefix debug
 bool runningDataFileAppendTime true
 
+tStep doubleResolutionAtStep 10
 """)
 
         self.extra_methods = """

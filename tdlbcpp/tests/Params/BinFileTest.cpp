@@ -11,7 +11,7 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/BinFile.hpp"
+#include "Params/BinFileParams.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
 #include "tdlbcpp/tests/Params/ParamsCommon.hpp"
@@ -66,14 +66,9 @@ TEST_F(BinFileTests, BinFileParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     BinFileParams binFileParamsRead;
-    TestUtils::captureStderr();
-    binFileParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 23\n"
-                              "  Missing ',' or '}' in object declaration\n"
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(binFileParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reading from input file: \\* Line 1, Column 23\n"
+                              "  Missing ',' or '}' in object declaration\n");
 }
 
 TEST_F(BinFileTests, BinFileParamsReadInValidTestInvalidType)
@@ -84,12 +79,7 @@ TEST_F(BinFileTests, BinFileParamsReadInValidTestInvalidType)
     std::cerr << filename << std::endl;
 
     BinFileParams binFileParamsRead;
-    TestUtils::captureStderr();
-    binFileParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
-                              "Value is not convertible to UInt64."
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    
+    EXPECT_EXIT(binFileParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reached parsing arguments in BinFileParams: Value is not convertible to UInt64.\n");
 }

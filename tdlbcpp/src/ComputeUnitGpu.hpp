@@ -224,7 +224,61 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
 
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
-};
+}
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::doubleResolutionFullCU()
+{
+    // save old fields
+    Fld oldQ;
+    oldQ.setSize(size);
+    oldQ.q = new T[oldQ.qSize];
+    checkCudaErrors(cudaMemcpy(oldQ.q, Q.q, sizeof(T) * oldQ.qSize, cudaMemcpyDeviceToHost));
+
+    T *oldNu;
+    oldNu = new T[size];
+    checkCudaErrors(cudaMemcpy(oldNu, Nu, sizeof(T) * size, cudaMemcpyDeviceToHost));
+    
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+
+    // set new grid size
+    tNi factor = 2;
+
+    resolution += factor;
+
+    x *= factor;
+    y *= factor;
+    z *= factor;
+
+    initGridParams();
+
+    size = size_t(xg) * yg * zg;
+
+    freeMemory();
+    allocateMemory();//using new cu.x, size etc
+    architectureInit();
+    initialise(0);
+
+    Fld newQ;
+    newQ.setSize(size);
+    newQ.q = new T[newQ.qSize];
+    T *newNu;
+    newNu = new T[size];
+    
+    copyFieldsWithScaling(newQ, oldQ, newNu, oldNu);
+    
+    checkCudaErrors(cudaMemcpy(Q.q, newQ.q, sizeof(T) * newQ.qSize, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(Nu, newNu, sizeof(T) * size, cudaMemcpyHostToDevice));
+
+    delete[] oldQ.q;
+    delete[] oldNu;
+    delete[] newQ.q;
+    delete[] newNu;
+
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+}
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::copyGeomToGPU(std::vector<PosPolar<tNi, T>> &geom) {

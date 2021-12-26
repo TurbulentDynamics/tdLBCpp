@@ -1,0 +1,112 @@
+{
+    "BinFileParams": {
+        "QDataType": "float",
+        "QOutputLength": 4,
+        "binFileSizeInStructs": 0,
+        "coordsType": "uint16_t",
+        "filePath": "NoFilePath",
+        "hasColRowtCoords": true,
+        "hasGridtCoords": false,
+        "i0": 0,
+        "j0": 0,
+        "k0": 0,
+        "name": "NoName",
+        "note": "NoNote",
+        "reference": "absolute",
+        "structName": "tDisk_colrow_Q4"
+    },
+    "CheckpointParams": {
+        "checkpointLoadFromDir": "notSet",
+        "checkpointRepeat": 0,
+        "checkpointWriteDirAppendTime": true,
+        "checkpointWriteDirPrefix": "debug",
+        "checkpointWriteRootDir": ".",
+        "startWithCheckpoint": false
+    },
+    "ComputeUnitParams": {
+        "deviceID": 0,
+        "ghost": 0,
+        "i0": 0,
+        "idi": 0,
+        "idj": 0,
+        "idk": 0,
+        "j0": 0,
+        "k0": 0,
+        "nodeID": 0,
+        "resolution": 0,
+        "strCollisonAlgo": "notSet",
+        "strCompileFlag": "notSet",
+        "strMemoryLayout": "notSet",
+        "strQLength": "notSet",
+        "strQVecPrecision": "notSet",
+        "strStreamingAlgo": "notSet",
+        "x": 0,
+        "y": 0,
+        "z": 0
+    },
+    "FlowParams": {
+        "Re_f": 0.0,
+        "Re_m": 0.0,
+        "alpha": 0.97,
+        "beta": 1.9,
+        "collision": "EgglesSomers",
+        "cs0": 0.12,
+        "fx0": 0.0,
+        "fy0": 0.0,
+        "fz0": 0.0,
+        "g3": 0.8,
+        "initialRho": 8.0,
+        "nu": 0.0,
+        "reMNonDimensional": 7300.0,
+        "streaming": "Simple",
+        "uav": 0.1,
+        "uf": 0.0,
+        "useLES": false
+    },
+    "GridParams": {
+        "multiStep": 1,
+        "ngx": 1,
+        "ngy": 1,
+        "ngz": 1,
+        "strMinQVecPrecision": "float",
+        "x": 72,
+        "y": 72,
+        "z": 72
+    },
+    "OutputParams": {
+        "XY_vorticity_planes": [
+            {
+                "cutAt": 36,
+                "end_at_step": 0,
+                "jpegCompression": 100,
+                "name_root": "vort_slice",
+                "repeat": 1,
+                "start_at_step": 0
+            }
+        ],
+        "XZ_vorticity_planes": [
+            {
+                "cutAt": 48,
+                "end_at_step": 0,
+                "jpegCompression": 100,
+                "name_root": "vort_axis",
+                "repeat": 1,
+                "start_at_step": 0
+            }
+        ],
+        "outputRootDir": "debug_output_dir"
+    },
+    "RunningParams": {
+        "angle": 0.0,
+        "impellerStartupStepsUntilNormalSpeed": 30,
+        "numStepsForAverageCalc": 10,
+        "num_steps": 200,
+        "repeatPrintTimerToFile": 20,
+        "repeatPrintTimerToStdOut": 10,
+        "runningDataFileAppendTime": true,
+        "runningDataFileDir": ".",
+        "runningDataFilePrefix": "debug",
+        "step": 1,
+        "doubleResolutionAtStep": 100
+    }
+}

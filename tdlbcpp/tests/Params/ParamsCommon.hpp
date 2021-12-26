@@ -1,11 +1,11 @@
 #include <random>
 
-#include "Params/Checkpoint.hpp"
-#include "Params/BinFile.hpp"
+#include "Params/CheckpointParams.hpp"
+#include "Params/BinFileParams.hpp"
 #include "Params/ComputeUnitParams.hpp"
-#include "Params/Flow.hpp"
-#include "Params/Grid.hpp"
-#include "Params/Running.hpp"
+#include "Params/FlowParams.hpp"
+#include "Params/GridParams.hpp"
+#include "Params/RunningParams.hpp"
 #include "Params/OutputParams.hpp"
 #include "ComputeUnit.hpp"
 

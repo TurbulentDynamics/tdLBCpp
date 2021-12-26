@@ -13,8 +13,8 @@
 #undef WITH_GPU
 
 #include "Header.h"
-#include "Params/Running.hpp"
-#include "Params/Checkpoint.hpp"
+#include "Params/RunningParams.hpp"
+#include "Params/CheckpointParams.hpp"
 #include "Params/OutputParams.hpp"
 #include "ComputeUnit.hpp"
 
@@ -55,12 +55,12 @@ TEST(StreamingNieveGpuTest, StreamingNieveGpuValidTest)
     ComputeUnitParams cuParams = ParamsCommon::createComputeUnitParamsFixed();
     FlowParams<unsigned long> flow;
     CheckpointParams checkpointParams = ParamsCommon::createCheckpointParamsFixed();
-    checkpointParams.checkpoint_root_dir = TestUtils::getTempFilename(testing::TempDir(), "StreamingNieveTestRoot");
+    checkpointParams.checkpointWriteRootDir = TestUtils::getTempFilename(testing::TempDir(), "StreamingNieveTestRoot");
     OutputParams outputParams(TestUtils::getTempFilename(testing::TempDir(), "StreamingNieveTestOutput"));
-    DiskOutputTree diskOutputTree(checkpointParams, outputParams);
+    DiskOutputTree diskOutputTree(outputParams, checkpointParams);
     GridParams gridParams = ParamsCommon::createGridParamsFixed();
     RunningParams runningParams = ParamsCommon::createRunningParamsFixed();
-    diskOutputTree.setParams(cuParams, gridParams, flow, runningParams, outputParams, checkpointParams);
+    diskOutputTree.setParams(cuParams, gridParams.getJson(), flow.getJson(), runningParams.getJson(), outputParams.getJson(), checkpointParams.getJson());
     // if cu parameters change then StreamingNieveTest.hpp needs to be recreated
     cuParams.x = 3;
     cuParams.y = 3;
@@ -70,7 +70,7 @@ TEST(StreamingNieveGpuTest, StreamingNieveGpuValidTest)
     ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU> lb2(cuParams, flow, diskOutputTree);
     ComputeUnit<unsigned long, QLen::D3Q19, MemoryLayoutLIJK, EgglesSomers, Simple, CPU> lb2lijk(cuParams, flow, diskOutputTree);
 
-    createGpuUnitsExecutePush(lb2.Q.q, lb2lijk.Q.q, cuParams, flow, diskOutputTree);    
+    createGpuUnitsExecutePush(lb2.Q.q, lb2lijk.Q.q, cuParams, flow, diskOutputTree);
 
     testStream("IJKL", cuParams, flow, diskOutputTree, lb2);
 

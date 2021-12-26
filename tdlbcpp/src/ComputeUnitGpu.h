@@ -10,12 +10,17 @@ class ComputeUnitArchitectureCommonGPU : public ComputeUnitStreaming<T, QVecSize
 public:
     using Base = ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>;
     using Current = ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+    using typename Base::Fld;
     using Base::Base;
     using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1;
     using Base::F; using Base::index; using Base::Q; using Base::Nu;
     using Base::size; using Base::O; using Base::deviceID; using Base::ExcludeOutputPoints;
     using Base::xg; using Base::yg; using Base::zg;
+    using Base::x; using Base::y; using Base::z;
+    using Base::resolution;
     using Base::init;
+    using Base::initGridParams;
+    using Base::copyFieldsWithScaling;
     using Base::saveJpeg;
 
     dim3 numBlocks;
@@ -41,6 +46,7 @@ public:
     virtual void copyGeomToGPU(std::vector<PosPolar<tNi, T>> &geom);
     virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta, int oFlag);
     virtual void forcingRESET(int oFlag);
+    virtual void doubleResolutionFullCU();
     //virtual void collision();
     //virtual void moments();
     //virtual void bounceBackBoundary();
