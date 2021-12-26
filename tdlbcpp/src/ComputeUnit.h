@@ -45,6 +45,8 @@ public:
     int idi, idj, idk;
     int nodeID;
     int deviceID;
+
+    tNi resolution;
     
     //Size of this ComputeUnit
     tNi x, y, z;
@@ -90,6 +92,7 @@ public:
     
     ~ComputeUnitBase();
     
+    void initGridParams();
     void initParams(ComputeUnitParams);
     virtual void allocateMemory();
     virtual void freeMemory();
@@ -97,6 +100,7 @@ public:
     void init(ComputeUnitParams, bool);
     HOST_DEVICE_GPU tNi inline index(tNi i, tNi j, tNi k);
     tNi inline indexPlusGhost(tNi i, tNi j, tNi k);
+    tNi inline indexPreviousResolution(tNi i, tNi j, tNi k);
 
 
     Velocity<T> inline getVelocity(tNi i, tNi j, tNi k);
@@ -129,6 +133,8 @@ public:
     void checkpoint_read(std::string dirname, std::string unit_name);
     void checkpoint_write(std::string unit_name, RunningParams run);
     
+    void copyFieldsWithScaling(Fld &newQ, Fld &oldQ, T *newNu, T* oldNu);
+    virtual void doubleResolutionFullCU();
 
 
 

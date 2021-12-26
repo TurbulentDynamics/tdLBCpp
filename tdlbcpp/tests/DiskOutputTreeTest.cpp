@@ -12,10 +12,10 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/Running.hpp"
-#include "Params/Checkpoint.hpp"
+#include "Params/RunningParams.hpp"
+#include "Params/CheckpointParams.hpp"
 #include "Params/OutputParams.hpp"
-#include "Params/BinFile.hpp"
+#include "Params/BinFileParams.hpp"
 #include "DiskOutputTree.h"
 
 #include "tdlbcpp/tests/utils.hpp"
@@ -51,15 +51,15 @@ public:
 TEST_F(DiskOutputTreeTests, DiskOutputTreeWriteReadValidTest)
 {
     CheckpointParams checkpointParams = ParamsCommon::createCheckpointParamsFixed();
-    checkpointParams.checkpoint_root_dir = checkpointDirOfDiskOutputTree;
+    checkpointParams.checkpointWriteRootDir = checkpointDirOfDiskOutputTree;
     OutputParams outputParams(rootDirDiskOutputTree);
-    DiskOutputTree diskOutputTree(checkpointParams, outputParams);
+    DiskOutputTree diskOutputTree(outputParams, checkpointParams);
 
     ComputeUnitParams computeUnitParams = ParamsCommon::createComputeUnitParamsFixed();
     GridParams gridParams = ParamsCommon::createGridParamsFixed();
     FlowParams<double> flowParams = ParamsCommon::createFlowParamsFixed();
     RunningParams runningParams = ParamsCommon::createRunningParamsFixed();
-    diskOutputTree.setParams(computeUnitParams, gridParams, flowParams, runningParams, outputParams, checkpointParams);
+    diskOutputTree.setParams(computeUnitParams, gridParams.getJson(), flowParams.getJson(), runningParams.getJson(), outputParams.getJson(), checkpointParams.getJson());
 
     BinFileParams binFileParams;
     binFileParams.filePath = filename;
@@ -68,8 +68,9 @@ TEST_F(DiskOutputTreeTests, DiskOutputTreeWriteReadValidTest)
     std::cerr << filename << std::endl;
 
     CheckpointParams checkpointParamsNew = ParamsCommon::createCheckpointParamsFixed();
+    checkpointParamsNew.checkpointWriteRootDir = checkpointDirOfDiskOutputTree;
     OutputParams outputParamsNew(rootDirDiskOutputTree + "test2");
-    DiskOutputTree diskOutputTreeRead(checkpointParamsNew, outputParamsNew);
+    DiskOutputTree diskOutputTreeRead(outputParamsNew, checkpointParamsNew);
     diskOutputTreeRead.readAllParamsJson(filename + ".json", binFileParams, runParams);
 
     checkAllFields(diskOutputTree, diskOutputTreeRead);

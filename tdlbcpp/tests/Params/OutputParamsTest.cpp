@@ -67,14 +67,9 @@ TEST_F(OutputParamsTests, OutputParamsInvalidTest)
     std::cerr << filename << std::endl;
 
     OutputParams outputParamsRead("test");
-    TestUtils::captureStderr();
-    outputParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 15\n"
-                              "  Syntax error: value, object or array expected.\n"
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(outputParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reading from input file: \\* Line 1, Column 15\n"
+                              "  Syntax error: value, object or array expected.\n");
 }
 
 TEST_F(OutputParamsTests, OutputParamsInvalidTestInvalidType)
@@ -85,12 +80,6 @@ TEST_F(OutputParamsTests, OutputParamsInvalidTestInvalidType)
     std::cerr << filename << std::endl;
 
     OutputParams outputParamsRead("test");
-    TestUtils::captureStderr();
-    outputParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
-                              "Value is not convertible to UInt64."
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(outputParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reached parsing arguments in OrthoPlaneParams: Value is not convertible to UInt64.\n");
 }

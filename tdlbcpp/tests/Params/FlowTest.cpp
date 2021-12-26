@@ -11,7 +11,7 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/Flow.hpp"
+#include "Params/FlowParams.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
 #include "tdlbcpp/tests/Params/ParamsCommon.hpp"
@@ -79,14 +79,9 @@ TEST_F(FlowParamsTests, FlowParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     FlowParams<double> flowParamsRead;
-    TestUtils::captureStderr();
-    flowParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 16\n"
-                              "  Missing ',' or '}' in object declaration\n"
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(flowParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reading from input file: \\* Line 1, Column 16\n"
+                              "  Missing ',' or '}' in object declaration\n");
 }
 
 TEST_F(FlowParamsTests, FlowParamsReadInValidTestInvalidType)
@@ -97,12 +92,6 @@ TEST_F(FlowParamsTests, FlowParamsReadInValidTestInvalidType)
     std::cerr << filename << std::endl;
 
     FlowParams<double> flowParamsRead;
-    TestUtils::captureStderr();
-    flowParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
-                              "Value is not convertible to double."
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(flowParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reached parsing arguments in FlowParams: Value is not convertible to double.\n");
 }

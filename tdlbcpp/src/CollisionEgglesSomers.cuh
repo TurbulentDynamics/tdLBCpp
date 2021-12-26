@@ -30,7 +30,6 @@ __global__ void collisionEgglesSommers(ComputeUnitCollision<T, QVecSize, MemoryL
 
     Force<T> f = cu.F[cu.index(i, j, k)];
 
-    //TODO Change this to m, but write to q, notation only
     QVec<T, QVecSize> m = AF::read(cu, i, j, k);
 
     Velocity<T> u = m.velocity(f);

@@ -223,7 +223,7 @@ int main(int argc, char* argv[]){
     cu.resolution = 1;
 
     cu.strCompileFlag = strCompileFlag;
-    cu.strCollisonAlgo = "EgglesSomers";
+    cu.strCollisonAlgo = flow.collision;
     cu.strStreamingAlgo = flow.streaming;
 //    std::string strQVecPrecision =;
 //    std::string strQLength =;
@@ -251,8 +251,6 @@ int main(int argc, char* argv[]){
         lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist, CPU>(cu, flow, outputTree);
 #endif
     }
-
-
 
 
 
@@ -338,12 +336,73 @@ int main(int argc, char* argv[]){
         double main_time = mainTimer.time_now();
         double total_time = mainTimer.time_now();
 
+        running.incrementStep();
+
+
+
+
+        // MARK: INCREASE RESOLUTION
+
+        if (running.step == running.doubleResolutionAtStep){
+
+            std::stringstream text;
+            text << std::endl << std::endl << "INCREASING RESOLUTION FROM grid.x " << lb->x;
+
+            lb->doubleResolutionFullCU();
+
+            text << " TO " <<  lb->x << std::endl << std::endl << std::endl;
+            outputTree.writeToRunningDataFileAndPrint(text.str());
+
+
+            rt = RushtonTurbine((int)lb->x);
+            flow.calcNuAndRe_m(rt.impellers[0].blades.outerRadius);
+            flow.printParams();
+
+
+            e = Extents<tNi>(0, lb->x, 0, lb->y, 0, lb->z);
+
+            //Alternate calculation for geometry
+            //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
+
+            geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
+            useQVecPrecision deltaRunningAngleSTART = geom.calcThisStepImpellerIncrement(running.step);
+            running.angle += deltaRunningAngleSTART;
+
+            geom.impellerStartupStepsUntilNormalSpeed = running.impellerStartupStepsUntilNormalSpeed;
+            deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
+
+            geom.generateFixedGeometry(onSurface);
+            geomFixed = geom.returnFixedGeometry();
+
+
+            geom.generateRotatingNonUpdatingGeometry(deltaRunningAngleSTART, surfaceAndInternal);
+            geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
+
+
+            geom.generateRotatingGeometry(running.angle, deltaRunningAngleSTART, surfaceAndInternal);
+            geomRotating = geom.returnRotatingGeometry();
+
+
+            geomFORCING = geomFixed;
+            geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
+            geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );
+
+            lb->forcing(geomFORCING, flow.alpha, flow.beta);
+
+            lb->setOutputExcludePoints(geomFixed);
+            externalPoints = geom.getExternalPoints();
+            lb->setOutputExcludePoints(externalPoints);
+
+
+            output.updateParamsOnResolutionDouble();
+
+        }
+
 
 
 
         // MARK: GEOMETRY UPDATE
 
-        running.incrementStep();
         useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
         running.angle += deltaRunningAngle;
 
@@ -356,20 +415,12 @@ int main(int argc, char* argv[]){
 
 
 
-
-
-
-
         std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geomFixed;
         geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
 
         geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
         std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
         geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );
-
-
-
-
 
 
         main_time = mainTimer.check(0, 0, main_time, "updateRotatingGeometry");

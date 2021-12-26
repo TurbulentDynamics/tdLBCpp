@@ -12,7 +12,7 @@
 #include "gtest/gtest.h"
 
 #include "Header.h"
-#include "Params/Grid.hpp"
+#include "Params/GridParams.hpp"
 
 #include "tdlbcpp/tests/utils.hpp"
 #include "tdlbcpp/tests/Params/ParamsCommon.hpp"
@@ -67,14 +67,9 @@ TEST_F(GridParamsTests, GridParamsReadInValidTest)
     std::cerr << filename << std::endl;
 
     GridParams gridParamsRead;
-    TestUtils::captureStderr();
-    gridParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: * Line 1, Column 24\n"
-                              "  Missing '}' or object member name\n"
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(gridParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reading from input file: \\* Line 1, Column 24\n"
+                              "  Missing '}' or object member name\n");
 }
 
 TEST_F(GridParamsTests, GridParamsReadInValidTestInvalidType)
@@ -85,12 +80,6 @@ TEST_F(GridParamsTests, GridParamsReadInValidTestInvalidType)
     std::cerr << filename << std::endl;
 
     GridParams gridParamsRead;
-    TestUtils::captureStderr();
-    gridParamsRead.getParamsFromJsonFile(filename);
-    std::string capturedStdErr = TestUtils::getCapturedStderr();
-
-    ASSERT_EQ(capturedStdErr, "Unhandled Exception reached parsing arguments: "
-                              "Value is not convertible to Int."
-                              ", application will now exit\n")
-        << "cerr should contain error";
+    EXPECT_EXIT(gridParamsRead.getParamsFromJsonFile(filename), testing::ExitedWithCode(1), 
+    "Exception reached parsing arguments in GridParams: Value is not convertible to UInt64.\n");
 }
