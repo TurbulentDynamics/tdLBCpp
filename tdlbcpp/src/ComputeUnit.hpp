@@ -137,7 +137,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
 #if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
         int threads_per_warp = 32;
         int max_threads_per_block = 512;
-    
+
         int xthreads_per_block = 8;
         int ythreads_per_block = 8;
         int zthreads_per_block = 8;
@@ -205,10 +205,10 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::~ComputeUnitBase()
     checkCudaErrors(cudaFree(O));
 #endif
 #if WITH_GPU_MEMSHARED == 1
-        checkCudaErrors(cudaSetDevice(deviceID));
-        checkCudaErrors(cudaFree(F));
-        checkCudaErrors(cudaFree(Nu));
-        checkCudaErrors(cudaFree(O));
+    checkCudaErrors(cudaSetDevice(deviceID));
+    checkCudaErrors(cudaFree(F));
+    checkCudaErrors(cudaFree(Nu));
+    checkCudaErrors(cudaFree(O));
 #endif
 }
 
