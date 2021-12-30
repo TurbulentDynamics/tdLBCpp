@@ -133,9 +133,7 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
         
         for (tNi k1 = -1; k1<=1; k1++){
             for (tNi i1 = -1; i1<=1; i1++){
-                
-                //printf("fx,  %i %i %i % 1.8E % 1.8E % 1.8E  \n", i2, j2, k2, xs, ys, zs);
-                
+                                
                 tNi i2 = i + i1;
                 tNi j2 = j;
                 tNi k2 = k + k1;

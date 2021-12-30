@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
+#include <iomanip>
 #include <vector>
 #include <cstdint>
 #include <map>
@@ -171,7 +172,6 @@ public:
         
         std::cout << "DiskOutputTree creating directory: " << dir << std::endl;
         mkdir(dir.c_str(), 0775);
-        
     }
     
     

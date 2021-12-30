@@ -98,8 +98,8 @@ public:
     
     virtual ~ComputeUnitBase();
     
-    void init(ComputeUnitParams, bool = true);
-    tNi inline index(tNi i, tNi j, tNi k);
+    void init(ComputeUnitParams, bool);    
+    HOST_DEVICE_GPU tNi inline index(tNi i, tNi j, tNi k);
     tNi inline indexPlusGhost(tNi i, tNi j, tNi k);
 
 
@@ -299,6 +299,7 @@ struct AccessField<T, QVecSize, MemoryLayout, collisionType, Simple> {
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::printDebug(int fi, int ti, int fj, int tj, int fk, int tk) {
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+
     for (int i = fi; i <= fi; i++) {
         for (int j = fj; j <= tj; j++) {
             for (int k = fk; k <= tk; k++) {
@@ -316,6 +317,10 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
         }
     }
 }
+
+#if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
+#include "ComputeUnit.cuh"
+#endif
 
 #include "ComputeUnit.hpp"
 #include "ComputeUnitOutput.hpp"

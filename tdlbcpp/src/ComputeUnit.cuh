@@ -13,10 +13,8 @@
 
 #include "ComputeUnit.h"
 
-
-__global__
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
+__global__ void setQToZero(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu){
 
     tNi i = blockIdx.x * blockDim.x + threadIdx.x;
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
@@ -24,62 +22,58 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
 
 #pragma unroll
     for (tNi l = 0; l < QVecSize; l++){
-        Q[index(i,j,k)].q[l] = 0.0;
+        cu.Q[cu.index(i,j,k)].q[l] = 0.0;
     }
 };
 
 
 
-__global__
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::setRhoTo(T initialRho){
+__global__ void setRhoTo(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, T initialRho){
 
     tNi i = blockIdx.x * blockDim.x + threadIdx.x;
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
     tNi k = blockIdx.z * blockDim.z + threadIdx.z;
 
-    Q[index(i, j, k)].q[MRHO](initialRho);
+    cu.Q[cu.index(i, j, k)].q[MRHO] = initialRho;
 };
 
 
-__global__
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::setForceToZero(T initialRho){
+__global__ void setForceToZero(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, T initialRho){
 
     tNi i = blockIdx.x * blockDim.x + threadIdx.x;
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
     tNi k = blockIdx.z * blockDim.z + threadIdx.z;
 
-    F[index(i, j, k)].x = 0.0;
-    F[index(i, j, k)].y = 0.0;
-    F[index(i, j, k)].z = 0.0;
+    cu.F[cu.index(i, j, k)].x = 0.0;
+    cu.F[cu.index(i, j, k)].y = 0.0;
+    cu.F[cu.index(i, j, k)].z = 0.0;
 
-};
-
-
-
-
-__global__
-template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::setNuToZero(T initialRho){
-
-    tNi i = blockIdx.x * blockDim.x + threadIdx.x;
-    tNi j = blockIdx.y * blockDim.y + threadIdx.y;
-    tNi k = blockIdx.z * blockDim.z + threadIdx.z;
-
-    Nu[index(i, j, k)] = 0.0;
 };
 
 
 
-__global__
+
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::setOToZero(T initialRho){
+__global__ void setNuToZero(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, T initialRho){
 
     tNi i = blockIdx.x * blockDim.x + threadIdx.x;
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
     tNi k = blockIdx.z * blockDim.z + threadIdx.z;
 
-    O[index(i, j, k)] = false;
+    cu.Nu[cu.index(i, j, k)] = 0.0;
+};
+
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+__global__ void setOToZero(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, T initialRho){
+
+    tNi i = blockIdx.x * blockDim.x + threadIdx.x;
+    tNi j = blockIdx.y * blockDim.y + threadIdx.y;
+    tNi k = blockIdx.z * blockDim.z + threadIdx.z;
+
+    cu.O[cu.index(i, j, k)] = false;
 
 };

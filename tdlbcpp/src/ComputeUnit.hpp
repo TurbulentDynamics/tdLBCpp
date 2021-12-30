@@ -180,7 +180,7 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitBase &&rh
     ghost(rhs.ghost), size(rhs.size), flow(rhs.flow), Q(std::move(rhs.Q)), F(rhs.F), Nu(rhs.Nu), O(rhs.O), ExcludeOutputPoints(rhs.ExcludeOutputPoints),
     outputTree(rhs.outputTree), evenStep(rhs.evenStep)
 #if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
-    , devF(rhs.devF), devN(rhs.devN), devNu(rhs.debNu), threadsPerBlock(rhs.threadsPerBlock), numBlocks(rhs.numBlocks)
+    , devF(rhs.devF), threadsPerBlock(rhs.threadsPerBlock), numBlocks(rhs.numBlocks)
 #endif
 {
     rhs.O = nullptr;
@@ -250,13 +250,13 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
 #endif
 #if WITH_GPU || WITH_GPU_SHAREDMEM == 1
 
-    setQToZero<<< numBlocks, threadsPerBlock >>>();
-    setRhoTo(flow.initialRho)<<< numBlocks, threadsPerBlock >>>();
-    setForceToZero<<< numBlocks, threadsPerBlock >>>();
+    ::setQToZero<<< numBlocks, threadsPerBlock >>>(*this);
+    setRhoTo<<< numBlocks, threadsPerBlock >>>(*this, flow.initialRho);
+    setForceToZero<<< numBlocks, threadsPerBlock >>>(*this, initialRho);
     if (flow.useLES){
-        setNuToZero<<< numBlocks, threadsPerBlock >>>();
+        setNuToZero<<< numBlocks, threadsPerBlock >>>(*this, initialRho);
     }
-    setOToZero<<< numBlocks, threadsPerBlock >>>();
+    setOToZero<<< numBlocks, threadsPerBlock >>>(*this, initialRho);
 
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());

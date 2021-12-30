@@ -1,3 +1,21 @@
+load("@rules_cuda//cuda:defs.bzl", "cuda_library")
+load("//tdlbcpp/src:targets.bzl", "cc_binary_rule")
+
+config_setting(
+    name = "use_gpu",
+    define_values = {"gpu" : "yes"},
+)
+
+config_setting(
+    name = "use_mpi",
+    define_values = {"mpi" : "yes"},
+)
+
+config_setting(
+    name = "use_mpi_gpu",
+    define_values = {"mpi_gpu" : "yes"},
+)
+
 cc_library(
     name = "cxxopts",
     hdrs = ["cxxopts.hpp"]
@@ -18,11 +36,21 @@ cc_library(
     strip_include_prefix="",
 )
 
-cc_binary(
+cc_library(
+    name = "computeUnitCu",
+    hdrs = ["ComputeUnit.cuh"],
+    visibility = ["//visibility:public"],
+)
+
+tdlbcpp_deps = [":cxxopts", ":timer", "//tdlbcpp/src/Params:params", ":computeUnit", "//tdlbcpp/src/Tools:toojpeg",
+                "@tdLBGeometryRushtonTurbineLib//Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib"]
+
+cc_binary_rule(
     name = "tdlbcpp",
     srcs = ["main.cpp"],
-    deps = [":cxxopts", ":timer", "//tdlbcpp/src/Params:params", ":computeUnit", "//tdlbcpp/src/Tools:toojpeg",
-            "@tdLBGeometryRushtonTurbineLib//Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib"],
+    deps = tdlbcpp_deps,
+    deps_gpu = tdlbcpp_deps + [":computeUnitCu"],
+    copts = ["-Iexternal/local_cuda/cuda/samples/common/inc/"],
 )
 
 

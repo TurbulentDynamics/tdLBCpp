@@ -170,7 +170,9 @@ int gpuDeviceID = -1;
         printf("GPU Device %d: \"%s\" totalGlobalMem: %d, managedMemory: %d, with compute capability %d.%d\n\n", i, deviceProp.name,  deviceProp.totalGlobalMem, deviceProp.managedMemory, deviceProp.major, deviceProp.minor);
 
         if (memRequired < deviceProp.totalGlobalMem) {
-            if (WITH_GPU_SHARED && !deviceProp.managedMemory) continue;
+            #if defined(WITH_GPU_MEMSHARED)
+            if (!deviceProp.managedMemory) continue;
+            #endif
 
             gpuDeviceID = i;
         }
@@ -210,7 +212,7 @@ int gpuDeviceID = -1;
     // MARK: Set Up Output and Checkpoint
     if (!parametersLoadedFromJson) {
 
-        output.add_XY_plane("plot_axis", (tStep)5, (tNi)geom.kCenter);
+        output.add_XY_plane("plot_axis", (tStep)1, (tNi)geom.kCenter);
 
         
         //        output.add_XZ_plane("plot_slice", 10, rt.impellers[0].impellerPosition-1);
@@ -401,11 +403,7 @@ int gpuDeviceID = -1;
         lb->setOutputExcludePoints(geomFORCING);
 
         for (auto xy: output.XY_planes){
-            if ((xy.start_at_step == running.step) 
-                || (
-                     (running.step >= xy.start_at_step) 
-                  && (xy.repeat != 0) 
-                  && ((running.step - xy.start_at_step) % xy.repeat == 0))) {
+            if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
 //                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
                 lb->calcVorticityXY(xy.cutAt, running);
             }
@@ -414,11 +412,7 @@ int gpuDeviceID = -1;
 
 
         for (auto xz: output.XZ_planes){
-            if ((xz.start_at_step == running.step) 
-                || (
-                     (running.step >= xz.start_at_step) 
-                  && (xz.repeat != 0) 
-                  && ((running.step - xz.start_at_step) % xz.repeat == 0))) {
+            if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
 //                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
                 lb->calcVorticityXZ(xz.cutAt, running);
             }
@@ -456,7 +450,7 @@ int gpuDeviceID = -1;
 
 
         tGeomShapeRT revs = running.angle * ((180.0/M_PI)/360);
-        printf("Node %2i Step %lu/%lu, Angle: % 1.4E (%.1f revs)    ",  rank, step, running.num_steps, running.angle, revs);
+        printf("\nNode %2i Step %lu/%lu, Angle: % 1.4E (%.1f revs)    ",  rank, step, running.num_steps, running.angle, revs);
         mainTimer.print_time_left(step, running.num_steps, total_time);
 
         mainTimer.print_timer(step);
