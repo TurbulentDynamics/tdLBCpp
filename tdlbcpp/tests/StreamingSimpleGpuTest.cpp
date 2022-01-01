@@ -20,7 +20,7 @@
 
 #include "tdlbcpp/tests/utils.hpp"
 #include "tdlbcpp/tests/Params/ParamsCommon.hpp"
-#include "StreamingNievePushTest.hpp"
+#include "StreamingSimplePushTest.hpp"
 
 void createGpuUnitsExecutePush(unsigned long *q, unsigned long *qLijk, ComputeUnitParams cuParams, FlowParams<unsigned long> flow, DiskOutputTree diskOutputTree);
 

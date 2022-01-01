@@ -167,8 +167,13 @@ namespace ParamsCommon
     #endif
 
     template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-    void fillForTest(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, unsigned long offset = 0)
+    void fillForTest(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, unsigned long offset = 0, bool useOneDigitCoordinates = false)
     {
+        unsigned long int coordinateDigits = 100;
+        if (useOneDigitCoordinates)
+        {
+            coordinateDigits = 10;
+        }
 
         if (cu.xg > 99 || cu.yg > 99 || cu.zg > 99)
         {
@@ -187,47 +192,54 @@ namespace ParamsCommon
 
                     for (unsigned long int l = 0; l < QVecSize; l++)
                     {
-                        qTmp.q[l] = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + l;
+                        qTmp.q[l] = (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100 + l;
                     }
                     cu.Q[cu.index(i, j, k)] = qTmp;
 
-                    cu.F[cu.index(i, j, k)].x = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100;
-                    cu.F[cu.index(i, j, k)].y = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 1;
-                    cu.F[cu.index(i, j, k)].z = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 2;
+                    cu.F[cu.index(i, j, k)].x = (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100;
+                    cu.F[cu.index(i, j, k)].y = (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100 + 1;
+                    cu.F[cu.index(i, j, k)].z = (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100 + 2;
 
-                    cu.Nu[cu.index(i, j, k)] = offset * 100000000ul + i * 1000000 + j * 10000 + k * 100 + 1;
+                    cu.Nu[cu.index(i, j, k)] = (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100 + 1;
                     cu.O[cu.index(i, j, k)] = true;
                 }
             }
         }
     }
 
+    void generateTestDataHeader(std::ostream &str, std::string fname);
+
+    void generateTestDataFooter(std::ostream &str);
+
     template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-    void generateTestData(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, std::string headerPath, std::string suffix, 
-        bool append = false, unsigned long offset = 0, bool markChanged = false)
+    void generateTestDataForComputeUnit(std::ostream &str, ComputeUnitBase<T, QVecSize, MemoryLayout> &cu,
+                                        unsigned long offset, bool markChanged, bool useOneDigitCoordinates, std::string cuName)
     {
-        std::ios_base::openmode mode = std::ios_base::out;
-        if (append) {
-            mode |= std::ios_base::app;
+        LOG("generateTestDataForComputeUnit: offset = %lu, markChanged = %d, useOneDigitCoordinates = %d\n", offset, markChanged, useOneDigitCoordinates);
+        unsigned long int coordinateDigits = 100;
+        if (useOneDigitCoordinates)
+        {
+            coordinateDigits = 10;
         }
-        std::ofstream hdr(headerPath, mode);
-        hdr << "namespace TestUtils {\n";
-        hdr << "    template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>\n";
-        hdr << "    void fillExpectedComputeUnitValues" << suffix << "(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu) {\n";
-        hdr << "        QVec<T, QVecSize> qTmp;\n";
-        std::string ind47(47, ' ');
-        std::string ind19(19, ' ');
-        std::string ind36(36, ' ');
-        std::string ind23(23, ' ');
-        std::string ind13(13, ' ');
-        std::string ind8(8, ' ');
-        auto m =[&](T v, tNi i, tNi j, tNi k, int l) {
-            std::stringstream ss;
+
+        std::string ind8(7, ' ');
+        auto changed = [&](tNi i, tNi j, tNi k, int l)
+        {
+            return ((((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100 + l != cu.Q[cu.index(i, j, k)].q[l]);
+        };
+        auto m = [&](T v, tNi i, tNi j, tNi k, int l)
+        {
+            std::stringstream ss; 
             ss << std::setw(7) << v << "ul";
-            if ((markChanged) && (offset*100000000ul+i*1000000+j*10000+k*100+l != v)) {
+            if ((markChanged) && changed(i, j, k, l))
+            {
                 ss << "/*C*/";
             }
             return ss.str();
+        };
+        auto changedForce = [&](T f, tNi i, tNi j, tNi k, int l)
+        {
+            return (((offset * coordinateDigits + i) * coordinateDigits + j) * coordinateDigits + k) * 100 + l != f;
         };
         for (tNi i = 0; i < cu.xg; i++)
         {
@@ -235,35 +247,104 @@ namespace ParamsCommon
             {
                 for (tNi k = 0; k < cu.zg; k++)
                 {
-                    hdr << ind47 << " qTmp.q[Q11] = " << m(cu.Q[cu.index(i, j, k)].q[Q11], i, j, k, Q11) << ";\n";
-                    hdr << ind19 << " qTmp.q[Q14] = " << m(cu.Q[cu.index(i, j, k)].q[Q14], i, j, k, Q14) << ";";
-                    hdr << " qTmp.q[Q03] = " << m(cu.Q[cu.index(i, j, k)].q[Q03], i, j, k, Q03) << ";";
-                    hdr << " qTmp.q[Q07] = " << m(cu.Q[cu.index(i, j, k)].q[Q07], i, j, k, Q07) << ";\n";
-                    hdr << ind36 << " qTmp.q[Q17] = " << m(cu.Q[cu.index(i, j, k)].q[Q17], i, j, k, Q17) << ";\n";
+                    std::stringstream currentQupdate;
+                    for (int l = 0; l < D3Q19; l++)
+                    {
 
-                    hdr << ind23 << " qTmp.q[Q16] = " << m(cu.Q[cu.index(i, j, k)].q[Q16], i, j, k, Q16) << ";";
-                    hdr << " qTmp.q[Q05] = " << m(cu.Q[cu.index(i, j, k)].q[Q05], i, j, k, Q05) << ";";
-                    hdr << " qTmp.q[Q09] = " << m(cu.Q[cu.index(i, j, k)].q[Q09], i, j, k, Q09) << ";\n";
-                    hdr << ind19 << " qTmp.q[Q02] = " << m(cu.Q[cu.index(i, j, k)].q[Q02], i, j, k, Q02) << ";" << ind23;
-                    hdr << " qTmp.q[Q01] = " << m(cu.Q[cu.index(i, j, k)].q[Q01], i, j, k, Q01) << ";\n";
-                    hdr << ind13 << " qTmp.q[Q10] = " << m(cu.Q[cu.index(i, j, k)].q[Q10], i, j, k, Q10) << ";";
-                    hdr << " qTmp.q[Q06] = " << m(cu.Q[cu.index(i, j, k)].q[Q06], i, j, k, Q06) << ";";
-                    hdr << " qTmp.q[Q15] = " << m(cu.Q[cu.index(i, j, k)].q[Q15], i, j, k, Q15) << ";\n";
+                        if (changed(i, j, k, l))
+                        {
+                            currentQupdate << ind8 << " qTmp.q[Q" << std::setfill('0') << std::setw(2) << (l + 1) << "] = " 
+                                           << std::setw(0) << std::setfill(' ') << m(cu.Q[cu.index(i, j, k)].q[l], i, j, k, l) << ";\n";
+                        }
+                    }
 
-                    hdr << ind47 << " qTmp.q[Q18] = " << m(cu.Q[cu.index(i, j, k)].q[Q18], i, j, k, Q18) << ";\n";
-                    hdr << ind19 << " qTmp.q[Q08] = " << m(cu.Q[cu.index(i, j, k)].q[Q08], i, j, k, Q08) << ";";
-                    hdr << " qTmp.q[Q04] = " << m(cu.Q[cu.index(i, j, k)].q[Q04], i, j, k, Q04) << ";";
-                    hdr << " qTmp.q[Q13] = " << m(cu.Q[cu.index(i, j, k)].q[Q13], i, j, k, Q13) << ";\n";
-                    hdr << ind36 << " qTmp.q[Q12] = " << m(cu.Q[cu.index(i, j, k)].q[Q12], i, j, k, Q12) << ";\n";
-
-                    hdr << "\n        cu.Q[cu.index(" << i << ", " << j << ", " << k << ")] = qTmp;\n";
-                    hdr << ind8 << "cu.F[cu.index(" << i << ", " << j << ", " << k << ")].x = " << cu.F[cu.index(i, j, k)].x << ";\n";
-                    hdr << ind8 << "cu.F[cu.index(" << i << ", " << j << ", " << k << ")].y = " << cu.F[cu.index(i, j, k)].y << ";\n";
-                    hdr << ind8 << "cu.F[cu.index(" << i << ", " << j << ", " << k << ")].z = " << cu.F[cu.index(i, j, k)].z << ";\n";
+                    if (currentQupdate.rdbuf()->in_avail() > 0)
+                    {
+                        str << ind8 << " qTmp = " << cuName << "Q[" << cuName << "index(" << i << ", " << j << ", " << k << ")];\n";
+                        str << currentQupdate.rdbuf();
+                        str << "        " << cuName << "Q[" << cuName << "index(" << i << ", " << j << ", " << k << ")] = qTmp;\n\n";
+                    }
+                    if (changedForce(cu.F[cu.index(i, j, k)].x, i, j, k, 0))
+                    {
+                        str << ind8 << cuName << "F[" << cuName << "index(" << i << ", " << j << ", " << k << ")].x = " << cu.F[cu.index(i, j, k)].x << ";\n";
+                    }
+                    if (changedForce(cu.F[cu.index(i, j, k)].y, i, j, k, 1))
+                    {
+                        str << ind8 << cuName << "F[" << cuName << "index(" << i << ", " << j << ", " << k << ")].y = " << cu.F[cu.index(i, j, k)].y << ";\n";
+                    }
+                    if (changedForce(cu.F[cu.index(i, j, k)].z, i, j, k, 2))
+                    {
+                        str << ind8 << cuName << "F[" << cuName << "index(" << i << ", " << j << ", " << k << ")].z = " << cu.F[cu.index(i, j, k)].z << ";\n";
+                    }
                 }
             }
         }
-        hdr << "    }\n}\n";
+    }
+
+    template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+    void generateTestData(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, std::string headerPath, std::string suffix,
+                          bool append = false, unsigned long offset = 0, bool markChanged = false, bool useOneDigitCoordinates = false)
+    {
+        std::ios_base::openmode mode = std::ios_base::out;
+        if (append)
+        {
+            mode |= std::ios_base::app;
+        }
+        std::ofstream hdr(headerPath, mode);
+        generateTestDataHeader(hdr, std::string("fillExpectedComputeUnitValues") + suffix);
+        generateTestDataForComputeUnit(hdr, cu, offset, markChanged, useOneDigitCoordinates, std::string("cu."));
+        generateTestDataFooter(hdr);
+
         hdr.close();
     }
+
+#if WITH_MPI == 1
+    void generateTestDataHeaderMpi(std::ostream &str, std::string fname);
+
+    template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, MemoryLayoutType MemoryLayoutHalo>
+    void generateTestDataMpi(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, ComputeUnitBase<T, QVecSize, MemoryLayoutHalo> **halos,
+                             int rank, int numprocs, MPI_Comm comm, std::string headerPath, std::string suffix,
+                             bool markChanged = false, bool useOneDigitCoordinates = false)
+    {
+        std::ofstream *hdr;
+        std::ios_base::openmode mode = std::ios_base::out;
+        if (rank != 0)
+        {
+            mode |= std::ios_base::app;
+        }
+        else
+        {
+            hdr = new std::ofstream(headerPath, mode);
+        }
+        MPI_Barrier(comm);
+        for (int i = 0; i < numprocs; i++)
+        {
+            if (rank == i)
+            {
+                if (i != 0)
+                {
+                    hdr = new std::ofstream(headerPath, mode);
+                }
+                if (i == 0)
+                {
+                    generateTestDataHeaderMpi(*hdr, std::string("fillExpectedComputeUnitValues") + suffix);
+                }
+                (*hdr) << "    if (Mpi.rank == " << rank << ") {\n";
+                generateTestDataForComputeUnit(*hdr, cu, rank * 100, markChanged, useOneDigitCoordinates, std::string("cu."));
+                for (int j = 0; j < D3Q27; j++)
+                {
+                    generateTestDataForComputeUnit(*hdr, *halos[j], rank * 100 + j + 1, markChanged, useOneDigitCoordinates,
+                                                   std::string("halos[") + std::to_string(j) + std::string("]->"));
+                }
+                (*hdr) << "    }\n";
+                if (i == numprocs - 1)
+                {
+                    generateTestDataFooter(*hdr);
+                }
+                hdr->close();
+            }
+            MPI_Barrier(comm);
+        }
+    }
+#endif
 }
