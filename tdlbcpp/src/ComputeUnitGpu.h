@@ -33,7 +33,7 @@ public:
     bool *devExcludeOutputPoints;
 
     ComputeUnitArchitectureCommonGPU();
-    ComputeUnitArchitectureCommonGPU(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
+    ComputeUnitArchitectureCommonGPU(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree, bool allocate=true);
     ComputeUnitArchitectureCommonGPU(ComputeUnitArchitectureCommonGPU &&) noexcept;
     void checkEnoughMemory();
     virtual void allocateMemory();

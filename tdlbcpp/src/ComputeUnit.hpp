@@ -101,22 +101,19 @@ template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::architectureInit() {}
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams, bool reallocate) {
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams, bool allocate) {
 
     initParams(cuParams);
 
-    size_t new_size = size_t(xg) * yg * zg;
-    if (reallocate && (new_size == size)) {
-        reallocate = false;
-    }
-    size = new_size;
+    size_t newSize = size_t(xg) * yg * zg;
+    bool sizeChanged = (newSize != size);
+    size = newSize;
 
-    if (reallocate) {
+    if (sizeChanged && allocate) {
         freeMemory();
+        allocateMemory();
     }
     evenStep = true;
-
-    allocateMemory();
 
     architectureInit();
 }
@@ -126,8 +123,13 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree):flow(flow), outputTree(outputTree){
-    init(cuParams, false);
+ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, bool allocate):flow(flow), outputTree(outputTree){
+    size = 0;
+    O = nullptr;
+    Nu = nullptr;
+    F = nullptr;
+    ExcludeOutputPoints = nullptr;
+    init(cuParams, allocate);
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>

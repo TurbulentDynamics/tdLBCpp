@@ -84,7 +84,7 @@ public:
     bool evenStep;
 
     ComputeUnitBase();
-    ComputeUnitBase(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
+    ComputeUnitBase(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree, bool allocateMemory=true);
     ComputeUnitBase(const ComputeUnitBase &) = delete;
     ComputeUnitBase(ComputeUnitBase &&) noexcept;
     ComputeUnitBase& operator=(const ComputeUnitBase &) = delete;

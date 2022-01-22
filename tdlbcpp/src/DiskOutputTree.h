@@ -157,7 +157,9 @@ public:
         grid = grid1.getJson();
     }
 
-
+    void setFlowParams(Json::Value flow1) {
+        flow = flow1;
+    }
 
     void setRunningParams(RunningParams running1){
         running = running1.getJson();
@@ -308,7 +310,7 @@ public:
             runningDataFile << text;
         } else {
 
-            cout << "Error: runningFile not open ";
+            cout << "Error: runningFile " << runningDataPath << " not open " << endl;
             cout << "Trying to print -> " << text << "<-" << endl;
         }
     }

@@ -172,14 +172,14 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::ComputeUnitArchitectureCommonGPU(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree) : 
-    ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>(cuParams, flow, outputTree)
+ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::ComputeUnitArchitectureCommonGPU(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, bool allocate) :
+    ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>(cuParams, flow, outputTree, allocate)
 {
     gpuThis = nullptr;
     std::cout << "gpuThis = " << gpuThis << std::endl;
     gpuGeomSize = 0;
     gpuGeom = nullptr;
-    init(cuParams, false);
+    init(cuParams, allocate);
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
