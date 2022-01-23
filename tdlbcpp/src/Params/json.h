@@ -1177,9 +1177,9 @@ private:
 
   struct {
     // Really a ValueType, but types should agree for bitfield packing.
-    unsigned int value_type_ : 8;
+    unsigned int value_type_;// : 8;
     // Unless allocated_, string_ must be null-terminated.
-    unsigned int allocated_ : 1;
+    unsigned int allocated_;//: 1;
   } bits_;
 
   class Comments {
