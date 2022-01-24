@@ -1,5 +1,9 @@
 #include "gtest/gtest.h"
 
+#if WITH_MPI == 1
+#include <mpi.h>
+#endif
+
 #include "Header.h"
 #include "ParamsCommon.hpp"
 #include "Params/CheckpointParams.hpp"
@@ -403,4 +407,27 @@ namespace ParamsCommon
             checkAllFields(expected.volumes[i], actual.volumes[i]);
         }
     }
+
+    void generateTestDataHeader(std::ostream &str, std::string fname)
+    {
+        str << "namespace TestUtils {\n";
+        str << "    template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>\n";
+        str << "    void " << fname << "(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu) {\n";
+        str << "        QVec<T, QVecSize> qTmp;\n";
+    }
+
+    void generateTestDataFooter(std::ostream &str)
+    {
+        str << "    }\n}\n";
+    }
+
+#if WITH_MPI == 1
+    void generateTestDataHeaderMpi(std::ostream &str, std::string fname)
+    {
+        str << "namespace TestUtils {\n";
+        str << "    template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, MemoryLayoutType MemoryLayoutHalo>\n";
+        str << "    void " << fname << "(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, ComputeUnitBase<T, QVecSize, MemoryLayoutHalo> **halos) {\n";
+        str << "        QVec<T, QVecSize> qTmp;\n";
+    }
+#endif
 }

@@ -11,7 +11,6 @@ public:
     using Base = ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>;
     using Current = ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>;
     using typename Base::Fld;
-    using Base::Base;
     using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1;
     using Base::F; using Base::index; using Base::Q; using Base::Nu;
     using Base::size; using Base::O; using Base::deviceID; using Base::ExcludeOutputPoints;
@@ -33,8 +32,11 @@ public:
     bool *devExcludeOutputPoints;
 
     ComputeUnitArchitectureCommonGPU();
-    ComputeUnitArchitectureCommonGPU(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree);
+    ComputeUnitArchitectureCommonGPU(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree, bool allocate=true);
     ComputeUnitArchitectureCommonGPU(ComputeUnitArchitectureCommonGPU &&) noexcept;
+    ComputeUnitArchitectureCommonGPU(const ComputeUnitArchitectureCommonGPU &) = delete;
+    ComputeUnitArchitectureCommonGPU& operator=(const ComputeUnitArchitectureCommonGPU &) = delete;
+    ComputeUnitArchitectureCommonGPU& operator=(ComputeUnitArchitectureCommonGPU &&) noexcept = delete;
     void checkEnoughMemory();
     virtual void allocateMemory();
     virtual void freeMemory();

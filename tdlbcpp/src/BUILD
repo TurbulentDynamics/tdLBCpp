@@ -21,7 +21,7 @@ config_setting(
     name = "generate_hpp_%d" % order,
     srcs = [inputFile],
     outs = [inputFile.replace(".gyb", "")],
-    cmd = "$(location @gyb//bin:gyb) -o ../../$@ $<",
+    cmd = "$(location @gyb//bin:gyb) $< > $@",
     tools = ["@gyb//bin:gyb"]
 ) for (inputFile, order) in [("StreamingSimple.cuh.gyb", 1)]]
 
