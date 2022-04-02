@@ -21,7 +21,7 @@ struct QVecAccessBase<T, QVecSize, MemoryLayoutIJKL>
 
     HOST_DEVICE_GPU QVecAccessBase(T *Q, tNi index) : q(Q + index * QVecSize) {}
 
-    inline T &operator[](tNi l)
+    inline HOST_DEVICE_GPU T &operator[](tNi l)
     {
         return q[l];
     }
@@ -46,7 +46,7 @@ struct SparseArray
 {
     T *q;
     size_t step;
-    SparseArray(T *q, size_t step) : q(q), step(step) {}
+    HOST_DEVICE_GPU SparseArray(T *q, size_t step) : q(q), step(step) {}
     inline HOST_DEVICE_GPU T &operator[](tNi l)
     {
         return q[l * step];
