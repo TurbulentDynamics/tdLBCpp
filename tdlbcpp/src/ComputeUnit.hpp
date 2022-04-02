@@ -481,7 +481,7 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexPreviousResolution(t
 {
     tNi factor = 2;
 
-    tNi fromXG = x / factor + ghost * 2;
+    
     tNi fromYG = y / factor + ghost * 2;
     tNi fromZG = z / factor + ghost * 2;
 
@@ -490,6 +490,8 @@ tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::indexPreviousResolution(t
     tNi fromK = (k/factor + k % factor);
 
 #ifdef DEBUG
+
+    tNi fromXG = x / factor + ghost * 2;
 
     if ((fromI>=fromXG) || (fromJ>=fromYG) || (fromK>=fromZG)) {
         std::cout << "Index Error  " << i <<" "<< xg <<" "<< j <<" "<< yg <<" "<< k <<" "<< zg << std::endl;

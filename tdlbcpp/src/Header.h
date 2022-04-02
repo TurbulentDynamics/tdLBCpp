@@ -14,7 +14,7 @@
 #define HOST_DEVICE_GPU __host__ __device__
 #endif
 
-#define DEBUG_LOG
+//#define DEBUG_LOG
 
 //Debug trace
 #ifdef DEBUG_LOG

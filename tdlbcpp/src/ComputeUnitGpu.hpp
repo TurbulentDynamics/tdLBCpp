@@ -152,8 +152,8 @@ template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision col
 void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::architectureInit()
 {
 
-    int threads_per_warp = 32;
-    int max_threads_per_block = 512;
+    //int threads_per_warp = 32;
+    //int max_threads_per_block = 512;
 
     int xthreads_per_block = 8;
     int ythreads_per_block = 8;
