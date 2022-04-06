@@ -59,7 +59,7 @@ public:
 
     void checkpoint_read(std::string dirname, std::string unit_name);
 
-    ~ComputeUnitArchitectureCommonGPU();
+    virtual ~ComputeUnitArchitectureCommonGPU();
 };
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
