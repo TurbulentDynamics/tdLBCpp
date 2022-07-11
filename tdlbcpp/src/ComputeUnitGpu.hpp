@@ -173,7 +173,7 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::ComputeUnitArchitectureCommonGPU(ComputeUnitParams cuParams, FlowParams<T> flow, DiskOutputTree outputTree, bool allocate) :
-    gpuThis(nullptr), gpuGeomSize(0), gpuGeom(nullptr),
+    gpuThis(nullptr), gpuGeomSize(0), gpuGeom(nullptr), VortXZ(nullptr), VortXY(nullptr),
     ComputeUnitStreaming<T, QVecSize, MemoryLayout, collisionType, streamingType>(cuParams, flow, outputTree, false)
 {
     size = 0;
