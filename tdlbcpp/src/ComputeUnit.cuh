@@ -31,7 +31,6 @@ __global__ void setQToZero(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu){
 };
 
 
-
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 __global__ void setRhoTo(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, T initialRho){
 
@@ -44,6 +43,28 @@ __global__ void setRhoTo(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, T initi
     }
 
     cu.Q[cu.index(i, j, k)].q[MRHO] = initialRho;
+};
+
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+__global__ int containsErrorsInQ(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu){
+
+    //TOFIX: This is not correct
+
+    tNi i = blockIdx.x * blockDim.x + threadIdx.x;
+    tNi j = blockIdx.y * blockDim.y + threadIdx.y;
+    tNi k = blockIdx.z * blockDim.z + threadIdx.z;
+
+    if (i >= cu.xg || j >= cu.yg || k >= cu.zg) {
+        return;
+    }
+
+    int numErrors = 0;
+    for (tNi l = 0; l < QVecSize; l++){
+        if (isnan(cu.Q[cu.index(i,j,k)].q[l])) numErrors ++;
+        if (isinf(cu.Q[cu.index(i,j,k)].q[l])) numErrors ++;
+    }
+    return numErrors;
 };
 
 

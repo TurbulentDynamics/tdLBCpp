@@ -29,6 +29,7 @@ public:
     PosPolar<tNi, T> *gpuGeom;
     T *VortXZ;
     T *VortXY;
+    T *VortYZ;
     bool *devExcludeOutputPoints;
 
     ComputeUnitArchitectureCommonGPU();
@@ -48,8 +49,9 @@ public:
     //virtual void moments();
     //virtual void bounceBackBoundary();
     //virtual void streamingPush();
-    virtual void calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression);
     virtual void calcVorticityXY(tNi k, RunningParams runParam, int jpegCompression);
+    virtual void calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression);
+    virtual void calcVorticityYZ(tNi i, RunningParams runParam, int jpegCompression);
 
     virtual void setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
     virtual void setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);

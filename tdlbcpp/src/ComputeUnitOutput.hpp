@@ -109,92 +109,6 @@ static inline std::string formatStep(tStep step){
 
 
 
-
-template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression){
-    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
-
-    T *Vort = new T[size];
-    bool minInitialized = false, maxInitialized = false;
-    T max = 0, min = 0;
-
-    for (tNi i = 1;  i <= xg1; i++) {
-
-        for (tNi k = 1; k <= zg1; k++) {
-
-
-            if (ExcludeOutputPoints[index(i,j,k)] == true) continue;
-
-
-            QVec<T, QVecSize> qDirnQ05 = AF::read(*this, i, j, k + 1);
-            QVec<T, QVecSize> qDirnQ06 = AF::read(*this, i, j, k - 1);
-            T uxy = T(0.5) * (qDirnQ05.velocity().x - qDirnQ06.velocity().x);
-            QVec<T, QVecSize> qDirnQ03 = AF::read(*this, i, j + 1, k);
-            QVec<T, QVecSize> qDirnQ04 = AF::read(*this, i, j - 1, k);
-            T uxz = T(0.5) * (qDirnQ03.velocity().x - qDirnQ04.velocity().x);
-
-            QVec<T, QVecSize> qDirnQ01 = AF::read(*this, i + 1, j, k);
-            QVec<T, QVecSize> qDirnQ02 = AF::read(*this, i - 1, j, k);
-            T uyx = T(0.5) * (qDirnQ01.velocity().y - qDirnQ02.velocity().y);
-            T uyz = T(0.5) * (qDirnQ03.velocity().y - qDirnQ04.velocity().y);
-
-
-            T uzx = T(0.5) * (qDirnQ01.velocity().z - qDirnQ02.velocity().z);
-            T uzy = T(0.5) * (qDirnQ05.velocity().z - qDirnQ06.velocity().z);
-
-
-            T uxyuyx = uxy - uyx;
-            T uyzuzy = uyz - uzy;
-            T uzxuxz = uzx - uxz;
-
-            Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
-
-            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!minInitialized || Vort[index(i,j,k)] < min)) {
-                min = Vort[index(i,j,k)];
-                minInitialized = true;
-            }
-            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!maxInitialized || Vort[index(i,j,k)] > max)) {
-                max = Vort[index(i,j,k)];
-                maxInitialized = true;
-            }
-        }
-    }
-
-    // Saving JPEG
-    auto *pict = new unsigned char[xg1 * zg1];
-
-
-    //Set at min max on step 74, for nx=80, slowstart=200
-    //TODO: Fix
-    //    min = -25.5539;
-    //    max = -0.681309;
-
-
-
-    for (tNi i = 1;  i <= xg1; i++) {
-        for (tNi k = 1; k <= zg1; k++) {
-            pict[zg1 * (i - 1) + (k - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
-        }
-    }
-
-    std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, j);
-
-    std::string jpegPath = plotDir + ".jpeg";
-
-
-    TooJpeg::openJpeg(jpegPath);
-    TooJpeg::writeJpeg(pict, xg1, zg1,
-                       false, 100, false, "Debug");
-    TooJpeg::closeJpeg();
-
-    delete[] Vort;
-    delete[] pict;
-}
-
-
-
-
-
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXY(tNi k, RunningParams runParam, int jpegCompression){
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
@@ -250,16 +164,9 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
     auto *pict = new unsigned char[xg1 * yg1];
 
 
-    //Set at min max on step 74, for nx=80, slowstart=200
-    //TODO: Fix
-    //    min = -25.5539;
-    //    max = -0.681309;
-
-
-
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi j = 1; j <= yg1; j++) {
-            pict[(i - 1) + xg1 * (j - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+            pict[xg1 * (j - 1) + (i - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
         }
     }
 
@@ -282,9 +189,166 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 }
 
 
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression){
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+
+    T *Vort = new T[size];
+    bool minInitialized = false, maxInitialized = false;
+    T max = 0, min = 0;
+
+    for (tNi i = 1;  i <= xg1; i++) {
+
+        for (tNi k = 1; k <= zg1; k++) {
+
+
+            if (ExcludeOutputPoints[index(i,j,k)] == true) continue;
+
+
+            QVec<T, QVecSize> qDirnQ05 = AF::read(*this, i, j, k + 1);
+            QVec<T, QVecSize> qDirnQ06 = AF::read(*this, i, j, k - 1);
+            T uxy = T(0.5) * (qDirnQ05.velocity().x - qDirnQ06.velocity().x);
+            QVec<T, QVecSize> qDirnQ03 = AF::read(*this, i, j + 1, k);
+            QVec<T, QVecSize> qDirnQ04 = AF::read(*this, i, j - 1, k);
+            T uxz = T(0.5) * (qDirnQ03.velocity().x - qDirnQ04.velocity().x);
+
+            QVec<T, QVecSize> qDirnQ01 = AF::read(*this, i + 1, j, k);
+            QVec<T, QVecSize> qDirnQ02 = AF::read(*this, i - 1, j, k);
+            T uyx = T(0.5) * (qDirnQ01.velocity().y - qDirnQ02.velocity().y);
+            T uyz = T(0.5) * (qDirnQ03.velocity().y - qDirnQ04.velocity().y);
+
+
+            T uzx = T(0.5) * (qDirnQ01.velocity().z - qDirnQ02.velocity().z);
+            T uzy = T(0.5) * (qDirnQ05.velocity().z - qDirnQ06.velocity().z);
+
+
+            T uxyuyx = uxy - uyx;
+            T uyzuzy = uyz - uzy;
+            T uzxuxz = uzx - uxz;
+
+            Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
+
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!minInitialized || Vort[index(i,j,k)] < min)) {
+                min = Vort[index(i,j,k)];
+                minInitialized = true;
+            }
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!maxInitialized || Vort[index(i,j,k)] > max)) {
+                max = Vort[index(i,j,k)];
+                maxInitialized = true;
+            }
+        }
+    }
+
+    // Saving JPEG
+    auto *pict = new unsigned char[xg1 * zg1];
+
+
+    for (tNi i = 1;  i <= xg1; i++) {
+        for (tNi k = 1; k <= zg1; k++) {
+            pict[zg1 * (i - 1) + (k - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+        }
+    }
+    
+    
+
+    std::string plotDir = outputTree.formatXZPlaneDir(runParam.step, j);
+
+    std::string jpegPath = plotDir + ".jpeg";
+
+
+    TooJpeg::openJpeg(jpegPath);
+    TooJpeg::writeJpeg(pict, xg1, zg1,
+                       false, 100, false, "Debug");
+    TooJpeg::closeJpeg();
+
+    delete[] Vort;
+    delete[] pict;
+}
 
 
 
+
+template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityYZ(tNi i, RunningParams runParam, int jpegCompression){
+    using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
+
+    T *Vort = new T[size];
+    bool minInitialized = false, maxInitialized = false;
+    T max = 0, min = 0;
+
+    for (tNi j = 1;  j <= yg1; j++) {
+
+        for (tNi k = 1; k <= zg1; k++) {
+
+
+            if (ExcludeOutputPoints[index(i,j,k)] == true) continue;
+
+
+            QVec<T, QVecSize> qDirnQ05 = AF::read(*this, i, j, k + 1);
+            QVec<T, QVecSize> qDirnQ06 = AF::read(*this, i, j, k - 1);
+            T uxy = T(0.5) * (qDirnQ05.velocity().x - qDirnQ06.velocity().x);
+            QVec<T, QVecSize> qDirnQ03 = AF::read(*this, i, j + 1, k);
+            QVec<T, QVecSize> qDirnQ04 = AF::read(*this, i, j - 1, k);
+            T uxz = T(0.5) * (qDirnQ03.velocity().x - qDirnQ04.velocity().x);
+
+            QVec<T, QVecSize> qDirnQ01 = AF::read(*this, i + 1, j, k);
+            QVec<T, QVecSize> qDirnQ02 = AF::read(*this, i - 1, j, k);
+            T uyx = T(0.5) * (qDirnQ01.velocity().y - qDirnQ02.velocity().y);
+            T uyz = T(0.5) * (qDirnQ03.velocity().y - qDirnQ04.velocity().y);
+
+
+            T uzx = T(0.5) * (qDirnQ01.velocity().z - qDirnQ02.velocity().z);
+            T uzy = T(0.5) * (qDirnQ05.velocity().z - qDirnQ06.velocity().z);
+
+
+            T uxyuyx = uxy - uyx;
+            T uyzuzy = uyz - uzy;
+            T uzxuxz = uzx - uxz;
+
+            Vort[index(i,j,k)] = T(log(T(uyzuzy * uyzuzy + uzxuxz * uzxuxz + uxyuyx * uxyuyx)));
+
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!minInitialized || Vort[index(i,j,k)] < min)) {
+                min = Vort[index(i,j,k)];
+                minInitialized = true;
+            }
+            if (!std::isinf(Vort[index(i,j,k)]) && !std::isnan(Vort[index(i,j,k)]) && (!maxInitialized || Vort[index(i,j,k)] > max)) {
+                max = Vort[index(i,j,k)];
+                maxInitialized = true;
+            }
+        }
+    }
+
+    // Saving JPEG
+    auto *pict = new unsigned char[yg1 * zg1];
+
+
+    for (tNi j = 1;  j <= yg1; j++) {
+        for (tNi k = 1; k <= zg1; k++) {
+            pict[yg1 * (k - 1) + (j - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+        }
+    }
+        
+
+    std::string plotDir = outputTree.formatYZPlaneDir(runParam.step, i);
+
+    std::string jpegPath = plotDir + ".jpeg";
+
+
+    TooJpeg::openJpeg(jpegPath);
+    TooJpeg::writeJpeg(pict, yg1, zg1,
+                       false, 100, false, "Debug");
+    TooJpeg::closeJpeg();
+
+    delete[] Vort;
+    delete[] pict;
+}
+
+
+
+
+
+
+//TODO: Finish
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams running)
 {
@@ -319,7 +383,6 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
 
             savePlaneXZ<float, 4>(xz, binFormat, running);
 
-            //FOR DEBUGGING
 //            calcVorticityXZ(xz.cutAt, running, xz.jpegCompression);
         }
     }

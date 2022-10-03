@@ -273,6 +273,8 @@ double angle 0
 tStep num_steps 20
 tStep impellerStartupStepsUntilNormalSpeed 30
 
+tStep repeatCheckForErrors 100
+
 tStep numStepsForAverageCalc 10
 tStep repeatPrintTimerToFile 20
 tStep repeatPrintTimerToStdOut 10
@@ -322,20 +324,26 @@ std::string QDataType float
 int QOutputLength 4
 """)
 
+
 class CheckpointParams(ParamsBase):
     def __init__(self):
         super().__init__("""
 
 bool startWithCheckpoint false
 std::string checkpointLoadFromDir notSet
-
+        
 int checkpointRepeat 10
 std::string checkpointWriteRootDir .
 std::string checkpointWriteDirPrefix debug
 bool checkpointWriteDirAppendTime true
 
 """)
-
+        self.extra_methods = """
+    bool hasOutputThisStep(tStep step){
+        if (checkpointRepeat && (step % checkpointRepeat == 0)) return true;
+        return false;
+    }
+"""
 
 class ComputeUnitParams(ParamsBase):
     def __init__(self):
@@ -376,6 +384,9 @@ std::string strCompileFlag notSet
 """
 
 
+
+        
+
 class OrthoPlaneParams(ParamsBase):
     def __init__(self):
         super().__init__("""
@@ -390,6 +401,13 @@ tStep start_at_step 0
 tStep end_at_step 0
 """)
 
+        self.extra_methods = """
+    bool hasOutputThisStep(tStep step){
+        if (repeat && (step >= start_at_step) && ((step - start_at_step) % repeat == 0)) return true;
+        else return false;
+    }
+"""
+
 
 class OrthoPlaneVorticityParams(ParamsBase):
     def __init__(self):
@@ -402,6 +420,13 @@ tStep repeat 0
 tStep start_at_step 0
 tStep end_at_step 0
 """)
+
+        self.extra_methods = """
+    bool hasOutputThisStep(tStep step){
+        if (repeat && (step >= start_at_step) && ((step - start_at_step) % repeat == 0)) return true;
+        else return false;
+    }
+"""
 
 
 class VolumeParams(ParamsBase):
@@ -418,6 +443,14 @@ bool use_half_float false
 std::string QDataType float
 """)
 
+        self.extra_methods = """
+    bool hasOutputThisStep(tStep step){
+        if (repeat && (step >= start_at_step) && ((step - start_at_step) % repeat == 0)) return true;
+        else return false;
+    }
+"""
+
+
 class AngleParams(ParamsBase):
     def __init__(self):
         super().__init__("""
@@ -432,6 +465,14 @@ bool use_half_float false
 
 std::string QDataType float
 """)
+
+        self.extra_methods = """
+    bool hasOutputThisStep(tStep step){
+        if (repeat && (step >= start_at_step) && ((step - start_at_step) % repeat == 0)) return true;
+        else return false;
+    }
+"""
+
 
 class PlaneAtAngleParams(ParamsBase):
     def __init__(self):
@@ -448,6 +489,13 @@ bool use_half_float false
 
 std::string QDataType float
 """)
+
+        self.extra_methods = """
+    bool hasOutputThisStep(tStep step){
+        if (repeat && (step >= start_at_step) && ((step - start_at_step) % repeat == 0)) return true;
+        else return false;
+    }
+"""
 
 
 class SectorParams(ParamsBase):
@@ -467,6 +515,12 @@ bool use_half_float false
 std::string QDataType float
 """)
 
+        self.extra_methods = """
+    bool hasOutputThisStep(tStep step){
+        if (repeat && (step >= start_at_step) && ((step - start_at_step) % repeat == 0)) return true;
+        else return false;
+    }
+"""
 
 
 class OutputParams(ParamsBase):
@@ -476,6 +530,7 @@ std::string outputRootDir debug_output_dir
 """)
 
         self.ortho_plane_objs = list()
+        self.ortho_plane_vort_objs = list()
         self.volume_objs = list()
         self.angle_objs = list()
         self.plane_at_angle_objs = list()
@@ -488,6 +543,33 @@ std::string outputRootDir debug_output_dir
 #include "AngleParams.hpp"
 #include "PlaneAtAngleParams.hpp"
 #include "SectorParams.hpp"
+"""
+
+        self.extra_methods = """
+    bool hasOutputThisStep(tStep step){
+
+        for (auto xy: XY_planes){
+            if (xy.hasOutputThisStep(step)) return true;
+        }
+        for (auto xz: XZ_planes){
+            if (xz.hasOutputThisStep(step)) return true;
+        }
+        for (auto yz: YZ_planes){
+            if (yz.hasOutputThisStep(step)) return true;
+        }
+
+        for (auto xy: XY_vorticity_planes){
+            if (xy.hasOutputThisStep(step)) return true;
+        }
+        for (auto xz: XZ_vorticity_planes){
+            if (xz.hasOutputThisStep(step)) return true;
+        }
+        for (auto yz: YZ_vorticity_planes){
+            if (yz.hasOutputThisStep(step)) return true;
+        }
+
+        return false;
+    }
 """
 
     @property
@@ -508,6 +590,7 @@ std::string outputRootDir debug_output_dir
 
 
         upsert_level2(self.ortho_plane_objs)
+        upsert_level2(self.ortho_plane_vort_objs)
         upsert_level2(self.volume_objs)
         upsert_level2(self.angle_objs)
         upsert_level2(self.plane_at_angle_objs)
@@ -518,45 +601,59 @@ std::string outputRootDir debug_output_dir
 
     def add_debug_output(self, grid):
 
-#        orthoPlaneXY = OrthoPlaneParams()
-#        orthoPlaneXY.struct_name = "XY_planes"
-#        orthoPlaneXY.cutAt = grid.z / 2
-#        orthoPlaneXY.repeat = 20
-#        orthoPlaneXY.name_root = "plot_slice"
-#
-#        self.ortho_plane_objs.append(orthoPlaneXY)
-#
-#        orthoPlaneXZ = OrthoPlaneParams()
-#        orthoPlaneXZ.struct_name = "XZ_planes"
-#        orthoPlaneXZ.cutAt = grid.y / 3 * 2
-#        orthoPlaneXZ.repeat = 20
-#        orthoPlaneXZ.name_root = "plot_axis"
-#
-#        self.ortho_plane_objs.append(orthoPlaneXZ)
+        orthoPlaneXY = OrthoPlaneParams()
+        orthoPlaneXY.struct_name = "XY_planes"
+        orthoPlaneXY.cutAt = grid.z / 2
+        orthoPlaneXY.repeat = 20
+        orthoPlaneXY.name_root = "plot_XY"
 
+        self.ortho_plane_objs.append(orthoPlaneXY)
 
+        orthoPlaneXZ = OrthoPlaneParams()
+        orthoPlaneXZ.struct_name = "XZ_planes"
+        orthoPlaneXZ.cutAt = grid.y / 3 * 2
+        orthoPlaneXZ.repeat = 20
+        orthoPlaneXZ.name_root = "plot_slice"
+
+        self.ortho_plane_objs.append(orthoPlaneXZ)
+
+        orthoPlaneYZ = OrthoPlaneParams()
+        orthoPlaneYZ.struct_name = "YZ_planes"
+        orthoPlaneYZ.cutAt = grid.x / 2
+        orthoPlaneYZ.repeat = 20
+        orthoPlaneYZ.name_root = "plot_YZ"
+
+        self.ortho_plane_objs.append(orthoPlaneYZ)
 
 
         orthoPlaneVorticityXY = OrthoPlaneVorticityParams()
         orthoPlaneVorticityXY.struct_name = "XY_vorticity_planes"
         orthoPlaneVorticityXY.cutAt = int(grid.z / 2)
         orthoPlaneVorticityXY.repeat = 1
-        orthoPlaneVorticityXY.name_root = "vort_slice"
+        orthoPlaneVorticityXY.name_root = "vort_axis"
         orthoPlaneVorticityXY.jpegCompression = 100
 
-        self.ortho_plane_objs.append(orthoPlaneVorticityXY)
-
+        self.ortho_plane_vort_objs.append(orthoPlaneVorticityXY)
 
 
         orthoPlaneVorticityXZ = OrthoPlaneVorticityParams()
         orthoPlaneVorticityXZ.struct_name = "XZ_vorticity_planes"
         orthoPlaneVorticityXZ.cutAt = int(grid.y / 3 * 2)
         orthoPlaneVorticityXZ.repeat = 1
-        orthoPlaneVorticityXZ.name_root = "vort_axis"
+        orthoPlaneVorticityXZ.name_root = "vort_slice"
         orthoPlaneVorticityXZ.jpegCompression = 100
 
-        self.ortho_plane_objs.append(orthoPlaneVorticityXZ)
+        self.ortho_plane_vort_objs.append(orthoPlaneVorticityXZ)
 
+
+        orthoPlaneVorticityYZ = OrthoPlaneVorticityParams()
+        orthoPlaneVorticityYZ.struct_name = "YZ_vorticity_planes"
+        orthoPlaneVorticityYZ.cutAt = int(grid.x / 2)
+        orthoPlaneVorticityYZ.repeat = 1
+        orthoPlaneVorticityYZ.name_root = "vort_YZ"
+        orthoPlaneVorticityYZ.jpegCompression = 100
+
+        self.ortho_plane_vort_objs.append(orthoPlaneVorticityYZ)
 
 
 if __name__ == '__main__':
@@ -586,9 +683,9 @@ if __name__ == '__main__':
 
     out = OrthoPlaneParams()
     out.cpp_file()
+    
     out = OrthoPlaneVorticityParams()
     out.cpp_file()
-
 
     out = VolumeParams()
     out.cpp_file()
@@ -602,5 +699,7 @@ if __name__ == '__main__':
     out = SectorParams()
     out.cpp_file()
 
-
+# TODO: FInish this
+#    out = OutputParams()
+#    out.cpp_file()
 

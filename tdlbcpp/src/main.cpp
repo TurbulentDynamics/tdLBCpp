@@ -329,193 +329,141 @@ int main(int argc, char* argv[]){
     outputTree.writeAllParamsJson(binFormat, running, outputTree.runningDataPath);
 
 
-
+    int foundErrors = 0;
+    int numStepsAfterFirstError = 0;
+    
     for (tStep step=running.step; step<=running.num_steps; step++) {
-
+        
         mainTimer.start_epoch();
         double main_time = mainTimer.time_now();
         double total_time = mainTimer.time_now();
-
+        
         running.incrementStep();
-
-
-
-
+        
+        
+        
+        
         // MARK: INCREASE RESOLUTION
-
+        
         if (running.step == running.doubleResolutionAtStep){
-
+            
             std::stringstream text;
             text << std::endl << std::endl << "INCREASING RESOLUTION FROM grid.x " << lb->x;
-
+            
             lb->doubleResolutionFullCU();
-
+            
             text << " TO " <<  lb->x << std::endl << std::endl << std::endl;
             outputTree.writeToRunningDataFileAndPrint(text.str());
-
-
+            
+            
             rt = RushtonTurbine((int)lb->x);
             flow.calcNuAndRe_m(rt.impellers[0].blades.outerRadius);
             flow.printParams();
-
-
+            
+            
             e = Extents<tNi>(0, lb->x, 0, lb->y, 0, lb->z);
-
+            
             //Alternate calculation for geometry
             //    RushtonTurbineMidPointCPP<tNi> geom = RushtonTurbineMidPointCPP<tNi>(rt, e);
-
+            
             geom = RushtonTurbinePolarCPP<tNi, useQVecPrecision>(rt, e);
             useQVecPrecision deltaRunningAngleSTART = geom.calcThisStepImpellerIncrement(running.step);
             running.angle += deltaRunningAngleSTART;
-
+            
             geom.impellerStartupStepsUntilNormalSpeed = running.impellerStartupStepsUntilNormalSpeed;
             deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
-
+            
             geom.generateFixedGeometry(onSurface);
             geomFixed = geom.returnFixedGeometry();
-
-
+            
+            
             geom.generateRotatingNonUpdatingGeometry(deltaRunningAngleSTART, surfaceAndInternal);
             geomRotatingNonUpdating = geom.returnRotatingNonUpdatingGeometry();
-
-
+            
+            
             geom.generateRotatingGeometry(running.angle, deltaRunningAngleSTART, surfaceAndInternal);
             geomRotating = geom.returnRotatingGeometry();
-
-
+            
+            
             geomFORCING = geomFixed;
             geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
             geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );
-
+            
             lb->forcing(geomFORCING, flow.alpha, flow.beta);
-
+            
             lb->setOutputExcludePoints(geomFixed);
             externalPoints = geom.getExternalPoints();
             lb->setOutputExcludePoints(externalPoints);
-
-
+            
+            
             output.updateParamsOnResolutionDouble();
-
+            
         }
-
-
-
-
+        
+        
+        
+        
         // MARK: GEOMETRY UPDATE
-
+        
         useQVecPrecision deltaRunningAngle = geom.calcThisStepImpellerIncrement(running.step);
         running.angle += deltaRunningAngle;
-
+        
         if (step < running.impellerStartupStepsUntilNormalSpeed) {
-
+            
             std::stringstream sstream;
             sstream << "Angle " << fixed << std::setw(6) << std::setprecision(4) << running.angle << "  deltaRunningAngle " << deltaRunningAngle << std::endl;
             outputTree.writeToRunningDataFileAndPrint(sstream.str());
         }
-
-
-
+        
+        
+        
         std::vector<PosPolar<tNi, useQVecPrecision>> geomFORCING = geomFixed;
         geomFORCING.insert( geomFORCING.end(), geomRotatingNonUpdating.begin(), geomRotatingNonUpdating.end() );
-
+        
         geom.updateRotatingGeometry(running.angle, deltaRunningAngle, surfaceAndInternal);
         std::vector<PosPolar<tNi, useQVecPrecision>> geomRotating = geom.returnRotatingGeometry();
         geomFORCING.insert( geomFORCING.end(), geomRotating.begin(), geomRotating.end() );
-
-
+        
+        
         main_time = mainTimer.check(0, 0, main_time, "updateRotatingGeometry");
-
-
-
-
+        
+        
+        
+        
         // MARK: COLLISION AND STREAMING
-
-
-
+        
+        
+        
         lb->collision();
         main_time = mainTimer.check(0, 1, main_time, "Collision");
-
-
+        
+        
         lb->bounceBackBoundary();
         main_time = mainTimer.check(0, 2, main_time, "BounceBack");
-
-
+        
+        
         lb->streamingPush();
         main_time = mainTimer.check(0, 3, main_time, "Streaming");
-
-
+        
+        
         lb->moments();
         main_time = mainTimer.check(0, 4, main_time, "Moments");
-
-
+        
+        
         lb->forcing(geomFORCING, flow.alpha, flow.beta);
         main_time = mainTimer.check(0, 5, main_time, "Forcing");
-
-
-
-
-
-
-        // MARK: OUTPUT
-
-        //TODO: Need to exclude inside of baffles
-
-        lb->setOutputExcludePoints(geomFORCING);
-
-//        for (auto xy: output.XY_planes){
-//            if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
-//                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
-//            }
-//        }
-
-        for (auto xy: output.XY_vorticity_planes){
-            if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
-                lb->calcVorticityXY(xy.cutAt, running, xy.jpegCompression);
-            }
+        
+        
+        if (running.repeatCheckForErrors && (running.step % running.repeatCheckForErrors == 0)) {
+            foundErrors += lb->containsErrors();
         }
-
-
-//        for (auto xz: output.XZ_planes){
-//            if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
-//                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
-//            }
-//        }
-
-        for (auto xz: output.XZ_vorticity_planes){
-            if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
-                lb->calcVorticityXZ(xz.cutAt, running, xz.jpegCompression);
-            }
-        }
-
-
-        //REMOVE THE ROTATING POINTS.
-        lb->unsetOutputExcludePoints(geomFORCING);
-
-
-        //TODO: This will write BINARY PLOTS
-        //                lb.writeAllOutput(geom, output, binFormat, running);
-        main_time = mainTimer.check(0, 6, main_time, "writeAllOutput");
-
-
-
-
-
-
-        // MARK: CHECKPOINT
-
-        if (checkpoint.checkpointRepeat && (running.step % checkpoint.checkpointRepeat == 0)) {
-
-            lb->checkpoint_write("device", running);
-            main_time = mainTimer.check(0, 6, main_time, "Checkpoint");
-        }
-
-
-
-        mainTimer.check(1, 0, total_time, "TOTAL STEP");
-
-
-
-        //Print running updates
+        if (foundErrors > 0) numStepsAfterFirstError ++;
+        main_time = mainTimer.check(0, 6, main_time, "ErrorChecking");
+        
+        
+        
+        //MARK: PRINT TIMINGS
+        
         tGeomShapeRT revs = running.angle * ((180.0/M_PI)/360);
         std::stringstream sstream;
         sstream << "Node " << rank;
@@ -532,14 +480,107 @@ int main(int argc, char* argv[]){
         cudaMemGetInfo(&mf, &ma);
         std::cout << "GPU memory: free: " << mf << " total: " << ma << std::endl;
 #endif
-
+        
         //Print average time per function
         if (step == 1 || (step > 1 && (step % running.numStepsForAverageCalc) == 0)) {
             std::string text = mainTimer.averageAllFunctions(step);
             outputTree.writeToRunningDataFileAndPrint(text);
         }
+        
+        
+        
+        
+        // MARK: OUTPUT
+        
+        if (numStepsAfterFirstError == 0 && checkpoint.hasOutputThisStep(running.step) == false && output.hasOutputThisStep(running.step) == false) continue;
+        
+            
+        
+        
+        //TODO: Need to exclude inside of baffles
+
+        lb->setOutputExcludePoints(geomFORCING);
+
+        
+        
+        
+//        for (auto xy: output.XY_planes){
+//            if (numStepsAfterFirstError > 0 || xy.hasOutputThisStep(running.step)) {
+//                lb.template savePlaneXY<float, 4>(xy, binFormat, running);
+//            }
+//        }
+
+//        for (auto xz: output.XZ_planes){
+//            if (numStepsAfterFirstError > 0 || xz.hasOutputThisStep(running.step)) {
+//                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
+//            }
+//        }
+
+//        for (auto yz: output.XZ_planes){
+//            if (numStepsAfterFirstError > 0 || yz.hasOutputThisStep(running.step)) {
+//                lb->template savePlaneXZ<float, 4>(xz, binFormat, running);
+//            }
+//        }
 
 
+        
+        for (auto xy: output.XY_vorticity_planes){
+            if (numStepsAfterFirstError > 0 || xy.hasOutputThisStep(running.step)) {
+                lb->calcVorticityXY(xy.cutAt, running, xy.jpegCompression);
+            }
+        }
+        
+        for (auto xz: output.XZ_vorticity_planes){
+            if (numStepsAfterFirstError > 0 || xz.hasOutputThisStep(running.step)) {
+                lb->calcVorticityXZ(xz.cutAt, running, xz.jpegCompression);
+            }
+        }
+
+        for (auto yz: output.YZ_vorticity_planes){
+            if (numStepsAfterFirstError > 0 || yz.hasOutputThisStep(running.step)) {
+                lb->calcVorticityYZ(yz.cutAt, running, yz.jpegCompression);
+            }
+        }
+
+        
+        
+        //REMOVE THE ROTATING POINTS.
+        lb->unsetOutputExcludePoints(geomFORCING);
+
+
+        //TODO: This will write BINARY PLOTS
+        //                lb.writeAllOutput(geom, output, binFormat, running);
+        main_time = mainTimer.check(0, 7, main_time, "writeAllOutput");
+
+
+
+
+
+
+        // MARK: CHECKPOINT
+
+        if (checkpoint.hasOutputThisStep(running.step)) {
+
+            lb->checkpoint_write("device", running);
+            main_time = mainTimer.check(0, 8, main_time, "Checkpoint");
+        }
+
+
+
+        mainTimer.check(1, 0, total_time, "TOTAL STEP");
+
+
+
+
+
+
+
+        //TODO: should be max, grid.x, y, z
+        if (numStepsAfterFirstError > grid.x / 2) {
+            //Worst case of an error in the very center of the simulation would
+            //take half the grid to propagate from center to edge.
+            step = running.num_steps;
+        }
 
 
 

@@ -169,8 +169,6 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::setQToZero(){
 };
 
 
-
-
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
 
@@ -189,6 +187,22 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::initialise(T initialRho){
     }
 };
 
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+int ComputeUnitBase<T, QVecSize, MemoryLayout>::containsErrors(){
+
+    int nErrors = 0;
+    for (tNi i=0; i<=xg0; i++){
+        for (tNi j=0; j<=yg0; j++){
+            for (tNi k=0; k<=zg0; k++){
+
+                nErrors += Q[index(i, j, k)].containsErrors();
+                
+            }
+        }
+    }
+    return nErrors;
+};
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>

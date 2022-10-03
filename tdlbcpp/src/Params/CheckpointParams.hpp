@@ -32,6 +32,11 @@ struct CheckpointParams {
 
     
     
+    bool hasOutputThisStep(tStep step){
+        if (checkpointRepeat && (step % checkpointRepeat == 0)) return true;
+        return false;
+    }
+
     
     void getParamsFromJson(Json::Value jsonParams) {
 

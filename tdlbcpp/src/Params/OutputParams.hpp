@@ -54,6 +54,31 @@ struct OutputParams {
     OutputParams(std::string outputRootDir):outputRootDir(outputRootDir){};
 
 
+    bool hasOutputThisStep(tStep step){
+
+        for (auto xy: XY_planes){
+            if (xy.hasOutputThisStep(step)) return true;
+        }
+        for (auto xz: XZ_planes){
+            if (xz.hasOutputThisStep(step)) return true;
+        }
+        for (auto yz: YZ_planes){
+            if (yz.hasOutputThisStep(step)) return true;
+        }
+
+        for (auto xy: XY_vorticity_planes){
+            if (xy.hasOutputThisStep(step)) return true;
+        }
+        for (auto xz: XZ_vorticity_planes){
+            if (xz.hasOutputThisStep(step)) return true;
+        }
+        for (auto yz: YZ_vorticity_planes){
+            if (yz.hasOutputThisStep(step)) return true;
+        }
+
+        return false;
+    }
+    
     void updateParamsOnResolutionDouble(){
 
         for (auto &p: XY_planes) p.cutAt *= 2;

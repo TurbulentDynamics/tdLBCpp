@@ -45,7 +45,7 @@ public:
     int idi, idj, idk;
     int nodeID;
     int deviceID;
-
+    
     tNi resolution;
     
     //Size of this ComputeUnit
@@ -53,7 +53,7 @@ public:
     
     //Starting absolute position in the grid
     tNi i0, j0, k0;
-
+    
     
     
     tNi xg, yg, zg;
@@ -72,17 +72,17 @@ public:
     
     Force<T> * __restrict__ F;
     //    std::vector<Force<T>> sparseF;
-        
+    
     T * __restrict__ Nu;
     
     bool * __restrict__ O;
-
+    
     bool * __restrict__ ExcludeOutputPoints;
-
-
+    
+    
     DiskOutputTree outputTree;
     bool evenStep;
-
+    
     ComputeUnitBase();
     ComputeUnitBase(ComputeUnitParams cuJson, FlowParams<T> flow, DiskOutputTree outputTree, bool allocateMemory=true);
     ComputeUnitBase(const ComputeUnitBase &) = delete;
@@ -101,15 +101,16 @@ public:
     HOST_DEVICE_GPU tNi inline index(tNi i, tNi j, tNi k);
     tNi inline indexPlusGhost(tNi i, tNi j, tNi k);
     tNi inline indexPreviousResolution(tNi i, tNi j, tNi k);
-
-
+    
+    
     Velocity<T> inline getVelocity(tNi i, tNi j, tNi k);
     Velocity<T> inline getVelocitySparseF(tNi i, tNi j, tNi k, Force<T> f);
-
+    
     void setQToZero();
     virtual void initialise(T rho);
+    int containsErrors();
 
-
+    
     virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta) = 0;
     
     
@@ -121,49 +122,47 @@ public:
     void bounceBackBoundaryBackward();
     void bounceBackBoundaryForward();
     void bounceBackEdges();
-
+    
     void setGhostSizes();
     void getParamsFromJson(const std::string filePath);
     int writeParamsToJsonFile(const std::string filePath);
     Json::Value getJson();
     void printParams();
-
-        
     
     void checkpoint_read(std::string dirname, std::string unit_name);
     void checkpoint_write(std::string unit_name, RunningParams run);
     
     void copyFieldsWithScaling(Fld &newQ, Fld &oldQ, T *newNu, T* oldNu);
     virtual void doubleResolutionFullCU();
-
-
-
+    
+    
+    
     bool hasOutputAtStep(OutputParams output, RunningParams running);
     
     virtual void setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
     virtual void setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
-
+    
     virtual void unsetOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
     virtual void unsetOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
-
-
+    
+    
     template <typename tDiskPrecision, int tDiskSize>
     void savePlaneXZ(OrthoPlaneParams plane, BinFileParams binFormat, RunningParams runParam);
-
+    
     void writeAllOutput(RushtonTurbinePolarCPP<tNi, T> geom, OutputParams output, BinFileParams binFormat, RunningParams runParam);
-
-    //Debug
-    virtual void calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression) = 0;
+    
     virtual void calcVorticityXY(tNi k, RunningParams runParam, int jpegCompression) = 0;
-
+    virtual void calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression) = 0;
+    virtual void calcVorticityYZ(tNi i, RunningParams runParam, int jpegCompression) = 0;
+    
     void saveJpeg(const char *tag, T* Vort, tNi pictX, tNi pictY, tNi border, RunningParams runParam, tNi cutAt, int jpegCompression=100);
     
     
 private:
-
+    
     FILE* fopen_read(std::string filePath);
     FILE* fopen_write(std::string filePath);
-
+    
 public:    
     
     HOST_DEVICE_GPU tNi inline dirnQ00(tNi i, tNi j, tNi k);
@@ -193,14 +192,12 @@ public:
     HOST_DEVICE_GPU tNi inline dirnQ24(tNi i, tNi j, tNi k);
     HOST_DEVICE_GPU tNi inline dirnQ25(tNi i, tNi j, tNi k);
     HOST_DEVICE_GPU tNi inline dirnQ26(tNi i, tNi j, tNi k);
-
+    
     virtual void collision() = 0;
     virtual void moments() = 0;
     virtual void streamingPull() = 0;
     virtual void streamingPush() = 0;
     virtual void printDebug(int fi, int ti, int fj, int tj, int fk, int tk) = 0;
-
-
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
@@ -217,8 +214,9 @@ public:
     using Base::outputTree;
     virtual void moments();
     virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta);
-    virtual void calcVorticityXZ(tNi j, RunningParams runParam, int jpegCompression);
     virtual void calcVorticityXY(tNi k, RunningParams runParam, int jpegCompression);
+    virtual void calcVorticityXZ(tNi k, RunningParams runParam, int jpegCompression);
+    virtual void calcVorticityYZ(tNi i, RunningParams runParam, int jpegCompression);
     virtual void printDebug(int fi, int ti, int fj, int tj, int fk, int tk);
 };
 
@@ -312,7 +310,7 @@ template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision coll
 void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::printDebug(int fi, int ti, int fj, int tj, int fk, int tk) {
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
-    for (int i = fi; i <= fi; i++) {
+    for (int i = fi; i <= ti; i++) {
         for (int j = fj; j <= tj; j++) {
             for (int k = fk; k <= tk; k++) {
                 QVec<T, QVecSize> q = AF::read(*this, i, j, k);
@@ -329,6 +327,8 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
         }
     }
 }
+
+
 
 #include "ComputeUnit.hpp"
 #include "ComputeUnitOutput.hpp"

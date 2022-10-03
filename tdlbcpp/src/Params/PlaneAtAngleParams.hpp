@@ -35,6 +35,11 @@ struct PlaneAtAngleParams {
 
     
     
+    bool hasOutputThisStep(tStep step){
+        if (repeat && (step >= start_at_step) && ((step - start_at_step) % repeat == 0)) return true;
+        else return false;
+    }
+
     
     void getParamsFromJson(Json::Value jsonParams) {
 

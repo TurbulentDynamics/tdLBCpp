@@ -62,3 +62,15 @@ __global__ void calcVorticityXY(ComputeUnitArchitectureCommonGPU<T, QVecSize, Me
     cu.VortXY[cu.xg * j + i] = calcVorticity(cu, i, j, k);
 
 }
+
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
+__global__ void calcVorticityYZ(ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType> &cu, tNi i, int jpegCompression) {
+    tNi j = blockIdx.y * blockDim.y + threadIdx.y;
+    tNi k = blockIdx.z * blockDim.z + threadIdx.z;
+    if (i > cu.xg1 || j > cu.yg1 || k > cu.zg1 || i < 1 || j < 1 || k < 1) {
+        return;
+    }
+
+    cu.VortYZ[cu.yg * i + j] = calcVorticity(cu, i, j, k);
+
+}

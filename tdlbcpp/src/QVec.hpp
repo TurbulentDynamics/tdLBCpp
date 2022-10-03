@@ -48,7 +48,6 @@ struct Force {
         x = 0.0;
         y = 0.0;
         z = 0.0;
-        
     }
     
     bool isNotZero(){
@@ -121,40 +120,60 @@ struct CommonOperations : public Base {
     using Base::q;
     using Base::Base;
     using Base::operator=;
-
+    
     HOST_DEVICE_GPU Velocity<T> velocity(Force<T> f){
-
-
+        
         Velocity<T> u;
         u.x = (1.0 / q[M01]) * (q[M02] + 0.5 * f.x);
         u.y = (1.0 / q[M01]) * (q[M03] + 0.5 * f.y);
         u.z = (1.0 / q[M01]) * (q[M04] + 0.5 * f.z);
-
+        
         return u;
     }
-
+    
     HOST_DEVICE_GPU Velocity<T> velocity(){
         
         Velocity<T> u;
         u.x = q[M02] / q[M01];
         u.y = q[M03] / q[M01];
         u.z = q[M04] / q[M01];
-      
+        
         return u;
-    };
-
-    void initialiseRho(T initialRho, T other){
+    }
+    
+    HOST_DEVICE_GPU void initialiseRho(T initialRho, T other){
         q[MRHO] = initialRho;
         for (int l = 1; l < size; l++) {
             q[l] = other;
         }
     }
-
-    void setToZero(){
+    
+    HOST_DEVICE_GPU void setToZero(){
         for (int l = 0; l < size; l++) {
             q[l] = 0.0;
         }
     }
+    
+    HOST_DEVICE_GPU int containsNaN(){
+        int nNaN = 0;
+        for (int l = 0; l < size; l++) {
+            if (std::isnan(q[l])) nNaN ++;
+        }
+        return nNaN;
+    }
+    
+    HOST_DEVICE_GPU int containsInf(){
+        int nInf = 0;
+        for (int l = 0; l < size; l++) {
+            if (std::isinf(q[l])) nInf ++;
+        }
+        return nInf;
+    }
+    
+    HOST_DEVICE_GPU int containsErrors(){
+        return containsNaN() + containsInf();
+    }
+    
 };
 
 template<typename T, int size=QLen::D3Q19>
