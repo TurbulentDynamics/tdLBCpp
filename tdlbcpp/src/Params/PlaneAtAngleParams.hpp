@@ -28,6 +28,7 @@ struct PlaneAtAngleParams {
     double tolerance = 0.0;
     tNi cutAt = 0;
     int Q_output_len = 4;
+    tStep repeat = 0;
     tStep start_at_step = 0;
     tStep end_at_step = 0;
     bool use_half_float = false;

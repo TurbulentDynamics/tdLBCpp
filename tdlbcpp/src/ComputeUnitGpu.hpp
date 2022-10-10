@@ -396,8 +396,8 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::calcVorticityYZ(tNi i, RunningParams runParam, int jpegCompression) {
     T *Vort = new(T[yg * zg]);
-    dim3 blocksXY(numBlocks.y, numBlocks.z, 1);
-    dim3 threadsXY(threadsPerBlock.y, threadsPerBlock.z, 1);
+    dim3 blocksYZ(numBlocks.y, numBlocks.z, 1);
+    dim3 threadsYZ(threadsPerBlock.y, threadsPerBlock.z, 1);
     ::calcVorticityYZ<<<blocksYZ, threadsYZ>>>(*gpuThis, i, jpegCompression);
     checkCudaErrors(cudaMemcpy(Vort, VortYZ, sizeof(T) * yg * zg, cudaMemcpyDeviceToHost));
     saveJpeg("yz", Vort, yg, zg, 1, runParam, i);
