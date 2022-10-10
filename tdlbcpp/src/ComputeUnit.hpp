@@ -255,7 +255,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::copyFieldsWithScaling(Fld &newQ
 
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::doubleResolutionFullCU(){
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::doubleResolutionFullCU(ComputeUnitParams cuParams){
 
     tNi factor = 2;
 

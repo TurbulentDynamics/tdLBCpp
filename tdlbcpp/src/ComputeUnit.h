@@ -134,7 +134,7 @@ public:
     void checkpoint_write(std::string unit_name, RunningParams run);
     
     void copyFieldsWithScaling(Fld &newQ, Fld &oldQ, T *newNu, T* oldNu);
-    virtual void doubleResolutionFullCU();
+    virtual void doubleResolutionFullCU(ComputeUnitParams);
 
 
 

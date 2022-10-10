@@ -20,12 +20,12 @@ FILENAME = "input_debug_gridx%s_numSteps%s.json"
 
 # (ngx, grid.x, numSteps, chkRepeat)
 all_debug = [
- (1, 9, 3, 0),
- (1, 64, 20, 10), #Initialised Params Setup
- (1, 104, 200, 0),
- (1, 208, 1000, 1000),
- (1, 408, 2000, 2000),
- (1, 600, 5000, 5000),
+ (1, 6, 3, 0),
+ (1, 62, 20, 10), #Initialised Params Setup
+ (1, 102, 200, 0),
+ (1, 206, 1000, 1000),
+ (1, 406, 2000, 2000),
+ (1, 598, 5000, 5000),
  ]
 
 
@@ -106,10 +106,10 @@ def main():
         grid.y = args.gridx
         grid.z = args.gridx
 
-        #Validate input to gpu
-        assert(grid.x % grid.gpu_xthreads_per_block == 0, "grid.x must be evenly divisible by gpu_xthreads_per_block")
-        assert(grid.y % grid.gpu_ythreads_per_block == 0, "grid.y must be evenly divisible by gpu_ythreads_per_block")
-        assert(grid.z % grid.gpu_zthreads_per_block == 0, "grid.z must be evenly divisible by gpu_zthreads_per_block")
+    #Validate input to gpu
+    assert(grid.x + 2 * grid.multiStep % cup.gpu_xthreads_per_block == 0, "grid.x must be evenly divisible by gpu_xthreads_per_block")
+    assert(grid.y + 2 * grid.multiStep % cup.gpu_ythreads_per_block == 0, "grid.y must be evenly divisible by gpu_ythreads_per_block")
+    assert(grid.z + 2 * grid.multiStep % cup.gpu_zthreads_per_block == 0, "grid.z must be evenly divisible by gpu_zthreads_per_block")
 
 
 

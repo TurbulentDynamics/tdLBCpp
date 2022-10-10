@@ -348,7 +348,7 @@ int main(int argc, char* argv[]){
             std::stringstream text;
             text << std::endl << std::endl << "INCREASING RESOLUTION FROM grid.x " << lb->x;
 
-            lb->doubleResolutionFullCU();
+            lb->doubleResolutionFullCU(cu);
 
             text << " TO " <<  lb->x << std::endl << std::endl << std::endl;
             outputTree.writeToRunningDataFileAndPrint(text.str());

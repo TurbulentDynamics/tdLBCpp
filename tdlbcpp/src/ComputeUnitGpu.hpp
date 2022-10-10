@@ -167,14 +167,16 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
     
     numBlocks = dim3(block_in_x_dirn, block_in_y_dirn, block_in_z_dirn);
 
-
-    if ((threadsPerBlock.x == 0 || xg % threadsPerBlock.x > 0 || numBlocks.x == 0) {exit(1)};
-    if ((threadsPerBlock.y == 0 || yg % threadsPerBlock.y > 0 || numBlocks.y == 0) {exit(1)};
-    if ((threadsPerBlock.z == 0 || zg % threadsPerBlock.z > 0 || numBlocks.z == 0) {exit(1)};
-
-
     std::cout << "threads_per_block" << threadsPerBlock.x << ", " << threadsPerBlock.y << ", " << threadsPerBlock.z << std::endl;
     std::cout << "numBlocks" << numBlocks.x << ", " << numBlocks.y << ", " << numBlocks.z << std::endl;
+    
+
+    if (threadsPerBlock.x == 0 || xg % threadsPerBlock.x > 0 || numBlocks.x == 0) {exit(1);};
+    if (threadsPerBlock.y == 0 || yg % threadsPerBlock.y > 0 || numBlocks.y == 0) {exit(1);};
+    if (threadsPerBlock.z == 0 || zg % threadsPerBlock.z > 0 || numBlocks.z == 0) {exit(1);};
+
+
+
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
@@ -222,7 +224,7 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::doubleResolutionFullCU()
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::doubleResolutionFullCU(ComputeUnitParams cuParams)
 {
     // save old fields
     Fld oldQ;

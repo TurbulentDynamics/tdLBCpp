@@ -17,7 +17,7 @@
     },
     "CheckpointParams": {
         "checkpointLoadFromDir": "notSet",
-        "checkpointRepeat": 0,
+        "checkpointRepeat": 10,
         "checkpointWriteDirAppendTime": true,
         "checkpointWriteDirPrefix": "debug",
         "checkpointWriteRootDir": ".",
@@ -26,6 +26,9 @@
     "ComputeUnitParams": {
         "deviceID": 0,
         "ghost": 0,
+        "gpu_xthreads_per_block": 8,
+        "gpu_ythreads_per_block": 8,
+        "gpu_zthreads_per_block": 8,
         "i0": 0,
         "idi": 0,
         "idj": 0,
@@ -58,7 +61,7 @@
         "initialRho": 8.0,
         "nu": 0.0,
         "reMNonDimensional": 7300.0,
-        "streaming": "Simple",
+        "streaming": "Esotwist",
         "uav": 0.1,
         "uf": 0.0,
         "useLES": false
@@ -69,14 +72,14 @@
         "ngy": 1,
         "ngz": 1,
         "strMinQVecPrecision": "float",
-        "x": 72,
-        "y": 72,
-        "z": 72
+        "x": 206,
+        "y": 206,
+        "z": 206
     },
     "OutputParams": {
         "XY_vorticity_planes": [
             {
-                "cutAt": 36,
+                "cutAt": 104,
                 "end_at_step": 0,
                 "jpegCompression": 100,
                 "name_root": "vort_slice",
@@ -86,7 +89,7 @@
         ],
         "XZ_vorticity_planes": [
             {
-                "cutAt": 48,
+                "cutAt": 138,
                 "end_at_step": 0,
                 "jpegCompression": 100,
                 "name_root": "vort_axis",
@@ -98,15 +101,15 @@
     },
     "RunningParams": {
         "angle": 0.0,
+        "doubleResolutionAtStep": 0,
         "impellerStartupStepsUntilNormalSpeed": 30,
         "numStepsForAverageCalc": 10,
-        "num_steps": 200,
+        "num_steps": 1000,
         "repeatPrintTimerToFile": 20,
         "repeatPrintTimerToStdOut": 10,
         "runningDataFileAppendTime": true,
         "runningDataFileDir": ".",
         "runningDataFilePrefix": "debug",
-        "step": 1,
-        "doubleResolutionAtStep": 100
+        "step": 1
     }
 }

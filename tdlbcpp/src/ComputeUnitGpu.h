@@ -42,7 +42,7 @@ public:
     virtual void freeMemory();
     virtual void architectureInit(ComputeUnitParams);
     virtual void initialise(T rho);
-    virtual void doubleResolutionFullCU();
+    virtual void doubleResolutionFullCU(ComputeUnitParams);
     virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta);
     //virtual void collision();
     //virtual void moments();
