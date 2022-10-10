@@ -322,6 +322,7 @@ std::string QDataType float
 int QOutputLength 4
 """)
 
+
 class CheckpointParams(ParamsBase):
     def __init__(self):
         super().__init__("""
@@ -357,6 +358,10 @@ tNi k0 0
 
 tNi ghost 0
 tNi resolution 0
+
+int gpu_xthreads_per_block 8
+int gpu_ythreads_per_block 8
+int gpu_zthreads_per_block 8
 
 std::string strQVecPrecision notSet
 std::string strQLength notSet

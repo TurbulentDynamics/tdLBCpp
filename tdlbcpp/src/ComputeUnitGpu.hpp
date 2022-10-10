@@ -26,6 +26,10 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
         std::cout << "Cannot allocate device on GPU." << std::endl;
         exit(1);
     }
+    
+    //int threads_per_warp = 32;
+    //int max_threads_per_block = 512;
+    
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
@@ -149,23 +153,25 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
-void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::architectureInit()
+void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, streamingType>::architectureInit(ComputeUnitParams cuParams)
 {
 
     //int threads_per_warp = 32;
     //int max_threads_per_block = 512;
 
-    int xthreads_per_block = 8;
-    int ythreads_per_block = 8;
-    int zthreads_per_block = 8;
-
-    threadsPerBlock = dim3(xthreads_per_block, ythreads_per_block, zthreads_per_block);
-
-    int block_in_x_dirn = xg / threadsPerBlock.x + (xg % xthreads_per_block != 0);
-    int block_in_y_dirn = zg / threadsPerBlock.y + (yg % ythreads_per_block != 0);
-    int block_in_z_dirn = zg / threadsPerBlock.z + (zg % zthreads_per_block != 0);
-
+    threadsPerBlock = dim3(cuParams.gpu_xthreads_per_block, cuParams.gpu_ythreads_per_block, cuParams.gpu_zthreads_per_block);
+    
+    int block_in_x_dirn = xg / threadsPerBlock.x;
+    int block_in_y_dirn = zg / threadsPerBlock.y;
+    int block_in_z_dirn = zg / threadsPerBlock.z;
+    
     numBlocks = dim3(block_in_x_dirn, block_in_y_dirn, block_in_z_dirn);
+
+
+    if ((threadsPerBlock.x == 0 || xg % threadsPerBlock.x > 0 || numBlocks.x == 0) {exit(1)};
+    if ((threadsPerBlock.y == 0 || yg % threadsPerBlock.y > 0 || numBlocks.y == 0) {exit(1)};
+    if ((threadsPerBlock.z == 0 || zg % threadsPerBlock.z > 0 || numBlocks.z == 0) {exit(1)};
+
 
     std::cout << "threads_per_block" << threadsPerBlock.x << ", " << threadsPerBlock.y << ", " << threadsPerBlock.z << std::endl;
     std::cout << "numBlocks" << numBlocks.x << ", " << numBlocks.y << ", " << numBlocks.z << std::endl;
@@ -246,7 +252,7 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
 
     freeMemory();
     allocateMemory();//using new cu.x, size etc
-    architectureInit();
+    architectureInit(cuParams);
     initialise(0);
 
     Fld newQ;

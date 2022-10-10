@@ -20,9 +20,11 @@ __global__ void setQToZero(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu){
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
     tNi k = blockIdx.z * blockDim.z + threadIdx.z;
 
+%ifdef DEBUG
     if (i >= cu.xg || j >= cu.yg || k >= cu.zg) {
         return;
     }
+%endif
 
 #pragma unroll
     for (tNi l = 0; l < QVecSize; l++){
@@ -39,9 +41,11 @@ __global__ void setRhoTo(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, T initi
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
     tNi k = blockIdx.z * blockDim.z + threadIdx.z;
 
+%ifdef DEBUG
     if (i >= cu.xg || j >= cu.yg || k >= cu.zg) {
         return;
     }
+%endif
 
     cu.Q[cu.index(i, j, k)].q[MRHO] = initialRho;
 };
@@ -54,9 +58,11 @@ __global__ void setForceToZero(ComputeUnitArchitectureCommonGPU<T, QVecSize, Mem
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
     tNi k = blockIdx.z * blockDim.z + threadIdx.z;
 
+%ifdef DEBUG
     if (i >= cu.xg || j >= cu.yg || k >= cu.zg) {
         return;
     }
+%endif
 
     cu.F[cu.index(i, j, k)].x = 0.0;
     cu.F[cu.index(i, j, k)].y = 0.0;
@@ -74,9 +80,11 @@ __global__ void setNuToZero(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu, T in
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
     tNi k = blockIdx.z * blockDim.z + threadIdx.z;
 
+%ifdef DEBUG
     if (i >= cu.xg || j >= cu.yg || k >= cu.zg) {
         return;
     }
+%endif
 
     cu.Nu[cu.index(i, j, k)] = 0.0;
 };
@@ -90,9 +98,11 @@ __global__ void setOToZero(ComputeUnitBase<T, QVecSize, MemoryLayout> &cu){
     tNi j = blockIdx.y * blockDim.y + threadIdx.y;
     tNi k = blockIdx.z * blockDim.z + threadIdx.z;
 
+%ifdef DEBUG
     if (i >= cu.xg || j >= cu.yg || k >= cu.zg) {
         return;
     }
+%endif
 
     cu.O[cu.index(i, j, k)] = false;
 

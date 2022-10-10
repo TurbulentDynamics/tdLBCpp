@@ -96,7 +96,7 @@ public:
     void initParams(ComputeUnitParams);
     virtual void allocateMemory();
     virtual void freeMemory();
-    virtual void architectureInit();
+    virtual void architectureInit(ComputeUnitParams);
     void init(ComputeUnitParams, bool);
     HOST_DEVICE_GPU tNi inline index(tNi i, tNi j, tNi k);
     tNi inline indexPlusGhost(tNi i, tNi j, tNi k);

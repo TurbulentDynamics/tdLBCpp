@@ -40,7 +40,7 @@ public:
     void checkEnoughMemory();
     virtual void allocateMemory();
     virtual void freeMemory();
-    virtual void architectureInit();
+    virtual void architectureInit(ComputeUnitParams);
     virtual void initialise(T rho);
     virtual void doubleResolutionFullCU();
     virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta);

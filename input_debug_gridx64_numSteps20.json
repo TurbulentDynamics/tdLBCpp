@@ -26,6 +26,9 @@
     "ComputeUnitParams": {
         "deviceID": 0,
         "ghost": 0,
+        "gpu_xthreads_per_block": 8,
+        "gpu_ythreads_per_block": 8,
+        "gpu_zthreads_per_block": 8,
         "i0": 0,
         "idi": 0,
         "idj": 0,
@@ -69,26 +72,14 @@
         "ngy": 1,
         "ngz": 1,
         "strMinQVecPrecision": "float",
-        "x": 60,
-        "y": 60,
-        "z": 60
+        "x": 64,
+        "y": 64,
+        "z": 64
     },
     "OutputParams": {
-        "XY_planes": [
-            {
-                "QDataType": "float",
-                "Q_output_len": 4,
-                "cutAt": 30.0,
-                "end_at_step": 0,
-                "name_root": "plot_slice",
-                "repeat": 20,
-                "start_at_step": 0,
-                "use_half_float": false
-            }
-        ],
         "XY_vorticity_planes": [
             {
-                "cutAt": 30.0,
+                "cutAt": 32,
                 "end_at_step": 0,
                 "jpegCompression": 100,
                 "name_root": "vort_slice",
@@ -96,21 +87,9 @@
                 "start_at_step": 0
             }
         ],
-        "XZ_planes": [
-            {
-                "QDataType": "float",
-                "Q_output_len": 4,
-                "cutAt": 40.0,
-                "end_at_step": 0,
-                "name_root": "plot_axis",
-                "repeat": 20,
-                "start_at_step": 0,
-                "use_half_float": false
-            }
-        ],
         "XZ_vorticity_planes": [
             {
-                "cutAt": 40.0,
+                "cutAt": 42,
                 "end_at_step": 0,
                 "jpegCompression": 100,
                 "name_root": "vort_axis",
@@ -122,6 +101,7 @@
     },
     "RunningParams": {
         "angle": 0.0,
+        "doubleResolutionAtStep": 10,
         "impellerStartupStepsUntilNormalSpeed": 30,
         "numStepsForAverageCalc": 10,
         "num_steps": 20,

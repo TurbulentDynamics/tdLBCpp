@@ -36,6 +36,9 @@ struct ComputeUnitParams {
     tNi k0 = 0;
     tNi ghost = 0;
     tNi resolution = 0;
+    int gpu_xthreads_per_block = 8;
+    int gpu_ythreads_per_block = 8;
+    int gpu_zthreads_per_block = 8;
     std::string strQVecPrecision = "notSet";
     std::string strQLength = "notSet";
     std::string strMemoryLayout = "notSet";
@@ -70,6 +73,9 @@ struct ComputeUnitParams {
     k0 = (tNi)jsonParams["k0"].asUInt64();
     ghost = (tNi)jsonParams["ghost"].asUInt64();
     resolution = (tNi)jsonParams["resolution"].asUInt64();
+    gpu_xthreads_per_block = (int)jsonParams["gpu_xthreads_per_block"].asInt();
+    gpu_ythreads_per_block = (int)jsonParams["gpu_ythreads_per_block"].asInt();
+    gpu_zthreads_per_block = (int)jsonParams["gpu_zthreads_per_block"].asInt();
     strQVecPrecision = (std::string)jsonParams["strQVecPrecision"].asString();
     strQLength = (std::string)jsonParams["strQLength"].asString();
     strMemoryLayout = (std::string)jsonParams["strMemoryLayout"].asString();
@@ -107,6 +113,9 @@ struct ComputeUnitParams {
     jsonParams["k0"] = (Json::UInt64)k0;
     jsonParams["ghost"] = (Json::UInt64)ghost;
     jsonParams["resolution"] = (Json::UInt64)resolution;
+    jsonParams["gpu_xthreads_per_block"] = (int)gpu_xthreads_per_block;
+    jsonParams["gpu_ythreads_per_block"] = (int)gpu_ythreads_per_block;
+    jsonParams["gpu_zthreads_per_block"] = (int)gpu_zthreads_per_block;
     jsonParams["strQVecPrecision"] = (std::string)strQVecPrecision;
     jsonParams["strQLength"] = (std::string)strQLength;
     jsonParams["strMemoryLayout"] = (std::string)strMemoryLayout;

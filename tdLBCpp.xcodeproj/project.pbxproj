@@ -35,6 +35,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		39590FA228F01DEF00F081E2 /* input_debug_gridx64_numSteps20.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = input_debug_gridx64_numSteps20.json; sourceTree = "<group>"; };
 		3C3CFE1C26A4084D002B7FD4 /* Field.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Field.hpp; sourceTree = "<group>"; };
 		3C71D861269E2E1D00C37F3D /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		3C71D862269E2E1D00C37F3D /* toojpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = toojpeg.h; sourceTree = "<group>"; };
@@ -94,7 +95,7 @@
 		D6E5C72E25EE184B0067FDE1 /* DiskOutputTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskOutputTree.h; sourceTree = "<group>"; };
 		D6E5C73225EE184B0067FDE1 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
 		D6E5C73325EE184B0067FDE1 /* ComputeUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComputeUnit.h; sourceTree = "<group>"; };
-		D6E5C73625EE184B0067FDE1 /* template.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = template.py; sourceTree = "<group>"; };
+		D6E5C73625EE184B0067FDE1 /* ComputeUnit_formatter.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ComputeUnit_formatter.py; sourceTree = "<group>"; };
 		D6E5C73725EE184B0067FDE1 /* Output.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Output.hpp; sourceTree = "<group>"; };
 		D6E5C73825EE184B0067FDE1 /* CollisionEgglesSomers.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEgglesSomers.hpp; sourceTree = "<group>"; };
 		D6E5C73925EE184B0067FDE1 /* CollisionEntropic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CollisionEntropic.hpp; sourceTree = "<group>"; };
@@ -162,6 +163,7 @@
 		D698D74C257D036500A3BFD2 = {
 			isa = PBXGroup;
 			children = (
+				39590FA228F01DEF00F081E2 /* input_debug_gridx64_numSteps20.json */,
 				D67F4D3D276615F300952021 /* generate_stirred_tank_input.py */,
 				D60526C2270D9A61002FB3CA /* docs */,
 				D60B522126B1B00400963282 /* README.md */,
@@ -248,11 +250,11 @@
 				D6F5335D2615E78B00A715C9 /* BUILD */,
 				D6F533492615815D00A715C9 /* Params */,
 				D6E5C72825EE184B0067FDE1 /* Header.h */,
+				D6E5C73625EE184B0067FDE1 /* ComputeUnit_formatter.py */,
 				D6E5C72A25EE184B0067FDE1 /* cxxopts.hpp */,
 				D6E5C73E25EE184B0067FDE1 /* main.cpp */,
 				D6E5C73725EE184B0067FDE1 /* Output.hpp */,
 				D6E5C72E25EE184B0067FDE1 /* DiskOutputTree.h */,
-				D6E5C73625EE184B0067FDE1 /* template.py */,
 				D66D0F88269C4A200079FCAC /* timer.h */,
 				D66D0F86269C49E50079FCAC /* timer.cpp */,
 				D6E5C72C25EE184B0067FDE1 /* QVec.hpp */,

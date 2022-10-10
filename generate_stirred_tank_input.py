@@ -21,10 +21,10 @@ FILENAME = "input_debug_gridx%s_numSteps%s.json"
 # (ngx, grid.x, numSteps, chkRepeat)
 all_debug = [
  (1, 9, 3, 0),
- (1, 60, 100, 20), #Initialised Params Setup
- (1, 102, 200, 0),
- (1, 204, 1000, 1000),
- (1, 402, 2000, 2000),
+ (1, 64, 20, 10), #Initialised Params Setup
+ (1, 104, 200, 0),
+ (1, 208, 1000, 1000),
+ (1, 408, 2000, 2000),
  (1, 600, 5000, 5000),
  ]
 
@@ -70,6 +70,7 @@ def main():
     parser.add_argument("-n", "--num_steps", type=int, help="Run number of steps")
     parser.add_argument("-q", "--impellerStartupStepsUntilNormalSpeed", type=int, help="Start the impeller slowly")
 
+    parser.add_argument("-t", "--xThreadsPerBlock", type=int, help="Set the gpu_xThreadsPerBlock (y,z = x)")
 
     parser.add_argument("-p", "--checkpoint_repeat", type=int, help="Checkpoint repeat every n steps")
     parser.add_argument("-d", "--checkpointRootDir", type=str, help="Checkpoint Root Dir")
@@ -104,6 +105,12 @@ def main():
         grid.x = args.gridx
         grid.y = args.gridx
         grid.z = args.gridx
+
+        #Validate input to gpu
+        assert(grid.x % grid.gpu_xthreads_per_block == 0, "grid.x must be evenly divisible by gpu_xthreads_per_block")
+        assert(grid.y % grid.gpu_ythreads_per_block == 0, "grid.y must be evenly divisible by gpu_ythreads_per_block")
+        assert(grid.z % grid.gpu_zthreads_per_block == 0, "grid.z must be evenly divisible by gpu_zthreads_per_block")
+
 
 
 

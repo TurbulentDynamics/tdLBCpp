@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#/usr/bin/env python3
 import unittest
 
 
@@ -53,11 +53,13 @@ def nullorsign(n):
         return sign(n)
 
 
-def direction((l, x, y, z)):
+def direction(data):
+    l, x, y, z, = data
     return sign(x) + " " + sign(y) + " " + sign(z)
 
 
-def text_direction((l, x, y, z)):
+def text_direction(data):
+    l, x, y, z, = data
     text = []
     if x < 0: text.append("LEFT")
     elif x > 0: text.append("RIGHT")
@@ -91,8 +93,8 @@ def function(line):
     here = """
 //%s DIRECTION    Q%s
 // %s
-template <typename T, int QVecSize>
-tNi inline ComputeUnit<T, QVecSize>::iQ%s(tNi i, tNi j, tNi k)
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ%s(tNi i, tNi j, tNi k)
 {
     return %s;
 }
@@ -106,7 +108,8 @@ def opposite(n):
     else :
         return n-1
 
-def count_dirns((q, x, y, z)):
+def count_dirns(data):
+    q, x, y, z = data
     dirn = 0
     if x != 0: dirn += 1
     if y != 0: dirn += 1
@@ -145,15 +148,28 @@ def get_backwards():
     return [q for (q,x,y,z) in Q if z == -1]
 
 
+# ==================  Print ComputeUnit.h ==================
 
+print("="*20)
+print("\n\nFor ComputeUnit.h\n\n")
 
 for line in Q:
-    print("tNi inline dirnQ%s(tNi i, tNi j, tNi k);" % line[0])
+    print("HOST_DEVICE_GPU tNi inline dirnQ%s(tNi i, tNi j, tNi k);" % line[0])
+
+
+# ==================  Print ComputeUnit.h ==================
+
+print("="*20)
+print("\n\nFor ComputeUnit.h\n\n")
 
 for line in Q:
     print(function(line))
 
 
+# ==================  Print Boundary.h ==================
+
+print("="*20)
+print("\n\nFor Boundary.h\n\n")
 
 def bounce_back(t):
     print("Q[dirnQ%s(i,j,k)].q[Q%s] = Q[dirnQ000(i,j,k)].q[Q%s];" % (opposite(t), opposite(t), t))
@@ -255,8 +271,8 @@ class TestStringMethods(unittest.TestCase):
         here = """
 //UP DIRECTION    Q3
 //  0 +1  0
-template <typename T, int QVecSize>
-tNi inline ComputeUnit<T, QVecSize>::iQ3(tNi i, tNi j, tNi k)
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+tNi inline ComputeUnitBase<T, QVecSize, MemoryLayout>::dirnQ3(tNi i, tNi j, tNi k)
 {
     return (i * yg * zg) + ((j + 1) * zg) + k;
 }

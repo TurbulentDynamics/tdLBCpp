@@ -98,7 +98,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::freeMemory() {
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
-void ComputeUnitBase<T, QVecSize, MemoryLayout>::architectureInit() {}
+void ComputeUnitBase<T, QVecSize, MemoryLayout>::architectureInit(ComputeUnitParams) {}
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
 void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams, bool allocate) {
@@ -115,7 +115,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::init(ComputeUnitParams cuParams
     }
     evenStep = true;
 
-    architectureInit();
+    architectureInit(cuParams);
 }
 
 
