@@ -116,7 +116,7 @@ struct BitWriter
   // store the most recently encoded bits that are not written yet
   struct BitBuffer
   {
-    int32_t data    = 0; // actually only at most 24 bits are used
+    uint32_t data    = 0; // actually only at most 24 bits are used
     uint8_t numBits = 0; // number of valid bits (the right-most bits)
   } buffer;
 

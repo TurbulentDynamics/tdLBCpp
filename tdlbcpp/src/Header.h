@@ -36,16 +36,23 @@ enum QLen {D3Q19 = 18, D3Q27 = 26};
 enum Collision {EgglesSomers, EgglesSomersLES, Entropic};
 enum Streaming {Simple, Esotwist};
 enum MemoryLayoutType {MemoryLayoutIJKL, MemoryLayoutLIJK};
-enum Architecture {CPU,GPU,GPU_MEM_SHARED};
+enum Architecture {CPU,GPU,GPU_MEM_SHARED,CPU_ZIG};
 
-
+#ifndef ZIG_IMPORT
 using tNi = long int;
 using let_tNi = const long int;
 
 
 using tStep = unsigned long int;
 using let_tStep = const unsigned long int;
+#else
+typedef long int tNi;
+typedef const long int let_tNi;
 
+
+typedef unsigned long int tStep;
+typedef const unsigned long int let_tStep;
+#endif
 
 
 //Coordinate system

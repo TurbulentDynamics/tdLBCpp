@@ -339,6 +339,10 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 #include "Boundary.hpp"
 #include "Forcing.hpp"
 
+#if defined(WITH_ZIG)
+#include "ComputeUnitZig.h"
+#endif
+
 #if defined(WITH_GPU) || defined(WITH_GPU_MEMSHARED)
 #include "ComputeUnitGpu.h"
 #endif

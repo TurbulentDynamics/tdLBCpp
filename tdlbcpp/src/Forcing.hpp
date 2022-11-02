@@ -76,6 +76,9 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
         tNi i = g.i + ghost;
         tNi j = g.j + ghost;
         tNi k = g.k + ghost;
+        if (i < 1 || i > xg1 || j < 1 || j > yg1 || k < 1 || k > zg1) {
+            continue;
+        }
 
         
         smoothedDeltaFunction(g.iCartFraction, g.kCartFraction, ppp);

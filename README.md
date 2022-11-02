@@ -42,6 +42,12 @@ Specify capabilities and custom cuda path using the following switches:
 bazel build -c dbg --config gpu --@rules_cuda//cuda:cuda_targets=sm_75 --repo_env=CUDA_PATH=/usr/local/cuda-11.5 //tdlbcpp/src:tdlbcpp
 ```
 
+### Zig build
+uses `zig` compiler to compile all c++ code and zig code
+
+```
+bazel build --config zig //tdlbcpp/src:tdlbcpp
+
 ##Tests
 ```
 bazel test //tdlbcpp/tests/Params:tests

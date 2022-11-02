@@ -55,6 +55,9 @@ int main(int argc, char* argv[]){
 #ifdef WITH_CPU
     strCompileFlag = "WITH_CPU";
 #endif
+#ifdef WITH_ZIG
+    strCompileFlag = "WITH_ZIG";
+#endif
 #ifdef WITH_GPU
     strCompileFlag = "WITH_GPU";
 #endif
@@ -240,6 +243,8 @@ int main(int argc, char* argv[]){
         std::cout << "Streaming = Simple" << std::endl;
 #if WITH_GPU == 1
         lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, GPU>(cu, flow, outputTree);
+#elif WITH_ZIG == 1
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU_ZIG>(cu, flow, outputTree);
 #else
         lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU>(cu, flow, outputTree);
 #endif
@@ -247,6 +252,8 @@ int main(int argc, char* argv[]){
         std::cout << "Streaming = Esoteric" << std::endl;
 #if WITH_GPU == 1
         lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist, GPU>(cu, flow, outputTree);
+#elif WITH_ZIG == 1
+        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist, CPU_ZIG>(cu, flow, outputTree);
 #else
         lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist, CPU>(cu, flow, outputTree);
 #endif
@@ -534,7 +541,7 @@ int main(int argc, char* argv[]){
 #endif
 
         //Print average time per function
-        if (step == 1 || (step > 1 && (step % running.numStepsForAverageCalc) == 0)) {
+        if (step == 1 || (step > 1 && running.numStepsForAverageCalc && (step % running.numStepsForAverageCalc) == 0)) {
             std::string text = mainTimer.averageAllFunctions(step);
             outputTree.writeToRunningDataFileAndPrint(text);
         }

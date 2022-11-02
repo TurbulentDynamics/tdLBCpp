@@ -1,0 +1,15 @@
+diff --git a/toolchain/defs.bzl b/toolchain/defs.bzl
+index 672bc33..360474f 100644
+--- a/toolchain/defs.bzl
++++ b/toolchain/defs.bzl
+@@ -91,6 +91,10 @@ _ZIG_TOOLS = [
+     "ld64.lld",  # Mach-O
+     "lld-link",  # COFF
+     "wasm-ld",  # WebAssembly
++    "build-exe",
++    "build-lib",
++    "build-obj",
++
+ ]
+ 
+ _ZIG_TOOL_WRAPPER_WINDOWS_CACHE_KNOWN = """@echo off
