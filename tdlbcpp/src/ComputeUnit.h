@@ -90,7 +90,7 @@ public:
     ComputeUnitBase& operator=(const ComputeUnitBase &) = delete;
     ComputeUnitBase& operator=(ComputeUnitBase &&) noexcept = delete;
     
-    ~ComputeUnitBase();
+    virtual ~ComputeUnitBase();
     
     void initGridParams();
     void initParams(ComputeUnitParams);

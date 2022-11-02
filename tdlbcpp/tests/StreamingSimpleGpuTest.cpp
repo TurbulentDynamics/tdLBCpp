@@ -13,6 +13,19 @@
 #undef WITH_GPU
 
 #include "Header.h"
+
+HOST_DEVICE_GPU unsigned long fabs(unsigned long v) {
+    return v;
+}
+
+HOST_DEVICE_GPU unsigned long log(unsigned long v) {
+    return v;
+}
+
+HOST_DEVICE_GPU unsigned long sqrt(unsigned long v) {
+    return v;
+}
+
 #include "Params/RunningParams.hpp"
 #include "Params/CheckpointParams.hpp"
 #include "Params/OutputParams.hpp"
