@@ -10,6 +10,7 @@ class ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamin
     using Base::Base;
 
     virtual void collision();
+    virtual void moments();
 };
 
 #include "ComputeUnitZig.hpp"

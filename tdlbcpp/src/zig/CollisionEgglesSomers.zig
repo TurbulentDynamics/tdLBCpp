@@ -41,7 +41,7 @@ inline fn EgglesSomers_collision_zig(
 
                 var alpha = [_]T{0} ** qVecSize;
 
-                if (flow.useLES != 0) {
+                if (flow.useLES == 1) {
                     var fct: T = 3.0 / (m[h.M01] * (1.0 + 6.0 * (Nu[fq.index(i, j, k)] + flow.nu)));
 
                     //calculating the derivatives for x, y and z
@@ -159,6 +159,81 @@ inline fn EgglesSomers_collision_zig(
     }
 }
 
+inline fn EgglesSomers_collision_moments_zig(
+    comptime T: type,
+    comptime qVecSize: u32,
+    comptime tNi: type,
+    comptime memoryLayout: h.enum_MemoryLayoutType,
+    comptime streaming: h.enum_Streaming,
+    fq: qVec.FieldAccess(T, qVecSize, tNi, memoryLayout, streaming),
+) void {
+
+    var i: tNi = 1;
+    while (i < fq.xg - 1) : (i += 1) {
+        var j: tNi = 1;
+        while (j < fq.yg - 1) : (j += 1) {
+            var k: tNi = 1;
+            while (k < fq.zg - 1) : (k += 1) {
+                var q: [qVecSize]T = fq.read(i, j, k);
+                var m = [_]T{0} ** qVecSize;
+
+                //the first position is simply the entire mass-vector (Q summed up)
+                m[h.M01] = q[h.Q01] + q[h.Q03] + q[h.Q02] + q[h.Q04] + q[h.Q05] + q[h.Q06] + q[h.Q07] + q[h.Q14] + q[h.Q08] + q[h.Q13] + q[h.Q09] + q[h.Q16] + q[h.Q10] + q[h.Q15] + q[h.Q11] + q[h.Q18] + q[h.Q12] + q[h.Q17];
+
+
+                //the second position is everything with an x-component
+                m[h.M02] = q[h.Q01] - q[h.Q02] + q[h.Q07] - q[h.Q14] - q[h.Q08] + q[h.Q13] + q[h.Q09] - q[h.Q16] - q[h.Q10] + q[h.Q15];
+
+
+                //the third position is everything with an y-component
+                m[h.M03] = q[h.Q03] - q[h.Q04] + q[h.Q07] + q[h.Q14] - q[h.Q08] - q[h.Q13] + q[h.Q11] - q[h.Q18] - q[h.Q12] + q[h.Q17];
+
+
+                //the fourth position is everything with a z-component
+                m[h.M04] = q[h.Q05] - q[h.Q06] + q[h.Q09] + q[h.Q16] - q[h.Q10] - q[h.Q15] + q[h.Q11] + q[h.Q18] - q[h.Q12] - q[h.Q17];
+
+
+                //starting from the fifth position, it gets more complicated in
+                //structure, but it still follows the article by Eggels and Somers
+                m[h.M05] =  - q[h.Q03] - q[h.Q04] - q[h.Q05] - q[h.Q06] + q[h.Q07] + q[h.Q14] + q[h.Q08] + q[h.Q13] + q[h.Q09] + q[h.Q16] + q[h.Q10] + q[h.Q15];
+
+
+                m[h.M06] = q[h.Q07] - q[h.Q14] + q[h.Q08] - q[h.Q13];
+
+                m[h.M07] =  - q[h.Q01] - q[h.Q02] - q[h.Q05] - q[h.Q06] + q[h.Q07] + q[h.Q14] + q[h.Q08] + q[h.Q13] + q[h.Q11] + q[h.Q18] + q[h.Q12] + q[h.Q17];
+
+                m[h.M08] = q[h.Q09] - q[h.Q16] + q[h.Q10] - q[h.Q15];
+
+                m[h.M09] = q[h.Q11] - q[h.Q18] + q[h.Q12] - q[h.Q17];
+
+                m[h.M10] =  - q[h.Q01] - q[h.Q03] - q[h.Q02] - q[h.Q04] + q[h.Q09] + q[h.Q16] + q[h.Q10] + q[h.Q15] + q[h.Q11] + q[h.Q18] + q[h.Q12] + q[h.Q17];
+
+                m[h.M11] =  - q[h.Q01] + q[h.Q02] + 2*q[h.Q07] - 2*q[h.Q14] - 2*q[h.Q08] + 2*q[h.Q13] - q[h.Q09] + q[h.Q16] + q[h.Q10] - q[h.Q15];
+
+                m[h.M12] =  - q[h.Q03] + q[h.Q04] + 2*q[h.Q07] + 2*q[h.Q14] - 2*q[h.Q08] - 2*q[h.Q13] - q[h.Q11] + q[h.Q18] + q[h.Q12] - q[h.Q17];
+
+                m[h.M13] =  - 3*q[h.Q01] + 3*q[h.Q02] + 3*q[h.Q09] - 3*q[h.Q16] - 3*q[h.Q10] + 3*q[h.Q15];
+
+                m[h.M14] =  - 3*q[h.Q03] + 3*q[h.Q04] + 3*q[h.Q11] - 3*q[h.Q18] - 3*q[h.Q12] + 3*q[h.Q17];
+
+                m[h.M15] =  - 2*q[h.Q05] + 2*q[h.Q06] + q[h.Q09] + q[h.Q16] - q[h.Q10] - q[h.Q15] + q[h.Q11] + q[h.Q18] - q[h.Q12] - q[h.Q17];
+
+                m[h.M16] =  - 3*q[h.Q09] - 3*q[h.Q16] + 3*q[h.Q10] + 3*q[h.Q15] + 3*q[h.Q11] + 3*q[h.Q18] - 3*q[h.Q12] - 3*q[h.Q17];
+
+                m[h.M17] = 0.5*q[h.Q01] + 0.5*q[h.Q03] + 0.5*q[h.Q02] + 0.5*q[h.Q04] - q[h.Q05] - q[h.Q06] - q[h.Q07] - q[h.Q14] - q[h.Q08] - q[h.Q13] + 0.5*q[h.Q09] + 0.5*q[h.Q16] + 0.5*q[h.Q10] + 0.5*q[h.Q15] + 0.5*q[h.Q11] + 0.5*q[h.Q18] + 0.5*q[h.Q12] + 0.5*q[h.Q17];
+
+                m[h.M18] = 1.5*q[h.Q01] - 1.5*q[h.Q03] + 1.5*q[h.Q02] - 1.5*q[h.Q04] - 1.5*q[h.Q09] - 1.5*q[h.Q16] - 1.5*q[h.Q10] - 1.5*q[h.Q15] + 1.5*q[h.Q11] + 1.5*q[h.Q18] + 1.5*q[h.Q12] + 1.5*q[h.Q17];
+
+                fq.writeMoments(i, j, k, m);
+
+            }
+        }
+    }
+
+}//end of func
+
+
+
 export fn EgglesSomers_collision_zig__neive__float__long_int__19_ijkl(
     q: [*]f32,
     F: [*]f32,
@@ -207,4 +282,38 @@ export fn EgglesSomers_collision_zig__esotwist__float__long_int__19_ijkl(
     var flow = qVec.FlowParams(f32){ .nu = flow_nu, .useLES = flow_useLes, .cs0 = flow_cs0, .g3 = flow_g3 };
 
     EgglesSomers_collision_zig(f32, 18, c_long, h.MemoryLayoutIJKL, h.Esotwist, flow, fq, @ptrCast([*]qVec.Force(f32), F), Nu);
+}
+
+export fn EgglesSomers_collision_moments_zig__neive__float__long_int__19_ijkl(
+    q: [*]f32,
+    xg: c_long,
+    yg: c_long,
+    zg: c_long
+) void {
+    var fq = qVec.FieldAccess(f32, 18, c_long, h.MemoryLayoutIJKL, h.Simple){
+        .q = q,
+        .xg = xg,
+        .yg = yg,
+        .zg = zg,
+    };
+
+    EgglesSomers_collision_moments_zig(f32, 18, c_long, h.MemoryLayoutIJKL, h.Simple, fq);
+}
+
+export fn EgglesSomers_collision_moments_zig__esotwist__float__long_int__19_ijkl(
+    q: [*]f32,
+    xg: c_long,
+    yg: c_long,
+    zg: c_long,
+    evenStep: c_int
+) void {
+    var fq = qVec.FieldAccess(f32, 18, c_long, h.MemoryLayoutIJKL, h.Esotwist){
+        .q = q,
+        .xg = xg,
+        .yg = yg,
+        .zg = zg,
+    };
+    fq.streaming.evenStep = if (evenStep == 0) false else true;
+
+    EgglesSomers_collision_moments_zig(f32, 18, c_long, h.MemoryLayoutIJKL, h.Esotwist, fq);
 }
