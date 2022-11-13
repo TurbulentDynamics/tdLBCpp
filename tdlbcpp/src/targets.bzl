@@ -41,9 +41,8 @@ def _zig_rule(ctx):
     hdrs = ctx.files.hdrs
     paths = [src.path for src in srcs]
     copts = ctx.attr.copts
-    includes_folders = list([("./" + k + "/") for k in dict([(hdr.dirname, 1) for hdr in hdrs if hdr.path.lower().endswith(".h")]).keys()])
-    includes_opts = [item for pair in zip(["-isystem"] * len(includes_folders), includes_folders) for item in pair]
-    includes_opts += [("-I" + item) for item in includes_folders]
+    includes_folders = list([k for k in dict([(hdr.dirname, 1) for hdr in hdrs if hdr.path.lower().endswith(".h")]).keys()])
+    includes_opts = [("-I" + item) for item in includes_folders]
 
     ctx.actions.run(
         mnemonic = "zig",
