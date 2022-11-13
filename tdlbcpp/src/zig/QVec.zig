@@ -142,7 +142,7 @@ pub fn Streaming(comptime T: type, comptime qVecSize: comptime_int, comptime tNi
                     }
                     qVec[h.Q12] = fa.peek(i, j_, k_).q(self.esoMap(h.Q12)).*;
                     qVec[h.Q10] = fa.peek(i_, j, k_).q(self.esoMap(h.Q10)).*;
-                    qVec[h.Q08] = fa.peek(i_, j_, k_).q(self.esoMap(h.Q08)).*;
+                    qVec[h.Q08] = fa.peek(i_, j_, k).q(self.esoMap(h.Q08)).*;
                     return qVec;
                 },
                 else => {

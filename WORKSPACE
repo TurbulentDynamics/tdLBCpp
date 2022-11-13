@@ -49,13 +49,17 @@ http_archive(
 
 load("@bazel-zig-cc//toolchain:defs.bzl", zig_toolchains = "toolchains")
 
+ZIG_VERSION = "0.10.0"
+#DOWNLOAD_PATH = "builds" # for snapshots
+DOWNLOAD_PATH = "download/{}".format(ZIG_VERSION) # for releases
+
 # version, url_formats and host_platform_sha256 are optional, but highly
 # recommended. Zig SDK is by default downloaded from dl.jakstys.lt, which is a
 # tiny server in the closet of Yours Truly.
 zig_toolchains(
-    version = "0.10.0-dev.4253+fa9327ac0",
+    version = "{}".format(ZIG_VERSION),
     url_formats = [
-        "https://ziglang.org/builds/zig-{host_platform}-{version}.tar.xz",
+        "https://ziglang.org/{}".format(DOWNLOAD_PATH) + "/zig-{host_platform}-{version}.tar.xz",
     ],
-    host_platform_sha256 = { "linux-x86_64": "a701d9f2f60d65feee20f60b8e729224187cab80805685ae207ab67dd13e8f1b" },
+    host_platform_sha256 = { "linux-x86_64": "631ec7bcb649cd6795abe40df044d2473b59b44e10be689c15632a0458ddea55" },
 )

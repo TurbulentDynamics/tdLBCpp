@@ -67,8 +67,8 @@ cc_library(
 
 zig_lib(
     name = "zigModules",
-    srcs = ["CollisionEgglesSomers.zig"],
-    hdrs = ["QVec.zig", "Header.h"],
+    srcs = ["zig/CollisionEgglesSomers.zig"],
+    hdrs = ["zig/QVec.zig", "Header.h"],
 )
 
 tdlbcpp_deps = [":cxxopts", ":timer", "//tdlbcpp/src/Params:params", ":computeUnit", "//tdlbcpp/src/Tools:toojpeg",
