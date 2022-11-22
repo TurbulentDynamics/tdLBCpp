@@ -215,7 +215,6 @@ pub fn Streaming(comptime T: type, comptime qVecSize: comptime_int, comptime tNi
                     fa.peek(i, j_, k_).q(self.esoMap(h.Q12)).* = qVec[h.Q12];
                     fa.peek(i_, j, k_).q(self.esoMap(h.Q10)).* = qVec[h.Q10];
                     fa.peek(i_, j_, k).q(self.esoMap(h.Q08)).* = qVec[h.Q08];
-                    return qVec;
                 },
                 else => {
                     @compileError("Not supported streaming: '" ++ streaming ++ "'");
@@ -229,6 +228,7 @@ pub fn FieldAccess(comptime T: type, comptime qVecSize: comptime_int, comptime t
     return extern struct {
         const Self = @This();
         const StreamingType = Streaming(T, qVecSize, tNi, memoryLayout, streaming);
+        const h = header;
         q: [*]T,
         xg: tNi,
         yg: tNi,
@@ -239,18 +239,87 @@ pub fn FieldAccess(comptime T: type, comptime qVecSize: comptime_int, comptime t
             return @intCast(usize, i * (self.yg * self.zg) + (j * self.zg) + k);
         }
 
-        pub fn peek(self: Self, i: tNi, j: tNi, k: tNi) QVecAccess(T, tNi) {
+        pub inline fn dirn(self: Self, comptime dirnQ: comptime_int, i: tNi, j: tNi, k: tNi) usize {
+            switch (dirnQ) {
+                -1 => {
+                    return @intCast(usize, i * (self.yg * self.zg) + (j * self.zg) + k);
+                },
+                h.Q01 => {
+                    return @intCast(usize, (i + 1) * (self.yg * self.zg) + (j * self.zg) + k);
+                },
+                h.Q02 => {
+                    return @intCast(usize, (i - 1) * (self.yg * self.zg) + (j * self.zg) + k);
+                },
+                h.Q03 => {
+                    return @intCast(usize, i * (self.yg * self.zg) + ((j + 1) * self.zg) + k);
+                },
+                h.Q04 => {
+                    return @intCast(usize, i * (self.yg * self.zg) + ((j - 1) * self.zg) + k);
+                },
+                h.Q05 => {
+                    return @intCast(usize, i * (self.yg * self.zg) + (j * self.zg) + (k + 1));
+                },
+                h.Q06 => {
+                    return @intCast(usize, i * (self.yg * self.zg) + (j * self.zg) + (k - 1));
+                },
+                h.Q07 => {
+                    return @intCast(usize, (i + 1) * (self.yg * self.zg) + ((j + 1) * self.zg) + k);
+                },
+                h.Q08 => {
+                    return @intCast(usize, (i - 1) * (self.yg * self.zg) + ((j - 1) * self.zg) + k);
+                },
+                h.Q09 => {
+                    return @intCast(usize, (i + 1) * (self.yg * self.zg) + (j * self.zg) + (k + 1));
+                },
+                h.Q10 => {
+                    return @intCast(usize, (i - 1) * (self.yg * self.zg) + (j * self.zg) + (k - 1));
+                },
+                h.Q11 => {
+                    return @intCast(usize, i * (self.yg * self.zg) + ((j + 1) * self.zg) + (k + 1));
+                },
+                h.Q12 => {
+                    return @intCast(usize, i * (self.yg * self.zg) + ((j - 1) * self.zg) + (k - 1));
+                },
+                h.Q13 => {
+                    return @intCast(usize, (i + 1) * (self.yg * self.zg) + ((j - 1) * self.zg) + k);
+                },
+                h.Q14 => {
+                    return @intCast(usize, (i - 1) * (self.yg * self.zg) + ((j + 1) * self.zg) + k);
+                },
+                h.Q15 => {
+                    return @intCast(usize, (i + 1) * (self.yg * self.zg) + (j * self.zg) + (k - 1));
+                },
+                h.Q16 => {
+                    return @intCast(usize, (i - 1) * (self.yg * self.zg) + (j * self.zg) + (k + 1));
+                },
+                h.Q17 => {
+                    return @intCast(usize, i * (self.yg * self.zg) + ((j + 1) * self.zg) + (k - 1));
+                },
+                h.Q18 => {
+                    return @intCast(usize, i * (self.yg * self.zg) + ((j - 1) * self.zg) + (k + 1));
+                },
+                else => {
+                    @compileError("Not supported direction: '" ++ dirnQ ++ "'");
+                },
+            }
+        }
+
+        pub inline fn peekDirn(self: Self, comptime dirnQ: comptime_int, i: tNi, j: tNi, k: tNi) QVecAccess(T, tNi) {
             switch (memoryLayout) {
                 header.MemoryLayoutIJKL => {
-                    return QVecAccess(T, tNi){ .qF = self.q, .offset = self.index(i, j, k) * qVecSize, .step = 1 };
+                    return QVecAccess(T, tNi){ .qF = self.q, .offset = self.dirn(dirnQ, i, j, k) * qVecSize, .step = 1 };
                 },
                 header.MemoryLayoutLIJK => {
-                    return QVecAccess(T, tNi){ .qF = self.q, .offset = self.index(i, j, k), .step = self.xg * self.yg * self.zg };
+                    return QVecAccess(T, tNi){ .qF = self.q, .offset = self.dirn(dirnQ, i, j, k), .step = self.xg * self.yg * self.zg };
                 },
                 else => {
                     @compileError("Not supported layout: '" ++ memoryLayout ++ "'");
                 },
             }
+        }
+
+        pub fn peek(self: Self, i: tNi, j: tNi, k: tNi) QVecAccess(T, tNi) {
+            return self.peekDirn(-1, i, j, k);
         }
 
         pub fn read(self: Self, i: tNi, j: tNi, k: tNi) [qVecSize]T {

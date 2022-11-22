@@ -5,36 +5,38 @@ const h = @cImport({
     @cInclude("Header.h");
 });
 const qVec = @import("QVec.zig");
+const cu = @import("ComputeUnit.zig");
 
 inline fn range(comptime tNi: type, bound: tNi) []const u0 {
     var ubound: usize = if (bound >= 0) @intCast(usize, bound) else 0;
     return [_]u0{0} ** ubound;
 }
 
-inline fn EgglesSomers_collision_zig(
+pub inline fn EgglesSomers_collision_zig(
     comptime T: type,
     comptime qVecSize: u32,
     comptime tNi: type,
     comptime memoryLayout: h.enum_MemoryLayoutType,
     comptime streaming: h.enum_Streaming,
-    flow: qVec.FlowParams(T),
-    fq: qVec.FieldAccess(T, qVecSize, tNi, memoryLayout, streaming),
-    F: [*]qVec.Force(T),
-    Nu: [*]T,
+    compUnit: cu.ComputeUnit(T, qVecSize, tNi, memoryLayout, streaming)
 ) void {
+    const flow = compUnit.flow;
+    const fa = compUnit.fa;
+    const F = compUnit.F;
+    const Nu = compUnit.Nu;
     //kinematic viscosity.
     var b: T = 1.0 / (1.0 + 6 * flow.nu);
     var c: T = 1.0 - 6 * flow.nu;
 
     var i: tNi = 1;
-    while (i < fq.xg - 1) : (i += 1) {
+    while (i < fa.xg - 1) : (i += 1) {
         var j: tNi = 1;
-        while (j < fq.yg - 1) : (j += 1) {
+        while (j < fa.yg - 1) : (j += 1) {
             var k: tNi = 1;
-            while (k < fq.zg - 1) : (k += 1) {
-                var f: *qVec.Force(T) = &F[fq.index(i, j, k)];
+            while (k < fa.zg - 1) : (k += 1) {
+                var f: *qVec.Force(T) = &F[fa.index(i, j, k)];
 
-                var m: [qVecSize]T = fq.read(i, j, k);
+                var m: [qVecSize]T = fa.read(i, j, k);
                 var mq = qVec.QVec(T, qVecSize){ .q = m };
 
                 var u: qVec.Velocity(T) = mq.velocity(f.*);
@@ -42,26 +44,26 @@ inline fn EgglesSomers_collision_zig(
                 var alpha = [_]T{0} ** qVecSize;
 
                 if (flow.useLES == 1) {
-                    var fct: T = 3.0 / (m[h.M01] * (1.0 + 6.0 * (Nu[fq.index(i, j, k)] + flow.nu)));
+                    var fct: T = 3.0 / (m[h.M01] * (1.0 + 6.0 * (Nu[fa.index(i, j, k)] + flow.nu)));
 
                     //calculating the derivatives for x, y and z
-                    var dudx: T = fct * ((m[h.M02] + 0.5 * F[fq.index(i, j, k)].x * u.x - m[h.M05]));
-                    var dvdy: T = fct * ((m[h.M03] + 0.5 * F[fq.index(i, j, k)].y * u.y - m[h.M07]));
-                    var dwdz: T = fct * ((m[h.M04] + 0.5 * F[fq.index(i, j, k)].z * u.z - m[h.M10]));
+                    var dudx: T = fct * ((m[h.M02] + 0.5 * F[fa.index(i, j, k)].x * u.x - m[h.M05]));
+                    var dvdy: T = fct * ((m[h.M03] + 0.5 * F[fa.index(i, j, k)].y * u.y - m[h.M07]));
+                    var dwdz: T = fct * ((m[h.M04] + 0.5 * F[fa.index(i, j, k)].z * u.z - m[h.M10]));
 
                     var divv: T = dudx + dvdy + dwdz;
 
                     //calculating the cross terms, used for the shear matrix
-                    var dudypdvdx: T = 2 * fct * ((m[h.M03]) + 0.5 * F[fq.index(i, j, k)].y * u.x - m[h.M06]);
-                    var dudzpdwdx: T = 2 * fct * ((m[h.M04]) + 0.5 * F[fq.index(i, j, k)].z * u.x - m[h.M08]);
-                    var dvdzpdwdy: T = 2 * fct * ((m[h.M04]) + 0.5 * F[fq.index(i, j, k)].z * u.y - m[h.M09]);
+                    var dudypdvdx: T = 2 * fct * ((m[h.M03]) + 0.5 * F[fa.index(i, j, k)].y * u.x - m[h.M06]);
+                    var dudzpdwdx: T = 2 * fct * ((m[h.M04]) + 0.5 * F[fa.index(i, j, k)].z * u.x - m[h.M08]);
+                    var dvdzpdwdy: T = 2 * fct * ((m[h.M04]) + 0.5 * F[fa.index(i, j, k)].z * u.y - m[h.M09]);
 
                     //calculating sh (the resolved deformation rate, S^2)
                     var sh: T = 2 * dudx * dudx + 2 * dvdy * dvdy + 2 * dwdz * dwdz + dudypdvdx * dudypdvdx + dudzpdwdx * dudzpdwdx + dvdzpdwdy * dvdzpdwdy - (2.0 / 3.0) * divv * divv;
 
                     //calculating eddy viscosity:
                     //nu_t = (lambda_mix)^2 * sqrt(S^2)     (Smagorinsky)
-                    Nu[fq.index(i, j, k)] = flow.cs0 * flow.cs0 * @sqrt(@fabs(sh));
+                    Nu[fa.index(i, j, k)] = flow.cs0 * flow.cs0 * @sqrt(@fabs(sh));
 
                     // Viscosity is adjusted only for LES, because LES uses a
                     // subgrid-adjustment model for turbulence that's too small to
@@ -72,7 +74,7 @@ inline fn EgglesSomers_collision_zig(
                     // Somers (1993) -> low strain rates do not excite the
                     // eddy viscosity.
 
-                    var nut: T = Nu[fq.index(i, j, k)] + flow.nu;
+                    var nut: T = Nu[fa.index(i, j, k)] + flow.nu;
                     b = 1.0 / (1.0 + 6 * nut);
                     c = 1.0 - 6 * nut;
                 } //end of LES
@@ -153,28 +155,28 @@ inline fn EgglesSomers_collision_zig(
 
                 m[h.M17] = alpha[h.M01] + 2 * alpha[h.M03] - 2 * alpha[h.M04] - 1.5 * alpha[h.M05] + 1.5 * alpha[h.M07] - 6 * alpha[h.M09] + 1.5 * alpha[h.M10] - alpha[h.M12] + alpha[h.M14] - alpha[h.M15] - alpha[h.M16] + alpha[h.M17] + alpha[h.M18];
 
-                fq.write(i, j, k, m);
+                fa.write(i, j, k, m);
             }
         }
     }
 }
 
-inline fn EgglesSomers_collision_moments_zig(
+pub inline fn EgglesSomers_collision_moments_zig(
     comptime T: type,
     comptime qVecSize: u32,
     comptime tNi: type,
     comptime memoryLayout: h.enum_MemoryLayoutType,
     comptime streaming: h.enum_Streaming,
-    fq: qVec.FieldAccess(T, qVecSize, tNi, memoryLayout, streaming),
+    fa: qVec.FieldAccess(T, qVecSize, tNi, memoryLayout, streaming),
 ) void {
 
     var i: tNi = 1;
-    while (i < fq.xg - 1) : (i += 1) {
+    while (i < fa.xg - 1) : (i += 1) {
         var j: tNi = 1;
-        while (j < fq.yg - 1) : (j += 1) {
+        while (j < fa.yg - 1) : (j += 1) {
             var k: tNi = 1;
-            while (k < fq.zg - 1) : (k += 1) {
-                var q: [qVecSize]T = fq.read(i, j, k);
+            while (k < fa.zg - 1) : (k += 1) {
+                var q: [qVecSize]T = fa.read(i, j, k);
                 var m = [_]T{0} ** qVecSize;
 
                 //the first position is simply the entire mass-vector (Q summed up)
@@ -224,96 +226,10 @@ inline fn EgglesSomers_collision_moments_zig(
 
                 m[h.M18] = 1.5*q[h.Q01] - 1.5*q[h.Q03] + 1.5*q[h.Q02] - 1.5*q[h.Q04] - 1.5*q[h.Q09] - 1.5*q[h.Q16] - 1.5*q[h.Q10] - 1.5*q[h.Q15] + 1.5*q[h.Q11] + 1.5*q[h.Q18] + 1.5*q[h.Q12] + 1.5*q[h.Q17];
 
-                fq.writeMoments(i, j, k, m);
+                fa.writeMoments(i, j, k, m);
 
             }
         }
     }
 
 }//end of func
-
-
-
-export fn EgglesSomers_collision_zig__neive__float__long_int__19_ijkl(
-    q: [*]f32,
-    F: [*]f32,
-    Nu: [*]f32,
-    xg: c_long,
-    yg: c_long,
-    zg: c_long,
-    flow_cs0: f32,
-    flow_g3: f32,
-    flow_nu: f32,
-    flow_useLes: c_int,
-) void {
-    var fq = qVec.FieldAccess(f32, 18, c_long, h.MemoryLayoutIJKL, h.Simple){
-        .q = q,
-        .xg = xg,
-        .yg = yg,
-        .zg = zg,
-    };
-
-    var flow = qVec.FlowParams(f32){ .nu = flow_nu, .useLES = flow_useLes, .cs0 = flow_cs0, .g3 = flow_g3 };
-
-    EgglesSomers_collision_zig(f32, 18, c_long, h.MemoryLayoutIJKL, h.Simple, flow, fq, @ptrCast([*]qVec.Force(f32), F), Nu);
-}
-
-export fn EgglesSomers_collision_zig__esotwist__float__long_int__19_ijkl(
-    q: [*]f32,
-    F: [*]f32,
-    Nu: [*]f32,
-    xg: c_long,
-    yg: c_long,
-    zg: c_long,
-    flow_cs0: f32,
-    flow_g3: f32,
-    flow_nu: f32,
-    flow_useLes: c_int,
-    evenStep: c_int,
-) void {
-    var fq = qVec.FieldAccess(f32, 18, c_long, h.MemoryLayoutIJKL, h.Esotwist){
-        .q = q,
-        .xg = xg,
-        .yg = yg,
-        .zg = zg,
-    };
-    fq.streaming.evenStep = if (evenStep == 0) false else true;
-
-    var flow = qVec.FlowParams(f32){ .nu = flow_nu, .useLES = flow_useLes, .cs0 = flow_cs0, .g3 = flow_g3 };
-
-    EgglesSomers_collision_zig(f32, 18, c_long, h.MemoryLayoutIJKL, h.Esotwist, flow, fq, @ptrCast([*]qVec.Force(f32), F), Nu);
-}
-
-export fn EgglesSomers_collision_moments_zig__neive__float__long_int__19_ijkl(
-    q: [*]f32,
-    xg: c_long,
-    yg: c_long,
-    zg: c_long
-) void {
-    var fq = qVec.FieldAccess(f32, 18, c_long, h.MemoryLayoutIJKL, h.Simple){
-        .q = q,
-        .xg = xg,
-        .yg = yg,
-        .zg = zg,
-    };
-
-    EgglesSomers_collision_moments_zig(f32, 18, c_long, h.MemoryLayoutIJKL, h.Simple, fq);
-}
-
-export fn EgglesSomers_collision_moments_zig__esotwist__float__long_int__19_ijkl(
-    q: [*]f32,
-    xg: c_long,
-    yg: c_long,
-    zg: c_long,
-    evenStep: c_int
-) void {
-    var fq = qVec.FieldAccess(f32, 18, c_long, h.MemoryLayoutIJKL, h.Esotwist){
-        .q = q,
-        .xg = xg,
-        .yg = yg,
-        .zg = zg,
-    };
-    fq.streaming.evenStep = if (evenStep == 0) false else true;
-
-    EgglesSomers_collision_moments_zig(f32, 18, c_long, h.MemoryLayoutIJKL, h.Esotwist, fq);
-}

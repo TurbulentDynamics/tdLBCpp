@@ -85,6 +85,11 @@ zig_lib = rule(
     attrs = {
         "srcs": attr.label_list(allow_files = [".zig", ".h"]),
         "hdrs": attr.label_list(allow_files = [".zig", ".h"]),
+        "deps": attr.label_list(
+            mandatory = False,
+            allow_empty = False,
+            providers = [CcInfo],
+        ),
         "copts": attr.string_list(),
         "compiler": attr.label(
             default = Label("@zig_sdk//:tools/build-lib"),

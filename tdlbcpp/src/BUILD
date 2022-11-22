@@ -1,5 +1,5 @@
 load("@rules_cuda//cuda:defs.bzl", "cuda_library")
-load("//tdlbcpp/src:targets.bzl", "cc_binary_rule", "zig_lib")
+load("//tdlbcpp/src:targets.bzl", "cc_binary_rule")
 
 config_setting(
     name = "use_gpu",
@@ -51,6 +51,13 @@ cc_library(
 )
 
 cc_library(
+    name = "header",
+    hdrs = ["Header.h"],
+    visibility = ["//visibility:public"],
+    strip_include_prefix="",
+)
+
+cc_library(
     name = "computeUnitCu",
     hdrs = ["ComputeUnit.cuh", "ComputeUnitGpu.h", "ComputeUnitGpu.hpp", "Forcing.cuh", "CollisionEgglesSomers.cuh", "Boundary.cuh", 
             "StreamingSimple.cuh", "StreamingEsoTwist.cuh", "ComputeUnitOutput.cuh"],
@@ -65,12 +72,6 @@ cc_library(
     strip_include_prefix="",
 )
 
-zig_lib(
-    name = "zigModules",
-    srcs = ["zig/CollisionEgglesSomers.zig"],
-    hdrs = ["zig/QVec.zig", "Header.h"],
-)
-
 tdlbcpp_deps = [":cxxopts", ":timer", "//tdlbcpp/src/Params:params", ":computeUnit", "//tdlbcpp/src/Tools:toojpeg",
                 "@tdLBGeometryRushtonTurbineLib//Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib"]
 
@@ -79,7 +80,7 @@ cc_binary_rule(
     srcs = ["main.cpp"],
     deps = tdlbcpp_deps,
     deps_gpu = tdlbcpp_deps + [":computeUnitCu"],
-    deps_zig = tdlbcpp_deps + [":zigModules", ":computeUnitZig"],
+    deps_zig = tdlbcpp_deps + ["//tdlbcpp/src/zig:zigModules", ":computeUnitZig"],
     copts = ["-Iexternal/local_cuda/cuda/samples/common/inc/",
              "-I$(BINDIR)/tdlbcpp/src", "-fsanitize=undefined", "-Werror"], # workaround for generated sources
     linkopts = ["-fsanitize=undefined"]

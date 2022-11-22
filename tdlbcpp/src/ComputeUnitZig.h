@@ -11,6 +11,7 @@ class ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamin
 
     virtual void collision();
     virtual void moments();
+    virtual void bounceBackBoundary();
 };
 
 #include "ComputeUnitZig.hpp"
