@@ -47,8 +47,9 @@ uses `zig` compiler to compile all c++ code and zig code
 
 ```
 bazel build --config zig //tdlbcpp/src:tdlbcpp
+```
 
-##Tests
+## Tests
 ```
 bazel test //tdlbcpp/tests/Params:tests
 ```
