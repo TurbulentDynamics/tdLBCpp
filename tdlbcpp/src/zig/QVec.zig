@@ -390,25 +390,5 @@ pub fn FlowParams(comptime T: type) type {
         alpha: T = 0,
         beta: T = 0,
         useLES: c_int = 0,
-
-        pub fn create(
-            initialRho: T,
-            reMNonDimensional: T,
-            uav: T,
-            cs0: T,
-            g3: T,
-            nu: T,
-            fx0: T,
-            fy0: T,
-            fz0: T,
-            Re_m: T,
-            Re_f: T,
-            uf: T,
-            alpha: T,
-            beta: T,
-            useLES: c_int,
-        ) Self {
-            return Self{ .initialRho = initialRho, .reMNonDimensional = reMNonDimensional, .uav = uav, .cs0 = cs0, .g3 = g3, .nu = nu, .fx0 = fx0, .fy0 = fy0, .fz0 = fz0, .Re_m = Re_m, .Re_f = Re_f, .uf = uf, .alpha = alpha, .beta = beta, .useLES = useLES };
-        }
     };
 }
