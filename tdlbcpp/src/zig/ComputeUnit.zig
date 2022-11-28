@@ -7,7 +7,7 @@ const header = @cImport({
 });
 
 pub fn ComputeUnit(comptime T: type, comptime qVecSize: comptime_int, comptime tNi: type, comptime memoryLayout: header.enum_MemoryLayoutType, comptime streaming: header.enum_Streaming) type {
-    return struct {
+    return extern struct {
         const FieldAccessType = qv.FieldAccess(T, qVecSize, tNi, memoryLayout, streaming);
         const FlowParamsType = qv.FlowParams(T);
         const ForceType = qv.Force(T);
@@ -15,5 +15,7 @@ pub fn ComputeUnit(comptime T: type, comptime qVecSize: comptime_int, comptime t
         flow: FlowParamsType,
         F: [*]ForceType,
         Nu: [*]T,
+        O: [*]bool = undefined,
+        ghost: tNi = 0
     };
 }

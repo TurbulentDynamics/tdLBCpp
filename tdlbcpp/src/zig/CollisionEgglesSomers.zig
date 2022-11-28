@@ -7,10 +7,6 @@ const h = @cImport({
 const qVec = @import("QVec.zig");
 const cu = @import("ComputeUnit.zig");
 
-inline fn range(comptime tNi: type, bound: tNi) []const u0 {
-    var ubound: usize = if (bound >= 0) @intCast(usize, bound) else 0;
-    return [_]u0{0} ** ubound;
-}
 
 pub inline fn EgglesSomers_collision_zig(
     comptime T: type,

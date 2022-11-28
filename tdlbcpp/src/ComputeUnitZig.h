@@ -12,6 +12,7 @@ class ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streamin
     virtual void collision();
     virtual void moments();
     virtual void bounceBackBoundary();
+    virtual void forcing(std::vector<PosPolar<tNi, T>> &geom, T alfa, T beta);
 };
 
 #include "ComputeUnitZig.hpp"
