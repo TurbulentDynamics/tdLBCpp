@@ -1,5 +1,7 @@
 tdlbcpp-bin
 
+third_party/gyb/bin/gyb.pyc
+
 tdLBGeometryRushtonTurbineLib/
 tdLBCppApi/
 

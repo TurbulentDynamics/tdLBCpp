@@ -185,7 +185,6 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
 void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>::moments(){
 
-    using QVecAcc = QVecAccess<T, QVecSize, MemoryLayout>;
     using AF = AccessField<T, QVecSize, MemoryLayout, collisionType, streamingType>;
 
     for (tNi i = 1;  i <= xg1; i++) {

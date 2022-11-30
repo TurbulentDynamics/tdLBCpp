@@ -107,7 +107,10 @@ static inline std::string formatStep(tStep step){
     return sstream.str();
 }
 
-
+template<typename T>
+static inline unsigned char saturate(T val) {
+    return ((std::isnan(val) || val < 0) ? 0 : ((std::isinf(val) || val > 255) ? 255 : (unsigned char)val));
+}
 
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
@@ -173,7 +176,8 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi k = 1; k <= zg1; k++) {
-            pict[zg1 * (i - 1) + (k - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+            T color = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+            pict[zg1 * (i - 1) + (k - 1)] = saturate(color);
         }
     }
 
@@ -259,7 +263,8 @@ void ComputeUnitForcing<T, QVecSize, MemoryLayout, collisionType, streamingType>
 
     for (tNi i = 1;  i <= xg1; i++) {
         for (tNi j = 1; j <= yg1; j++) {
-            pict[(i - 1) + xg1 * (j - 1)] = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+            T color = floor(255 * ((Vort[index(i,j,k)] - min) / (max - min)));
+            pict[(i - 1) + xg1 * (j - 1)] = saturate(color);
         }
     }
 
@@ -377,7 +382,9 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::savePlaneXZ(OrthoPlaneParams pl
             tmp.jGrid = uint16_t(j      - 1);
             tmp.kGrid = uint16_t(k0 + k - 1);
 
+#ifndef __GNUC__
 #pragma unroll
+#endif
             for (int l=0; l<tDiskSize; l++){
                 tmp.q[l] = Q[index(i,j,k)].q[l];
             }

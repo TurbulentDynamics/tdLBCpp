@@ -8,3 +8,4 @@ build:gpu --copt="-DWITH_GPU" --define gpu=yes --verbose_failures -s
 build:gpu_shared --copt="-DWITH_GPU_MEMSHARED" --define gpu=yes --verbose_failures -s
 build:mpi_gpu --@rules_cuda//cuda:compiler=mpicc --client_env=CC=mpicc --copt="-DWITH_MPI" --copt="-DWITH_GPU" --define mpi_gpu=yes --verbose_failures -s
 build:tegra --copt="-DWITH_TEGRA" --verbose_failures -s
+build:zig --spawn_strategy=local --incompatible_enable_cc_toolchain_resolution --platforms @zig_sdk//platform:linux_x86_64 --extra_toolchains @zig_sdk//toolchain:x86_64-linux-musl --copt="-DWITH_ZIG" --define zig=yes --verbose_failures -s

@@ -16,6 +16,11 @@ config_setting(
     define_values = {"mpi_gpu" : "yes"},
 )
 
+config_setting(
+    name = "use_zig",
+    define_values = {"zig" : "yes"},
+)
+
 
 [genrule(
     name = "generate_hpp_%d" % order,
@@ -46,9 +51,23 @@ cc_library(
 )
 
 cc_library(
+    name = "header",
+    hdrs = ["Header.h"],
+    visibility = ["//visibility:public"],
+    strip_include_prefix="",
+)
+
+cc_library(
     name = "computeUnitCu",
     hdrs = ["ComputeUnit.cuh", "ComputeUnitGpu.h", "ComputeUnitGpu.hpp", "Forcing.cuh", "CollisionEgglesSomers.cuh", "Boundary.cuh", 
             "StreamingSimple.cuh", "StreamingEsoTwist.cuh", "ComputeUnitOutput.cuh"],
+    visibility = ["//visibility:public"],
+    strip_include_prefix="",
+)
+
+cc_library(
+    name = "computeUnitZig",
+    hdrs = ["ComputeUnitZig.h", "ComputeUnitZig.hpp"],
     visibility = ["//visibility:public"],
     strip_include_prefix="",
 )
@@ -61,6 +80,8 @@ cc_binary_rule(
     srcs = ["main.cpp"],
     deps = tdlbcpp_deps,
     deps_gpu = tdlbcpp_deps + [":computeUnitCu"],
+    deps_zig = tdlbcpp_deps + ["//tdlbcpp/src/zig:zigModules", ":computeUnitZig"],
     copts = ["-Iexternal/local_cuda/cuda/samples/common/inc/",
-             "-I$(BINDIR)/tdlbcpp/src"], # workaround for generated sources
+             "-I$(BINDIR)/tdlbcpp/src", "-fsanitize=undefined", "-Werror"], # workaround for generated sources
+    linkopts = ["-fsanitize=undefined"]
 )
