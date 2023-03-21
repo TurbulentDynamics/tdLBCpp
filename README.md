@@ -15,6 +15,12 @@ python3 generate_stirred_tank_input.py -x 100 -f input_debug_gridx100_numSteps20
 
 ## Building
 
+### Dependencies
+```
+sudo apt install bazel
+cp /location/to/cuda-samples/Common/{helper_*,exception.h} tdlbcpp/src
+```
+
 ### Generic build
 ```
 bazel build //tdlbcpp/src:tdlbcpp --verbose_failures -s
@@ -42,7 +48,7 @@ Specify capabilities and custom cuda path using the following switches:
 bazel build -c dbg --config gpu --@rules_cuda//cuda:cuda_targets=sm_75 --repo_env=CUDA_PATH=/usr/local/cuda-11.5 //tdlbcpp/src:tdlbcpp
 ```
 
-##Tests
+## Tests
 ```
 bazel test //tdlbcpp/tests/Params:tests
 ```
