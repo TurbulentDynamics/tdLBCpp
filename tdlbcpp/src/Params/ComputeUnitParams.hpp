@@ -12,7 +12,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "json.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 
 
@@ -51,31 +52,31 @@ struct ComputeUnitParams {
      : nodeID(nodeID), deviceID(deviceID), idi(idi), idj(idj), idk(idk), x(x), y(y), z(z), i0(i0), j0(j0), k0(k0), ghost(ghost) {}
 
     
-    void getParamsFromJson(Json::Value jsonParams) {
+    void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
-                nodeID = (int)jsonParams["nodeID"].asInt();
-    deviceID = (int)jsonParams["deviceID"].asInt();
-    idi = (int)jsonParams["idi"].asInt();
-    idj = (int)jsonParams["idj"].asInt();
-    idk = (int)jsonParams["idk"].asInt();
-    x = (tNi)jsonParams["x"].asUInt64();
-    y = (tNi)jsonParams["y"].asUInt64();
-    z = (tNi)jsonParams["z"].asUInt64();
-    i0 = (tNi)jsonParams["i0"].asUInt64();
-    j0 = (tNi)jsonParams["j0"].asUInt64();
-    k0 = (tNi)jsonParams["k0"].asUInt64();
-    ghost = (tNi)jsonParams["ghost"].asUInt64();
-    resolution = (tNi)jsonParams["resolution"].asUInt64();
-    strQVecPrecision = (std::string)jsonParams["strQVecPrecision"].asString();
-    strQLength = (std::string)jsonParams["strQLength"].asString();
-    strMemoryLayout = (std::string)jsonParams["strMemoryLayout"].asString();
-    strCollisonAlgo = (std::string)jsonParams["strCollisonAlgo"].asString();
-    strStreamingAlgo = (std::string)jsonParams["strStreamingAlgo"].asString();
-    strCompileFlag = (std::string)jsonParams["strCompileFlag"].asString();
+                nodeID = (int)jsonParams["nodeID"].get<int>();
+    deviceID = (int)jsonParams["deviceID"].get<int>();
+    idi = (int)jsonParams["idi"].get<int>();
+    idj = (int)jsonParams["idj"].get<int>();
+    idk = (int)jsonParams["idk"].get<int>();
+    x = (tNi)jsonParams["x"].get<uint64_t>();
+    y = (tNi)jsonParams["y"].get<uint64_t>();
+    z = (tNi)jsonParams["z"].get<uint64_t>();
+    i0 = (tNi)jsonParams["i0"].get<uint64_t>();
+    j0 = (tNi)jsonParams["j0"].get<uint64_t>();
+    k0 = (tNi)jsonParams["k0"].get<uint64_t>();
+    ghost = (tNi)jsonParams["ghost"].get<uint64_t>();
+    resolution = (tNi)jsonParams["resolution"].get<uint64_t>();
+    strQVecPrecision = jsonParams["strQVecPrecision"].get<std::string>();
+    strQLength = jsonParams["strQLength"].get<std::string>();
+    strMemoryLayout = jsonParams["strMemoryLayout"].get<std::string>();
+    strCollisonAlgo = jsonParams["strCollisonAlgo"].get<std::string>();
+    strStreamingAlgo = jsonParams["strStreamingAlgo"].get<std::string>();
+    strCompileFlag = jsonParams["strCompileFlag"].get<std::string>();
 
             
         }
@@ -88,25 +89,25 @@ struct ComputeUnitParams {
     }
     
     
-    Json::Value getJson(){
+    json getJson() const {
         
         try {
             
-            Json::Value jsonParams;
+            json jsonParams;
             
                 jsonParams["nodeID"] = (int)nodeID;
     jsonParams["deviceID"] = (int)deviceID;
     jsonParams["idi"] = (int)idi;
     jsonParams["idj"] = (int)idj;
     jsonParams["idk"] = (int)idk;
-    jsonParams["x"] = (Json::UInt64)x;
-    jsonParams["y"] = (Json::UInt64)y;
-    jsonParams["z"] = (Json::UInt64)z;
-    jsonParams["i0"] = (Json::UInt64)i0;
-    jsonParams["j0"] = (Json::UInt64)j0;
-    jsonParams["k0"] = (Json::UInt64)k0;
-    jsonParams["ghost"] = (Json::UInt64)ghost;
-    jsonParams["resolution"] = (Json::UInt64)resolution;
+    jsonParams["x"] = x;
+    jsonParams["y"] = y;
+    jsonParams["z"] = z;
+    jsonParams["i0"] = i0;
+    jsonParams["j0"] = j0;
+    jsonParams["k0"] = k0;
+    jsonParams["ghost"] = ghost;
+    jsonParams["resolution"] = resolution;
     jsonParams["strQVecPrecision"] = (std::string)strQVecPrecision;
     jsonParams["strQLength"] = (std::string)strQLength;
     jsonParams["strMemoryLayout"] = (std::string)strMemoryLayout;
@@ -121,7 +122,7 @@ struct ComputeUnitParams {
             
             std::cerr << "Exception reached parsing arguments in ComputeUnitParams: " << e.what() << std::endl;
 
-            return "";
+            return json();
         }
     }
     
@@ -133,7 +134,7 @@ struct ComputeUnitParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
+            json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -156,10 +157,10 @@ struct ComputeUnitParams {
         
         try {
             
-            Json::Value jsonParams = getJson();
+            json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
+            out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
         } catch(std::exception& e){

@@ -12,7 +12,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "json.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 
 #include "OrthoPlaneParams.hpp"
@@ -267,19 +268,19 @@ struct OutputParams {
 
     }
 
-    template <typename ParamType> void getParamsFromJsonArray(Json::Value jsonArray, std::vector<ParamType> &array) {
+    template <typename ParamType> void getParamsFromJsonArray(const json& jsonArray, std::vector<ParamType> &array) {
         array.clear();
-        for (Json::Value::ArrayIndex i = 0; i < jsonArray.size(); i++) {
+        for (size_t i = 0; i < jsonArray.size(); i++) {
             ParamType param;
             param.getParamsFromJson(jsonArray[i]);
             array.push_back(param);
         }
     }
 
-    void getParamsFromJson(Json::Value jsonParams) {
+    void getParamsFromJson(const json& jsonParams) {
         try
         {
-            outputRootDir = jsonParams["outputRootDir"].asString();
+            outputRootDir = jsonParams["outputRootDir"].get<std::string>();
 
             getParamsFromJsonArray(jsonParams["XY_planes"], XY_planes);
             getParamsFromJsonArray(jsonParams["XZ_planes"], XZ_planes);
@@ -298,19 +299,19 @@ struct OutputParams {
         }
     }
 
-    template <typename ParamType> Json::Value getJsonOfArray(std::vector<ParamType> &array) {
-        Json::Value jsonArray = Json::arrayValue;
+    template <typename ParamType> json getJsonOfArray(std::vector<ParamType> &array) {
+        json jsonArray = json::array();
         for (ParamType param : array) {
             std::cout << param.getJson() << std::endl;
-            jsonArray.append(param.getJson());
+            jsonArray.push_back(param.getJson());
         }
         return jsonArray;
     }
 
-    Json::Value getJson() {
+    json getJson() {
         try
         {
-            Json::Value jsonParams;
+            json jsonParams;
 
             jsonParams["outputRootDir"] = outputRootDir;
 
@@ -331,7 +332,7 @@ struct OutputParams {
 
             std::cerr << "Unhandled Exception reached parsing arguments: "
             << e.what() << ", application will now exit" << std::endl;
-            return "";
+            return json();
         }
     }
 
@@ -346,7 +347,7 @@ struct OutputParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
+            json jsonParams;
             in >> jsonParams;
             in.close();
 
@@ -369,10 +370,10 @@ struct OutputParams {
 
         try {
 
-            Json::Value jsonParams = getJson();
+            json jsonParams = getJson();
 
             std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
+            out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
 
         } catch(std::exception& e){

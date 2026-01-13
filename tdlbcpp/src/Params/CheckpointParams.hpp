@@ -12,7 +12,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "json.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 
 
@@ -33,18 +34,18 @@ struct CheckpointParams {
     
     
     
-    void getParamsFromJson(Json::Value jsonParams) {
+    void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
-                startWithCheckpoint = (bool)jsonParams["startWithCheckpoint"].asBool();
-    checkpointLoadFromDir = (std::string)jsonParams["checkpointLoadFromDir"].asString();
-    checkpointRepeat = (int)jsonParams["checkpointRepeat"].asInt();
-    checkpointWriteRootDir = (std::string)jsonParams["checkpointWriteRootDir"].asString();
-    checkpointWriteDirPrefix = (std::string)jsonParams["checkpointWriteDirPrefix"].asString();
-    checkpointWriteDirAppendTime = (bool)jsonParams["checkpointWriteDirAppendTime"].asBool();
+                startWithCheckpoint = jsonParams["startWithCheckpoint"].get<bool>();
+    checkpointLoadFromDir = jsonParams["checkpointLoadFromDir"].get<std::string>();
+    checkpointRepeat = (int)jsonParams["checkpointRepeat"].get<int>();
+    checkpointWriteRootDir = jsonParams["checkpointWriteRootDir"].get<std::string>();
+    checkpointWriteDirPrefix = jsonParams["checkpointWriteDirPrefix"].get<std::string>();
+    checkpointWriteDirAppendTime = jsonParams["checkpointWriteDirAppendTime"].get<bool>();
 
             
         }
@@ -57,11 +58,11 @@ struct CheckpointParams {
     }
     
     
-    Json::Value getJson(){
+    json getJson() const {
         
         try {
             
-            Json::Value jsonParams;
+            json jsonParams;
             
                 jsonParams["startWithCheckpoint"] = (bool)startWithCheckpoint;
     jsonParams["checkpointLoadFromDir"] = (std::string)checkpointLoadFromDir;
@@ -77,7 +78,7 @@ struct CheckpointParams {
             
             std::cerr << "Exception reached parsing arguments in CheckpointParams: " << e.what() << std::endl;
 
-            return "";
+            return json();
         }
     }
     
@@ -89,7 +90,7 @@ struct CheckpointParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
+            json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -112,10 +113,10 @@ struct CheckpointParams {
         
         try {
             
-            Json::Value jsonParams = getJson();
+            json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
+            out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
         } catch(std::exception& e){

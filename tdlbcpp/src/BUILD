@@ -41,7 +41,7 @@ cc_library(
 cc_library(
     name = "computeUnit",
     hdrs = ["ComputeUnit.h", "Header.h", "Output.hpp", "DiskOutputTree.h", "Boundary.hpp", "CollisionEntropic.hpp", "GlobalStructures.hpp", "StreamingEsoteric.hpp", "cxxopts.hpp", "CollisionEgglesSomers.hpp", "ComputeUnit.hpp", "ComputeUnitOutput.hpp", "Forcing.hpp", "QVec.hpp", "StreamingSimple.hpp", "timer.h", "Field.hpp"],
-    deps = ["//tdlbcpp/src/Params:pjson"],
+    deps = ["//tdlbcpp/src/Params:params"],
     visibility = ["//visibility:public"],
     strip_include_prefix="",
 )
@@ -63,6 +63,5 @@ cc_binary_rule(
     deps = tdlbcpp_deps,
     deps_gpu = tdlbcpp_deps + [":computeUnitCu"],
     copts = ["-Iexternal/local_cuda/cuda/samples/common/inc/",
-             "-I$(BINDIR)/tdlbcpp/src",  # workaround for generated sources
-             "-Itdlbcpp/src/Params"],     # for json.h
+             "-I$(BINDIR)/tdlbcpp/src"],  # workaround for generated sources
 )

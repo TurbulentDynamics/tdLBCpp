@@ -13,6 +13,7 @@ bazel_dep(name = "rules_cc", version = "0.1.1")
 bazel_dep(name = "googletest", version = "1.15.2", repo_name = "googletest")
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "nlohmann_json", version = "3.11.3", repo_name = "json")
 
 # Local dependencies (vendored or submodules)
 # These are declared with bazel_dep and overridden with local_path_override

@@ -13,7 +13,8 @@
 #include <fstream>
 #include <cmath>
 
-#include "json.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 
 
@@ -70,47 +71,47 @@ struct FlowParams {
     }
 
     
-    void getParamsFromJson(Json::Value jsonParams) {
+    void getParamsFromJson(const json& jsonParams) {
 
-        
+
         try
         {
 
-                initialRho = (T)jsonParams["initialRho"].asDouble();
-    reMNonDimensional = (T)jsonParams["reMNonDimensional"].asDouble();
-    uav = (T)jsonParams["uav"].asDouble();
-    cs0 = (T)jsonParams["cs0"].asDouble();
-    g3 = (T)jsonParams["g3"].asDouble();
-    nu = (T)jsonParams["nu"].asDouble();
-    fx0 = (T)jsonParams["fx0"].asDouble();
-    fy0 = (T)jsonParams["fy0"].asDouble();
-    fz0 = (T)jsonParams["fz0"].asDouble();
-    Re_m = (T)jsonParams["Re_m"].asDouble();
-    Re_f = (T)jsonParams["Re_f"].asDouble();
-    uf = (T)jsonParams["uf"].asDouble();
-    alpha = (T)jsonParams["alpha"].asDouble();
-    beta = (T)jsonParams["beta"].asDouble();
-    useLES = (bool)jsonParams["useLES"].asBool();
-    collision = (std::string)jsonParams["collision"].asString();
-    streaming = (std::string)jsonParams["streaming"].asString();
+                initialRho = (T)jsonParams["initialRho"].get<double>();
+    reMNonDimensional = (T)jsonParams["reMNonDimensional"].get<double>();
+    uav = (T)jsonParams["uav"].get<double>();
+    cs0 = (T)jsonParams["cs0"].get<double>();
+    g3 = (T)jsonParams["g3"].get<double>();
+    nu = (T)jsonParams["nu"].get<double>();
+    fx0 = (T)jsonParams["fx0"].get<double>();
+    fy0 = (T)jsonParams["fy0"].get<double>();
+    fz0 = (T)jsonParams["fz0"].get<double>();
+    Re_m = (T)jsonParams["Re_m"].get<double>();
+    Re_f = (T)jsonParams["Re_f"].get<double>();
+    uf = (T)jsonParams["uf"].get<double>();
+    alpha = (T)jsonParams["alpha"].get<double>();
+    beta = (T)jsonParams["beta"].get<double>();
+    useLES = jsonParams["useLES"].get<bool>();
+    collision = jsonParams["collision"].get<std::string>();
+    streaming = jsonParams["streaming"].get<std::string>();
 
-            
+
         }
         catch(std::exception& e)
         {
             std::cerr << "Exception reached parsing arguments in FlowParams: " << e.what() << std::endl;
             exit(EXIT_FAILURE);
         }
-                
+
     }
     
     
-    Json::Value getJson(){
-        
+    json getJson() const {
+
         try {
-            
-            Json::Value jsonParams;
-            
+
+            json jsonParams;
+
                 jsonParams["initialRho"] = (double)initialRho;
     jsonParams["reMNonDimensional"] = (double)reMNonDimensional;
     jsonParams["uav"] = (double)uav;
@@ -125,18 +126,18 @@ struct FlowParams {
     jsonParams["uf"] = (double)uf;
     jsonParams["alpha"] = (double)alpha;
     jsonParams["beta"] = (double)beta;
-    jsonParams["useLES"] = (bool)useLES;
-    jsonParams["collision"] = (std::string)collision;
-    jsonParams["streaming"] = (std::string)streaming;
+    jsonParams["useLES"] = useLES;
+    jsonParams["collision"] = collision;
+    jsonParams["streaming"] = streaming;
 
-            
+
             return jsonParams;
-            
+
         } catch(std::exception& e) {
-            
+
             std::cerr << "Exception reached parsing arguments in FlowParams: " << e.what() << std::endl;
 
-            return "";
+            return json();
         }
     }
     
@@ -144,44 +145,44 @@ struct FlowParams {
     
     
     void getParamsFromJsonFile(const std::string filePath) {
-        
+
         try
         {
             std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
+            json jsonParams;
             in >> jsonParams;
             in.close();
-            
+
             getParamsFromJson(jsonParams);
-            
+
         }
         catch(std::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
             exit(EXIT_FAILURE);
         }
-        
+
     };
     
     
     
     
     int writeParamsToJsonFile(const std::string filePath) {
-        
-        
+
+
         try {
-            
-            Json::Value jsonParams = getJson();
-            
+
+            json jsonParams = getJson();
+
             std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
+            out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
-            
+
         } catch(std::exception& e){
-            
+
             std::cerr << "Exception writing json file for FlowParams: " << e.what() << std::endl;
         }
-        
+
         return 0;
     }
     

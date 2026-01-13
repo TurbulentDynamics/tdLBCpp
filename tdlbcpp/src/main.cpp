@@ -18,6 +18,9 @@
 //For the overflow error checking. (didnt work with pg compiler)
 #include <cfenv>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 
 #if WITH_GPU
 #include <cuda_runtime.h>
@@ -133,7 +136,7 @@ int main(int argc, char* argv[]){
 
         std::cout << "Loading input from: " << inputJsonFile << std::endl;
 
-        Json::Value jsonParams;
+        json jsonParams;
 
         try {
             std::ifstream in(inputJsonFile.c_str());

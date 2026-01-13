@@ -12,7 +12,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "json.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 
 
@@ -35,20 +36,20 @@ struct OrthoPlaneParams {
     
     
     
-    void getParamsFromJson(Json::Value jsonParams) {
+    void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
-                name_root = (std::string)jsonParams["name_root"].asString();
-    QDataType = (std::string)jsonParams["QDataType"].asString();
-    Q_output_len = (int)jsonParams["Q_output_len"].asInt();
-    use_half_float = (bool)jsonParams["use_half_float"].asBool();
-    cutAt = (tNi)jsonParams["cutAt"].asUInt64();
-    repeat = (tStep)jsonParams["repeat"].asUInt64();
-    start_at_step = (tStep)jsonParams["start_at_step"].asUInt64();
-    end_at_step = (tStep)jsonParams["end_at_step"].asUInt64();
+                name_root = jsonParams["name_root"].get<std::string>();
+    QDataType = jsonParams["QDataType"].get<std::string>();
+    Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
+    use_half_float = jsonParams["use_half_float"].get<bool>();
+    cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
+    repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
+    start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
+    end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
 
             
         }
@@ -61,20 +62,20 @@ struct OrthoPlaneParams {
     }
     
     
-    Json::Value getJson(){
+    json getJson() const {
         
         try {
             
-            Json::Value jsonParams;
+            json jsonParams;
             
                 jsonParams["name_root"] = (std::string)name_root;
     jsonParams["QDataType"] = (std::string)QDataType;
     jsonParams["Q_output_len"] = (int)Q_output_len;
     jsonParams["use_half_float"] = (bool)use_half_float;
-    jsonParams["cutAt"] = (Json::UInt64)cutAt;
-    jsonParams["repeat"] = (Json::UInt64)repeat;
-    jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
-    jsonParams["end_at_step"] = (Json::UInt64)end_at_step;
+    jsonParams["cutAt"] = cutAt;
+    jsonParams["repeat"] = repeat;
+    jsonParams["start_at_step"] = start_at_step;
+    jsonParams["end_at_step"] = end_at_step;
 
             
             return jsonParams;
@@ -83,7 +84,7 @@ struct OrthoPlaneParams {
             
             std::cerr << "Exception reached parsing arguments in OrthoPlaneParams: " << e.what() << std::endl;
 
-            return "";
+            return json();
         }
     }
     
@@ -95,7 +96,7 @@ struct OrthoPlaneParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
+            json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -118,10 +119,10 @@ struct OrthoPlaneParams {
         
         try {
             
-            Json::Value jsonParams = getJson();
+            json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
+            out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
         } catch(std::exception& e){

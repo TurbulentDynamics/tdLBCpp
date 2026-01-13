@@ -20,7 +20,8 @@
 #include <map>
 #include <string>
 #include <time.h>
-#include "json.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 
 #include "Header.h"
@@ -59,13 +60,13 @@ private:
     //Need to sync this across nodes
     std::string initTime = "initTimeNotSet";
 
-    Json::Value cuJson;
+    json cuJson;
 
-    Json::Value grid;
-    Json::Value flow;
-    Json::Value running;
-    Json::Value output;
-    Json::Value checkpoint;
+    json grid;
+    json flow;
+    json running;
+    json output;
+    json checkpoint;
 
 
 
@@ -95,7 +96,7 @@ public:
     };
 
 
-    DiskOutputTree(ComputeUnitParams cu, Json::Value grid, Json::Value flow, Json::Value running, Json::Value output, Json::Value checkpoint): cu(cu),  grid(grid), flow(flow), running(running), output(output), checkpoint(checkpoint) {
+    DiskOutputTree(ComputeUnitParams cu, json grid, json flow, json running, json output, json checkpoint): cu(cu),  grid(grid), flow(flow), running(running), output(output), checkpoint(checkpoint) {
 
         initTime = getTimeNowAsString();
 
@@ -133,7 +134,7 @@ public:
 //        createDir(checkpointWriteDir);
 //    };
 
-    void setParams(ComputeUnitParams cu1, Json::Value grid1, Json::Value flow1, Json::Value running1, Json::Value output1, Json::Value checkpoint1){
+    void setParams(ComputeUnitParams cu1, json grid1, json flow1, json running1, json output1, json checkpoint1){
 
         cu = cu1;
         cuJson = cu1.getJson();
@@ -157,7 +158,7 @@ public:
         grid = grid1.getJson();
     }
 
-    void setFlowParams(Json::Value flow1) {
+    void setFlowParams(json flow1) {
         flow = flow1;
     }
 
@@ -225,10 +226,10 @@ public:
 
 
     std::string paramSummary(){
-        std::string str = "_gridx_" + grid["x"].asString();
-        str += "_re_" + flow["reMNonDimensional"].asString();
-        str += "_les_" + flow["useLES"].asString();
-//        str += "_uav_" + flow["uav"].asString();
+        std::string str = "_gridx_" + grid["x"].get<std::string>();
+        str += "_re_" + flow["reMNonDimensional"].get<std::string>();
+        str += "_les_" + flow["useLES"].get<std::string>();
+//        str += "_uav_" + flow["uav"].get<std::string>();
         return str;
     }
 
@@ -262,9 +263,9 @@ public:
     std::string runningDataFileName(){
 
         std::string name = "";
-        if (running["runningDataFilePrefix"].asString() != "") name += running["runningDataFilePrefix"].asString() + "_";
+        if (running["runningDataFilePrefix"].get<std::string>() != "") name += running["runningDataFilePrefix"].get<std::string>() + "_";
         name += "running";
-        if (running["runningDataFileAppendTime"].asBool()) name += "_" + initTime;
+        if (running["runningDataFileAppendTime"].get<bool>()) name += "_" + initTime;
 
         return name;
     }
@@ -339,7 +340,7 @@ public:
 
     void setOutputDir(){
 
-        outputDir = output["outputRootDir"].asString() + "_" + initTime;
+        outputDir = output["outputRootDir"].get<std::string>() + "_" + initTime;
     }
 
 
@@ -415,8 +416,8 @@ public:
 
 
 
-    Json::Value getJsonParams(BinFileParams binFormat, RunningParams runParam){
-        Json::Value jsonParams;
+    json getJsonParams(BinFileParams binFormat, RunningParams runParam){
+        json jsonParams;
 
         try {
 
@@ -440,7 +441,7 @@ public:
 
     int writeAllParamsJson(BinFileParams binFormat, RunningParams runParam, std::string filePath){
 
-        Json::Value jsonParams = getJsonParams(binFormat, runParam);
+        json jsonParams = getJsonParams(binFormat, runParam);
 
         try {
             std::ofstream out(filePath.c_str(), std::ofstream::out);
@@ -460,7 +461,7 @@ public:
 
     int writeAllParamsJson(BinFileParams binFormat, RunningParams runParam){
 
-        Json::Value jsonParams = getJsonParams(binFormat, runParam);
+        json jsonParams = getJsonParams(binFormat, runParam);
 
         try {
 
@@ -489,7 +490,7 @@ public:
 
         try {
             std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
+            json jsonParams;
             in >> jsonParams;
             in.close();
 
@@ -545,16 +546,16 @@ public:
     std::string checkpointName(){
 
         std::string name = "";
-        if (checkpoint["checkpointWriteDirPrefix"].asString() != "") name += checkpoint["checkpointWriteDirPrefix"].asString() + "_";
+        if (checkpoint["checkpointWriteDirPrefix"].get<std::string>() != "") name += checkpoint["checkpointWriteDirPrefix"].get<std::string>() + "_";
         name += "checkpoint";
-        if (checkpoint["checkpointWriteDirAppendTime"].asBool()) name += "_" + initTime;
+        if (checkpoint["checkpointWriteDirAppendTime"].get<bool>()) name += "_" + initTime;
 
         return name;
     }
 
     void setCheckpointWriteDir(){
 
-        checkpointWriteDir = checkpoint["checkpointWriteRootDir"].asString();
+        checkpointWriteDir = checkpoint["checkpointWriteRootDir"].get<std::string>();
 
         checkpointWriteDir += "/" + checkpointName();
 

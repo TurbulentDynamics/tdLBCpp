@@ -12,7 +12,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "json.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 
 
@@ -43,26 +44,26 @@ struct BinFileParams {
     
     
     
-    void getParamsFromJson(Json::Value jsonParams) {
+    void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
-                filePath = (std::string)jsonParams["filePath"].asString();
-    name = (std::string)jsonParams["name"].asString();
-    note = (std::string)jsonParams["note"].asString();
-    structName = (std::string)jsonParams["structName"].asString();
-    binFileSizeInStructs = (tNi)jsonParams["binFileSizeInStructs"].asUInt64();
-    coordsType = (std::string)jsonParams["coordsType"].asString();
-    hasGridtCoords = (bool)jsonParams["hasGridtCoords"].asBool();
-    hasColRowtCoords = (bool)jsonParams["hasColRowtCoords"].asBool();
-    reference = (std::string)jsonParams["reference"].asString();
-    i0 = (tNi)jsonParams["i0"].asUInt64();
-    j0 = (tNi)jsonParams["j0"].asUInt64();
-    k0 = (tNi)jsonParams["k0"].asUInt64();
-    QDataType = (std::string)jsonParams["QDataType"].asString();
-    QOutputLength = (int)jsonParams["QOutputLength"].asInt();
+                filePath = jsonParams["filePath"].get<std::string>();
+    name = jsonParams["name"].get<std::string>();
+    note = jsonParams["note"].get<std::string>();
+    structName = jsonParams["structName"].get<std::string>();
+    binFileSizeInStructs = (tNi)jsonParams["binFileSizeInStructs"].get<uint64_t>();
+    coordsType = jsonParams["coordsType"].get<std::string>();
+    hasGridtCoords = jsonParams["hasGridtCoords"].get<bool>();
+    hasColRowtCoords = jsonParams["hasColRowtCoords"].get<bool>();
+    reference = jsonParams["reference"].get<std::string>();
+    i0 = (tNi)jsonParams["i0"].get<uint64_t>();
+    j0 = (tNi)jsonParams["j0"].get<uint64_t>();
+    k0 = (tNi)jsonParams["k0"].get<uint64_t>();
+    QDataType = jsonParams["QDataType"].get<std::string>();
+    QOutputLength = (int)jsonParams["QOutputLength"].get<int>();
 
             
         }
@@ -75,24 +76,24 @@ struct BinFileParams {
     }
     
     
-    Json::Value getJson(){
+    json getJson() const {
         
         try {
             
-            Json::Value jsonParams;
+            json jsonParams;
             
                 jsonParams["filePath"] = (std::string)filePath;
     jsonParams["name"] = (std::string)name;
     jsonParams["note"] = (std::string)note;
     jsonParams["structName"] = (std::string)structName;
-    jsonParams["binFileSizeInStructs"] = (Json::UInt64)binFileSizeInStructs;
+    jsonParams["binFileSizeInStructs"] = binFileSizeInStructs;
     jsonParams["coordsType"] = (std::string)coordsType;
     jsonParams["hasGridtCoords"] = (bool)hasGridtCoords;
     jsonParams["hasColRowtCoords"] = (bool)hasColRowtCoords;
     jsonParams["reference"] = (std::string)reference;
-    jsonParams["i0"] = (Json::UInt64)i0;
-    jsonParams["j0"] = (Json::UInt64)j0;
-    jsonParams["k0"] = (Json::UInt64)k0;
+    jsonParams["i0"] = i0;
+    jsonParams["j0"] = j0;
+    jsonParams["k0"] = k0;
     jsonParams["QDataType"] = (std::string)QDataType;
     jsonParams["QOutputLength"] = (int)QOutputLength;
 
@@ -103,7 +104,7 @@ struct BinFileParams {
             
             std::cerr << "Exception reached parsing arguments in BinFileParams: " << e.what() << std::endl;
 
-            return "";
+            return json();
         }
     }
     
@@ -115,7 +116,7 @@ struct BinFileParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
+            json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -138,10 +139,10 @@ struct BinFileParams {
         
         try {
             
-            Json::Value jsonParams = getJson();
+            json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
+            out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
         } catch(std::exception& e){

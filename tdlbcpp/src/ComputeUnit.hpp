@@ -325,7 +325,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_read(std::string dir
     BinFileParams binFormat;
     binFormat.filePath = outputTree.getAllParamsFilePath(dirname, unit_name);
     binFormat.structName = "checkpoint";
-    binFormat.binFileSizeInStructs = (Json::UInt64)size;
+    binFormat.binFileSizeInStructs = (uint64_t)size;
     binFormat.coordsType = "none";
     binFormat.hasGridtCoords = 0;
     binFormat.hasColRowtCoords = 0;
@@ -400,7 +400,7 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::checkpoint_write(std::string un
     BinFileParams binFormat;
     binFormat.filePath = outputTree.getAllParamsFilePath(dirname, unit_name);
     binFormat.structName = "checkpoint";
-    binFormat.binFileSizeInStructs = (Json::UInt64)size;
+    binFormat.binFileSizeInStructs = (uint64_t)size;
     binFormat.coordsType = "none";
     binFormat.hasGridtCoords = 0;
     binFormat.hasColRowtCoords = 0;

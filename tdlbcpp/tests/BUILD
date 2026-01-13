@@ -26,7 +26,7 @@ testDeps = [
           "@tdLBGeometryRushtonTurbineLib//Sources/tdLBGeometryRushtonTurbineLibCPP:tdLBGeometryRushtonTurbineLib",
           "@googletest//:gtest_main"
   ]
-testCOpts = ["-Itdlbcpp/src", "-Itdlbcpp/src/Tools", "-Itdlbcpp/src/Params"]
+testCOpts = ["-Itdlbcpp/src", "-Itdlbcpp/src/Tools"]
 
 cc_test(
   name = "diskOutputTest",

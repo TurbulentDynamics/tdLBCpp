@@ -12,7 +12,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "json.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 
 
@@ -37,20 +38,20 @@ struct GridParams {
     
     
     
-    void getParamsFromJson(Json::Value jsonParams) {
+    void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
-                ngx = (tNi)jsonParams["ngx"].asUInt64();
-    ngy = (tNi)jsonParams["ngy"].asUInt64();
-    ngz = (tNi)jsonParams["ngz"].asUInt64();
-    x = (tNi)jsonParams["x"].asUInt64();
-    y = (tNi)jsonParams["y"].asUInt64();
-    z = (tNi)jsonParams["z"].asUInt64();
-    multiStep = (tNi)jsonParams["multiStep"].asUInt64();
-    strMinQVecPrecision = (std::string)jsonParams["strMinQVecPrecision"].asString();
+                ngx = (tNi)jsonParams["ngx"].get<uint64_t>();
+    ngy = (tNi)jsonParams["ngy"].get<uint64_t>();
+    ngz = (tNi)jsonParams["ngz"].get<uint64_t>();
+    x = (tNi)jsonParams["x"].get<uint64_t>();
+    y = (tNi)jsonParams["y"].get<uint64_t>();
+    z = (tNi)jsonParams["z"].get<uint64_t>();
+    multiStep = (tNi)jsonParams["multiStep"].get<uint64_t>();
+    strMinQVecPrecision = jsonParams["strMinQVecPrecision"].get<std::string>();
 
             
         }
@@ -63,19 +64,19 @@ struct GridParams {
     }
     
     
-    Json::Value getJson(){
+    json getJson() const {
         
         try {
             
-            Json::Value jsonParams;
+            json jsonParams;
             
-                jsonParams["ngx"] = (Json::UInt64)ngx;
-    jsonParams["ngy"] = (Json::UInt64)ngy;
-    jsonParams["ngz"] = (Json::UInt64)ngz;
-    jsonParams["x"] = (Json::UInt64)x;
-    jsonParams["y"] = (Json::UInt64)y;
-    jsonParams["z"] = (Json::UInt64)z;
-    jsonParams["multiStep"] = (Json::UInt64)multiStep;
+                jsonParams["ngx"] = ngx;
+    jsonParams["ngy"] = ngy;
+    jsonParams["ngz"] = ngz;
+    jsonParams["x"] = x;
+    jsonParams["y"] = y;
+    jsonParams["z"] = z;
+    jsonParams["multiStep"] = multiStep;
     jsonParams["strMinQVecPrecision"] = (std::string)strMinQVecPrecision;
 
             
@@ -85,7 +86,7 @@ struct GridParams {
             
             std::cerr << "Exception reached parsing arguments in GridParams: " << e.what() << std::endl;
 
-            return "";
+            return json();
         }
     }
     
@@ -97,7 +98,7 @@ struct GridParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
+            json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -120,10 +121,10 @@ struct GridParams {
         
         try {
             
-            Json::Value jsonParams = getJson();
+            json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
+            out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
         } catch(std::exception& e){

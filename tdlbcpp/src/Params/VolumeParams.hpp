@@ -12,7 +12,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "json.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 
 
@@ -34,19 +35,19 @@ struct VolumeParams {
     
     
     
-    void getParamsFromJson(Json::Value jsonParams) {
+    void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
-                name_root = (std::string)jsonParams["name_root"].asString();
-    repeat = (tStep)jsonParams["repeat"].asUInt64();
-    Q_output_len = (int)jsonParams["Q_output_len"].asInt();
-    start_at_step = (tStep)jsonParams["start_at_step"].asUInt64();
-    end_at_step = (tStep)jsonParams["end_at_step"].asUInt64();
-    use_half_float = (bool)jsonParams["use_half_float"].asBool();
-    QDataType = (std::string)jsonParams["QDataType"].asString();
+                name_root = jsonParams["name_root"].get<std::string>();
+    repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
+    Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
+    start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
+    end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
+    use_half_float = jsonParams["use_half_float"].get<bool>();
+    QDataType = jsonParams["QDataType"].get<std::string>();
 
             
         }
@@ -59,17 +60,17 @@ struct VolumeParams {
     }
     
     
-    Json::Value getJson(){
+    json getJson() const {
         
         try {
             
-            Json::Value jsonParams;
+            json jsonParams;
             
                 jsonParams["name_root"] = (std::string)name_root;
-    jsonParams["repeat"] = (Json::UInt64)repeat;
+    jsonParams["repeat"] = repeat;
     jsonParams["Q_output_len"] = (int)Q_output_len;
-    jsonParams["start_at_step"] = (Json::UInt64)start_at_step;
-    jsonParams["end_at_step"] = (Json::UInt64)end_at_step;
+    jsonParams["start_at_step"] = start_at_step;
+    jsonParams["end_at_step"] = end_at_step;
     jsonParams["use_half_float"] = (bool)use_half_float;
     jsonParams["QDataType"] = (std::string)QDataType;
 
@@ -80,7 +81,7 @@ struct VolumeParams {
             
             std::cerr << "Exception reached parsing arguments in VolumeParams: " << e.what() << std::endl;
 
-            return "";
+            return json();
         }
     }
     
@@ -92,7 +93,7 @@ struct VolumeParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            Json::Value jsonParams;
+            json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -115,10 +116,10 @@ struct VolumeParams {
         
         try {
             
-            Json::Value jsonParams = getJson();
+            json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
-            out << jsonParams;
+            out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
         } catch(std::exception& e){
