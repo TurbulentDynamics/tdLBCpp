@@ -11,9 +11,17 @@ xcuserdata
 coverage_html/
 tdlbcpp
 
+# IDE settings (keep examples, ignore actual settings)
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/c_cpp_properties.json
+.idea/
+*.iml
 
 debug_*
 Error_*
 
 *.jpeg
 *.json
+!.vscode/*.example

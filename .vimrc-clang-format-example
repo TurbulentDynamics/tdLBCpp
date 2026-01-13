@@ -1,0 +1,117 @@
+" ============================================================================
+" Vim/Neovim clang-format configuration for tdLBCpp project
+" ============================================================================
+"
+" Usage:
+"   1. Copy the relevant section to your .vimrc or init.vim
+"   2. Install vim-plug if using plugins: https://github.com/junegunn/vim-plug
+"   3. Run :PlugInstall to install plugins
+"   4. Restart Vim/Neovim
+"
+" Manual formatting:
+"   - Format entire file: <leader>f (usually \f)
+"   - Format selection: Select in visual mode, then <leader>f
+"
+" ============================================================================
+
+" ----------------------------------------------------------------------------
+" Option 1: Using vim-autoformat plugin (recommended)
+" ----------------------------------------------------------------------------
+" Add to your .vimrc between vim-plug blocks:
+"
+" call plug#begin('~/.vim/plugged')
+" Plug 'Chiel92/vim-autoformat'
+" call plug#end()
+
+" Configure clang-format
+let g:formatdef_clangformat = '"clang-format -style=file"'
+let g:formatters_cpp = ['clangformat']
+let g:formatters_c = ['clangformat']
+
+" Format on save (optional, remove if you don't want auto-format)
+au BufWrite *.cpp,*.hpp,*.h,*.cuh :Autoformat
+
+" Manual format commands
+nnoremap <leader>f :Autoformat<CR>
+vnoremap <leader>f :Autoformat<CR>
+
+" Don't show errors if clang-format not found
+let g:autoformat_autoindent = 0
+let g:autoformat_retab = 0
+let g:autoformat_remove_trailing_spaces = 0
+
+" ----------------------------------------------------------------------------
+" Option 2: Simple built-in solution (no plugins)
+" ----------------------------------------------------------------------------
+" Format entire file
+nnoremap <leader>f :%!clang-format<CR>
+
+" Format visual selection
+vnoremap <leader>f :!clang-format<CR>
+
+" Format on save (optional, uncomment to enable)
+" autocmd BufWritePre *.cpp,*.hpp,*.h,*.cuh :silent! %!clang-format 2>/dev/null
+
+" Format function (preserves cursor position)
+function! ClangFormat()
+    let l:save_cursor = getpos('.')
+    execute '%!clang-format'
+    call setpos('.', l:save_cursor)
+endfunction
+nnoremap <leader>F :call ClangFormat()<CR>
+
+" ----------------------------------------------------------------------------
+" Option 3: ALE integration (for async linting and formatting)
+" ----------------------------------------------------------------------------
+" Add to vim-plug:
+" Plug 'dense-analysis/ale'
+
+let g:ale_linters = {
+\   'cpp': ['clangd', 'clangtidy'],
+\   'c': ['clangd', 'clangtidy'],
+\}
+let g:ale_fixers = {
+\   'cpp': ['clang-format'],
+\   'c': ['clang-format'],
+\}
+
+" Format on save with ALE
+let g:ale_fix_on_save = 1
+
+" Manual format with ALE
+nnoremap <leader>f :ALEFix<CR>
+
+" ----------------------------------------------------------------------------
+" General C++ settings for tdLBCpp
+" ----------------------------------------------------------------------------
+" Set tab width to 4 spaces (matches .clang-format)
+set tabstop=4
+set shiftwidth=4
+set expandtab
+set softtabstop=4
+
+" Highlight code at 100 columns (matches .clang-format ColumnLimit)
+set colorcolumn=100
+
+" Enable syntax highlighting
+syntax on
+filetype plugin indent on
+
+" File type associations
+autocmd BufRead,BufNewFile *.hpp set filetype=cpp
+autocmd BufRead,BufNewFile *.cuh set filetype=cuda
+autocmd BufRead,BufNewFile *.gyb set filetype=python
+
+" Additional useful mappings
+" Show whitespace characters
+set list
+set listchars=tab:→\ ,trail:·,extends:>,precedes:<
+
+" Toggle paste mode (useful when pasting code)
+set pastetoggle=<F2>
+
+" ----------------------------------------------------------------------------
+" Status line indicator (optional)
+" ----------------------------------------------------------------------------
+" Show current file type and format
+set statusline=%f\ %h%w%m%r\ %=%{&ff}\ %{&fenc}\ %{&ft}\ %l,%c\ %P
