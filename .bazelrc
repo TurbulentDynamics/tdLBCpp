@@ -1,10 +1,123 @@
-# Convenient flag shortcuts.
-# build --flag_alias=MPI=//src:enable_mpi
-# build --flag_alias=CUDA=//src:enable_cuda
-# build --flag_alias=TEGRA=//src:enable_tegra
+# ==============================================================================
+# tdLBCpp Bazel Build Configuration
+# ==============================================================================
 
-build:mpi --client_env=CC=mpicc --copt="-DWITH_MPI" --define mpi=yes --verbose_failures -s
-build:gpu --copt="-DWITH_GPU" --define gpu=yes --verbose_failures -s
-build:gpu_shared --copt="-DWITH_GPU_MEMSHARED" --define gpu=yes --verbose_failures -s
-build:mpi_gpu --@rules_cuda//cuda:compiler=mpicc --client_env=CC=mpicc --copt="-DWITH_MPI" --copt="-DWITH_GPU" --define mpi_gpu=yes --verbose_failures -s
-build:tegra --copt="-DWITH_TEGRA" --verbose_failures -s
+# Use Bzlmod (modern Bazel module system for Bazel 7+)
+# WORKSPACE is disabled - all dependencies configured in MODULE.bazel
+
+# Common build flags
+build --enable_platform_specific_config
+build --incompatible_strict_action_env
+build --action_env=BAZEL_CXXOPTS="-std=c++17"
+build --cxxopt="-std=c++17"
+build --host_cxxopt="-std=c++17"
+
+# Improved error reporting
+build --verbose_failures
+build --show_timestamps
+build --color=yes
+
+# Build performance
+build --jobs=auto
+build --worker_sandboxing
+
+# Test output
+test --test_output=errors
+test --test_summary=detailed
+
+# ==============================================================================
+# Configuration Profiles
+# ==============================================================================
+
+# CPU-only build (default)
+build:cpu --copt="-O3" --copt="-march=native"
+
+# Debug build
+build:debug -c dbg
+build:debug --copt="-g" --copt="-O0"
+build:debug --strip="never"
+build:debug --compilation_mode=dbg
+
+# Release build with optimizations
+build:release -c opt
+build:release --copt="-O3" --copt="-DNDEBUG"
+build:release --compilation_mode=opt
+build:release --strip="always"
+
+# MPI build
+build:mpi --client_env=CC=mpicc
+build:mpi --copt="-DWITH_MPI"
+build:mpi --define mpi=yes
+build:mpi --verbose_failures -s
+
+# GPU build (CUDA)
+build:gpu --copt="-DWITH_GPU"
+build:gpu --define gpu=yes
+build:gpu --verbose_failures -s
+
+# GPU build with shared memory
+build:gpu_shared --copt="-DWITH_GPU_MEMSHARED"
+build:gpu_shared --define gpu=yes
+build:gpu_shared --verbose_failures -s
+
+# MPI + GPU build
+build:mpi_gpu --@rules_cuda//cuda:compiler=mpicc
+build:mpi_gpu --client_env=CC=mpicc
+build:mpi_gpu --copt="-DWITH_MPI"
+build:mpi_gpu --copt="-DWITH_GPU"
+build:mpi_gpu --define mpi_gpu=yes
+build:mpi_gpu --verbose_failures -s
+
+# Tegra platform build
+build:tegra --copt="-DWITH_TEGRA"
+build:tegra --verbose_failures -s
+
+# ==============================================================================
+# Platform-specific configurations
+# ==============================================================================
+
+# Linux-specific settings
+build:linux --copt="-fPIC"
+build:linux --linkopt="-lpthread"
+
+# macOS-specific settings
+build:macos --copt="-Wno-deprecated-declarations"
+build:macos --host_copt="-Wno-deprecated-declarations"
+
+# Windows-specific settings (if needed in future)
+build:windows --copt="/std:c++17"
+
+# ==============================================================================
+# Sanitizer configurations (for debugging)
+# ==============================================================================
+
+# Address Sanitizer
+build:asan --strip=never
+build:asan --copt="-fsanitize=address"
+build:asan --copt="-DADDRESS_SANITIZER"
+build:asan --copt="-O1"
+build:asan --copt="-g"
+build:asan --copt="-fno-omit-frame-pointer"
+build:asan --linkopt="-fsanitize=address"
+
+# Thread Sanitizer
+build:tsan --strip=never
+build:tsan --copt="-fsanitize=thread"
+build:tsan --copt="-DTHREAD_SANITIZER"
+build:tsan --copt="-O1"
+build:tsan --copt="-g"
+build:tsan --copt="-fno-omit-frame-pointer"
+build:tsan --linkopt="-fsanitize=thread"
+
+# Undefined Behavior Sanitizer
+build:ubsan --strip=never
+build:ubsan --copt="-fsanitize=undefined"
+build:ubsan --copt="-O1"
+build:ubsan --copt="-g"
+build:ubsan --copt="-fno-omit-frame-pointer"
+build:ubsan --linkopt="-fsanitize=undefined"
+
+# ==============================================================================
+# User-specific overrides (create .bazelrc.user for local customizations)
+# ==============================================================================
+try-import %workspace%/.bazelrc.user

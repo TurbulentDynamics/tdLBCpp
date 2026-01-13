@@ -1,0 +1,9 @@
+"""
+gyb - Generate Your Boilerplate
+Template generation tool
+"""
+
+module(
+    name = "gyb",
+    version = "0.1.0",
+)

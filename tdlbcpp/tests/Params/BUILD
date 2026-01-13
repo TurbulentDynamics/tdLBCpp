@@ -23,6 +23,7 @@ cc_library(
     srcs = ["ParamsCommon.cpp"],
     visibility = ["//visibility:public"],
     deps = paramsCommonDeps,
+    copts = ["-Itdlbcpp/src", "-Itdlbcpp/src/Params"],
     target_compatible_with = select({
         ":use_gpu": ["@platforms//:incompatible"], ":use_mpi_gpu": ["@platforms//:incompatible"],
         "//conditions:default": [],
@@ -35,7 +36,7 @@ cuda_library(
     srcs = ["ParamsCommon.cpp"],
     visibility = ["//visibility:public"],
     deps = paramsCommonDeps + ["//tdlbcpp/src:computeUnitCu"],
-    copts = ["-Iexternal/local_cuda/cuda/samples/common/inc/"],
+    copts = ["-Iexternal/local_cuda/cuda/samples/common/inc/", "-Itdlbcpp/src", "-Itdlbcpp/src/Params"],
     target_compatible_with = select({
         ":use_gpu": [], ":use_mpi_gpu": [],
         "//conditions:default": ["@platforms//:incompatible"],
@@ -52,7 +53,7 @@ cc_test(
           "//tdlbcpp/tests/Params:ParamsCommon",
           "@googletest//:gtest_main"
   ],
-  copts = ["-Itdlbcpp/src"]
+  copts = ["-Itdlbcpp/src", "-Itdlbcpp/src/Params"]
 )
 
 

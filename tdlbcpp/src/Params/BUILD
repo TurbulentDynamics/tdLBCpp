@@ -3,7 +3,6 @@ cc_library(
     srcs = ["jsoncpp.cpp"],
     hdrs = ["json.h"],
     visibility = ["//visibility:public"],
-    strip_include_prefix = "",
 )
 
 

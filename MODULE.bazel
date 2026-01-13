@@ -1,0 +1,38 @@
+"""
+tdLBCpp - Turbulent Dynamics Lattice Boltzmann C++ Module
+Modern Bazel module configuration for Bazel 7+
+"""
+
+module(
+    name = "tdlbcpp",
+    version = "0.1.0",
+)
+
+# Bazel dependencies
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "googletest", version = "1.15.2", repo_name = "googletest")
+bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+
+# Local dependencies (vendored or submodules)
+# These are declared with bazel_dep and overridden with local_path_override
+# repo_name provides compatibility with existing BUILD files
+bazel_dep(name = "rules_cuda", version = "0.0.0")
+bazel_dep(name = "tdlb_geometry_rushton_turbine_lib", version = "0.0.0", repo_name = "tdLBGeometryRushtonTurbineLib")
+bazel_dep(name = "gyb", version = "0.0.0")
+
+# Local path overrides for vendored/local dependencies
+local_path_override(
+    module_name = "rules_cuda",
+    path = "third_party/rules_cuda",
+)
+
+local_path_override(
+    module_name = "tdlb_geometry_rushton_turbine_lib",
+    path = "tdLBGeometryRushtonTurbineLib",
+)
+
+local_path_override(
+    module_name = "gyb",
+    path = "third_party/gyb",
+)

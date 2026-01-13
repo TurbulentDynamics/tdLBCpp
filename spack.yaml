@@ -1,57 +1,130 @@
-# This is a Spack Environment file.
+# ==============================================================================
+# tdLBCpp Spack Environment Configuration
+# ==============================================================================
 #
-# It describes a set of packages to be installed, along with
-# configuration settings.
-# Usage:
-#   install spack:
-#     git clone https://github.com/spack/spack.git ~/spack
-#     . ~/spack/share/spack/setup-env.sh
+# This is a Spack Environment file for managing dependencies.
 #
-# First, change global spack config, to install missing compilers
-# Run this and edit:
-#     spack config --scope defaults edit config
+# Usage:
+#   1. Install Spack:
+#      git clone https://github.com/spack/spack.git ~/spack
+#      . ~/spack/share/spack/setup-env.sh
 #
-# If set to true, Spack will attempt to build any compiler on the spec
-# that is not already available. If set to False, Spack will only use
-# compilers already configured in compilers.yaml
-# install_missing_compilers: False
+#   2. Create and activate environment:
+#      spack env create tdlb spack.yaml
+#      spack env activate -p tdlb
 #
-#     spack env create tdlb spack.yaml
-#     spack env activate -p tdlb
-#     spack install
+#   3. Install dependencies:
+#      spack install
+#
+# For more information: https://spack.readthedocs.io/
+#
+# ==============================================================================
 
 spack:
-  # add package specs to the `specs` list
-  #install_missing_compilers: true
+  # Package specifications
   specs:
-  #  - gcc@10.2.0
-    - gcc@7.4.0
-  #  - boost%gcc@7.5.0
-  #  - openmpi%gcc@7.5.0
-  #  - mpich@3.3.2%gcc@10.2.0
-    - googletest +gmock
-    - cmake
-  #  - valgrind%gcc@7.5.0
-    - openblas
-  #  - openblas@0.3.4%gcc@8.4.0 threads=openmp
-  #  - libtool
-  # - cuda
-  # - nccl+cuda
-    - nlohmann-json
-    - yaml-cpp
-    - cxxopts
+    # Compiler (C++17 required)
+    - gcc@11.4.0           # Modern GCC with full C++17 support
+
+    # Build tools
+    - cmake@3.28.0         # Latest stable CMake
+    - bazel@7.4.1          # Latest Bazel (Bzlmod support)
+
+    # Testing framework
+    - googletest@1.15.2 +gmock    # Latest GoogleTest (matches MODULE.bazel)
+
+    # Linear algebra
+    - openblas@0.3.27 threads=openmp  # Latest OpenBLAS with OpenMP
+
+    # YAML parsing (if needed)
+    - yaml-cpp@0.8.0                # Latest yaml-cpp
+
+    # Command-line parsing (if using external instead of vendored)
+    - cxxopts@3.2.1                 # Latest cxxopts
+
+    # Optional: MPI for distributed computing
+    # - openmpi@5.0.5                # Latest OpenMPI 5.x
+    # - mpich@4.2.2                  # Or latest MPICH
+
+    # Optional: CUDA for GPU support
+    # - cuda@12.6.0                  # Latest CUDA 12.x
+    # - nccl@2.23.4 +cuda            # NVIDIA Collective Communications Library
+
+    # Optional: Development tools
+    # - valgrind@3.23.0              # Memory debugging
+    # - gdb@15.1                     # GNU Debugger
+    # - clang@19.1.5                 # Alternative compiler
+
+  # Spack configuration
   view: true
-  #compilers:
-  #- compiler:
-  #    spec: gcc@10.2.0
-  #    paths:
-  #      cc: /usr/bin/gcc
-  #      cxx: /usr/bin/g++
-  #      f77:
-  #      fc:
-  #    flags: {}
-  #    operating_system: ubuntu18.04
-  #    target: x86_64
-  #    modules: []
-  #    environment: {unset: []}
-  #    extra_rpaths: []
+
+  # Concretizer preferences
+  concretizer:
+    unify: true
+    reuse: true
+
+  # Package preferences (optional - uncomment to enable)
+  packages:
+    all:
+      compiler: [gcc@11.4.0]
+      target: [x86_64_v3]  # Modern x86_64 with AVX2
+      variants: ~shared +pic
+
+    # Optimize for performance
+    openblas:
+      variants: threads=openmp +avx2
+
+    # Enable all GoogleTest features
+    googletest:
+      variants: +gmock +shared
+
+    # Use system CUDA if available (faster)
+    # cuda:
+    #   externals:
+    #   - spec: cuda@12.6.0
+    #     prefix: /usr/local/cuda-12.6
+    #   buildable: false
+
+# ==============================================================================
+# Compiler Configuration (Optional)
+# ==============================================================================
+# Uncomment to manually configure compilers
+#
+# compilers:
+# - compiler:
+#     spec: gcc@11.4.0
+#     paths:
+#       cc: /usr/bin/gcc-11
+#       cxx: /usr/bin/g++-11
+#       f77: /usr/bin/gfortran-11
+#       fc: /usr/bin/gfortran-11
+#     flags:
+#       cflags: -O3 -march=native
+#       cxxflags: -O3 -march=native -std=c++17
+#     operating_system: ubuntu22.04
+#     target: x86_64
+#     modules: []
+#     environment: {}
+#     extra_rpaths: []
+
+# ==============================================================================
+# Notes
+# ==============================================================================
+#
+# Version Selection Rationale:
+# - GCC 11.4.0: Mature C++17/20 support, stable
+# - Bazel 7.4.1: Latest with Bzlmod support (used in this project)
+# - GoogleTest 1.15.2: Matches MODULE.bazel dependency
+# - CMake 3.28: Latest stable with modern features
+# - OpenBLAS 0.3.27: Latest with performance improvements
+#
+# C++17 Requirement:
+# The project uses C++17 features, ensure your compiler supports:
+# - GCC 7.4+ (basic), GCC 9+ (recommended), GCC 11+ (best)
+# - Clang 6+ (basic), Clang 10+ (recommended)
+#
+# Platform Notes:
+# - x86_64_v3: Requires AVX2 support (2013+ Intel, 2015+ AMD)
+# - Use x86_64_v2 for older CPUs (2009+)
+# - Use aarch64 for ARM64 (Apple Silicon, AWS Graviton)
+#

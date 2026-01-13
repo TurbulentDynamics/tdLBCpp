@@ -1,0 +1,17 @@
+"""
+rules_cuda - Bazel rules for CUDA
+Local vendored version with Bzlmod support
+"""
+
+module(
+    name = "rules_cuda",
+    version = "0.0.0",
+)
+
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+
+# CUDA extension for detecting and configuring local CUDA toolkit
+cuda = use_extension("//cuda:extensions.bzl", "cuda")
+use_repo(cuda, "local_cuda")

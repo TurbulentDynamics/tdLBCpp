@@ -1,9 +1,12 @@
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-git_repository(
-  name = "googletest",
-  remote = "https://github.com/google/googletest",
-  tag = "release-1.11.0"
+# Google Test - Updated to latest stable version
+http_archive(
+    name = "googletest",
+    urls = ["https://github.com/google/googletest/archive/refs/tags/v1.15.2.tar.gz"],
+    strip_prefix = "googletest-1.15.2",
+    sha256 = "7b42b4d6ed48810c5362c265a17faebe90dc2373c885e5216439d37927f02926",
 )
 
 local_repository(

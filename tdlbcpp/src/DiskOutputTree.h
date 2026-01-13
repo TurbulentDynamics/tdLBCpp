@@ -3,8 +3,8 @@
 //  DiskOutputTreeV5.hpp
 //  stirred-tank-3d-xcode-cpp
 //
-//  Created by Niall OByrnes on 23/07/2018.
-//  Copyright © 2018 Niall P. O'Byrnes. All rights reserved.
+//  Created by Niall Ó Broin on 23/07/2018.
+//  Copyright © 2018 Niall Ó Broin. All rights reserved.
 //
 
 #ifndef DiskOutputTreeV5_hpp
