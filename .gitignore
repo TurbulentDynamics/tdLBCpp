@@ -1,6 +1,5 @@
 tdlbcpp-bin
 
-tdLBGeometryRushtonTurbineLib/
 tdLBCppApi/
 
 bazel-*
