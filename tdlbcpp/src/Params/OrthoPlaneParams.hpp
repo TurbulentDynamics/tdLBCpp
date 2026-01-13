@@ -25,31 +25,31 @@ using json = nlohmann::json;
 struct OrthoPlaneParams {
 
         std::string name_root = "plane";
-    std::string QDataType = "float";
-    int Q_output_len = 4;
-    bool use_half_float = false;
-    tNi cutAt = 0;
-    tStep repeat = 0;
-    tStep start_at_step = 0;
-    tStep end_at_step = 0;
+        std::string QDataType = "float";
+        int Q_output_len = 4;
+        bool use_half_float = false;
+        tNi cutAt = 0;
+        tStep repeat = 0;
+        tStep start_at_step = 0;
+        tStep end_at_step = 0;
 
     
     
     
-    void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
                 name_root = jsonParams["name_root"].get<std::string>();
-    QDataType = jsonParams["QDataType"].get<std::string>();
-    Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
-    use_half_float = jsonParams["use_half_float"].get<bool>();
-    cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
-    repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
-    start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
-    end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
+        QDataType = jsonParams["QDataType"].get<std::string>();
+        Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
+        use_half_float = jsonParams["use_half_float"].get<bool>();
+        cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
+        repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
+        start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
+        end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
 
             
         }
@@ -62,20 +62,20 @@ struct OrthoPlaneParams {
     }
     
     
-    json getJson() const {
+        json getJson() const {
         
         try {
             
             json jsonParams;
             
                 jsonParams["name_root"] = (std::string)name_root;
-    jsonParams["QDataType"] = (std::string)QDataType;
-    jsonParams["Q_output_len"] = (int)Q_output_len;
-    jsonParams["use_half_float"] = (bool)use_half_float;
-    jsonParams["cutAt"] = cutAt;
-    jsonParams["repeat"] = repeat;
-    jsonParams["start_at_step"] = start_at_step;
-    jsonParams["end_at_step"] = end_at_step;
+        jsonParams["QDataType"] = (std::string)QDataType;
+        jsonParams["Q_output_len"] = (int)Q_output_len;
+        jsonParams["use_half_float"] = (bool)use_half_float;
+        jsonParams["cutAt"] = cutAt;
+        jsonParams["repeat"] = repeat;
+        jsonParams["start_at_step"] = start_at_step;
+        jsonParams["end_at_step"] = end_at_step;
 
             
             return jsonParams;
@@ -91,7 +91,7 @@ struct OrthoPlaneParams {
     
     
     
-    void getParamsFromJsonFile(const std::string filePath) {
+        void getParamsFromJsonFile(const std::string filePath) {
         
         try
         {
@@ -114,7 +114,7 @@ struct OrthoPlaneParams {
     
     
     
-    int writeParamsToJsonFile(const std::string filePath) {
+        int writeParamsToJsonFile(const std::string filePath) {
         
         
         try {
@@ -134,7 +134,7 @@ struct OrthoPlaneParams {
     }
     
     
-    void printParams() {
+        void printParams() {
         
         std::cout
         << getJson()

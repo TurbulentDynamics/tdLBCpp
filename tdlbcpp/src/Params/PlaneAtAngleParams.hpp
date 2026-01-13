@@ -25,33 +25,33 @@ using json = nlohmann::json;
 struct PlaneAtAngleParams {
 
         std::string name_root = "plane_at_angle";
-    double degrees = 0.0;
-    double tolerance = 0.0;
-    tNi cutAt = 0;
-    int Q_output_len = 4;
-    tStep start_at_step = 0;
-    tStep end_at_step = 0;
-    bool use_half_float = false;
-    std::string QDataType = "float";
+        double degrees = 0.0;
+        double tolerance = 0.0;
+        tNi cutAt = 0;
+        int Q_output_len = 4;
+        tStep start_at_step = 0;
+        tStep end_at_step = 0;
+        bool use_half_float = false;
+        std::string QDataType = "float";
 
     
     
     
-    void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
                 name_root = jsonParams["name_root"].get<std::string>();
-    degrees = (double)jsonParams["degrees"].get<double>();
-    tolerance = (double)jsonParams["tolerance"].get<double>();
-    cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
-    Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
-    start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
-    end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
-    use_half_float = jsonParams["use_half_float"].get<bool>();
-    QDataType = jsonParams["QDataType"].get<std::string>();
+        degrees = (double)jsonParams["degrees"].get<double>();
+        tolerance = (double)jsonParams["tolerance"].get<double>();
+        cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
+        Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
+        start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
+        end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
+        use_half_float = jsonParams["use_half_float"].get<bool>();
+        QDataType = jsonParams["QDataType"].get<std::string>();
 
             
         }
@@ -64,21 +64,21 @@ struct PlaneAtAngleParams {
     }
     
     
-    json getJson() const {
+        json getJson() const {
         
         try {
             
             json jsonParams;
             
                 jsonParams["name_root"] = (std::string)name_root;
-    jsonParams["degrees"] = (double)degrees;
-    jsonParams["tolerance"] = (double)tolerance;
-    jsonParams["cutAt"] = cutAt;
-    jsonParams["Q_output_len"] = (int)Q_output_len;
-    jsonParams["start_at_step"] = start_at_step;
-    jsonParams["end_at_step"] = end_at_step;
-    jsonParams["use_half_float"] = (bool)use_half_float;
-    jsonParams["QDataType"] = (std::string)QDataType;
+        jsonParams["degrees"] = (double)degrees;
+        jsonParams["tolerance"] = (double)tolerance;
+        jsonParams["cutAt"] = cutAt;
+        jsonParams["Q_output_len"] = (int)Q_output_len;
+        jsonParams["start_at_step"] = start_at_step;
+        jsonParams["end_at_step"] = end_at_step;
+        jsonParams["use_half_float"] = (bool)use_half_float;
+        jsonParams["QDataType"] = (std::string)QDataType;
 
             
             return jsonParams;
@@ -94,7 +94,7 @@ struct PlaneAtAngleParams {
     
     
     
-    void getParamsFromJsonFile(const std::string filePath) {
+        void getParamsFromJsonFile(const std::string filePath) {
         
         try
         {
@@ -117,7 +117,7 @@ struct PlaneAtAngleParams {
     
     
     
-    int writeParamsToJsonFile(const std::string filePath) {
+        int writeParamsToJsonFile(const std::string filePath) {
         
         
         try {
@@ -137,7 +137,7 @@ struct PlaneAtAngleParams {
     }
     
     
-    void printParams() {
+        void printParams() {
         
         std::cout
         << getJson()

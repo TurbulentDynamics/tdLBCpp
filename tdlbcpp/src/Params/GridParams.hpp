@@ -27,31 +27,31 @@ using json = nlohmann::json;
 struct GridParams {
 
         tNi ngx = 1;
-    tNi ngy = 1;
-    tNi ngz = 1;
-    tNi x = 60;
-    tNi y = 60;
-    tNi z = 60;
-    tNi multiStep = 1;
-    std::string strMinQVecPrecision = "float";
+        tNi ngy = 1;
+        tNi ngz = 1;
+        tNi x = 60;
+        tNi y = 60;
+        tNi z = 60;
+        tNi multiStep = 1;
+        std::string strMinQVecPrecision = "float";
 
     
     
     
-    void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
                 ngx = (tNi)jsonParams["ngx"].get<uint64_t>();
-    ngy = (tNi)jsonParams["ngy"].get<uint64_t>();
-    ngz = (tNi)jsonParams["ngz"].get<uint64_t>();
-    x = (tNi)jsonParams["x"].get<uint64_t>();
-    y = (tNi)jsonParams["y"].get<uint64_t>();
-    z = (tNi)jsonParams["z"].get<uint64_t>();
-    multiStep = (tNi)jsonParams["multiStep"].get<uint64_t>();
-    strMinQVecPrecision = jsonParams["strMinQVecPrecision"].get<std::string>();
+        ngy = (tNi)jsonParams["ngy"].get<uint64_t>();
+        ngz = (tNi)jsonParams["ngz"].get<uint64_t>();
+        x = (tNi)jsonParams["x"].get<uint64_t>();
+        y = (tNi)jsonParams["y"].get<uint64_t>();
+        z = (tNi)jsonParams["z"].get<uint64_t>();
+        multiStep = (tNi)jsonParams["multiStep"].get<uint64_t>();
+        strMinQVecPrecision = jsonParams["strMinQVecPrecision"].get<std::string>();
 
             
         }
@@ -64,20 +64,20 @@ struct GridParams {
     }
     
     
-    json getJson() const {
+        json getJson() const {
         
         try {
             
             json jsonParams;
             
                 jsonParams["ngx"] = ngx;
-    jsonParams["ngy"] = ngy;
-    jsonParams["ngz"] = ngz;
-    jsonParams["x"] = x;
-    jsonParams["y"] = y;
-    jsonParams["z"] = z;
-    jsonParams["multiStep"] = multiStep;
-    jsonParams["strMinQVecPrecision"] = (std::string)strMinQVecPrecision;
+        jsonParams["ngy"] = ngy;
+        jsonParams["ngz"] = ngz;
+        jsonParams["x"] = x;
+        jsonParams["y"] = y;
+        jsonParams["z"] = z;
+        jsonParams["multiStep"] = multiStep;
+        jsonParams["strMinQVecPrecision"] = (std::string)strMinQVecPrecision;
 
             
             return jsonParams;
@@ -93,7 +93,7 @@ struct GridParams {
     
     
     
-    void getParamsFromJsonFile(const std::string filePath) {
+        void getParamsFromJsonFile(const std::string filePath) {
         
         try
         {
@@ -116,7 +116,7 @@ struct GridParams {
     
     
     
-    int writeParamsToJsonFile(const std::string filePath) {
+        int writeParamsToJsonFile(const std::string filePath) {
         
         
         try {
@@ -136,7 +136,7 @@ struct GridParams {
     }
     
     
-    void printParams() {
+        void printParams() {
         
         std::cout
         << getJson()

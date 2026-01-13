@@ -25,27 +25,27 @@ using json = nlohmann::json;
 struct OrthoPlaneVorticityParams {
 
         std::string name_root = "vort";
-    int jpegCompression = 100;
-    tNi cutAt = 0;
-    tStep repeat = 0;
-    tStep start_at_step = 0;
-    tStep end_at_step = 0;
+        int jpegCompression = 100;
+        tNi cutAt = 0;
+        tStep repeat = 0;
+        tStep start_at_step = 0;
+        tStep end_at_step = 0;
 
     
     
     
-    void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
                 name_root = jsonParams["name_root"].get<std::string>();
-    jpegCompression = (int)jsonParams["jpegCompression"].get<int>();
-    cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
-    repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
-    start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
-    end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
+        jpegCompression = (int)jsonParams["jpegCompression"].get<int>();
+        cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
+        repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
+        start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
+        end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
 
             
         }
@@ -58,18 +58,18 @@ struct OrthoPlaneVorticityParams {
     }
     
     
-    json getJson() const {
+        json getJson() const {
         
         try {
             
             json jsonParams;
             
                 jsonParams["name_root"] = (std::string)name_root;
-    jsonParams["jpegCompression"] = (int)jpegCompression;
-    jsonParams["cutAt"] = cutAt;
-    jsonParams["repeat"] = repeat;
-    jsonParams["start_at_step"] = start_at_step;
-    jsonParams["end_at_step"] = end_at_step;
+        jsonParams["jpegCompression"] = (int)jpegCompression;
+        jsonParams["cutAt"] = cutAt;
+        jsonParams["repeat"] = repeat;
+        jsonParams["start_at_step"] = start_at_step;
+        jsonParams["end_at_step"] = end_at_step;
 
             
             return jsonParams;
@@ -85,7 +85,7 @@ struct OrthoPlaneVorticityParams {
     
     
     
-    void getParamsFromJsonFile(const std::string filePath) {
+        void getParamsFromJsonFile(const std::string filePath) {
         
         try
         {
@@ -108,7 +108,7 @@ struct OrthoPlaneVorticityParams {
     
     
     
-    int writeParamsToJsonFile(const std::string filePath) {
+        int writeParamsToJsonFile(const std::string filePath) {
         
         
         try {
@@ -128,7 +128,7 @@ struct OrthoPlaneVorticityParams {
     }
     
     
-    void printParams() {
+        void printParams() {
         
         std::cout
         << getJson()

@@ -31,31 +31,31 @@ using json = nlohmann::json;
 
 struct OutputParams {
 
-    std::string outputRootDir = "debug_output_dir";
+        std::string outputRootDir = "debug_output_dir";
     //    std::string outputRootDir = "debug_timer_dir";
     //    std::string outputRootDir = "debug_run_dir";
 
 
 
-    std::vector<OrthoPlaneParams> XY_planes;
-    std::vector<OrthoPlaneParams> XZ_planes;
-    std::vector<OrthoPlaneParams> YZ_planes;
+        std::vector<OrthoPlaneParams> XY_planes;
+        std::vector<OrthoPlaneParams> XZ_planes;
+        std::vector<OrthoPlaneParams> YZ_planes;
 
-    std::vector<OrthoPlaneVorticityParams> XY_vorticity_planes;
-    std::vector<OrthoPlaneVorticityParams> XZ_vorticity_planes;
-    std::vector<OrthoPlaneVorticityParams> YZ_vorticity_planes;
+        std::vector<OrthoPlaneVorticityParams> XY_vorticity_planes;
+        std::vector<OrthoPlaneVorticityParams> XZ_vorticity_planes;
+        std::vector<OrthoPlaneVorticityParams> YZ_vorticity_planes;
 
-    std::vector<AngleParams> capture_at_blade_angle;
-    std::vector<PlaneAtAngleParams> YZ_plane_when_angle;
-    std::vector<VolumeParams> volumes;
-
-
-
-    OutputParams(){};
-    OutputParams(std::string outputRootDir):outputRootDir(outputRootDir){};
+        std::vector<AngleParams> capture_at_blade_angle;
+        std::vector<PlaneAtAngleParams> YZ_plane_when_angle;
+        std::vector<VolumeParams> volumes;
 
 
-    void updateParamsOnResolutionDouble(){
+
+        OutputParams(){};
+        OutputParams(std::string outputRootDir):outputRootDir(outputRootDir){};
+
+
+        void updateParamsOnResolutionDouble(){
 
         for (auto &p: XY_planes) p.cutAt *= 2;
         for (auto &p: XZ_planes) p.cutAt *= 2;
@@ -67,7 +67,7 @@ struct OutputParams {
     }
 
 
-    void add_XY_plane(std::string dir, tStep repeat, tNi cutAt,
+        void add_XY_plane(std::string dir, tStep repeat, tNi cutAt,
                       int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_colrow_Q4";
@@ -97,7 +97,7 @@ struct OutputParams {
 
 
     //formally axis
-    void add_XZ_plane(const std::string dir, tStep repeat, tNi cutAt,
+        void add_XZ_plane(const std::string dir, tStep repeat, tNi cutAt,
                       int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_colrow_Q4";
@@ -123,7 +123,7 @@ struct OutputParams {
 
 
     //Formaly slice
-    void add_YZ_plane(const std::string dir, tStep repeat, tNi cutAt,
+        void add_YZ_plane(const std::string dir, tStep repeat, tNi cutAt,
                       int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_colrow_Q4";
@@ -149,7 +149,7 @@ struct OutputParams {
 
 
 
-    void add_XY_vorticity_plane(std::string dir, tStep repeat, tNi cutAt,
+        void add_XY_vorticity_plane(std::string dir, tStep repeat, tNi cutAt,
                     int jpegCompression=100, tStep start_at_step = 0, tStep end_at_step = 0){
         OrthoPlaneVorticityParams p;
         p.name_root = dir;
@@ -162,7 +162,7 @@ struct OutputParams {
         XY_vorticity_planes.push_back(p);
     }
 
-    void add_XZ_vorticity_plane(std::string dir, tStep repeat, tNi cutAt,
+        void add_XZ_vorticity_plane(std::string dir, tStep repeat, tNi cutAt,
                                 int jpegCompression=100, tStep start_at_step = 0, tStep end_at_step = 0){
         OrthoPlaneVorticityParams p;
         p.name_root = dir;
@@ -175,7 +175,7 @@ struct OutputParams {
         XZ_vorticity_planes.push_back(p);
     }
 
-    void add_YZ_vorticity_plane(std::string dir, tStep repeat, tNi cutAt,
+        void add_YZ_vorticity_plane(std::string dir, tStep repeat, tNi cutAt,
                                 int jpegCompression=100, tStep start_at_step = 0, tStep end_at_step = 0){
         OrthoPlaneVorticityParams p;
         p.name_root = dir;
@@ -194,7 +194,7 @@ struct OutputParams {
 
 
 
-    void add_angle(const std::string dir,
+        void add_angle(const std::string dir,
                    tStep rotational_capture_repeat, double rotational_capture_behind_impeller_degrees,
                    int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
@@ -219,7 +219,7 @@ struct OutputParams {
     }
 
 
-    void add_YZ_plane_at_angle(const std::string dir, double fixed_axis_capture_behind_impeller_degrees,
+        void add_YZ_plane_at_angle(const std::string dir, double fixed_axis_capture_behind_impeller_degrees,
                                double tolerance, tNi cutAt, int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_colrow_Q4";
@@ -246,7 +246,7 @@ struct OutputParams {
 
 
 
-    void add_volume(const std::string dir, tStep plot_full_repeat,
+        void add_volume(const std::string dir, tStep plot_full_repeat,
                     int Q_output_len = 4, tStep start_at_step = 0, tStep end_at_step = 0, bool use_half_float=0){
 
         //        std::string QDataType = "tDisk_grid_Q4";
@@ -268,7 +268,7 @@ struct OutputParams {
 
     }
 
-    template <typename ParamType> void getParamsFromJsonArray(const json& jsonArray, std::vector<ParamType> &array) {
+        template <typename ParamType> void getParamsFromJsonArray(const json& jsonArray, std::vector<ParamType> &array) {
         array.clear();
         for (size_t i = 0; i < jsonArray.size(); i++) {
             ParamType param;
@@ -277,7 +277,7 @@ struct OutputParams {
         }
     }
 
-    void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const json& jsonParams) {
         try
         {
             outputRootDir = jsonParams["outputRootDir"].get<std::string>();
@@ -299,7 +299,7 @@ struct OutputParams {
         }
     }
 
-    template <typename ParamType> json getJsonOfArray(std::vector<ParamType> &array) {
+        template <typename ParamType> json getJsonOfArray(std::vector<ParamType> &array) {
         json jsonArray = json::array();
         for (ParamType param : array) {
             std::cout << param.getJson() << std::endl;
@@ -308,7 +308,7 @@ struct OutputParams {
         return jsonArray;
     }
 
-    json getJson() {
+        json getJson() {
         try
         {
             json jsonParams;
@@ -342,7 +342,7 @@ struct OutputParams {
 
 
 
-    void getParamsFromJsonFile(const std::string filePath) {
+        void getParamsFromJsonFile(const std::string filePath) {
 
         try
         {
@@ -365,7 +365,7 @@ struct OutputParams {
 
 
 
-    int writeParamsToJsonFile(const std::string filePath) {
+        int writeParamsToJsonFile(const std::string filePath) {
 
 
         try {
@@ -385,7 +385,7 @@ struct OutputParams {
     }
 
 
-    void printParams() {
+        void printParams() {
 
         std::cout
         << getJson()

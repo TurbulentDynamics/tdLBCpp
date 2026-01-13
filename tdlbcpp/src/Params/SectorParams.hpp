@@ -25,33 +25,33 @@ using json = nlohmann::json;
 struct SectorParams {
 
         std::string name_root = "sector";
-    tStep repeat = 0;
-    double angle_infront_blade = 0.0;
-    double angle_behind_blade = 0.0;
-    int Q_output_len = 4;
-    tStep start_at_step = 0;
-    tStep end_at_step = 0;
-    bool use_half_float = false;
-    std::string QDataType = "float";
+        tStep repeat = 0;
+        double angle_infront_blade = 0.0;
+        double angle_behind_blade = 0.0;
+        int Q_output_len = 4;
+        tStep start_at_step = 0;
+        tStep end_at_step = 0;
+        bool use_half_float = false;
+        std::string QDataType = "float";
 
     
     
     
-    void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
                 name_root = jsonParams["name_root"].get<std::string>();
-    repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
-    angle_infront_blade = (double)jsonParams["angle_infront_blade"].get<double>();
-    angle_behind_blade = (double)jsonParams["angle_behind_blade"].get<double>();
-    Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
-    start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
-    end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
-    use_half_float = jsonParams["use_half_float"].get<bool>();
-    QDataType = jsonParams["QDataType"].get<std::string>();
+        repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
+        angle_infront_blade = (double)jsonParams["angle_infront_blade"].get<double>();
+        angle_behind_blade = (double)jsonParams["angle_behind_blade"].get<double>();
+        Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
+        start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
+        end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
+        use_half_float = jsonParams["use_half_float"].get<bool>();
+        QDataType = jsonParams["QDataType"].get<std::string>();
 
             
         }
@@ -64,21 +64,21 @@ struct SectorParams {
     }
     
     
-    json getJson() const {
+        json getJson() const {
         
         try {
             
             json jsonParams;
             
                 jsonParams["name_root"] = (std::string)name_root;
-    jsonParams["repeat"] = repeat;
-    jsonParams["angle_infront_blade"] = (double)angle_infront_blade;
-    jsonParams["angle_behind_blade"] = (double)angle_behind_blade;
-    jsonParams["Q_output_len"] = (int)Q_output_len;
-    jsonParams["start_at_step"] = start_at_step;
-    jsonParams["end_at_step"] = end_at_step;
-    jsonParams["use_half_float"] = (bool)use_half_float;
-    jsonParams["QDataType"] = (std::string)QDataType;
+        jsonParams["repeat"] = repeat;
+        jsonParams["angle_infront_blade"] = (double)angle_infront_blade;
+        jsonParams["angle_behind_blade"] = (double)angle_behind_blade;
+        jsonParams["Q_output_len"] = (int)Q_output_len;
+        jsonParams["start_at_step"] = start_at_step;
+        jsonParams["end_at_step"] = end_at_step;
+        jsonParams["use_half_float"] = (bool)use_half_float;
+        jsonParams["QDataType"] = (std::string)QDataType;
 
             
             return jsonParams;
@@ -94,7 +94,7 @@ struct SectorParams {
     
     
     
-    void getParamsFromJsonFile(const std::string filePath) {
+        void getParamsFromJsonFile(const std::string filePath) {
         
         try
         {
@@ -117,7 +117,7 @@ struct SectorParams {
     
     
     
-    int writeParamsToJsonFile(const std::string filePath) {
+        int writeParamsToJsonFile(const std::string filePath) {
         
         
         try {
@@ -137,7 +137,7 @@ struct SectorParams {
     }
     
     
-    void printParams() {
+        void printParams() {
         
         std::cout
         << getJson()

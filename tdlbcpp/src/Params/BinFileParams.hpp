@@ -25,45 +25,45 @@ using json = nlohmann::json;
 struct BinFileParams {
 
         std::string filePath = "NoFilePath";
-    std::string name = "NoName";
+        std::string name = "NoName";
 
     //NoNote
-    std::string note = "NoNote";
-    std::string structName = "tDisk_colrow_Q4";
-    tNi binFileSizeInStructs = 0;
-    std::string coordsType = "uint16_t";
-    bool hasGridtCoords = false;
-    bool hasColRowtCoords = true;
-    std::string reference = "absolute";
-    tNi i0 = 0;
-    tNi j0 = 0;
-    tNi k0 = 0;
-    std::string QDataType = "float";
-    int QOutputLength = 4;
+        std::string note = "NoNote";
+        std::string structName = "tDisk_colrow_Q4";
+        tNi binFileSizeInStructs = 0;
+        std::string coordsType = "uint16_t";
+        bool hasGridtCoords = false;
+        bool hasColRowtCoords = true;
+        std::string reference = "absolute";
+        tNi i0 = 0;
+        tNi j0 = 0;
+        tNi k0 = 0;
+        std::string QDataType = "float";
+        int QOutputLength = 4;
 
     
     
     
-    void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
                 filePath = jsonParams["filePath"].get<std::string>();
-    name = jsonParams["name"].get<std::string>();
-    note = jsonParams["note"].get<std::string>();
-    structName = jsonParams["structName"].get<std::string>();
-    binFileSizeInStructs = (tNi)jsonParams["binFileSizeInStructs"].get<uint64_t>();
-    coordsType = jsonParams["coordsType"].get<std::string>();
-    hasGridtCoords = jsonParams["hasGridtCoords"].get<bool>();
-    hasColRowtCoords = jsonParams["hasColRowtCoords"].get<bool>();
-    reference = jsonParams["reference"].get<std::string>();
-    i0 = (tNi)jsonParams["i0"].get<uint64_t>();
-    j0 = (tNi)jsonParams["j0"].get<uint64_t>();
-    k0 = (tNi)jsonParams["k0"].get<uint64_t>();
-    QDataType = jsonParams["QDataType"].get<std::string>();
-    QOutputLength = (int)jsonParams["QOutputLength"].get<int>();
+        name = jsonParams["name"].get<std::string>();
+        note = jsonParams["note"].get<std::string>();
+        structName = jsonParams["structName"].get<std::string>();
+        binFileSizeInStructs = (tNi)jsonParams["binFileSizeInStructs"].get<uint64_t>();
+        coordsType = jsonParams["coordsType"].get<std::string>();
+        hasGridtCoords = jsonParams["hasGridtCoords"].get<bool>();
+        hasColRowtCoords = jsonParams["hasColRowtCoords"].get<bool>();
+        reference = jsonParams["reference"].get<std::string>();
+        i0 = (tNi)jsonParams["i0"].get<uint64_t>();
+        j0 = (tNi)jsonParams["j0"].get<uint64_t>();
+        k0 = (tNi)jsonParams["k0"].get<uint64_t>();
+        QDataType = jsonParams["QDataType"].get<std::string>();
+        QOutputLength = (int)jsonParams["QOutputLength"].get<int>();
 
             
         }
@@ -76,26 +76,26 @@ struct BinFileParams {
     }
     
     
-    json getJson() const {
+        json getJson() const {
         
         try {
             
             json jsonParams;
             
                 jsonParams["filePath"] = (std::string)filePath;
-    jsonParams["name"] = (std::string)name;
-    jsonParams["note"] = (std::string)note;
-    jsonParams["structName"] = (std::string)structName;
-    jsonParams["binFileSizeInStructs"] = binFileSizeInStructs;
-    jsonParams["coordsType"] = (std::string)coordsType;
-    jsonParams["hasGridtCoords"] = (bool)hasGridtCoords;
-    jsonParams["hasColRowtCoords"] = (bool)hasColRowtCoords;
-    jsonParams["reference"] = (std::string)reference;
-    jsonParams["i0"] = i0;
-    jsonParams["j0"] = j0;
-    jsonParams["k0"] = k0;
-    jsonParams["QDataType"] = (std::string)QDataType;
-    jsonParams["QOutputLength"] = (int)QOutputLength;
+        jsonParams["name"] = (std::string)name;
+        jsonParams["note"] = (std::string)note;
+        jsonParams["structName"] = (std::string)structName;
+        jsonParams["binFileSizeInStructs"] = binFileSizeInStructs;
+        jsonParams["coordsType"] = (std::string)coordsType;
+        jsonParams["hasGridtCoords"] = (bool)hasGridtCoords;
+        jsonParams["hasColRowtCoords"] = (bool)hasColRowtCoords;
+        jsonParams["reference"] = (std::string)reference;
+        jsonParams["i0"] = i0;
+        jsonParams["j0"] = j0;
+        jsonParams["k0"] = k0;
+        jsonParams["QDataType"] = (std::string)QDataType;
+        jsonParams["QOutputLength"] = (int)QOutputLength;
 
             
             return jsonParams;
@@ -111,7 +111,7 @@ struct BinFileParams {
     
     
     
-    void getParamsFromJsonFile(const std::string filePath) {
+        void getParamsFromJsonFile(const std::string filePath) {
         
         try
         {
@@ -134,7 +134,7 @@ struct BinFileParams {
     
     
     
-    int writeParamsToJsonFile(const std::string filePath) {
+        int writeParamsToJsonFile(const std::string filePath) {
         
         
         try {
@@ -154,7 +154,7 @@ struct BinFileParams {
     }
     
     
-    void printParams() {
+        void printParams() {
         
         std::cout
         << getJson()

@@ -25,27 +25,27 @@ using json = nlohmann::json;
 struct CheckpointParams {
 
         bool startWithCheckpoint = false;
-    std::string checkpointLoadFromDir = "notSet";
-    int checkpointRepeat = 10;
-    std::string checkpointWriteRootDir = ".";
-    std::string checkpointWriteDirPrefix = "debug";
-    bool checkpointWriteDirAppendTime = true;
+        std::string checkpointLoadFromDir = "notSet";
+        int checkpointRepeat = 10;
+        std::string checkpointWriteRootDir = ".";
+        std::string checkpointWriteDirPrefix = "debug";
+        bool checkpointWriteDirAppendTime = true;
 
     
     
     
-    void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const json& jsonParams) {
 
         
         try
         {
 
                 startWithCheckpoint = jsonParams["startWithCheckpoint"].get<bool>();
-    checkpointLoadFromDir = jsonParams["checkpointLoadFromDir"].get<std::string>();
-    checkpointRepeat = (int)jsonParams["checkpointRepeat"].get<int>();
-    checkpointWriteRootDir = jsonParams["checkpointWriteRootDir"].get<std::string>();
-    checkpointWriteDirPrefix = jsonParams["checkpointWriteDirPrefix"].get<std::string>();
-    checkpointWriteDirAppendTime = jsonParams["checkpointWriteDirAppendTime"].get<bool>();
+        checkpointLoadFromDir = jsonParams["checkpointLoadFromDir"].get<std::string>();
+        checkpointRepeat = (int)jsonParams["checkpointRepeat"].get<int>();
+        checkpointWriteRootDir = jsonParams["checkpointWriteRootDir"].get<std::string>();
+        checkpointWriteDirPrefix = jsonParams["checkpointWriteDirPrefix"].get<std::string>();
+        checkpointWriteDirAppendTime = jsonParams["checkpointWriteDirAppendTime"].get<bool>();
 
             
         }
@@ -58,18 +58,18 @@ struct CheckpointParams {
     }
     
     
-    json getJson() const {
+        json getJson() const {
         
         try {
             
             json jsonParams;
             
                 jsonParams["startWithCheckpoint"] = (bool)startWithCheckpoint;
-    jsonParams["checkpointLoadFromDir"] = (std::string)checkpointLoadFromDir;
-    jsonParams["checkpointRepeat"] = (int)checkpointRepeat;
-    jsonParams["checkpointWriteRootDir"] = (std::string)checkpointWriteRootDir;
-    jsonParams["checkpointWriteDirPrefix"] = (std::string)checkpointWriteDirPrefix;
-    jsonParams["checkpointWriteDirAppendTime"] = (bool)checkpointWriteDirAppendTime;
+        jsonParams["checkpointLoadFromDir"] = (std::string)checkpointLoadFromDir;
+        jsonParams["checkpointRepeat"] = (int)checkpointRepeat;
+        jsonParams["checkpointWriteRootDir"] = (std::string)checkpointWriteRootDir;
+        jsonParams["checkpointWriteDirPrefix"] = (std::string)checkpointWriteDirPrefix;
+        jsonParams["checkpointWriteDirAppendTime"] = (bool)checkpointWriteDirAppendTime;
 
             
             return jsonParams;
@@ -85,7 +85,7 @@ struct CheckpointParams {
     
     
     
-    void getParamsFromJsonFile(const std::string filePath) {
+        void getParamsFromJsonFile(const std::string filePath) {
         
         try
         {
@@ -108,7 +108,7 @@ struct CheckpointParams {
     
     
     
-    int writeParamsToJsonFile(const std::string filePath) {
+        int writeParamsToJsonFile(const std::string filePath) {
         
         
         try {
@@ -128,7 +128,7 @@ struct CheckpointParams {
     }
     
     
-    void printParams() {
+        void printParams() {
         
         std::cout
         << getJson()
