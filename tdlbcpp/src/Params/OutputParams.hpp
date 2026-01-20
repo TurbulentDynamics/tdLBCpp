@@ -281,20 +281,38 @@ struct OutputParams {
         {
             outputRootDir = jsonParams["outputRootDir"].get<std::string>();
 
-            getParamsFromJsonArray(jsonParams["XY_planes"], XY_planes);
-            getParamsFromJsonArray(jsonParams["XZ_planes"], XZ_planes);
-            getParamsFromJsonArray(jsonParams["YZ_planes"], YZ_planes);
-            getParamsFromJsonArray(jsonParams["XY_vorticity_planes"], XY_vorticity_planes);
-            getParamsFromJsonArray(jsonParams["XZ_vorticity_planes"], XZ_vorticity_planes);
-            getParamsFromJsonArray(jsonParams["YZ_vorticity_planes"], YZ_vorticity_planes);
-            getParamsFromJsonArray(jsonParams["capture_at_blade_angle"], capture_at_blade_angle);
-            getParamsFromJsonArray(jsonParams["YZ_plane_when_angle"], YZ_plane_when_angle);
-            getParamsFromJsonArray(jsonParams["volumes"], volumes);
+            if (jsonParams.contains("XY_planes")) {
+                getParamsFromJsonArray(jsonParams["XY_planes"], XY_planes);
+            }
+            if (jsonParams.contains("XZ_planes")) {
+                getParamsFromJsonArray(jsonParams["XZ_planes"], XZ_planes);
+            }
+            if (jsonParams.contains("YZ_planes")) {
+                getParamsFromJsonArray(jsonParams["YZ_planes"], YZ_planes);
+            }
+            if (jsonParams.contains("XY_vorticity_planes")) {
+                getParamsFromJsonArray(jsonParams["XY_vorticity_planes"], XY_vorticity_planes);
+            }
+            if (jsonParams.contains("XZ_vorticity_planes")) {
+                getParamsFromJsonArray(jsonParams["XZ_vorticity_planes"], XZ_vorticity_planes);
+            }
+            if (jsonParams.contains("YZ_vorticity_planes")) {
+                getParamsFromJsonArray(jsonParams["YZ_vorticity_planes"], YZ_vorticity_planes);
+            }
+            if (jsonParams.contains("capture_at_blade_angle")) {
+                getParamsFromJsonArray(jsonParams["capture_at_blade_angle"], capture_at_blade_angle);
+            }
+            if (jsonParams.contains("YZ_plane_when_angle")) {
+                getParamsFromJsonArray(jsonParams["YZ_plane_when_angle"], YZ_plane_when_angle);
+            }
+            if (jsonParams.contains("volumes")) {
+                getParamsFromJsonArray(jsonParams["volumes"], volumes);
+            }
         }
         catch(const nlohmann::json::exception& e)
         {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "JSON parsing error in OutputParams: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to parse OutputParams: ") + e.what());
         }
     }
 
