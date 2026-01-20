@@ -65,7 +65,7 @@ struct RunningParams {
         runningDataFileDir = jsonParams["runningDataFileDir"].get<std::string>();
         runningDataFilePrefix = jsonParams["runningDataFilePrefix"].get<std::string>();
         runningDataFileAppendTime = jsonParams["runningDataFileAppendTime"].get<bool>();
-        doubleResolutionAtStep = jsonParams["doubleResolutionAtStep"].get<tStep>();
+        doubleResolutionAtStep = jsonParams.value("doubleResolutionAtStep", static_cast<tStep>(10));
 
             
         }

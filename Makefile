@@ -277,6 +277,27 @@ quick: build test
 	@echo "$(GREEN)Quick build and test complete!$(NC)"
 
 # ==============================================================================
+# Code Formatting & Linting
+# ==============================================================================
+
+## Check code formatting (clang-format)
+format-check:
+	@echo "$(BLUE)Checking code formatting...$(NC)"
+	@./format-code.sh --check
+	@echo "$(GREEN)Format check complete!$(NC)"
+
+## Fix code formatting (clang-format)
+format:
+	@echo "$(BLUE)Formatting code...$(NC)"
+	@./format-code.sh --fix
+	@echo "$(GREEN)Code formatted!$(NC)"
+
+## Format specific file or directory
+format-path:
+	@echo "$(BLUE)Formatting $(PATH_TO_FORMAT)...$(NC)"
+	@./format-code.sh --fix $(PATH_TO_FORMAT)
+
+# ==============================================================================
 # Examples
 # ==============================================================================
 
