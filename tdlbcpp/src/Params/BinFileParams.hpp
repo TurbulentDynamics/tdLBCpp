@@ -66,10 +66,10 @@ struct BinFileParams {
 
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in BinFileParams: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            std::cerr << "JSON parsing error in BinFileParams:: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to parse BinFileParams: ") + e.what());
         }
                 
     }
@@ -99,11 +99,11 @@ struct BinFileParams {
             
             return jsonParams;
             
-        } catch(std::exception& e) {
+        } catch(const nlohmann::json::exception& e) {
             
-            std::cerr << "Exception reached parsing arguments in BinFileParams: " << e.what() << std::endl;
+            std::cerr << "JSON parsing error in BinFileParams:: " << e.what() << std::endl;
 
-            return json();
+            return nlohmann::json();
         }
     }
     
@@ -122,10 +122,10 @@ struct BinFileParams {
             getParamsFromJson(jsonParams);
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(std::string("Failed to parse BinFileParams: ") + e.what());
         }
         
     };
@@ -144,7 +144,7 @@ struct BinFileParams {
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
-        } catch(std::exception& e){
+        } catch(const nlohmann::json::exception& e){
             
             std::cerr << "Exception writing json file for BinFileParams: " << e.what() << std::endl;
         }

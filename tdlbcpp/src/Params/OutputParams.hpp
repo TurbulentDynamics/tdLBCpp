@@ -291,7 +291,7 @@ struct OutputParams {
             getParamsFromJsonArray(jsonParams["YZ_plane_when_angle"], YZ_plane_when_angle);
             getParamsFromJsonArray(jsonParams["volumes"], volumes);
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Unhandled Exception reached parsing arguments: "
             << e.what() << ", application will now exit" << std::endl;
@@ -331,7 +331,7 @@ struct OutputParams {
 
             std::cerr << "Unhandled Exception reached parsing arguments: "
             << e.what() << ", application will now exit" << std::endl;
-            return json();
+            return nlohmann::json();
         }
     }
 
@@ -353,10 +353,10 @@ struct OutputParams {
             getParamsFromJson(jsonParams);
 
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(std::string("Failed to parse OutputParams: ") + e.what());
         }
 
     };
@@ -375,7 +375,7 @@ struct OutputParams {
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
 
-        } catch(std::exception& e){
+        } catch(const nlohmann::json::exception& e){
 
             std::cerr << "Exception writing json file for OutputParams: " << e.what() << std::endl;
         }

@@ -48,10 +48,10 @@ struct OrthoPlaneVorticityParams {
 
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in OrthoPlaneVorticityParams: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            std::cerr << "JSON parsing error in OrthoPlaneVorticityParams:: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to parse OrthoPlaneVorticityParams: ") + e.what());
         }
                 
     }
@@ -73,11 +73,11 @@ struct OrthoPlaneVorticityParams {
             
             return jsonParams;
             
-        } catch(std::exception& e) {
+        } catch(const nlohmann::json::exception& e) {
             
-            std::cerr << "Exception reached parsing arguments in OrthoPlaneVorticityParams: " << e.what() << std::endl;
+            std::cerr << "JSON parsing error in OrthoPlaneVorticityParams:: " << e.what() << std::endl;
 
-            return json();
+            return nlohmann::json();
         }
     }
     
@@ -96,10 +96,10 @@ struct OrthoPlaneVorticityParams {
             getParamsFromJson(jsonParams);
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(std::string("Failed to parse OrthoPlaneVorticityParams: ") + e.what());
         }
         
     };
@@ -118,7 +118,7 @@ struct OrthoPlaneVorticityParams {
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
-        } catch(std::exception& e){
+        } catch(const nlohmann::json::exception& e){
             
             std::cerr << "Exception writing json file for OrthoPlaneVorticityParams: " << e.what() << std::endl;
         }
