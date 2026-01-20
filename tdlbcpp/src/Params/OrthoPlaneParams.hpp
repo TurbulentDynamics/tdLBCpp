@@ -46,9 +46,9 @@ struct OrthoPlaneParams {
         Q_output_len = static_cast<int>(jsonParams["Q_output_len"].get<int>());
         use_half_float = jsonParams["use_half_float"].get<bool>();
         cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
-        repeat = static_cast<tStep>(jsonParams["repeat"].get<uint64_t>());
-        start_at_step = static_cast<tStep>(jsonParams["start_at_step"].get<uint64_t>());
-        end_at_step = static_cast<tStep>(jsonParams["end_at_step"].get<uint64_t>());
+        repeat = jsonParams["repeat"].get<tStep>();
+        start_at_step = jsonParams["start_at_step"].get<tStep>();
+        end_at_step = jsonParams["end_at_step"].get<tStep>();
 
             
         }

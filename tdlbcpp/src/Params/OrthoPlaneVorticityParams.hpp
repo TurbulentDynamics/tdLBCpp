@@ -42,9 +42,9 @@ struct OrthoPlaneVorticityParams {
                 name_root = jsonParams["name_root"].get<std::string>();
         jpegCompression = static_cast<int>(jsonParams["jpegCompression"].get<int>());
         cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
-        repeat = static_cast<tStep>(jsonParams["repeat"].get<uint64_t>());
-        start_at_step = static_cast<tStep>(jsonParams["start_at_step"].get<uint64_t>());
-        end_at_step = static_cast<tStep>(jsonParams["end_at_step"].get<uint64_t>());
+        repeat = jsonParams["repeat"].get<tStep>();
+        start_at_step = jsonParams["start_at_step"].get<tStep>();
+        end_at_step = jsonParams["end_at_step"].get<tStep>();
 
             
         }

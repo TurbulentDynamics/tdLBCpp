@@ -41,10 +41,10 @@ struct VolumeParams {
         {
 
                 name_root = jsonParams["name_root"].get<std::string>();
-        repeat = static_cast<tStep>(jsonParams["repeat"].get<uint64_t>());
+        repeat = jsonParams["repeat"].get<tStep>();
         Q_output_len = static_cast<int>(jsonParams["Q_output_len"].get<int>());
-        start_at_step = static_cast<tStep>(jsonParams["start_at_step"].get<uint64_t>());
-        end_at_step = static_cast<tStep>(jsonParams["end_at_step"].get<uint64_t>());
+        start_at_step = jsonParams["start_at_step"].get<tStep>();
+        end_at_step = jsonParams["end_at_step"].get<tStep>();
         use_half_float = jsonParams["use_half_float"].get<bool>();
         QDataType = jsonParams["QDataType"].get<std::string>();
 
