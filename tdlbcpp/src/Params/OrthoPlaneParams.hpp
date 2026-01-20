@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -36,7 +35,7 @@ struct OrthoPlaneParams {
     
     
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
         
         try
@@ -44,7 +43,7 @@ struct OrthoPlaneParams {
 
                 name_root = jsonParams["name_root"].get<std::string>();
         QDataType = jsonParams["QDataType"].get<std::string>();
-        Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
+        Q_output_len = static_cast<int>(jsonParams["Q_output_len"].get<int>());
         use_half_float = jsonParams["use_half_float"].get<bool>();
         cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
         repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
@@ -62,16 +61,16 @@ struct OrthoPlaneParams {
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
         
         try {
             
-            json jsonParams;
+            nlohmann::json jsonParams;
             
-                jsonParams["name_root"] = (std::string)name_root;
-        jsonParams["QDataType"] = (std::string)QDataType;
-        jsonParams["Q_output_len"] = (int)Q_output_len;
-        jsonParams["use_half_float"] = (bool)use_half_float;
+                jsonParams["name_root"] = static_cast<std::string>(name_root);
+        jsonParams["QDataType"] = static_cast<std::string>(QDataType);
+        jsonParams["Q_output_len"] = static_cast<int>(Q_output_len);
+        jsonParams["use_half_float"] = static_cast<bool>(use_half_float);
         jsonParams["cutAt"] = cutAt;
         jsonParams["repeat"] = repeat;
         jsonParams["start_at_step"] = start_at_step;
@@ -96,7 +95,7 @@ struct OrthoPlaneParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -119,7 +118,7 @@ struct OrthoPlaneParams {
         
         try {
             
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces

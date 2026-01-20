@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 #include "OrthoPlaneParams.hpp"
@@ -268,7 +267,7 @@ struct OutputParams {
 
     }
 
-        template <typename ParamType> void getParamsFromJsonArray(const json& jsonArray, std::vector<ParamType> &array) {
+        template <typename ParamType> void getParamsFromJsonArray(const nlohmann::json& jsonArray, std::vector<ParamType> &array) {
         array.clear();
         for (size_t i = 0; i < jsonArray.size(); i++) {
             ParamType param;
@@ -277,7 +276,7 @@ struct OutputParams {
         }
     }
 
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
         try
         {
             outputRootDir = jsonParams["outputRootDir"].get<std::string>();
@@ -299,7 +298,7 @@ struct OutputParams {
         }
     }
 
-        template <typename ParamType> json getJsonOfArray(std::vector<ParamType> &array) {
+        template <typename ParamType> nlohmann::json getJsonOfArray(std::vector<ParamType> &array) {
         json jsonArray = json::array();
         for (ParamType param : array) {
             std::cout << param.getJson() << std::endl;
@@ -308,10 +307,10 @@ struct OutputParams {
         return jsonArray;
     }
 
-        json getJson() {
+        nlohmann::json getJson() {
         try
         {
-            json jsonParams;
+            nlohmann::json jsonParams;
 
             jsonParams["outputRootDir"] = outputRootDir;
 
@@ -347,7 +346,7 @@ struct OutputParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
 
@@ -370,7 +369,7 @@ struct OutputParams {
 
         try {
 
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
 
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces

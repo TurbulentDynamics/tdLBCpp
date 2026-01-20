@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -38,7 +37,7 @@ struct GridParams {
     
     
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
         
         try
@@ -64,11 +63,11 @@ struct GridParams {
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
         
         try {
             
-            json jsonParams;
+            nlohmann::json jsonParams;
             
                 jsonParams["ngx"] = ngx;
         jsonParams["ngy"] = ngy;
@@ -77,7 +76,7 @@ struct GridParams {
         jsonParams["y"] = y;
         jsonParams["z"] = z;
         jsonParams["multiStep"] = multiStep;
-        jsonParams["strMinQVecPrecision"] = (std::string)strMinQVecPrecision;
+        jsonParams["strMinQVecPrecision"] = static_cast<std::string>(strMinQVecPrecision);
 
             
             return jsonParams;
@@ -98,7 +97,7 @@ struct GridParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -121,7 +120,7 @@ struct GridParams {
         
         try {
             
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces

@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -35,7 +34,7 @@ struct VolumeParams {
     
     
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
         
         try
@@ -43,7 +42,7 @@ struct VolumeParams {
 
                 name_root = jsonParams["name_root"].get<std::string>();
         repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
-        Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
+        Q_output_len = static_cast<int>(jsonParams["Q_output_len"].get<int>());
         start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
         end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
         use_half_float = jsonParams["use_half_float"].get<bool>();
@@ -60,19 +59,19 @@ struct VolumeParams {
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
         
         try {
             
-            json jsonParams;
+            nlohmann::json jsonParams;
             
-                jsonParams["name_root"] = (std::string)name_root;
+                jsonParams["name_root"] = static_cast<std::string>(name_root);
         jsonParams["repeat"] = repeat;
-        jsonParams["Q_output_len"] = (int)Q_output_len;
+        jsonParams["Q_output_len"] = static_cast<int>(Q_output_len);
         jsonParams["start_at_step"] = start_at_step;
         jsonParams["end_at_step"] = end_at_step;
-        jsonParams["use_half_float"] = (bool)use_half_float;
-        jsonParams["QDataType"] = (std::string)QDataType;
+        jsonParams["use_half_float"] = static_cast<bool>(use_half_float);
+        jsonParams["QDataType"] = static_cast<std::string>(QDataType);
 
             
             return jsonParams;
@@ -93,7 +92,7 @@ struct VolumeParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -116,7 +115,7 @@ struct VolumeParams {
         
         try {
             
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces

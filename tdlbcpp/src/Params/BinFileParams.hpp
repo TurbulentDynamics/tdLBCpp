@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -44,7 +43,7 @@ struct BinFileParams {
     
     
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
         
         try
@@ -63,7 +62,7 @@ struct BinFileParams {
         j0 = (tNi)jsonParams["j0"].get<uint64_t>();
         k0 = (tNi)jsonParams["k0"].get<uint64_t>();
         QDataType = jsonParams["QDataType"].get<std::string>();
-        QOutputLength = (int)jsonParams["QOutputLength"].get<int>();
+        QOutputLength = static_cast<int>(jsonParams["QOutputLength"].get<int>());
 
             
         }
@@ -76,26 +75,26 @@ struct BinFileParams {
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
         
         try {
             
-            json jsonParams;
+            nlohmann::json jsonParams;
             
-                jsonParams["filePath"] = (std::string)filePath;
-        jsonParams["name"] = (std::string)name;
-        jsonParams["note"] = (std::string)note;
-        jsonParams["structName"] = (std::string)structName;
+                jsonParams["filePath"] = static_cast<std::string>(filePath);
+        jsonParams["name"] = static_cast<std::string>(name);
+        jsonParams["note"] = static_cast<std::string>(note);
+        jsonParams["structName"] = static_cast<std::string>(structName);
         jsonParams["binFileSizeInStructs"] = binFileSizeInStructs;
-        jsonParams["coordsType"] = (std::string)coordsType;
-        jsonParams["hasGridtCoords"] = (bool)hasGridtCoords;
-        jsonParams["hasColRowtCoords"] = (bool)hasColRowtCoords;
-        jsonParams["reference"] = (std::string)reference;
+        jsonParams["coordsType"] = static_cast<std::string>(coordsType);
+        jsonParams["hasGridtCoords"] = static_cast<bool>(hasGridtCoords);
+        jsonParams["hasColRowtCoords"] = static_cast<bool>(hasColRowtCoords);
+        jsonParams["reference"] = static_cast<std::string>(reference);
         jsonParams["i0"] = i0;
         jsonParams["j0"] = j0;
         jsonParams["k0"] = k0;
-        jsonParams["QDataType"] = (std::string)QDataType;
-        jsonParams["QOutputLength"] = (int)QOutputLength;
+        jsonParams["QDataType"] = static_cast<std::string>(QDataType);
+        jsonParams["QOutputLength"] = static_cast<int>(QOutputLength);
 
             
             return jsonParams;
@@ -116,7 +115,7 @@ struct BinFileParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -139,7 +138,7 @@ struct BinFileParams {
         
         try {
             
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces

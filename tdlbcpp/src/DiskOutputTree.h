@@ -21,7 +21,6 @@
 #include <string>
 #include <time.h>
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 #include "Header.h"
@@ -60,7 +59,7 @@ private:
     //Need to sync this across nodes
     std::string initTime = "initTimeNotSet";
 
-    json cuJson;
+    nlohmann::json cuJson;
 
     json grid;
     json flow;

@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -41,7 +40,7 @@ struct RunningParams {
         void update(tStep _step, double _angle){
 
         step = (tStep)_step;
-        angle = (double)_angle;
+        angle = static_cast<double>(_angle);
 
     }
 
@@ -50,14 +49,14 @@ struct RunningParams {
     }
 
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
         
         try
         {
 
                 step = (tStep)jsonParams["step"].get<uint64_t>();
-        angle = (double)jsonParams["angle"].get<double>();
+        angle = static_cast<double>(jsonParams["angle"].get<double>());
         num_steps = (tStep)jsonParams["num_steps"].get<uint64_t>();
         impellerStartupStepsUntilNormalSpeed = (tStep)jsonParams["impellerStartupStepsUntilNormalSpeed"].get<uint64_t>();
         numStepsForAverageCalc = (tStep)jsonParams["numStepsForAverageCalc"].get<uint64_t>();
@@ -79,22 +78,22 @@ struct RunningParams {
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
         
         try {
             
-            json jsonParams;
+            nlohmann::json jsonParams;
             
                 jsonParams["step"] = step;
-        jsonParams["angle"] = (double)angle;
+        jsonParams["angle"] = static_cast<double>(angle);
         jsonParams["num_steps"] = num_steps;
         jsonParams["impellerStartupStepsUntilNormalSpeed"] = impellerStartupStepsUntilNormalSpeed;
         jsonParams["numStepsForAverageCalc"] = numStepsForAverageCalc;
         jsonParams["repeatPrintTimerToFile"] = repeatPrintTimerToFile;
         jsonParams["repeatPrintTimerToStdOut"] = repeatPrintTimerToStdOut;
-        jsonParams["runningDataFileDir"] = (std::string)runningDataFileDir;
-        jsonParams["runningDataFilePrefix"] = (std::string)runningDataFilePrefix;
-        jsonParams["runningDataFileAppendTime"] = (bool)runningDataFileAppendTime;
+        jsonParams["runningDataFileDir"] = static_cast<std::string>(runningDataFileDir);
+        jsonParams["runningDataFilePrefix"] = static_cast<std::string>(runningDataFilePrefix);
+        jsonParams["runningDataFileAppendTime"] = static_cast<bool>(runningDataFileAppendTime);
         jsonParams["doubleResolutionAtStep"] = doubleResolutionAtStep;
 
             
@@ -116,7 +115,7 @@ struct RunningParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
             
@@ -139,7 +138,7 @@ struct RunningParams {
         
         try {
             
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
