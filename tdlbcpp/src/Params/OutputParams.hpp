@@ -299,7 +299,7 @@ struct OutputParams {
     }
 
         template <typename ParamType> nlohmann::json getJsonOfArray(std::vector<ParamType> &array) {
-        json jsonArray = json::array();
+        nlohmann::json jsonArray = nlohmann::json::array();
         for (ParamType param : array) {
             std::cout << param.getJson() << std::endl;
             jsonArray.push_back(param.getJson());
