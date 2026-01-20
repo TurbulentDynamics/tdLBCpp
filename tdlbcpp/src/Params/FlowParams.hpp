@@ -66,7 +66,7 @@ struct FlowParams {
 
         Re_m = reMNonDimensional * M_PI / 2.0;
 
-        nu  = uav * (T)impellerBladeOuterRadius / Re_m;
+        nu  = uav * static_cast<T>(impellerBladeOuterRadius) / Re_m;
     }
 
     

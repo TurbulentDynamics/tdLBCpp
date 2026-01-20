@@ -55,17 +55,17 @@ struct RunningParams {
         try
         {
 
-                step = (tStep)jsonParams["step"].get<uint64_t>();
+                step = static_cast<tStep>(jsonParams["step"].get<uint64_t>());
         angle = static_cast<double>(jsonParams["angle"].get<double>());
-        num_steps = (tStep)jsonParams["num_steps"].get<uint64_t>();
-        impellerStartupStepsUntilNormalSpeed = (tStep)jsonParams["impellerStartupStepsUntilNormalSpeed"].get<uint64_t>();
-        numStepsForAverageCalc = (tStep)jsonParams["numStepsForAverageCalc"].get<uint64_t>();
-        repeatPrintTimerToFile = (tStep)jsonParams["repeatPrintTimerToFile"].get<uint64_t>();
-        repeatPrintTimerToStdOut = (tStep)jsonParams["repeatPrintTimerToStdOut"].get<uint64_t>();
+        num_steps = static_cast<tStep>(jsonParams["num_steps"].get<uint64_t>());
+        impellerStartupStepsUntilNormalSpeed = static_cast<tStep>(jsonParams["impellerStartupStepsUntilNormalSpeed"].get<uint64_t>());
+        numStepsForAverageCalc = static_cast<tStep>(jsonParams["numStepsForAverageCalc"].get<uint64_t>());
+        repeatPrintTimerToFile = static_cast<tStep>(jsonParams["repeatPrintTimerToFile"].get<uint64_t>());
+        repeatPrintTimerToStdOut = static_cast<tStep>(jsonParams["repeatPrintTimerToStdOut"].get<uint64_t>());
         runningDataFileDir = jsonParams["runningDataFileDir"].get<std::string>();
         runningDataFilePrefix = jsonParams["runningDataFilePrefix"].get<std::string>();
         runningDataFileAppendTime = jsonParams["runningDataFileAppendTime"].get<bool>();
-        doubleResolutionAtStep = (tStep)jsonParams["doubleResolutionAtStep"].get<uint64_t>();
+        doubleResolutionAtStep = static_cast<tStep>(jsonParams["doubleResolutionAtStep"].get<uint64_t>());
 
             
         }
