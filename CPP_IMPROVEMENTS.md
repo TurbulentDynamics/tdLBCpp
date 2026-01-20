@@ -178,6 +178,43 @@ No new warnings. Existing warnings unchanged:
 
 ---
 
+## Runtime Issues Fixed
+
+### JSON Type Conversion Issues
+
+During testing, two JSON parsing issues were identified and fixed:
+
+#### Issue 1: Type Strictness with Signed/Unsigned Integers
+**Problem**: Initial fix used `.get<uint64_t>()` which is too strict
+```cpp
+// Too strict - fails if JSON has signed int
+step = static_cast<tStep>(jsonParams["step"].get<uint64_t>());
+```
+
+**Solution**: Use direct type extraction with `.get<tStep>()`
+```cpp
+// Let nlohmann/json handle the conversion
+step = jsonParams["step"].get<tStep>();
+```
+
+#### Issue 2: Missing Optional Field
+**Problem**: Code expected `doubleResolutionAtStep` field, but older JSON files don't include it
+```cpp
+// Fails if field missing in JSON
+doubleResolutionAtStep = jsonParams["doubleResolutionAtStep"].get<tStep>();
+```
+**Error**: `[json.exception.type_error.302] type must be number, but is number`
+
+**Solution**: Use `.value()` with default fallback
+```cpp
+// Falls back to default value (10) if field missing
+doubleResolutionAtStep = jsonParams.value("doubleResolutionAtStep", static_cast<tStep>(10));
+```
+
+**Result**: ✅ All JSON parsing errors resolved. Program runs successfully with both old and new JSON formats.
+
+---
+
 ## Branch Information
 
 ### Git Branch
@@ -189,6 +226,12 @@ feature/cpp-improvements
 1. **2f129f9** - Modernize C++: Fix namespace pollution and replace C-style casts
 2. **b9aae52** - Improve exception handling specificity in parameter files
 3. **163c772** - Complete namespace pollution fixes across all files
+4. **25ed879** - Add comprehensive documentation (CPP_IMPROVEMENTS.md)
+5. **bf8bddd** - Fix remaining C-style casts (T, tStep, std::string)
+6. **02c269a** - Add precision preservation verification to documentation
+7. **010a8ca** - Add IDE integration documentation and examples
+8. **010b5cd** - Fix JSON type conversion: use direct type extraction for tStep
+9. **a7d3946** - Fix JSON parsing error: make doubleResolutionAtStep optional
 
 ### How to Review
 ```bash
