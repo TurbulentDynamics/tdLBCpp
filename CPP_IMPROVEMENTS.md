@@ -95,15 +95,23 @@ jsonParams["initialRho"] = static_cast<double>(initialRho);
 
 ### 3. Improve Exception Handling Specificity (High Priority)
 
-**Problem**: All parameter files caught overly broad `std::exception&` and called `exit(EXIT_FAILURE)`, terminating the entire program.
+**Problem**: Exception handling had multiple critical issues:
+1. All parameter files caught overly broad `std::exception&` and called `exit(EXIT_FAILURE)`, terminating the entire program
+2. All `getJson()` methods returned empty `nlohmann::json()` objects on error, silently propagating invalid state
+3. DiskOutputTree.h had incorrect error handling (returning wrong types)
 
-**Solution**: Catch specific `nlohmann::json::exception` types with `const&` and throw exceptions instead of exiting.
+**Solution**:
+1. In `getParamsFromJson()`: Catch specific `nlohmann::json::exception` with `const&` and throw instead of exiting
+2. In `getJson()`: Throw exceptions instead of returning empty JSON objects
+3. Fixed all incorrect return types and made exception handling consistent
 
-#### Files Modified (13 total)
-- All 13 parameter headers
+#### Files Modified (14 total)
+- All 13 parameter headers (getParamsFromJson AND getJson methods)
+- DiskOutputTree.h
 
 #### Before & After
 
+**getParamsFromJson() - Input Parsing:**
 ```cpp
 // BEFORE: ❌ Too broad, terminates program
 catch(std::exception& e) {  // Non-const, catches everything
@@ -122,12 +130,31 @@ catch(const nlohmann::json::exception& e) {  // Specific JSON errors
 }
 ```
 
+**getJson() - Output Serialization:**
+```cpp
+// BEFORE: ❌ Returns empty JSON, silent failure
+catch(const nlohmann::json::exception& e) {
+    std::cerr << "JSON parsing error in FlowParams:: " << e.what() << std::endl;
+    return nlohmann::json();  // Empty JSON propagates invalid state!
+}
+```
+
+```cpp
+// AFTER: ✅ Throws exception, explicit failure
+catch(const nlohmann::json::exception& e) {
+    std::cerr << "JSON serialization error: " << e.what() << std::endl;
+    throw std::runtime_error(std::string("Failed to serialize params: ") + e.what());
+}
+```
+
 #### Benefits
 - **Specific exceptions**: Catches `type_error`, `out_of_range`, `parse_error` from JSON library
 - **Const correctness**: `const&` prevents accidental modification
 - **No termination**: Library code doesn't kill the program
+- **No silent failures**: All errors are explicitly thrown, not hidden
 - **Graceful handling**: Callers can catch and recover
-- **Better debugging**: Error message includes context and underlying error
+- **Better debugging**: Error messages include context and underlying error
+- **Prevents corruption**: Invalid state cannot propagate through the system
 - **Standards compliance**: Follows C++ Core Guidelines E.15, E.30
 
 ---
@@ -182,7 +209,7 @@ No new warnings. Existing warnings unchanged:
 
 ### JSON Type Conversion Issues
 
-During testing, two JSON parsing issues were identified and fixed:
+During testing, multiple JSON parsing issues were identified and fixed:
 
 #### Issue 1: Type Strictness with Signed/Unsigned Integers
 **Problem**: Initial fix used `.get<uint64_t>()` which is too strict
@@ -211,7 +238,39 @@ doubleResolutionAtStep = jsonParams["doubleResolutionAtStep"].get<tStep>();
 doubleResolutionAtStep = jsonParams.value("doubleResolutionAtStep", static_cast<tStep>(10));
 ```
 
-**Result**: ✅ All JSON parsing errors resolved. Program runs successfully with both old and new JSON formats.
+#### Issue 3: Silent Failures in getJson() Methods
+**Problem**: All 13 parameter files returned empty JSON objects on serialization errors
+```cpp
+// Silently returns invalid data
+catch(const nlohmann::json::exception& e) {
+    return nlohmann::json();  // Empty JSON!
+}
+```
+
+**Solution**: Throw exceptions to prevent invalid state propagation
+```cpp
+// Explicitly fails with clear error
+catch(const nlohmann::json::exception& e) {
+    throw std::runtime_error(std::string("Failed to serialize params: ") + e.what());
+}
+```
+
+#### Issue 4: OutputParams Optional Fields
+**Problem**: Code expected all output array fields to exist, but many are optional
+```cpp
+// Fails if field missing
+getParamsFromJsonArray(jsonParams["YZ_planes"], YZ_planes);
+```
+
+**Solution**: Check field existence before parsing
+```cpp
+// Only parse if field exists
+if (jsonParams.contains("YZ_planes")) {
+    getParamsFromJsonArray(jsonParams["YZ_planes"], YZ_planes);
+}
+```
+
+**Result**: ✅ All JSON parsing errors resolved. Program runs successfully and generates correct output files. No silent failures possible.
 
 ---
 
@@ -232,6 +291,9 @@ feature/cpp-improvements
 7. **010a8ca** - Add IDE integration documentation and examples
 8. **010b5cd** - Fix JSON type conversion: use direct type extraction for tStep
 9. **a7d3946** - Fix JSON parsing error: make doubleResolutionAtStep optional
+10. **2012d26** - Document JSON parsing issues and fixes
+11. **ea0ffc4** - Fix OutputParams: make array fields optional
+12. **77033d9** - Improve exception handling: throw instead of returning empty JSON
 
 ### How to Review
 ```bash
