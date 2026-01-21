@@ -344,12 +344,10 @@ struct OutputParams {
 
             return jsonParams;
         }
-        catch (std::exception &e)
+        catch (const nlohmann::json::exception& e)
         {
-
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
-            return nlohmann::json();
+            std::cerr << "JSON error in OutputParams::getJson: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to serialize OutputParams: ") + e.what());
         }
     }
 

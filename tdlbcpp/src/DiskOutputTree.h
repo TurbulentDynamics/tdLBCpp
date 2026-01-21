@@ -429,10 +429,9 @@ public:
             jsonParams["OutputParams"] = output;
             jsonParams["CheckpointParams"] = checkpoint;
 
-        } catch(std::exception& e) {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
-            return 1;
+        } catch(const nlohmann::json::exception& e) {
+            std::cerr << "JSON error in getJsonParams: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to create JSON params: ") + e.what());
         }
         return jsonParams;
     }
@@ -449,9 +448,8 @@ public:
 
             return 0;
         }
-        catch(std::exception& e) {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+        catch(const std::exception& e) {
+            std::cerr << "Error writing params JSON: " << e.what() << std::endl;
             return 1;
         }
 
@@ -472,9 +470,8 @@ public:
 
             return 0;
         }
-        catch(std::exception& e) {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+        catch(const std::exception& e) {
+            std::cerr << "Error writing params JSON: " << e.what() << std::endl;
             return 1;
         }
 

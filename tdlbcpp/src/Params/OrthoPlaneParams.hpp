@@ -80,10 +80,8 @@ struct OrthoPlaneParams {
             return jsonParams;
             
         } catch(const nlohmann::json::exception& e) {
-            
-            std::cerr << "JSON parsing error in OrthoPlaneParams:: " << e.what() << std::endl;
-
-            return nlohmann::json();
+            std::cerr << "JSON serialization error: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to serialize params: ") + e.what());
         }
     }
     
