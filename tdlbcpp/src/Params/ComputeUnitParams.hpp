@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -52,17 +51,17 @@ struct ComputeUnitParams {
      : nodeID(nodeID), deviceID(deviceID), idi(idi), idj(idj), idk(idk), x(x), y(y), z(z), i0(i0), j0(j0), k0(k0), ghost(ghost) {}
 
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
         
         try
         {
 
-                nodeID = (int)jsonParams["nodeID"].get<int>();
-        deviceID = (int)jsonParams["deviceID"].get<int>();
-        idi = (int)jsonParams["idi"].get<int>();
-        idj = (int)jsonParams["idj"].get<int>();
-        idk = (int)jsonParams["idk"].get<int>();
+                nodeID = static_cast<int>(jsonParams["nodeID"].get<int>());
+        deviceID = static_cast<int>(jsonParams["deviceID"].get<int>());
+        idi = static_cast<int>(jsonParams["idi"].get<int>());
+        idj = static_cast<int>(jsonParams["idj"].get<int>());
+        idk = static_cast<int>(jsonParams["idk"].get<int>());
         x = (tNi)jsonParams["x"].get<uint64_t>();
         y = (tNi)jsonParams["y"].get<uint64_t>();
         z = (tNi)jsonParams["z"].get<uint64_t>();
@@ -80,26 +79,26 @@ struct ComputeUnitParams {
 
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in ComputeUnitParams: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            std::cerr << "JSON parsing error in ComputeUnitParams:: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to parse ComputeUnitParams: ") + e.what());
         }
                 
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
         
         try {
             
-            json jsonParams;
+            nlohmann::json jsonParams;
             
-                jsonParams["nodeID"] = (int)nodeID;
-        jsonParams["deviceID"] = (int)deviceID;
-        jsonParams["idi"] = (int)idi;
-        jsonParams["idj"] = (int)idj;
-        jsonParams["idk"] = (int)idk;
+                jsonParams["nodeID"] = static_cast<int>(nodeID);
+        jsonParams["deviceID"] = static_cast<int>(deviceID);
+        jsonParams["idi"] = static_cast<int>(idi);
+        jsonParams["idj"] = static_cast<int>(idj);
+        jsonParams["idk"] = static_cast<int>(idk);
         jsonParams["x"] = x;
         jsonParams["y"] = y;
         jsonParams["z"] = z;
@@ -108,21 +107,19 @@ struct ComputeUnitParams {
         jsonParams["k0"] = k0;
         jsonParams["ghost"] = ghost;
         jsonParams["resolution"] = resolution;
-        jsonParams["strQVecPrecision"] = (std::string)strQVecPrecision;
-        jsonParams["strQLength"] = (std::string)strQLength;
-        jsonParams["strMemoryLayout"] = (std::string)strMemoryLayout;
-        jsonParams["strCollisonAlgo"] = (std::string)strCollisonAlgo;
-        jsonParams["strStreamingAlgo"] = (std::string)strStreamingAlgo;
-        jsonParams["strCompileFlag"] = (std::string)strCompileFlag;
+        jsonParams["strQVecPrecision"] = static_cast<std::string>(strQVecPrecision);
+        jsonParams["strQLength"] = static_cast<std::string>(strQLength);
+        jsonParams["strMemoryLayout"] = static_cast<std::string>(strMemoryLayout);
+        jsonParams["strCollisonAlgo"] = static_cast<std::string>(strCollisonAlgo);
+        jsonParams["strStreamingAlgo"] = static_cast<std::string>(strStreamingAlgo);
+        jsonParams["strCompileFlag"] = static_cast<std::string>(strCompileFlag);
 
             
             return jsonParams;
             
-        } catch(std::exception& e) {
-            
-            std::cerr << "Exception reached parsing arguments in ComputeUnitParams: " << e.what() << std::endl;
-
-            return json();
+        } catch(const nlohmann::json::exception& e) {
+            std::cerr << "JSON serialization error: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to serialize params: ") + e.what());
         }
     }
     
@@ -134,17 +131,17 @@ struct ComputeUnitParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
             
             getParamsFromJson(jsonParams);
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(std::string("Failed to parse ComputeUnitParams: ") + e.what());
         }
         
     };
@@ -157,13 +154,13 @@ struct ComputeUnitParams {
         
         try {
             
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
-        } catch(std::exception& e){
+        } catch(const nlohmann::json::exception& e){
             
             std::cerr << "Exception writing json file for ComputeUnitParams: " << e.what() << std::endl;
         }

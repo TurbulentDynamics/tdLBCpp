@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -34,38 +33,38 @@ struct OrthoPlaneVorticityParams {
     
     
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
         
         try
         {
 
                 name_root = jsonParams["name_root"].get<std::string>();
-        jpegCompression = (int)jsonParams["jpegCompression"].get<int>();
+        jpegCompression = static_cast<int>(jsonParams["jpegCompression"].get<int>());
         cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
-        repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
-        start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
-        end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
+        repeat = jsonParams["repeat"].get<tStep>();
+        start_at_step = jsonParams["start_at_step"].get<tStep>();
+        end_at_step = jsonParams["end_at_step"].get<tStep>();
 
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in OrthoPlaneVorticityParams: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            std::cerr << "JSON parsing error in OrthoPlaneVorticityParams:: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to parse OrthoPlaneVorticityParams: ") + e.what());
         }
                 
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
         
         try {
             
-            json jsonParams;
+            nlohmann::json jsonParams;
             
-                jsonParams["name_root"] = (std::string)name_root;
-        jsonParams["jpegCompression"] = (int)jpegCompression;
+                jsonParams["name_root"] = static_cast<std::string>(name_root);
+        jsonParams["jpegCompression"] = static_cast<int>(jpegCompression);
         jsonParams["cutAt"] = cutAt;
         jsonParams["repeat"] = repeat;
         jsonParams["start_at_step"] = start_at_step;
@@ -74,11 +73,9 @@ struct OrthoPlaneVorticityParams {
             
             return jsonParams;
             
-        } catch(std::exception& e) {
-            
-            std::cerr << "Exception reached parsing arguments in OrthoPlaneVorticityParams: " << e.what() << std::endl;
-
-            return json();
+        } catch(const nlohmann::json::exception& e) {
+            std::cerr << "JSON serialization error: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to serialize params: ") + e.what());
         }
     }
     
@@ -90,17 +87,17 @@ struct OrthoPlaneVorticityParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
             
             getParamsFromJson(jsonParams);
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(std::string("Failed to parse OrthoPlaneVorticityParams: ") + e.what());
         }
         
     };
@@ -113,13 +110,13 @@ struct OrthoPlaneVorticityParams {
         
         try {
             
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
-        } catch(std::exception& e){
+        } catch(const nlohmann::json::exception& e){
             
             std::cerr << "Exception writing json file for OrthoPlaneVorticityParams: " << e.what() << std::endl;
         }

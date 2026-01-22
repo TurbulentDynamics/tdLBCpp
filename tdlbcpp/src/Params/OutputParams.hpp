@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 #include "OrthoPlaneParams.hpp"
@@ -268,7 +267,7 @@ struct OutputParams {
 
     }
 
-        template <typename ParamType> void getParamsFromJsonArray(const json& jsonArray, std::vector<ParamType> &array) {
+        template <typename ParamType> void getParamsFromJsonArray(const nlohmann::json& jsonArray, std::vector<ParamType> &array) {
         array.clear();
         for (size_t i = 0; i < jsonArray.size(); i++) {
             ParamType param;
@@ -277,30 +276,48 @@ struct OutputParams {
         }
     }
 
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
         try
         {
             outputRootDir = jsonParams["outputRootDir"].get<std::string>();
 
-            getParamsFromJsonArray(jsonParams["XY_planes"], XY_planes);
-            getParamsFromJsonArray(jsonParams["XZ_planes"], XZ_planes);
-            getParamsFromJsonArray(jsonParams["YZ_planes"], YZ_planes);
-            getParamsFromJsonArray(jsonParams["XY_vorticity_planes"], XY_vorticity_planes);
-            getParamsFromJsonArray(jsonParams["XZ_vorticity_planes"], XZ_vorticity_planes);
-            getParamsFromJsonArray(jsonParams["YZ_vorticity_planes"], YZ_vorticity_planes);
-            getParamsFromJsonArray(jsonParams["capture_at_blade_angle"], capture_at_blade_angle);
-            getParamsFromJsonArray(jsonParams["YZ_plane_when_angle"], YZ_plane_when_angle);
-            getParamsFromJsonArray(jsonParams["volumes"], volumes);
+            if (jsonParams.contains("XY_planes")) {
+                getParamsFromJsonArray(jsonParams["XY_planes"], XY_planes);
+            }
+            if (jsonParams.contains("XZ_planes")) {
+                getParamsFromJsonArray(jsonParams["XZ_planes"], XZ_planes);
+            }
+            if (jsonParams.contains("YZ_planes")) {
+                getParamsFromJsonArray(jsonParams["YZ_planes"], YZ_planes);
+            }
+            if (jsonParams.contains("XY_vorticity_planes")) {
+                getParamsFromJsonArray(jsonParams["XY_vorticity_planes"], XY_vorticity_planes);
+            }
+            if (jsonParams.contains("XZ_vorticity_planes")) {
+                getParamsFromJsonArray(jsonParams["XZ_vorticity_planes"], XZ_vorticity_planes);
+            }
+            if (jsonParams.contains("YZ_vorticity_planes")) {
+                getParamsFromJsonArray(jsonParams["YZ_vorticity_planes"], YZ_vorticity_planes);
+            }
+            if (jsonParams.contains("capture_at_blade_angle")) {
+                getParamsFromJsonArray(jsonParams["capture_at_blade_angle"], capture_at_blade_angle);
+            }
+            if (jsonParams.contains("YZ_plane_when_angle")) {
+                getParamsFromJsonArray(jsonParams["YZ_plane_when_angle"], YZ_plane_when_angle);
+            }
+            if (jsonParams.contains("volumes")) {
+                getParamsFromJsonArray(jsonParams["volumes"], volumes);
+            }
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+            std::cerr << "JSON parsing error in OutputParams: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to parse OutputParams: ") + e.what());
         }
     }
 
-        template <typename ParamType> json getJsonOfArray(std::vector<ParamType> &array) {
-        json jsonArray = json::array();
+        template <typename ParamType> nlohmann::json getJsonOfArray(std::vector<ParamType> &array) {
+        nlohmann::json jsonArray = nlohmann::json::array();
         for (ParamType param : array) {
             std::cout << param.getJson() << std::endl;
             jsonArray.push_back(param.getJson());
@@ -308,10 +325,10 @@ struct OutputParams {
         return jsonArray;
     }
 
-        json getJson() {
+        nlohmann::json getJson() {
         try
         {
-            json jsonParams;
+            nlohmann::json jsonParams;
 
             jsonParams["outputRootDir"] = outputRootDir;
 
@@ -327,12 +344,10 @@ struct OutputParams {
 
             return jsonParams;
         }
-        catch (std::exception &e)
+        catch (const nlohmann::json::exception& e)
         {
-
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
-            return json();
+            std::cerr << "JSON error in OutputParams::getJson: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to serialize OutputParams: ") + e.what());
         }
     }
 
@@ -347,17 +362,17 @@ struct OutputParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
 
             getParamsFromJson(jsonParams);
 
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(std::string("Failed to parse OutputParams: ") + e.what());
         }
 
     };
@@ -370,13 +385,13 @@ struct OutputParams {
 
         try {
 
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
 
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
 
-        } catch(std::exception& e){
+        } catch(const nlohmann::json::exception& e){
 
             std::cerr << "Exception writing json file for OutputParams: " << e.what() << std::endl;
         }

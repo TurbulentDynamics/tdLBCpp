@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -36,7 +35,7 @@ struct OrthoPlaneParams {
     
     
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
         
         try
@@ -44,34 +43,34 @@ struct OrthoPlaneParams {
 
                 name_root = jsonParams["name_root"].get<std::string>();
         QDataType = jsonParams["QDataType"].get<std::string>();
-        Q_output_len = (int)jsonParams["Q_output_len"].get<int>();
+        Q_output_len = static_cast<int>(jsonParams["Q_output_len"].get<int>());
         use_half_float = jsonParams["use_half_float"].get<bool>();
         cutAt = (tNi)jsonParams["cutAt"].get<uint64_t>();
-        repeat = (tStep)jsonParams["repeat"].get<uint64_t>();
-        start_at_step = (tStep)jsonParams["start_at_step"].get<uint64_t>();
-        end_at_step = (tStep)jsonParams["end_at_step"].get<uint64_t>();
+        repeat = jsonParams["repeat"].get<tStep>();
+        start_at_step = jsonParams["start_at_step"].get<tStep>();
+        end_at_step = jsonParams["end_at_step"].get<tStep>();
 
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in OrthoPlaneParams: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            std::cerr << "JSON parsing error in OrthoPlaneParams:: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to parse OrthoPlaneParams: ") + e.what());
         }
                 
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
         
         try {
             
-            json jsonParams;
+            nlohmann::json jsonParams;
             
-                jsonParams["name_root"] = (std::string)name_root;
-        jsonParams["QDataType"] = (std::string)QDataType;
-        jsonParams["Q_output_len"] = (int)Q_output_len;
-        jsonParams["use_half_float"] = (bool)use_half_float;
+                jsonParams["name_root"] = static_cast<std::string>(name_root);
+        jsonParams["QDataType"] = static_cast<std::string>(QDataType);
+        jsonParams["Q_output_len"] = static_cast<int>(Q_output_len);
+        jsonParams["use_half_float"] = static_cast<bool>(use_half_float);
         jsonParams["cutAt"] = cutAt;
         jsonParams["repeat"] = repeat;
         jsonParams["start_at_step"] = start_at_step;
@@ -80,11 +79,9 @@ struct OrthoPlaneParams {
             
             return jsonParams;
             
-        } catch(std::exception& e) {
-            
-            std::cerr << "Exception reached parsing arguments in OrthoPlaneParams: " << e.what() << std::endl;
-
-            return json();
+        } catch(const nlohmann::json::exception& e) {
+            std::cerr << "JSON serialization error: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to serialize params: ") + e.what());
         }
     }
     
@@ -96,17 +93,17 @@ struct OrthoPlaneParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
             
             getParamsFromJson(jsonParams);
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(std::string("Failed to parse OrthoPlaneParams: ") + e.what());
         }
         
     };
@@ -119,13 +116,13 @@ struct OrthoPlaneParams {
         
         try {
             
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
-        } catch(std::exception& e){
+        } catch(const nlohmann::json::exception& e){
             
             std::cerr << "Exception writing json file for OrthoPlaneParams: " << e.what() << std::endl;
         }

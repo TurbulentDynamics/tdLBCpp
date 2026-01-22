@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -38,7 +37,7 @@ struct GridParams {
     
     
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
         
         try
@@ -55,20 +54,20 @@ struct GridParams {
 
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in GridParams: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            std::cerr << "JSON parsing error in GridParams:: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to parse GridParams: ") + e.what());
         }
                 
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
         
         try {
             
-            json jsonParams;
+            nlohmann::json jsonParams;
             
                 jsonParams["ngx"] = ngx;
         jsonParams["ngy"] = ngy;
@@ -77,16 +76,14 @@ struct GridParams {
         jsonParams["y"] = y;
         jsonParams["z"] = z;
         jsonParams["multiStep"] = multiStep;
-        jsonParams["strMinQVecPrecision"] = (std::string)strMinQVecPrecision;
+        jsonParams["strMinQVecPrecision"] = static_cast<std::string>(strMinQVecPrecision);
 
             
             return jsonParams;
             
-        } catch(std::exception& e) {
-            
-            std::cerr << "Exception reached parsing arguments in GridParams: " << e.what() << std::endl;
-
-            return json();
+        } catch(const nlohmann::json::exception& e) {
+            std::cerr << "JSON serialization error: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to serialize params: ") + e.what());
         }
     }
     
@@ -98,17 +95,17 @@ struct GridParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
             
             getParamsFromJson(jsonParams);
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(std::string("Failed to parse GridParams: ") + e.what());
         }
         
     };
@@ -121,13 +118,13 @@ struct GridParams {
         
         try {
             
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
-        } catch(std::exception& e){
+        } catch(const nlohmann::json::exception& e){
             
             std::cerr << "Exception writing json file for GridParams: " << e.what() << std::endl;
         }

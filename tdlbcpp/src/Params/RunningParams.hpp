@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -41,7 +40,7 @@ struct RunningParams {
         void update(tStep _step, double _angle){
 
         step = (tStep)_step;
-        angle = (double)_angle;
+        angle = static_cast<double>(_angle);
 
     }
 
@@ -50,61 +49,59 @@ struct RunningParams {
     }
 
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
         
         try
         {
 
-                step = (tStep)jsonParams["step"].get<uint64_t>();
-        angle = (double)jsonParams["angle"].get<double>();
-        num_steps = (tStep)jsonParams["num_steps"].get<uint64_t>();
-        impellerStartupStepsUntilNormalSpeed = (tStep)jsonParams["impellerStartupStepsUntilNormalSpeed"].get<uint64_t>();
-        numStepsForAverageCalc = (tStep)jsonParams["numStepsForAverageCalc"].get<uint64_t>();
-        repeatPrintTimerToFile = (tStep)jsonParams["repeatPrintTimerToFile"].get<uint64_t>();
-        repeatPrintTimerToStdOut = (tStep)jsonParams["repeatPrintTimerToStdOut"].get<uint64_t>();
+                step = jsonParams["step"].get<tStep>();
+        angle = jsonParams["angle"].get<double>();
+        num_steps = jsonParams["num_steps"].get<tStep>();
+        impellerStartupStepsUntilNormalSpeed = jsonParams["impellerStartupStepsUntilNormalSpeed"].get<tStep>();
+        numStepsForAverageCalc = jsonParams["numStepsForAverageCalc"].get<tStep>();
+        repeatPrintTimerToFile = jsonParams["repeatPrintTimerToFile"].get<tStep>();
+        repeatPrintTimerToStdOut = jsonParams["repeatPrintTimerToStdOut"].get<tStep>();
         runningDataFileDir = jsonParams["runningDataFileDir"].get<std::string>();
         runningDataFilePrefix = jsonParams["runningDataFilePrefix"].get<std::string>();
         runningDataFileAppendTime = jsonParams["runningDataFileAppendTime"].get<bool>();
-        doubleResolutionAtStep = (tStep)jsonParams["doubleResolutionAtStep"].get<uint64_t>();
+        doubleResolutionAtStep = jsonParams.value("doubleResolutionAtStep", static_cast<tStep>(10));
 
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in RunningParams: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            std::cerr << "JSON parsing error in RunningParams:: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to parse RunningParams: ") + e.what());
         }
                 
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
         
         try {
             
-            json jsonParams;
+            nlohmann::json jsonParams;
             
                 jsonParams["step"] = step;
-        jsonParams["angle"] = (double)angle;
+        jsonParams["angle"] = static_cast<double>(angle);
         jsonParams["num_steps"] = num_steps;
         jsonParams["impellerStartupStepsUntilNormalSpeed"] = impellerStartupStepsUntilNormalSpeed;
         jsonParams["numStepsForAverageCalc"] = numStepsForAverageCalc;
         jsonParams["repeatPrintTimerToFile"] = repeatPrintTimerToFile;
         jsonParams["repeatPrintTimerToStdOut"] = repeatPrintTimerToStdOut;
-        jsonParams["runningDataFileDir"] = (std::string)runningDataFileDir;
-        jsonParams["runningDataFilePrefix"] = (std::string)runningDataFilePrefix;
-        jsonParams["runningDataFileAppendTime"] = (bool)runningDataFileAppendTime;
+        jsonParams["runningDataFileDir"] = static_cast<std::string>(runningDataFileDir);
+        jsonParams["runningDataFilePrefix"] = static_cast<std::string>(runningDataFilePrefix);
+        jsonParams["runningDataFileAppendTime"] = static_cast<bool>(runningDataFileAppendTime);
         jsonParams["doubleResolutionAtStep"] = doubleResolutionAtStep;
 
             
             return jsonParams;
             
-        } catch(std::exception& e) {
-            
-            std::cerr << "Exception reached parsing arguments in RunningParams: " << e.what() << std::endl;
-
-            return json();
+        } catch(const nlohmann::json::exception& e) {
+            std::cerr << "JSON serialization error: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to serialize params: ") + e.what());
         }
     }
     
@@ -116,17 +113,17 @@ struct RunningParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
             
             getParamsFromJson(jsonParams);
             
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(std::string("Failed to parse RunningParams: ") + e.what());
         }
         
     };
@@ -139,13 +136,13 @@ struct RunningParams {
         
         try {
             
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
             
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
             
-        } catch(std::exception& e){
+        } catch(const nlohmann::json::exception& e){
             
             std::cerr << "Exception writing json file for RunningParams: " << e.what() << std::endl;
         }

@@ -14,7 +14,6 @@
 #include <cmath>
 
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 
@@ -67,65 +66,65 @@ struct FlowParams {
 
         Re_m = reMNonDimensional * M_PI / 2.0;
 
-        nu  = uav * (T)impellerBladeOuterRadius / Re_m;
+        nu  = uav * static_cast<T>(impellerBladeOuterRadius) / Re_m;
     }
 
     
-        void getParamsFromJson(const json& jsonParams) {
+        void getParamsFromJson(const nlohmann::json& jsonParams) {
 
 
         try
         {
 
-                initialRho = (T)jsonParams["initialRho"].get<double>();
-        reMNonDimensional = (T)jsonParams["reMNonDimensional"].get<double>();
-        uav = (T)jsonParams["uav"].get<double>();
-        cs0 = (T)jsonParams["cs0"].get<double>();
-        g3 = (T)jsonParams["g3"].get<double>();
-        nu = (T)jsonParams["nu"].get<double>();
-        fx0 = (T)jsonParams["fx0"].get<double>();
-        fy0 = (T)jsonParams["fy0"].get<double>();
-        fz0 = (T)jsonParams["fz0"].get<double>();
-        Re_m = (T)jsonParams["Re_m"].get<double>();
-        Re_f = (T)jsonParams["Re_f"].get<double>();
-        uf = (T)jsonParams["uf"].get<double>();
-        alpha = (T)jsonParams["alpha"].get<double>();
-        beta = (T)jsonParams["beta"].get<double>();
+                initialRho = static_cast<T>(jsonParams["initialRho"].get<double>());
+        reMNonDimensional = static_cast<T>(jsonParams["reMNonDimensional"].get<double>());
+        uav = static_cast<T>(jsonParams["uav"].get<double>());
+        cs0 = static_cast<T>(jsonParams["cs0"].get<double>());
+        g3 = static_cast<T>(jsonParams["g3"].get<double>());
+        nu = static_cast<T>(jsonParams["nu"].get<double>());
+        fx0 = static_cast<T>(jsonParams["fx0"].get<double>());
+        fy0 = static_cast<T>(jsonParams["fy0"].get<double>());
+        fz0 = static_cast<T>(jsonParams["fz0"].get<double>());
+        Re_m = static_cast<T>(jsonParams["Re_m"].get<double>());
+        Re_f = static_cast<T>(jsonParams["Re_f"].get<double>());
+        uf = static_cast<T>(jsonParams["uf"].get<double>());
+        alpha = static_cast<T>(jsonParams["alpha"].get<double>());
+        beta = static_cast<T>(jsonParams["beta"].get<double>());
         useLES = jsonParams["useLES"].get<bool>();
         collision = jsonParams["collision"].get<std::string>();
         streaming = jsonParams["streaming"].get<std::string>();
 
 
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
-            std::cerr << "Exception reached parsing arguments in FlowParams: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            std::cerr << "JSON parsing error in FlowParams:: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to parse FlowParams: ") + e.what());
         }
 
     }
     
     
-        json getJson() const {
+        nlohmann::json getJson() const {
 
         try {
 
-            json jsonParams;
+            nlohmann::json jsonParams;
 
-                jsonParams["initialRho"] = (double)initialRho;
-        jsonParams["reMNonDimensional"] = (double)reMNonDimensional;
-        jsonParams["uav"] = (double)uav;
-        jsonParams["cs0"] = (double)cs0;
-        jsonParams["g3"] = (double)g3;
-        jsonParams["nu"] = (double)nu;
-        jsonParams["fx0"] = (double)fx0;
-        jsonParams["fy0"] = (double)fy0;
-        jsonParams["fz0"] = (double)fz0;
-        jsonParams["Re_m"] = (double)Re_m;
-        jsonParams["Re_f"] = (double)Re_f;
-        jsonParams["uf"] = (double)uf;
-        jsonParams["alpha"] = (double)alpha;
-        jsonParams["beta"] = (double)beta;
+                jsonParams["initialRho"] = static_cast<double>(initialRho);
+        jsonParams["reMNonDimensional"] = static_cast<double>(reMNonDimensional);
+        jsonParams["uav"] = static_cast<double>(uav);
+        jsonParams["cs0"] = static_cast<double>(cs0);
+        jsonParams["g3"] = static_cast<double>(g3);
+        jsonParams["nu"] = static_cast<double>(nu);
+        jsonParams["fx0"] = static_cast<double>(fx0);
+        jsonParams["fy0"] = static_cast<double>(fy0);
+        jsonParams["fz0"] = static_cast<double>(fz0);
+        jsonParams["Re_m"] = static_cast<double>(Re_m);
+        jsonParams["Re_f"] = static_cast<double>(Re_f);
+        jsonParams["uf"] = static_cast<double>(uf);
+        jsonParams["alpha"] = static_cast<double>(alpha);
+        jsonParams["beta"] = static_cast<double>(beta);
         jsonParams["useLES"] = useLES;
         jsonParams["collision"] = collision;
         jsonParams["streaming"] = streaming;
@@ -133,11 +132,9 @@ struct FlowParams {
 
             return jsonParams;
 
-        } catch(std::exception& e) {
-
-            std::cerr << "Exception reached parsing arguments in FlowParams: " << e.what() << std::endl;
-
-            return json();
+        } catch(const nlohmann::json::exception& e) {
+            std::cerr << "JSON serialization error: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to serialize params: ") + e.what());
         }
     }
     
@@ -149,17 +146,17 @@ struct FlowParams {
         try
         {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
 
             getParamsFromJson(jsonParams);
 
         }
-        catch(std::exception& e)
+        catch(const nlohmann::json::exception& e)
         {
             std::cerr << "Exception reading from input file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(std::string("Failed to parse FlowParams: ") + e.what());
         }
 
     };
@@ -172,13 +169,13 @@ struct FlowParams {
 
         try {
 
-            json jsonParams = getJson();
+            nlohmann::json jsonParams = getJson();
 
             std::ofstream out(filePath.c_str(), std::ofstream::out);
             out << jsonParams.dump(4);  // Pretty print with 4 spaces
             out.close();
 
-        } catch(std::exception& e){
+        } catch(const nlohmann::json::exception& e){
 
             std::cerr << "Exception writing json file for FlowParams: " << e.what() << std::endl;
         }

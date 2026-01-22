@@ -10,8 +10,18 @@ This is a basic version of the multi-node heterogeneous HPC code to run simulati
 git clone --recursive https://github.com/TurbulentDynamics/tdLBCpp
 cd tdLBCpp
 
+# If submodules didn't clone automatically (check if tdLBGeometryRushtonTurbineLib is empty):
+# git submodule update --init --recursive
+
 # Run setup script to check dependencies
 ./setup-dev.sh
+```
+
+**Note:** If `git clone --recursive` doesn't work on your system, use this two-step approach:
+```bash
+git clone https://github.com/TurbulentDynamics/tdLBCpp
+cd tdLBCpp
+git submodule update --init --recursive
 ```
 
 ## Building
@@ -226,6 +236,109 @@ See [BUILD_GUIDE.md](BUILD_GUIDE.md) for complete documentation.
 - [BUILD_GUIDE.md](BUILD_GUIDE.md) - Comprehensive build and development guide
 - [docs/](docs/) - Additional documentation and diagrams
 - [BZLMOD_MIGRATION.md](BZLMOD_MIGRATION.md) - Bzlmod migration details (Bazel 8+)
+
+## Troubleshooting
+
+### Submodule Issues
+
+**Problem:** "Permission denied (publickey)" when cloning submodules, even with HTTPS
+
+This happens when Git is configured to rewrite HTTPS URLs to SSH globally.
+
+**Solution 1 - Override URL rewriting** (recommended):
+```bash
+# Clone the repository
+git clone https://github.com/TurbulentDynamics/tdLBCpp
+cd tdLBCpp
+
+# Configure Git to use HTTPS for GitHub (this session only)
+git config --global url."https://github.com/".insteadOf git@github.com:
+
+# Initialize submodules
+git submodule update --init --recursive
+
+# Optional: Remove the global config after cloning
+git config --global --unset url."https://github.com/".insteadOf
+```
+
+**Solution 2 - Check for conflicting Git configuration**:
+```bash
+# Check if you have URL rewriting configured
+git config --global --get-regexp url
+
+# If you see: url.git@github.com:.insteadof https://github.com/
+# Remove it temporarily:
+git config --global --unset url."git@github.com:".insteadOf
+
+# Then clone with submodules
+git clone --recursive https://github.com/TurbulentDynamics/tdLBCpp
+```
+
+**Solution 3 - Two-step clone with explicit HTTPS**:
+```bash
+git clone https://github.com/TurbulentDynamics/tdLBCpp
+cd tdLBCpp
+git config submodule.tdLBGeometryRushtonTurbineLib.url https://github.com/TurbulentDynamics/tdLBGeometryRushtonTurbineLib.git
+git submodule update --init --recursive
+```
+
+### Build Issues
+
+**Problem:** "Error computing the main repository mapping" with Bazel
+
+This error typically indicates missing submodules or Bazel cache issues.
+
+**Solutions:**
+
+1. **Ensure submodules are initialized** (most common fix):
+```bash
+# Check if submodule directory is empty
+ls tdLBGeometryRushtonTurbineLib/
+
+# If empty or missing files, initialize:
+git submodule update --init --recursive
+
+# Verify submodule is populated:
+ls tdLBGeometryRushtonTurbineLib/Sources/
+```
+
+2. **Clean Bazel cache and rebuild**:
+```bash
+# Clean all Bazel artifacts
+bazel clean --expunge
+
+# Rebuild
+make cpu
+# Or directly with Bazel:
+bazel build //tdlbcpp/src:tdlbcpp --config=cpu --config=release
+```
+
+3. **Check Bazel version** (needs 7.0+):
+```bash
+bazel --version  # Should show 7.0.0 or higher
+```
+
+4. **Check MODULE.bazel dependencies**:
+```bash
+# Verify local path overrides exist
+ls -la tdLBGeometryRushtonTurbineLib/
+ls -la third_party/rules_cuda/
+ls -la third_party/gyb/
+```
+
+**Other Issues:**
+
+If still having problems, check:
+1. **Git version**: Run `git --version` (should be 2.13+)
+2. **Submodule status**: Run `git submodule status`
+3. **Manual initialization**:
+   ```bash
+   cd tdLBGeometryRushtonTurbineLib
+   git init
+   git remote add origin https://github.com/TurbulentDynamics/tdLBGeometryRushtonTurbineLib.git
+   git fetch
+   git checkout main
+   ```
 
 ## Contributing
 

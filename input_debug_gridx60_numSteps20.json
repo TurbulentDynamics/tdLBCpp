@@ -81,7 +81,7 @@
                 "cutAt": 30.0,
                 "end_at_step": 0,
                 "name_root": "plot_slice",
-                "repeat": 20,
+                "repeat": 10,
                 "start_at_step": 0,
                 "use_half_float": false
             }
@@ -92,7 +92,7 @@
                 "end_at_step": 0,
                 "jpegCompression": 100,
                 "name_root": "vort_slice",
-                "repeat": 1,
+                "repeat": 10,
                 "start_at_step": 0
             }
         ],
@@ -103,7 +103,7 @@
                 "cutAt": 40.0,
                 "end_at_step": 0,
                 "name_root": "plot_axis",
-                "repeat": 20,
+                "repeat": 10,
                 "start_at_step": 0,
                 "use_half_float": false
             }
@@ -114,7 +114,7 @@
                 "end_at_step": 0,
                 "jpegCompression": 100,
                 "name_root": "vort_axis",
-                "repeat": 1,
+                "repeat": 10,
                 "start_at_step": 0
             }
         ],

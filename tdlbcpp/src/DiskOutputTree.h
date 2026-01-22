@@ -21,7 +21,6 @@
 #include <string>
 #include <time.h>
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 
 #include "Header.h"
@@ -60,13 +59,13 @@ private:
     //Need to sync this across nodes
     std::string initTime = "initTimeNotSet";
 
-    json cuJson;
+    nlohmann::json cuJson;
 
-    json grid;
-    json flow;
-    json running;
-    json output;
-    json checkpoint;
+    nlohmann::json grid;
+    nlohmann::json flow;
+    nlohmann::json running;
+    nlohmann::json output;
+    nlohmann::json checkpoint;
 
 
 
@@ -96,7 +95,7 @@ public:
     };
 
 
-    DiskOutputTree(ComputeUnitParams cu, json grid, json flow, json running, json output, json checkpoint): cu(cu),  grid(grid), flow(flow), running(running), output(output), checkpoint(checkpoint) {
+    DiskOutputTree(ComputeUnitParams cu, nlohmann::json grid, nlohmann::json flow, nlohmann::json running, nlohmann::json output, nlohmann::json checkpoint): cu(cu),  grid(grid), flow(flow), running(running), output(output), checkpoint(checkpoint) {
 
         initTime = getTimeNowAsString();
 
@@ -134,7 +133,7 @@ public:
 //        createDir(checkpointWriteDir);
 //    };
 
-    void setParams(ComputeUnitParams cu1, json grid1, json flow1, json running1, json output1, json checkpoint1){
+    void setParams(ComputeUnitParams cu1, nlohmann::json grid1, nlohmann::json flow1, nlohmann::json running1, nlohmann::json output1, nlohmann::json checkpoint1){
 
         cu = cu1;
         cuJson = cu1.getJson();
@@ -158,7 +157,7 @@ public:
         grid = grid1.getJson();
     }
 
-    void setFlowParams(json flow1) {
+    void setFlowParams(nlohmann::json flow1) {
         flow = flow1;
     }
 
@@ -416,8 +415,8 @@ public:
 
 
 
-    json getJsonParams(BinFileParams binFormat, RunningParams runParam){
-        json jsonParams;
+    nlohmann::json getJsonParams(BinFileParams binFormat, RunningParams runParam){
+        nlohmann::json jsonParams;
 
         try {
 
@@ -430,10 +429,9 @@ public:
             jsonParams["OutputParams"] = output;
             jsonParams["CheckpointParams"] = checkpoint;
 
-        } catch(std::exception& e) {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
-            return 1;
+        } catch(const nlohmann::json::exception& e) {
+            std::cerr << "JSON error in getJsonParams: " << e.what() << std::endl;
+            throw std::runtime_error(std::string("Failed to create JSON params: ") + e.what());
         }
         return jsonParams;
     }
@@ -441,7 +439,7 @@ public:
 
     int writeAllParamsJson(BinFileParams binFormat, RunningParams runParam, std::string filePath){
 
-        json jsonParams = getJsonParams(binFormat, runParam);
+        nlohmann::json jsonParams = getJsonParams(binFormat, runParam);
 
         try {
             std::ofstream out(filePath.c_str(), std::ofstream::out);
@@ -450,9 +448,8 @@ public:
 
             return 0;
         }
-        catch(std::exception& e) {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+        catch(const std::exception& e) {
+            std::cerr << "Error writing params JSON: " << e.what() << std::endl;
             return 1;
         }
 
@@ -461,7 +458,7 @@ public:
 
     int writeAllParamsJson(BinFileParams binFormat, RunningParams runParam){
 
-        json jsonParams = getJsonParams(binFormat, runParam);
+        nlohmann::json jsonParams = getJsonParams(binFormat, runParam);
 
         try {
 
@@ -473,9 +470,8 @@ public:
 
             return 0;
         }
-        catch(std::exception& e) {
-            std::cerr << "Unhandled Exception reached parsing arguments: "
-            << e.what() << ", application will now exit" << std::endl;
+        catch(const std::exception& e) {
+            std::cerr << "Error writing params JSON: " << e.what() << std::endl;
             return 1;
         }
 
@@ -490,7 +486,7 @@ public:
 
         try {
             std::ifstream in(filePath.c_str());
-            json jsonParams;
+            nlohmann::json jsonParams;
             in >> jsonParams;
             in.close();
 
