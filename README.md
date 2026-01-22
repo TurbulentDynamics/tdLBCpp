@@ -282,6 +282,50 @@ git config submodule.tdLBGeometryRushtonTurbineLib.url https://github.com/Turbul
 git submodule update --init --recursive
 ```
 
+### Build Issues
+
+**Problem:** "Error computing the main repository mapping" with Bazel
+
+This error typically indicates missing submodules or Bazel cache issues.
+
+**Solutions:**
+
+1. **Ensure submodules are initialized** (most common fix):
+```bash
+# Check if submodule directory is empty
+ls tdLBGeometryRushtonTurbineLib/
+
+# If empty or missing files, initialize:
+git submodule update --init --recursive
+
+# Verify submodule is populated:
+ls tdLBGeometryRushtonTurbineLib/Sources/
+```
+
+2. **Clean Bazel cache and rebuild**:
+```bash
+# Clean all Bazel artifacts
+bazel clean --expunge
+
+# Rebuild
+make cpu
+# Or directly with Bazel:
+bazel build //tdlbcpp/src:tdlbcpp --config=cpu --config=release
+```
+
+3. **Check Bazel version** (needs 7.0+):
+```bash
+bazel --version  # Should show 7.0.0 or higher
+```
+
+4. **Check MODULE.bazel dependencies**:
+```bash
+# Verify local path overrides exist
+ls -la tdLBGeometryRushtonTurbineLib/
+ls -la third_party/rules_cuda/
+ls -la third_party/gyb/
+```
+
 **Other Issues:**
 
 If still having problems, check:
