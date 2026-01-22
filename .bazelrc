@@ -2,6 +2,9 @@
 # tdLBCpp Bazel Build Configuration
 # ==============================================================================
 
+# Enforce Bazel version requirement (8.5.1 or compatible)
+build --check_direct_dependencies=error
+
 # Use Bzlmod (modern Bazel module system for Bazel 7+)
 # WORKSPACE is disabled - all dependencies configured in MODULE.bazel
 
