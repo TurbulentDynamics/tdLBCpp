@@ -10,8 +10,18 @@ This is a basic version of the multi-node heterogeneous HPC code to run simulati
 git clone --recursive https://github.com/TurbulentDynamics/tdLBCpp
 cd tdLBCpp
 
+# If submodules didn't clone automatically (check if tdLBGeometryRushtonTurbineLib is empty):
+# git submodule update --init --recursive
+
 # Run setup script to check dependencies
 ./setup-dev.sh
+```
+
+**Note:** If `git clone --recursive` doesn't work on your system, use this two-step approach:
+```bash
+git clone https://github.com/TurbulentDynamics/tdLBCpp
+cd tdLBCpp
+git submodule update --init --recursive
 ```
 
 ## Building
@@ -226,6 +236,42 @@ See [BUILD_GUIDE.md](BUILD_GUIDE.md) for complete documentation.
 - [BUILD_GUIDE.md](BUILD_GUIDE.md) - Comprehensive build and development guide
 - [docs/](docs/) - Additional documentation and diagrams
 - [BZLMOD_MIGRATION.md](BZLMOD_MIGRATION.md) - Bzlmod migration details (Bazel 8+)
+
+## Troubleshooting
+
+### Submodule Issues
+
+**Problem:** Submodules not cloning on Ubuntu/Linux with `git clone --recursive`
+
+**Solutions:**
+1. **Two-step clone** (recommended for all systems):
+   ```bash
+   git clone https://github.com/TurbulentDynamics/tdLBCpp
+   cd tdLBCpp
+   git submodule update --init --recursive
+   ```
+
+2. **Update Git** (if using older version):
+   ```bash
+   # Check Git version
+   git --version
+   # Ubuntu: Update to latest Git
+   sudo apt update
+   sudo apt install git
+   ```
+
+3. **Check submodule status**:
+   ```bash
+   git submodule status
+   # Should show: +<commit> tdLBGeometryRushtonTurbineLib (...)
+   ```
+
+4. **Manual submodule initialization**:
+   ```bash
+   cd tdLBGeometryRushtonTurbineLib
+   git fetch
+   git checkout main  # or master
+   ```
 
 ## Contributing
 
