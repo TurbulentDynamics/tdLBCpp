@@ -241,36 +241,59 @@ See [BUILD_GUIDE.md](BUILD_GUIDE.md) for complete documentation.
 
 ### Submodule Issues
 
-**Problem:** Submodules not cloning on Ubuntu/Linux with `git clone --recursive`
+**Problem:** "Permission denied (publickey)" when cloning submodules, even with HTTPS
 
-**Solutions:**
-1. **Two-step clone** (recommended for all systems):
-   ```bash
-   git clone https://github.com/TurbulentDynamics/tdLBCpp
-   cd tdLBCpp
-   git submodule update --init --recursive
-   ```
+This happens when Git is configured to rewrite HTTPS URLs to SSH globally.
 
-2. **Update Git** (if using older version):
-   ```bash
-   # Check Git version
-   git --version
-   # Ubuntu: Update to latest Git
-   sudo apt update
-   sudo apt install git
-   ```
+**Solution 1 - Override URL rewriting** (recommended):
+```bash
+# Clone the repository
+git clone https://github.com/TurbulentDynamics/tdLBCpp
+cd tdLBCpp
 
-3. **Check submodule status**:
-   ```bash
-   git submodule status
-   # Should show: +<commit> tdLBGeometryRushtonTurbineLib (...)
-   ```
+# Configure Git to use HTTPS for GitHub (this session only)
+git config --global url."https://github.com/".insteadOf git@github.com:
 
-4. **Manual submodule initialization**:
+# Initialize submodules
+git submodule update --init --recursive
+
+# Optional: Remove the global config after cloning
+git config --global --unset url."https://github.com/".insteadOf
+```
+
+**Solution 2 - Check for conflicting Git configuration**:
+```bash
+# Check if you have URL rewriting configured
+git config --global --get-regexp url
+
+# If you see: url.git@github.com:.insteadof https://github.com/
+# Remove it temporarily:
+git config --global --unset url."git@github.com:".insteadOf
+
+# Then clone with submodules
+git clone --recursive https://github.com/TurbulentDynamics/tdLBCpp
+```
+
+**Solution 3 - Two-step clone with explicit HTTPS**:
+```bash
+git clone https://github.com/TurbulentDynamics/tdLBCpp
+cd tdLBCpp
+git config submodule.tdLBGeometryRushtonTurbineLib.url https://github.com/TurbulentDynamics/tdLBGeometryRushtonTurbineLib.git
+git submodule update --init --recursive
+```
+
+**Other Issues:**
+
+If still having problems, check:
+1. **Git version**: Run `git --version` (should be 2.13+)
+2. **Submodule status**: Run `git submodule status`
+3. **Manual initialization**:
    ```bash
    cd tdLBGeometryRushtonTurbineLib
+   git init
+   git remote add origin https://github.com/TurbulentDynamics/tdLBGeometryRushtonTurbineLib.git
    git fetch
-   git checkout main  # or master
+   git checkout main
    ```
 
 ## Contributing
