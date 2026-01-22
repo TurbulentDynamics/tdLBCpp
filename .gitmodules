@@ -1,3 +1,3 @@
 [submodule "tdLBGeometryRushtonTurbineLib"]
 	path = tdLBGeometryRushtonTurbineLib
-	url = https://github.com/TurbulentDynamics/tdLBGeometryRushtonTurbineLib.git
+	url = git@github.com:TurbulentDynamics/tdLBGeometryRushtonTurbineLib.git
