@@ -477,7 +477,18 @@ int main(int argc, char* argv[]){
         main_time = mainTimer.check(0, 5, main_time, "Forcing");
 
 
+        // Check for NaN and Inf after forcing
+        lb->checkForNaN(running);
+        if (lb->nan_detected && lb->nan_output_count == 0) {
+            // First detection - set to continue for 10 more steps
+            std::stringstream sstream;
+            sstream << "WARNING: NaN/Inf detected at step " << running.step
+                    << ", continuing for 10 more steps with output every step." << std::endl;
+            outputTree.writeToRunningDataFileAndPrint(sstream.str());
 
+            // Continue for exactly 10 more steps after NaN detection
+            running.num_steps = running.step + 10;
+        }
 
 
 
@@ -494,7 +505,8 @@ int main(int argc, char* argv[]){
 //        }
 
         for (auto xy: output.XY_vorticity_planes){
-            if (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0)) {
+            // Force output on every step if NaN detected, otherwise use normal repeat schedule
+            if (lb->nan_detected || (xy.repeat && (running.step >= xy.start_at_step) && ((running.step - xy.start_at_step) % xy.repeat == 0))) {
                 lb->calcVorticityXY(xy.cutAt, running, xy.jpegCompression);
             }
         }
@@ -507,7 +519,8 @@ int main(int argc, char* argv[]){
 //        }
 
         for (auto xz: output.XZ_vorticity_planes){
-            if (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0)) {
+            // Force output on every step if NaN detected, otherwise use normal repeat schedule
+            if (lb->nan_detected || (xz.repeat && (running.step >= xz.start_at_step) && ((running.step - xz.start_at_step) % xz.repeat == 0))) {
                 lb->calcVorticityXZ(xz.cutAt, running, xz.jpegCompression);
             }
         }

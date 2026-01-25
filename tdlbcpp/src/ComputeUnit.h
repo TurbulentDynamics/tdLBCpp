@@ -145,6 +145,20 @@ public:
     bool nan_detected;     // Flag indicating if NaN has been detected
     bool checkForNaN(RunningParams running);  // Returns true if NaN found
 
+    // Inline NaN/Inf check for a single cell during collision
+    inline bool checkCellForNaNInf(tNi i, tNi j, tNi k) {
+        size_t idx = index(i, j, k);
+        for (int l = 0; l < QVecSize; l++) {
+            T val = Q[idx].q[l];
+            if (std::isnan(val) || std::isinf(val)) {
+                std::cerr << "ERROR: NaN/Inf detected at cell (" << i << ", " << j << ", " << k
+                          << ") component q[" << l << "] = " << val << std::endl;
+                return true;
+            }
+        }
+        return false;
+    }
+
     virtual void setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
     virtual void setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
 
