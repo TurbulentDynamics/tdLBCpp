@@ -56,7 +56,6 @@ struct FlowParams {
         T uf = 0.0;
         T alpha = 0.97;
         T beta = 1.9;
-        bool useLES = false;
         std::string collision = "EgglesSomers";
         std::string streaming = "Esotwist";
 
@@ -90,7 +89,6 @@ struct FlowParams {
         uf = static_cast<T>(jsonParams["uf"].get<double>());
         alpha = static_cast<T>(jsonParams["alpha"].get<double>());
         beta = static_cast<T>(jsonParams["beta"].get<double>());
-        useLES = jsonParams["useLES"].get<bool>();
         collision = jsonParams["collision"].get<std::string>();
         streaming = jsonParams["streaming"].get<std::string>();
 
@@ -125,7 +123,6 @@ struct FlowParams {
         jsonParams["uf"] = static_cast<double>(uf);
         jsonParams["alpha"] = static_cast<double>(alpha);
         jsonParams["beta"] = static_cast<double>(beta);
-        jsonParams["useLES"] = useLES;
         jsonParams["collision"] = collision;
         jsonParams["streaming"] = streaming;
 

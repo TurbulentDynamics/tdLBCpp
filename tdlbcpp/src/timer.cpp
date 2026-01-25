@@ -121,6 +121,16 @@ void Multi_Timer::set_average_steps(tStep step){
 }
 
 
+void Multi_Timer::set_collision_type(std::string collision){
+    collision_type = collision;
+}
+
+
+void Multi_Timer::set_streaming_type(std::string streaming){
+    streaming_type = streaming;
+}
+
+
 
 
 
@@ -157,7 +167,21 @@ std::string Multi_Timer::averageAllFunctions(tStep step){
 
     stringstream sstream;
 
-    sstream << "Average time for the last " << steps_per_average << " steps @ Current step: " << step << "\n";
+    sstream << "Average time for the last " << steps_per_average << " steps @ Current step: " << step;
+
+    if (!collision_type.empty() || !streaming_type.empty()) {
+        sstream << " [";
+        if (!collision_type.empty()) {
+            sstream << "Collision: " << collision_type;
+        }
+        if (!streaming_type.empty()) {
+            if (!collision_type.empty()) sstream << ", ";
+            sstream << "Streaming: " << streaming_type;
+        }
+        sstream << "]";
+    }
+
+    sstream << "\n";
 
     for (int b = 0; b < MAX_FUNC; b++){
         if (block[b] == -1) break;

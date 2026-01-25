@@ -17,9 +17,157 @@
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
 void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomersLES, streamingType>::collision(){
+    using AF = AccessField<T, QVecSize, MemoryLayout, EgglesSomersLES, streamingType>;
 
-    //    alpha[ 5] = (2.0*(q[2] + 0.5*f.x)*u.x - q[ 5]*c)*b * Nu.getNu(i,j,k);
+    //kinematic viscosity.
+    T b = 1.0 / (1.0 + 6 * flow.nu);
+    T c = 1.0 - 6 * flow.nu;
 
+
+    for (tNi i=1; i<=xg1; i++){
+        for (tNi j=1; j<=yg1; j++){
+            for (tNi k=1; k<=zg1; k++){
+
+
+                Force<T> f = F[index(i,j,k)];
+
+
+                QVec<T, QVecSize> m = AF::read(*this, i, j, k);
+
+
+                Velocity<T> u = m.velocity(f);
+
+                QVec<T, QVecSize> alpha;
+
+
+                // LES turbulence modeling (Smagorinsky)
+                T fct = 3.0 / (m.q[M01] * (1.0 + 6.0 * (Nu[index(i,j,k)] + flow.nu)));
+
+                //calculating the derivatives for x, y and z
+                T dudx = fct * ((m.q[M02] + 0.5 * F[index(i,j,k)].x * u.x - m.q[M05]));
+                T dvdy = fct * ((m.q[M03] + 0.5 * F[index(i,j,k)].y * u.y - m.q[M07]));
+                T dwdz = fct * ((m.q[M04] + 0.5 * F[index(i,j,k)].z * u.z - m.q[M10]));
+
+                T divv = dudx + dvdy + dwdz;
+
+
+                //calculating the cross terms, used for the shear matrix
+                T dudypdvdx = 2 * fct * ((m.q[M03]) + 0.5 * F[index(i,j,k)].y * u.x - m.q[M06]);
+                T dudzpdwdx = 2 * fct * ((m.q[M04]) + 0.5 * F[index(i,j,k)].z * u.x - m.q[M08]);
+                T dvdzpdwdy = 2 * fct * ((m.q[M04]) + 0.5 * F[index(i,j,k)].z * u.y - m.q[M09]);
+
+
+                //calculating sh (the resolved deformation rate, S^2)
+                T sh = 2 * dudx*dudx + 2 * dvdy*dvdy + 2 * dwdz*dwdz + dudypdvdx*dudypdvdx + dudzpdwdx*dudzpdwdx + dvdzpdwdy*dvdzpdwdy - (2.0 / 3.0) * divv*divv;
+
+
+                //calculating eddy viscosity:
+                //nu_t = (lambda_mix)^2 * sqrt(S^2)     (Smagorinsky)
+                Nu[index(i,j,k)] = flow.cs0 * flow.cs0 * sqrt(fabs(sh));
+
+
+
+                // Viscosity is adjusted for LES, because LES uses a
+                // subgrid-adjustment model for turbulence that's too small to
+                // be captured in the regular cells. This adjustment is
+                // performed by adding the eddy viscosity to the viscosity.
+                // This model is called the Smagorinsky model, however this
+                // implementation is slightly different, as explained by
+                // Somers (1993) -> low strain rates do not excite the
+                // eddy viscosity.
+
+                T nut = Nu[index(i,j,k)] + flow.nu;
+                b = 1.0 / (1.0 + 6 * nut);
+                c = 1.0 - 6 * nut;
+
+
+
+                //0th order term
+                alpha[M01] = m[M01];
+
+
+                //1st order term
+                alpha[M02] = m[M02] + f.x;
+                alpha[M03] = m[M03] + f.y;
+                alpha[M04] = m[M04] + f.z;
+
+                //2nd order terms
+                alpha[M05] = (2.0 * (m[M02] + 0.5 * f.x) * u.x - m[M05]*c)*b;
+                alpha[M06] = (2.0 * (m[M02] + 0.5 * f.x) * u.y - m[M06]*c)*b;
+                alpha[M07] = (2.0 * (m[M03] + 0.5 * f.y) * u.y - m[M07]*c)*b;
+
+                alpha[M08] = (2.0 * (m[M02] + 0.5 * f.x) * u.z - m[M08]*c)*b;
+                alpha[M09] = (2.0 * (m[M03] + 0.5 * f.y) * u.z - m[M09]*c)*b;
+                alpha[M10] = (2.0 * (m[M04] + 0.5 * f.z) * u.z - m[M10]*c)*b;
+
+                //3rd order terms
+                alpha[M11] =  -flow.g3 * m[M11];
+                alpha[M12] =  -flow.g3 * m[M12];
+                alpha[M13] =  -flow.g3 * m[M13];
+                alpha[M14] =  -flow.g3 * m[M14];
+                alpha[M15] =  -flow.g3 * m[M15];
+                alpha[M16] =  -flow.g3 * m[M16];
+
+                //4th order terms
+                alpha[M17] = 0.0;
+                alpha[M18] = 0.0;
+
+
+                // Start of invMoments, which is responsible for determining
+                // the N-field (x) from alpha+ (alpha). It does this by using eq.
+                // 12 in the article by Eggels and Somers (1995), which means
+                // it's using the "filter matrix E" (not really present in the
+                // code as matrix, but it's where the coefficients come from).
+
+                for (int l=0;  l<QVecSize; l++) {
+                    alpha[l] /= 24.0;
+                }
+
+
+                m[Q01] = 2*alpha[M01] + 4*alpha[M02] + 3*alpha[M05] - 3*alpha[M07] - 3*alpha[M10] - 2*alpha[M11] - 2*alpha[M13] + 2*alpha[M17] + 2*alpha[M18];
+
+                m[Q02] = 2*alpha[M01] - 4*alpha[M02] + 3*alpha[M05] - 3*alpha[M07] - 3*alpha[M10] + 2*alpha[M11] + 2*alpha[M13] + 2*alpha[M17] + 2*alpha[M18];
+
+                m[Q03] = 2*alpha[M01] + 4*alpha[M03] - 3*alpha[M05] + 3*alpha[M07] - 3*alpha[M10] - 2*alpha[M12] - 2*alpha[M14] + 2*alpha[M17] - 2*alpha[M18];
+
+                m[Q04] = 2*alpha[M01] - 4*alpha[M03] - 3*alpha[M05] + 3*alpha[M07] - 3*alpha[M10] + 2*alpha[M12] + 2*alpha[M14] + 2*alpha[M17] - 2*alpha[M18];
+
+                m[Q05] = 2*alpha[M01] + 4*alpha[M04] - 3*alpha[M05] - 3*alpha[M07] + 3*alpha[M10] - 4*alpha[M15] - 4*alpha[M17];
+
+                m[Q06] = 2*alpha[M01] - 4*alpha[M04] - 3*alpha[M05] - 3*alpha[M07] + 3*alpha[M10] + 4*alpha[M15] - 4*alpha[M17];
+
+                m[Q07] = alpha[M01] + 2*alpha[M02] + 2*alpha[M03] + 1.5*alpha[M05] + 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] + 2*alpha[M11] + 2*alpha[M12] - 2*alpha[M17];
+
+                m[M14] = alpha[M01] - 2*alpha[M02] + 2*alpha[M03] + 1.5*alpha[M05] - 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] - 2*alpha[M11] + 2*alpha[M12] - 2*alpha[M17];
+
+                m[M08] = alpha[M01] - 2*alpha[M02] - 2*alpha[M03] + 1.5*alpha[M05] + 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] - 2*alpha[M11] - 2*alpha[M12] - 2*alpha[M17];
+
+                m[M13] = alpha[M01] + 2*alpha[M02] - 2*alpha[M03] + 1.5*alpha[M05] - 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] + 2*alpha[M11] - 2*alpha[M12] - 2*alpha[M17];
+
+                m[M09] = alpha[M01] + 2*alpha[M02] + 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] + 6*alpha[M08] + 1.5*alpha[M10] - alpha[M11] + alpha[M13] + alpha[M15] - alpha[M16] + alpha[M17] - alpha[M18];
+
+                m[M16] = alpha[M01] - 2*alpha[M02] + 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] - 6*alpha[M08] + 1.5*alpha[M10] + alpha[M11] - alpha[M13] + alpha[M15] - alpha[M16] + alpha[M17] - alpha[M18];
+
+                m[M10] = alpha[M01] - 2*alpha[M02] - 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] + 6*alpha[M08] + 1.5*alpha[M10] + alpha[M11] - alpha[M13] - alpha[M15] + alpha[M16] + alpha[M17] - alpha[M18];
+
+                m[M15] = alpha[M01] + 2*alpha[M02] - 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] - 6*alpha[M08] + 1.5*alpha[M10] - alpha[M11] + alpha[M13] - alpha[M15] + alpha[M16] + alpha[M17] - alpha[M18];
+
+                m[M11] = alpha[M01] + 2*alpha[M03] + 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] + 6*alpha[M09] + 1.5*alpha[M10] - alpha[M12] + alpha[M14] + alpha[M15] + alpha[M16] + alpha[M17] + alpha[M18];
+
+                m[M18] = alpha[M01] - 2*alpha[M03] + 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] - 6*alpha[M09] + 1.5*alpha[M10] + alpha[M12] - alpha[M14] + alpha[M15] + alpha[M16] + alpha[M17] + alpha[M18];
+
+                m[M12] = alpha[M01] - 2*alpha[M03] - 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] + 6*alpha[M09] + 1.5*alpha[M10] + alpha[M12] - alpha[M14] - alpha[M15] - alpha[M16] + alpha[M17] + alpha[M18];
+
+                m[M17] = alpha[M01] + 2*alpha[M03] - 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] - 6*alpha[M09] + 1.5*alpha[M10] - alpha[M12] + alpha[M14] - alpha[M15] - alpha[M16] + alpha[M17] + alpha[M18];
+
+
+
+
+                AF::write(*this, m, i, j, k);
+
+            }
+        }
+    }
 }
 
 
@@ -46,49 +194,6 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
                 Velocity<T> u = m.velocity(f);
 
                 QVec<T, QVecSize> alpha;
-
-
-                if (flow.useLES == 1){
-                    T fct = 3.0 / (m.q[M01] * (1.0 + 6.0 * (Nu[index(i,j,k)] + flow.nu)));
-
-                    //calculating the derivatives for x, y and z
-                    T dudx = fct * ((m.q[M02] + 0.5 * F[index(i,j,k)].x * u.x - m.q[M05]));
-                    T dvdy = fct * ((m.q[M03] + 0.5 * F[index(i,j,k)].y * u.y - m.q[M07]));
-                    T dwdz = fct * ((m.q[M04] + 0.5 * F[index(i,j,k)].z * u.z - m.q[M10]));
-
-                    T divv = dudx + dvdy + dwdz;
-
-
-                    //calculating the cross terms, used for the shear matrix
-                    T dudypdvdx = 2 * fct * ((m.q[M03]) + 0.5 * F[index(i,j,k)].y * u.x - m.q[M06]);
-                    T dudzpdwdx = 2 * fct * ((m.q[M04]) + 0.5 * F[index(i,j,k)].z * u.x - m.q[M08]);
-                    T dvdzpdwdy = 2 * fct * ((m.q[M04]) + 0.5 * F[index(i,j,k)].z * u.y - m.q[M09]);
-
-
-                    //calculating sh (the resolved deformation rate, S^2)
-                    T sh = 2 * dudx*dudx + 2 * dvdy*dvdy + 2 * dwdz*dwdz + dudypdvdx*dudypdvdx + dudzpdwdx*dudzpdwdx + dvdzpdwdy*dvdzpdwdy - (2.0 / 3.0) * divv*divv;
-
-
-                    //calculating eddy viscosity:
-                    //nu_t = (lambda_mix)^2 * sqrt(S^2)     (Smagorinsky)
-                    Nu[index(i,j,k)] = flow.cs0 * flow.cs0 * sqrt(fabs(sh));
-
-
-
-                    // Viscosity is adjusted only for LES, because LES uses a
-                    // subgrid-adjustment model for turbulence that's too small to
-                    // be captured in the regular cells. This adjustment is
-                    // performed by adding the eddy viscosity to the viscosity.
-                    // This model is called the Smagorinsky model, however this
-                    // implementation is slightly different, as explained by
-                    // Somers (1993) -> low strain rates do not excite the
-                    // eddy viscosity.
-
-                    T nut = Nu[index(i,j,k)] + flow.nu;
-                    b = 1.0 / (1.0 + 6 * nut);
-                    c = 1.0 - 6 * nut;
-
-                }//end of LES
 
 
 

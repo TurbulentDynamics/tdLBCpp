@@ -53,7 +53,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
                 // Compute equilibrium moments
                 QVec<T, QVecSize> m_eq;
 
-                // Equilibrium moments for D3Q19 (Eggels & Somers formulation)
+                // Equilibrium moments for D3Q19
                 m_eq[M01] = rho;  // 0th order: mass
 
                 // 1st order: momentum

@@ -36,7 +36,8 @@ private:
     int block[MAX_FUNC];
     int stream[MAX_FUNC];
 
-
+    std::string collision_type;
+    std::string streaming_type;
 
     double start_time[MAX_FUNC];
     double elapsed[MAX_FUNC];
@@ -46,7 +47,7 @@ private:
 
 public:
 
-    Multi_Timer(int rank):rank(rank){
+    Multi_Timer(int rank):rank(rank), collision_type(""), streaming_type(""){
         reset_everything();
     };
 
@@ -71,6 +72,8 @@ public:
 
 
     void set_average_steps(tStep);
+    void set_collision_type(std::string collision);
+    void set_streaming_type(std::string streaming);
 
 
     std::string averagePerFunction(tStep step, int block, int stream, std::string name, double start_time, double elapsed);

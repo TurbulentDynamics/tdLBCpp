@@ -345,6 +345,8 @@ int main(int argc, char* argv[]){
     int rank = 0;
     Multi_Timer mainTimer(rank);
     mainTimer.set_average_steps(running.numStepsForAverageCalc);
+    mainTimer.set_collision_type(flow.collision);
+    mainTimer.set_streaming_type(flow.streaming);
 
 
     std::string runFile = outputTree.runningDataFileName();
@@ -456,7 +458,7 @@ int main(int argc, char* argv[]){
 
 
         lb->collision();
-        main_time = mainTimer.check(0, 1, main_time, "Collision");
+        main_time = mainTimer.check(0, 1, main_time, "Collision-" + flow.collision);
 
 
         lb->bounceBackBoundary();
@@ -464,7 +466,7 @@ int main(int argc, char* argv[]){
 
 
         lb->streamingPush();
-        main_time = mainTimer.check(0, 3, main_time, "Streaming");
+        main_time = mainTimer.check(0, 3, main_time, "Streaming-" + flow.streaming);
 
 
         lb->moments();

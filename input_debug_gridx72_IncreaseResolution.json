@@ -60,8 +60,7 @@
         "reMNonDimensional": 7300.0,
         "streaming": "Simple",
         "uav": 0.1,
-        "uf": 0.0,
-        "useLES": false
+        "uf": 0.0
     },
     "GridParams": {
         "multiStep": 1,
