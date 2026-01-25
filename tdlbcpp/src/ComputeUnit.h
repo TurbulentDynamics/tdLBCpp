@@ -139,7 +139,12 @@ public:
 
 
     bool hasOutputAtStep(OutputParams output, RunningParams running);
-    
+
+    // NaN detection and handling
+    int nan_output_count;  // Counter for outputs after first NaN detection
+    bool nan_detected;     // Flag indicating if NaN has been detected
+    bool checkForNaN(RunningParams running);  // Returns true if NaN found
+
     virtual void setOutputExcludePoints(std::vector<Pos3d<tNi>> geomPoints);
     virtual void setOutputExcludePoints(std::vector<PosPolar<tNi, T>> geomPoints);
 

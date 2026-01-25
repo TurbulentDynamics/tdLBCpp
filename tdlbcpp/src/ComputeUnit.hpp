@@ -129,6 +129,8 @@ ComputeUnitBase<T, QVecSize, MemoryLayout>::ComputeUnitBase(ComputeUnitParams cu
     Nu = nullptr;
     F = nullptr;
     ExcludeOutputPoints = nullptr;
+    nan_detected = false;
+    nan_output_count = 0;
     init(cuParams, allocate);
 }
 

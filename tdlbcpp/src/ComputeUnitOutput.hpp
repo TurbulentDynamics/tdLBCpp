@@ -9,6 +9,8 @@
 
 #include <iostream>
 #include <cerrno>
+#include <cmath>
+#include <cstdlib>
 #include "Tools/toojpeg.h"
 
 #include "ComputeUnit.h"
@@ -96,6 +98,67 @@ bool ComputeUnitBase<T, QVecSize, MemoryLayout>::hasOutputAtStep(OutputParams ou
 }
 
 
+template <typename T, int QVecSize, MemoryLayoutType MemoryLayout>
+bool ComputeUnitBase<T, QVecSize, MemoryLayout>::checkForNaN(RunningParams running)
+{
+    bool found_nan = false;
+    size_t nan_count = 0;
+    tNi first_nan_i = 0, first_nan_j = 0, first_nan_k = 0;
+    int first_nan_component = -1;
+
+    // Check all distribution functions for NaN or Inf
+    for (tNi i = 1; i <= xg1; i++) {
+        for (tNi j = 1; j <= yg1; j++) {
+            for (tNi k = 1; k <= zg1; k++) {
+                size_t idx = index(i, j, k);
+
+                // Check all QVec components
+                for (int l = 0; l < QVecSize; l++) {
+                    T val = Q[idx].q[l];
+                    if (std::isnan(val) || std::isinf(val)) {
+                        if (!found_nan) {
+                            // Record first occurrence
+                            first_nan_i = i;
+                            first_nan_j = j;
+                            first_nan_k = k;
+                            first_nan_component = l;
+                        }
+                        found_nan = true;
+                        nan_count++;
+                    }
+                }
+            }
+        }
+    }
+
+    if (found_nan) {
+        if (!nan_detected) {
+            // First time detecting NaN
+            nan_detected = true;
+            std::cout << "\n!!! WARNING: NaN/Inf DETECTED !!!" << std::endl;
+            std::cout << "Step: " << running.step << std::endl;
+            std::cout << "First occurrence at grid position: ("
+                      << first_nan_i << ", " << first_nan_j << ", " << first_nan_k << ")" << std::endl;
+            std::cout << "Component: q[" << first_nan_component << "]" << std::endl;
+            std::cout << "Total NaN/Inf values found: " << nan_count << std::endl;
+            std::cout << "Continuing for 10 more outputs before termination..." << std::endl;
+        } else {
+            // NaN previously detected
+            std::cout << "Step " << running.step << ": NaN/Inf still present (count: "
+                      << nan_count << ")" << std::endl;
+        }
+
+        nan_output_count++;
+
+        if (nan_output_count >= 10) {
+            std::cout << "\n!!! TERMINATING: 10 outputs completed after NaN detection !!!" << std::endl;
+            std::cout << "Final step: " << running.step << std::endl;
+            std::exit(1);
+        }
+    }
+
+    return found_nan;
+}
 
 
 static inline std::string formatStep(tStep step){
@@ -290,6 +353,9 @@ void ComputeUnitBase<T, QVecSize, MemoryLayout>::writeAllOutput(RushtonTurbinePo
 {
 
     if (!hasOutputAtStep(output, running)) return;
+
+    // Check for NaN/Inf values at every output
+    checkForNaN(running);
 
 
     //    for (auto &p: excludeRotating){

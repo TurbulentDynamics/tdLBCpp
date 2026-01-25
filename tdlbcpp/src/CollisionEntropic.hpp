@@ -45,10 +45,6 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
     const T alpha_tolerance = 1e-8;  // Convergence tolerance for alpha
     const int alpha_max_iter = 100;   // Maximum iterations for alpha search
 
-    // Better initial guess: start with alpha=1.0 (standard BGK)
-    // Use spatial coherence - track previous alpha for better initial guess
-    T alpha_previous = 1.0;  // Start conservative with BGK relaxation
-
     for (tNi i = 1; i <= xg1; i++) {
         for (tNi j = 1; j <= yg1; j++) {
             for (tNi k = 1; k <= zg1; k++) {
@@ -120,8 +116,8 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
 
                 // Entropic stabilization: Find optimal alpha parameter
                 // The parameter alpha adjusts the relaxation to ensure entropy decrease
-                // Use previous cell's alpha as initial guess (spatial coherence)
-                T alpha = alpha_previous;
+                // Start with alpha=1.0 (standard BGK) for each cell
+                T alpha = 1.0;
 #ifndef NDEBUG
                 int iter_count = 0;
 #endif
@@ -170,9 +166,6 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
 #ifndef NDEBUG
                 total_alpha_iterations += iter_count;
 #endif
-
-                // Update previous alpha for next cell (spatial coherence)
-                alpha_previous = alpha;
 
 #ifndef NDEBUG
                 auto t4 = std::chrono::high_resolution_clock::now();
