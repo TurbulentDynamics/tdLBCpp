@@ -161,7 +161,6 @@ namespace ParamsCommon
         flowParams.uf = 0.9;
         flowParams.alpha = 1.0;
         flowParams.beta = 1.1;
-        flowParams.useLES = true;
         flowParams.collision = "test1";
         flowParams.streaming = "test2";
         return flowParams;

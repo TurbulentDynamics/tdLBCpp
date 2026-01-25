@@ -50,7 +50,6 @@ namespace ParamsCommon
         flowParams.uf = (T)unif(re);
         flowParams.alpha = (T)unif(re);
         flowParams.beta = (T)unif(re);
-        flowParams.useLES = (rand() & 1) == 1;
         flowParams.collision = TestUtils::random_string(TestUtils::randomStringLength);
         flowParams.streaming = TestUtils::random_string(TestUtils::randomStringLength);
 
@@ -72,7 +71,6 @@ namespace ParamsCommon
         ASSERT_EQ(expected.uf, actual.uf) << "uf field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.alpha, actual.alpha) << "alpha field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.beta, actual.beta) << "beta field has a wrong value after being written to a file and then read";
-        ASSERT_EQ(expected.useLES, actual.useLES) << "useLES field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.collision, actual.collision) << "collision field has a wrong value after being written to a file and then read";
         ASSERT_EQ(expected.streaming, actual.streaming) << "streaming field has a wrong value after being written to a file and then read";
     }
