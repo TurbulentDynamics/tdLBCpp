@@ -242,7 +242,13 @@ class ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomersLES, streaming
 };
 
 template<typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming streamingType>
-class ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>: public ComputeUnitBase<T, QVecSize, MemoryLayout> {
+class ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>: public ComputeUnitForcing<T, QVecSize, MemoryLayout, Entropic, streamingType> {
+public:
+    using Base=ComputeUnitForcing<T, QVecSize, MemoryLayout, Entropic, streamingType>;
+    using Base::flow; using Base::xg1; using Base::yg1; using Base::zg1;
+    using Base::F; using Base::index; using Base::Q; using Base::Nu;
+    using Base::Base;
+    using Base::evenStep;
     virtual void collision();
 };
 

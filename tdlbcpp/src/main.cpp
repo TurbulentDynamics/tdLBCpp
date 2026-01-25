@@ -239,20 +239,40 @@ int main(int argc, char* argv[]){
 
 
     ComputeUnitBase<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL> *lb;
-    if (flow.streaming == "Simple") {
-        std::cout << "Streaming = Simple" << std::endl;
+
+    // Select collision and streaming algorithms based on input.json
+    std::cout << "Collision = " << flow.collision << std::endl;
+    std::cout << "Streaming = " << flow.streaming << std::endl;
+
+    if (flow.collision == "Entropic") {
+        if (flow.streaming == "Simple") {
 #if WITH_GPU == 1
-        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, GPU>(cu, flow, outputTree);
+            lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, Entropic, Simple, GPU>(cu, flow, outputTree);
 #else
-        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU>(cu, flow, outputTree);
+            lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, Entropic, Simple, CPU>(cu, flow, outputTree);
 #endif
+        } else {
+#if WITH_GPU == 1
+            lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, Entropic, Esotwist, GPU>(cu, flow, outputTree);
+#else
+            lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, Entropic, Esotwist, CPU>(cu, flow, outputTree);
+#endif
+        }
     } else {
-        std::cout << "Streaming = Esoteric" << std::endl;
+        // Default to EgglesSomers
+        if (flow.streaming == "Simple") {
 #if WITH_GPU == 1
-        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist, GPU>(cu, flow, outputTree);
+            lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, GPU>(cu, flow, outputTree);
 #else
-        lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist, CPU>(cu, flow, outputTree);
+            lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Simple, CPU>(cu, flow, outputTree);
 #endif
+        } else {
+#if WITH_GPU == 1
+            lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist, GPU>(cu, flow, outputTree);
+#else
+            lb = new ComputeUnit<useQVecPrecision, QLen::D3Q19, MemoryLayoutIJKL, EgglesSomers, Esotwist, CPU>(cu, flow, outputTree);
+#endif
+        }
     }
 
 
