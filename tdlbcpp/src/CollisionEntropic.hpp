@@ -23,12 +23,15 @@ template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Streaming str
 void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::collision() {
     using AF = AccessField<T, QVecSize, MemoryLayout, Entropic, streamingType>;
 
+    // Timing is controlled by NDEBUG - disabled in release builds (-DNDEBUG)
+#ifndef NDEBUG
     // Debug timing variables
     auto t_start = std::chrono::high_resolution_clock::now();
     double time_read = 0.0, time_velocity = 0.0, time_equilibrium = 0.0;
     double time_alpha_search = 0.0, time_collision = 0.0, time_write = 0.0;
     size_t total_cells = 0;
     size_t total_alpha_iterations = 0;
+#endif
 
     // Lattice speed of sound squared: c_s^2 = 1/3 for D3Q19
     const T cs2 = 1.0 / 3.0;
@@ -41,14 +44,18 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
     // Entropy stabilization parameters
     const T alpha_tolerance = 1e-8;  // Convergence tolerance for alpha
     const int alpha_max_iter = 100;   // Maximum iterations for alpha search
-    const T alpha_initial = 2.0;      // Initial guess for alpha parameter
+
+    // Better initial guess: start with alpha=1.0 (standard BGK)
+    // Use spatial coherence - track previous alpha for better initial guess
+    T alpha_previous = 1.0;  // Start conservative with BGK relaxation
 
     for (tNi i = 1; i <= xg1; i++) {
         for (tNi j = 1; j <= yg1; j++) {
             for (tNi k = 1; k <= zg1; k++) {
+#ifndef NDEBUG
                 total_cells++;
-
                 auto t0 = std::chrono::high_resolution_clock::now();
+#endif
 
                 // Read force at this location
                 Force<T> f = F[index(i, j, k)];
@@ -56,17 +63,30 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
                 // Read distribution functions (in moment space for D3Q19)
                 QVec<T, QVecSize> m = AF::read(*this, i, j, k);
 
+#ifndef NDEBUG
                 auto t1 = std::chrono::high_resolution_clock::now();
                 time_read += std::chrono::duration<double>(t1 - t0).count();
+#endif
 
                 // Compute macroscopic velocity including force contribution
                 Velocity<T> u = m.velocity(f);
 
+#ifndef NDEBUG
                 auto t2 = std::chrono::high_resolution_clock::now();
                 time_velocity += std::chrono::duration<double>(t2 - t1).count();
+#endif
 
                 // Compute density
                 T rho = m.q[M01];
+
+                // Precompute velocity products for better compiler optimization
+                // This eliminates redundant multiplications and enables FMA instructions
+                T ux2 = u.x * u.x;
+                T uy2 = u.y * u.y;
+                T uz2 = u.z * u.z;
+                T uxuy = u.x * u.y;
+                T uxuz = u.x * u.z;
+                T uyuz = u.y * u.z;
 
                 // Compute equilibrium moments
                 QVec<T, QVecSize> m_eq;
@@ -80,45 +100,56 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
                 m_eq[M04] = rho * u.z;
 
                 // 2nd order: stress tensor components
-                m_eq[M05] = rho * (u.x * u.x - cs2);
-                m_eq[M06] = rho * u.x * u.y;
-                m_eq[M07] = rho * (u.y * u.y - cs2);
-                m_eq[M08] = rho * u.x * u.z;
-                m_eq[M09] = rho * u.y * u.z;
-                m_eq[M10] = rho * (u.z * u.z - cs2);
+                m_eq[M05] = rho * (ux2 - cs2);
+                m_eq[M06] = rho * uxuy;
+                m_eq[M07] = rho * (uy2 - cs2);
+                m_eq[M08] = rho * uxuz;
+                m_eq[M09] = rho * uyuz;
+                m_eq[M10] = rho * (uz2 - cs2);
 
                 // 3rd order and higher moments equilibrium values (zero for incompressible flow)
+                #pragma omp simd
                 for (int l = M11; l < QVecSize; l++) {
                     m_eq[l] = 0.0;
                 }
 
+#ifndef NDEBUG
                 auto t3 = std::chrono::high_resolution_clock::now();
                 time_equilibrium += std::chrono::duration<double>(t3 - t2).count();
+#endif
 
                 // Entropic stabilization: Find optimal alpha parameter
                 // The parameter alpha adjusts the relaxation to ensure entropy decrease
-                T alpha = alpha_initial;
+                // Use previous cell's alpha as initial guess (spatial coherence)
+                T alpha = alpha_previous;
+#ifndef NDEBUG
                 int iter_count = 0;
+#endif
 
                 // Compute entropy function for stability check
                 // H = sum_i f_i * ln(f_i / w_i)
                 // The collision must ensure delta_H <= 0 (H-theorem)
 
                 for (int iter = 0; iter < alpha_max_iter; iter++) {
+#ifndef NDEBUG
                     iter_count = iter;
+#endif
 
                     // Check if this alpha satisfies entropy condition
                     // For simplicity, we use a predictor step
                     bool entropy_satisfied = true;
 
+                    // Vectorized loop to check entropy condition
+                    // Compute alpha * omega once
+                    T alpha_omega = alpha * omega;
+
+                    #pragma omp simd reduction(&& : entropy_satisfied)
                     for (int l = 0; l < QVecSize; l++) {
-                        T f_star = m[l] - alpha * omega * (m[l] - m_eq[l]);
+                        T delta = m[l] - m_eq[l];
+                        T f_star = m[l] - alpha_omega * delta;
 
                         // Ensure positivity (necessary for entropy definition)
-                        if (f_star <= 0.0) {
-                            entropy_satisfied = false;
-                            break;
-                        }
+                        entropy_satisfied = entropy_satisfied && (f_star > 0.0);
                     }
 
                     if (entropy_satisfied) {
@@ -126,7 +157,8 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
                     }
 
                     // Reduce alpha if entropy condition not satisfied
-                    alpha *= 0.9;
+                    // Faster reduction for quicker convergence
+                    alpha *= 0.5;
 
                     if (alpha < alpha_tolerance) {
                         // Fall back to small alpha for stability
@@ -135,35 +167,55 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
                     }
                 }
 
+#ifndef NDEBUG
                 total_alpha_iterations += iter_count;
+#endif
+
+                // Update previous alpha for next cell (spatial coherence)
+                alpha_previous = alpha;
+
+#ifndef NDEBUG
                 auto t4 = std::chrono::high_resolution_clock::now();
                 time_alpha_search += std::chrono::duration<double>(t4 - t3).count();
+#endif
 
                 // Apply entropic collision with optimized alpha
                 QVec<T, QVecSize> m_new;
 
+                // Precompute alpha * omega
+                T alpha_omega = alpha * omega;
+
+                // Vectorized collision step
+                #pragma omp simd
                 for (int l = 0; l < QVecSize; l++) {
                     // Entropic relaxation with alpha-adjusted omega
-                    m_new[l] = m[l] - alpha * omega * (m[l] - m_eq[l]);
-
-                    // Add force contribution (Guo forcing scheme)
-                    if (l == M02) m_new[l] += f.x;
-                    if (l == M03) m_new[l] += f.y;
-                    if (l == M04) m_new[l] += f.z;
+                    T delta = m[l] - m_eq[l];
+                    m_new[l] = m[l] - alpha_omega * delta;
                 }
 
+                // Add force contribution (Guo forcing scheme) - must be done separately
+                // as these are conditional operations
+                m_new[M02] += f.x;
+                m_new[M03] += f.y;
+                m_new[M04] += f.z;
+
+#ifndef NDEBUG
                 auto t5 = std::chrono::high_resolution_clock::now();
                 time_collision += std::chrono::duration<double>(t5 - t4).count();
+#endif
 
                 // Write back the collided distribution
                 AF::write(*this, m_new, i, j, k);
 
+#ifndef NDEBUG
                 auto t6 = std::chrono::high_resolution_clock::now();
                 time_write += std::chrono::duration<double>(t6 - t5).count();
+#endif
             }
         }
     }
 
+#ifndef NDEBUG
     // Print timing summary
     auto t_end = std::chrono::high_resolution_clock::now();
     double total_time = std::chrono::duration<double>(t_end - t_start).count();
@@ -187,6 +239,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
     std::cout << "\nAverage alpha iterations per cell: "
               << (double)total_alpha_iterations / total_cells << std::endl;
     std::cout << "=========================================\n" << std::endl;
+#endif
 }
 
 

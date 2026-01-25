@@ -191,12 +191,10 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomersLES, streamingT
                 // 3rd order moments: compensation with g3 parameter
                 // The g3 parameter (typically 0.8) compensates for third-order
                 // errors and improves numerical stability (Eggels & Somers 1995)
-                alpha[M11] =  -flow.g3 * m[M11];
-                alpha[M12] =  -flow.g3 * m[M12];
-                alpha[M13] =  -flow.g3 * m[M13];
-                alpha[M14] =  -flow.g3 * m[M14];
-                alpha[M15] =  -flow.g3 * m[M15];
-                alpha[M16] =  -flow.g3 * m[M16];
+                #pragma omp simd
+                for (int l = M11; l <= M16; l++) {
+                    alpha[l] = -flow.g3 * m[l];
+                }
 
                 // 4th order moments: set to zero (hydrodynamic limit)
                 alpha[M17] = 0.0;
@@ -218,6 +216,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomersLES, streamingT
                 // orthogonality properties of the moment basis.
 
                 // Scale factor for inverse transform (from D3Q19 normalization)
+                #pragma omp simd
                 for (int l=0;  l<QVecSize; l++) {
                     alpha[l] /= 24.0;
                 }
@@ -345,12 +344,10 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
                 alpha[M10] = (2.0 * (m[M04] + 0.5 * f.z) * u.z - m[M10]*c)*b;
 
                 //3rd order terms
-                alpha[M11] =  -flow.g3 * m[M11];
-                alpha[M12] =  -flow.g3 * m[M12];
-                alpha[M13] =  -flow.g3 * m[M13];
-                alpha[M14] =  -flow.g3 * m[M14];
-                alpha[M15] =  -flow.g3 * m[M15];
-                alpha[M16] =  -flow.g3 * m[M16];
+                #pragma omp simd
+                for (int l = M11; l <= M16; l++) {
+                    alpha[l] = -flow.g3 * m[l];
+                }
 
                 //4th order terms
                 alpha[M17] = 0.0;
@@ -363,6 +360,7 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, EgglesSomers, streamingType
                 // it's using the "filter matrix E" (not really present in the
                 // code as matrix, but it's where the coefficients come from).
 
+                #pragma omp simd
                 for (int l=0;  l<QVecSize; l++) {
                     alpha[l] /= 24.0;
                 }

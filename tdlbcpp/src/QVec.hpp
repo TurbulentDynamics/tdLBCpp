@@ -97,12 +97,18 @@ private:
     }
 
     inline HOST_DEVICE_GPU void copy(const T* qFrom) {
+#if !defined(__CUDA_ARCH__) && defined(_OPENMP)
+        #pragma omp simd
+#endif
         for (int l = 0; l < size; l++) {
             q[l] = qFrom[l];
         }
     }
 
     inline HOST_DEVICE_GPU void copy(const T* qFrom, size_t step) {
+#if !defined(__CUDA_ARCH__) && defined(_OPENMP)
+        #pragma omp simd
+#endif
         for (int l = 0; l < size; l++) {
             q[l] = *(qFrom + l * step);
         }
@@ -145,12 +151,18 @@ struct CommonOperations : public Base {
 
     void initialiseRho(T initialRho, T other){
         q[MRHO] = initialRho;
+#if !defined(__CUDA_ARCH__) && defined(_OPENMP)
+        #pragma omp simd
+#endif
         for (int l = 1; l < size; l++) {
             q[l] = other;
         }
     }
 
     void setToZero(){
+#if !defined(__CUDA_ARCH__) && defined(_OPENMP)
+        #pragma omp simd
+#endif
         for (int l = 0; l < size; l++) {
             q[l] = 0.0;
         }

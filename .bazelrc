@@ -37,7 +37,7 @@ build:cpu --copt="-O3" --copt="-march=native"
 
 # Debug build
 build:debug -c dbg
-build:debug --copt="-g" --copt="-O0"
+build:debug --copt="-g" --copt="-O0" --copt="-DDEBUG"
 build:debug --strip="never"
 build:debug --compilation_mode=dbg
 
