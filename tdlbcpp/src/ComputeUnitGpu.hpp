@@ -89,6 +89,16 @@ void ComputeUnitArchitectureCommonGPU<T, QVecSize, MemoryLayout, collisionType, 
         delete[] ExcludeOutputPoints;
         ExcludeOutputPoints = nullptr;
     }
+    if (devExcludeOutputPoints != nullptr)
+    {
+        checkCudaErrors(cudaFree(devExcludeOutputPoints));
+        devExcludeOutputPoints = nullptr;
+    }
+    if (gpuGeom != nullptr)
+    {
+        checkCudaErrors(cudaFree(gpuGeom));
+        gpuGeom = nullptr;
+    }
 }
 
 template <typename T, int QVecSize, MemoryLayoutType MemoryLayout, Collision collisionType, Streaming streamingType>
@@ -99,16 +109,11 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
     Q.setSize(size);
     checkCudaErrors(cudaMalloc((void **)&Q.q, sizeof(T) * Q.qSize));
 
-    //F = new Force<T>[size];
-
-    checkCudaErrors(cudaHostAlloc((void **)&devF, sizeof(T) * size, cudaHostAllocMapped));
-    checkCudaErrors(cudaHostGetDevicePointer((void **)&devF, (void *)F, 0));
-
-    checkCudaErrors(cudaHostAlloc((void **)&O, sizeof(T) * size, cudaHostAllocMapped));
-    checkCudaErrors(cudaHostGetDevicePointer((void **)&O, (void *)F, 0));
-
+    // Allocate host-mapped memory for F, Nu, and O
+    // This allows zero-copy access from both CPU and GPU
+    checkCudaErrors(cudaHostAlloc((void **)&F, sizeof(Force<T>) * size, cudaHostAllocMapped));
     checkCudaErrors(cudaHostAlloc((void **)&Nu, sizeof(T) * size, cudaHostAllocMapped));
-    checkCudaErrors(cudaHostGetDevicePointer((void **)&Nu, (void *)F, 0));
+    checkCudaErrors(cudaHostAlloc((void **)&O, sizeof(T) * size, cudaHostAllocMapped));
 
     ExcludeOutputPoints = new bool[size];
 }
@@ -126,19 +131,20 @@ void ComputeUnitArchitecture<T, QVecSize, MemoryLayout, collisionType, streaming
         checkCudaErrors(cudaFree(gpuThis));
         gpuThis = nullptr;
     }
+    // F, Nu, and O are allocated with cudaHostAlloc, so use cudaFreeHost
     if (F != nullptr)
     {
-        checkCudaErrors(cudaFree(F));
+        checkCudaErrors(cudaFreeHost(F));
         F = nullptr;
     }
     if (Nu != nullptr)
     {
-        checkCudaErrors(cudaFree(Nu));
+        checkCudaErrors(cudaFreeHost(Nu));
         Nu = nullptr;
     }
     if (O != nullptr)
     {
-        checkCudaErrors(cudaFree(O));
+        checkCudaErrors(cudaFreeHost(O));
         O = nullptr;
     }
     if (ExcludeOutputPoints != nullptr)
