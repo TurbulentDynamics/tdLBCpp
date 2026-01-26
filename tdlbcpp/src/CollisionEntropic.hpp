@@ -149,25 +149,48 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
                 time_alpha_search += std::chrono::duration<double>(t4 - t3).count();
 #endif
 
-                // Apply collision with entropic alpha scaling
-                QVec<T, QVecSize> m_new;
+                // Apply entropic scaling to filtered moments
+                QVec<T, QVecSize> alpha;
 
-                // Relaxation: m_new = m + alpha_scale * (alpha_eq - m)
-                // For alpha_scale = 1.0, this is identical to BGK
                 #pragma omp simd
                 for (int l = 0; l < QVecSize; l++) {
-                    m_new[l] = m[l] + alpha_scale * (alpha_eq[l] - m[l]);
-
-                    // Safety clamp for numerical stability
-                    if (std::isnan(m_new[l]) || std::isinf(m_new[l])) {
-                        m_new[l] = alpha_eq[l];  // Fall back to equilibrium
-                    }
+                    alpha[l] = m[l] + alpha_scale * (alpha_eq[l] - m[l]);
                 }
 
-                // Final density check
-                if (m_new[M01] <= 0.0 || std::isnan(m_new[M01]) || std::isinf(m_new[M01])) {
-                    m_new[M01] = 1.0;
+                // For alpha_scale = 1.0, alpha = alpha_eq (standard BGK)
+
+                // ========================================================
+                // INVERSE MOMENT TRANSFORM (FILTER MATRIX APPLICATION)
+                // ========================================================
+                // Transform relaxed moments (alpha) back to storage space
+                // This is the SAME inverse filter matrix as BGK collision
+
+                // Scale factor for inverse transform
+                #pragma omp simd
+                for (int l=0;  l<QVecSize; l++) {
+                    alpha[l] /= 24.0;
                 }
+
+                QVec<T, QVecSize> m_new;
+
+                m_new[Q01] = 2*alpha[M01] + 4*alpha[M02] + 3*alpha[M05] - 3*alpha[M07] - 3*alpha[M10] - 2*alpha[M11] - 2*alpha[M13] + 2*alpha[M17] + 2*alpha[M18];
+                m_new[Q02] = 2*alpha[M01] - 4*alpha[M02] + 3*alpha[M05] - 3*alpha[M07] - 3*alpha[M10] + 2*alpha[M11] + 2*alpha[M13] + 2*alpha[M17] + 2*alpha[M18];
+                m_new[Q03] = 2*alpha[M01] + 4*alpha[M03] - 3*alpha[M05] + 3*alpha[M07] - 3*alpha[M10] - 2*alpha[M12] - 2*alpha[M14] + 2*alpha[M17] - 2*alpha[M18];
+                m_new[Q04] = 2*alpha[M01] - 4*alpha[M03] - 3*alpha[M05] + 3*alpha[M07] - 3*alpha[M10] + 2*alpha[M12] + 2*alpha[M14] + 2*alpha[M17] - 2*alpha[M18];
+                m_new[Q05] = 2*alpha[M01] + 4*alpha[M04] - 3*alpha[M05] - 3*alpha[M07] + 3*alpha[M10] - 4*alpha[M15] - 4*alpha[M17];
+                m_new[Q06] = 2*alpha[M01] - 4*alpha[M04] - 3*alpha[M05] - 3*alpha[M07] + 3*alpha[M10] + 4*alpha[M15] - 4*alpha[M17];
+                m_new[Q07] = alpha[M01] + 2*alpha[M02] + 2*alpha[M03] + 1.5*alpha[M05] + 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] + 2*alpha[M11] + 2*alpha[M12] - 2*alpha[M17];
+                m_new[M14] = alpha[M01] - 2*alpha[M02] + 2*alpha[M03] + 1.5*alpha[M05] - 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] - 2*alpha[M11] + 2*alpha[M12] - 2*alpha[M17];
+                m_new[M08] = alpha[M01] - 2*alpha[M02] - 2*alpha[M03] + 1.5*alpha[M05] + 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] - 2*alpha[M11] - 2*alpha[M12] - 2*alpha[M17];
+                m_new[M13] = alpha[M01] + 2*alpha[M02] - 2*alpha[M03] + 1.5*alpha[M05] - 6*alpha[M06] + 1.5*alpha[M07] - 1.5*alpha[M10] + 2*alpha[M11] - 2*alpha[M12] - 2*alpha[M17];
+                m_new[M09] = alpha[M01] + 2*alpha[M02] + 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] + 6*alpha[M08] + 1.5*alpha[M10] - alpha[M11] + alpha[M13] + alpha[M15] - alpha[M16] + alpha[M17] - alpha[M18];
+                m_new[M16] = alpha[M01] - 2*alpha[M02] + 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] - 6*alpha[M08] + 1.5*alpha[M10] + alpha[M11] - alpha[M13] + alpha[M15] - alpha[M16] + alpha[M17] - alpha[M18];
+                m_new[M10] = alpha[M01] - 2*alpha[M02] - 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] + 6*alpha[M08] + 1.5*alpha[M10] + alpha[M11] - alpha[M13] - alpha[M15] + alpha[M16] + alpha[M17] - alpha[M18];
+                m_new[M15] = alpha[M01] + 2*alpha[M02] - 2*alpha[M04] + 1.5*alpha[M05] - 1.5*alpha[M07] - 6*alpha[M08] + 1.5*alpha[M10] - alpha[M11] + alpha[M13] - alpha[M15] + alpha[M16] + alpha[M17] - alpha[M18];
+                m_new[M11] = alpha[M01] + 2*alpha[M03] + 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] + 6*alpha[M09] + 1.5*alpha[M10] - alpha[M12] + alpha[M14] + alpha[M15] + alpha[M16] + alpha[M17] + alpha[M18];
+                m_new[M18] = alpha[M01] - 2*alpha[M03] + 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] - 6*alpha[M09] + 1.5*alpha[M10] + alpha[M12] - alpha[M14] + alpha[M15] + alpha[M16] + alpha[M17] + alpha[M18];
+                m_new[M12] = alpha[M01] - 2*alpha[M03] - 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] + 6*alpha[M09] + 1.5*alpha[M10] + alpha[M12] - alpha[M14] - alpha[M15] - alpha[M16] + alpha[M17] + alpha[M18];
+                m_new[M17] = alpha[M01] + 2*alpha[M03] - 2*alpha[M04] - 1.5*alpha[M05] + 1.5*alpha[M07] - 6*alpha[M09] + 1.5*alpha[M10] - alpha[M12] + alpha[M14] - alpha[M15] - alpha[M16] + alpha[M17] + alpha[M18];
 
 #ifndef NDEBUG
                 auto t5 = std::chrono::high_resolution_clock::now();
