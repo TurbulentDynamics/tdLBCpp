@@ -36,10 +36,9 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
     // Lattice speed of sound squared: c_s^2 = 1/3 for D3Q19
     const T cs2 = 1.0 / 3.0;
 
-    // Relaxation parameter from kinematic viscosity
-    // tau = 3*nu + 0.5
-    T tau = 3.0 * flow.nu + 0.5;
-    T omega = 1.0 / tau;  // BGK relaxation frequency
+    // Relaxation parameters for Eggels & Somers collision (matching BGK)
+    T b = 1.0 / (1.0 + 6 * flow.nu);
+    T c = 1.0 - 6 * flow.nu;
 
     // Entropy stabilization parameters
     const T alpha_tolerance = 1e-8;  // Convergence tolerance for alpha
@@ -88,39 +87,39 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
                     }
                 }
 
-                // Precompute velocity products for better compiler optimization
-                // This eliminates redundant multiplications and enables FMA instructions
-                T ux2 = u.x * u.x;
-                T uy2 = u.y * u.y;
-                T uz2 = u.z * u.z;
-                T uxuy = u.x * u.y;
-                T uxuz = u.x * u.z;
-                T uyuz = u.y * u.z;
+                // Compute relaxed moments using Eggels & Somers approach
+                // This matches the BGK collision structure
+                QVec<T, QVecSize> alpha_eq;
 
-                // Compute equilibrium moments
-                QVec<T, QVecSize> m_eq;
+                // 0th order moment: mass density (conserved)
+                alpha_eq[M01] = m[M01];
 
-                // Equilibrium moments for D3Q19
-                m_eq[M01] = rho;  // 0th order: mass
+                // 1st order moments: momentum with external forcing (Guo scheme)
+                alpha_eq[M02] = m[M02] + f.x;
+                alpha_eq[M03] = m[M03] + f.y;
+                alpha_eq[M04] = m[M04] + f.z;
 
-                // 1st order: momentum
-                m_eq[M02] = rho * u.x;
-                m_eq[M03] = rho * u.y;
-                m_eq[M04] = rho * u.z;
+                // 2nd order moments: stress tensor relaxation
+                // Equilibrium form: m_eq = rho * u_i * u_j (off-diagonal)
+                //                   m_eq = rho * (u_i^2 - c_s^2) (diagonal)
+                // Relaxation: alpha = b * (2*m_eq - c*m)
+                alpha_eq[M05] = (2.0 * (m[M02] + 0.5 * f.x) * u.x - m[M05]*c)*b;
+                alpha_eq[M06] = (2.0 * (m[M02] + 0.5 * f.x) * u.y - m[M06]*c)*b;
+                alpha_eq[M07] = (2.0 * (m[M03] + 0.5 * f.y) * u.y - m[M07]*c)*b;
 
-                // 2nd order: stress tensor components
-                m_eq[M05] = rho * (ux2 - cs2);
-                m_eq[M06] = rho * uxuy;
-                m_eq[M07] = rho * (uy2 - cs2);
-                m_eq[M08] = rho * uxuz;
-                m_eq[M09] = rho * uyuz;
-                m_eq[M10] = rho * (uz2 - cs2);
+                alpha_eq[M08] = (2.0 * (m[M02] + 0.5 * f.x) * u.z - m[M08]*c)*b;
+                alpha_eq[M09] = (2.0 * (m[M03] + 0.5 * f.y) * u.z - m[M09]*c)*b;
+                alpha_eq[M10] = (2.0 * (m[M04] + 0.5 * f.z) * u.z - m[M10]*c)*b;
 
-                // 3rd order and higher moments equilibrium values (zero for incompressible flow)
+                // 3rd order moments: compensation with g3 parameter
                 #pragma omp simd
-                for (int l = M11; l < QVecSize; l++) {
-                    m_eq[l] = 0.0;
+                for (int l = M11; l <= M16; l++) {
+                    alpha_eq[l] = -flow.g3 * m[l];
                 }
+
+                // 4th order moments: set to zero
+                alpha_eq[M17] = 0.0;
+                alpha_eq[M18] = 0.0;
 
 #ifndef NDEBUG
                 auto t3 = std::chrono::high_resolution_clock::now();
@@ -128,53 +127,18 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
 #endif
 
                 // Entropic stabilization: Find optimal alpha parameter
-                // The parameter alpha adjusts the relaxation to ensure entropy decrease
+                // The parameter alpha scales the relaxation: m_new = m + alpha * (alpha_eq - m)
                 // Start with alpha=1.0 (standard BGK) for each cell
-                T alpha = 1.0;
+                T alpha_scale = 1.0;
 #ifndef NDEBUG
                 int iter_count = 0;
 #endif
 
-                // Compute entropy function for stability check
-                // H = sum_i f_i * ln(f_i / w_i)
-                // The collision must ensure delta_H <= 0 (H-theorem)
-
-                for (int iter = 0; iter < alpha_max_iter; iter++) {
-#ifndef NDEBUG
-                    iter_count = iter;
-#endif
-
-                    // Check if this alpha satisfies entropy condition
-                    // For simplicity, we use a predictor step
-                    bool entropy_satisfied = true;
-
-                    // Vectorized loop to check entropy condition
-                    // Compute alpha * omega once
-                    T alpha_omega = alpha * omega;
-
-                    #pragma omp simd reduction(&& : entropy_satisfied)
-                    for (int l = 0; l < QVecSize; l++) {
-                        T delta = m[l] - m_eq[l];
-                        T f_star = m[l] - alpha_omega * delta;
-
-                        // Ensure positivity (necessary for entropy definition)
-                        entropy_satisfied = entropy_satisfied && (f_star > 0.0);
-                    }
-
-                    if (entropy_satisfied) {
-                        break;
-                    }
-
-                    // Reduce alpha if entropy condition not satisfied
-                    // Faster reduction for quicker convergence
-                    alpha *= 0.5;
-
-                    if (alpha < alpha_tolerance) {
-                        // Fall back to small alpha for stability
-                        alpha = 0.1;
-                        break;
-                    }
-                }
+                // For now, use alpha=1.0 (standard BGK behavior)
+                // Full entropic search would check positivity after inverse transform
+                // which is complex with the Eggels & Somers filter matrix
+                // TODO: Implement proper entropic alpha search for filter matrix approach
+                alpha_scale = 1.0;
 
 #ifndef NDEBUG
                 total_alpha_iterations += iter_count;
@@ -185,30 +149,20 @@ void ComputeUnitCollision<T, QVecSize, MemoryLayout, Entropic, streamingType>::c
                 time_alpha_search += std::chrono::duration<double>(t4 - t3).count();
 #endif
 
-                // Apply entropic collision with optimized alpha
+                // Apply collision with entropic alpha scaling
                 QVec<T, QVecSize> m_new;
 
-                // Precompute alpha * omega
-                T alpha_omega = alpha * omega;
-
-                // Vectorized collision step
+                // Relaxation: m_new = m + alpha_scale * (alpha_eq - m)
+                // For alpha_scale = 1.0, this is identical to BGK
                 #pragma omp simd
                 for (int l = 0; l < QVecSize; l++) {
-                    // Entropic relaxation with alpha-adjusted omega
-                    T delta = m[l] - m_eq[l];
-                    m_new[l] = m[l] - alpha_omega * delta;
+                    m_new[l] = m[l] + alpha_scale * (alpha_eq[l] - m[l]);
 
                     // Safety clamp for numerical stability
                     if (std::isnan(m_new[l]) || std::isinf(m_new[l])) {
-                        m_new[l] = m_eq[l];  // Fall back to equilibrium
+                        m_new[l] = alpha_eq[l];  // Fall back to equilibrium
                     }
                 }
-
-                // Add force contribution (Guo forcing scheme) - must be done separately
-                // as these are conditional operations
-                m_new[M02] += f.x;
-                m_new[M03] += f.y;
-                m_new[M04] += f.z;
 
                 // Final density check
                 if (m_new[M01] <= 0.0 || std::isnan(m_new[M01]) || std::isinf(m_new[M01])) {
